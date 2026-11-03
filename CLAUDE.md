@@ -20,7 +20,8 @@ RERUN: NEAR Hackathon 2026 entry. The full spec is the human's build plan (`RERU
 
 ## Verified facts (2026-11-03)
 
-- NEAR AI: base `https://cloud-api.near.ai`; `/v1/attestation/report` and `/v1/models` need no key. Send `provider=near`, `signing_algo=ecdsa`, `x-no-aliasing: true`. Run DCAP/NRAS checks sequentially (parallel fetches were flaky).
+- NEAR AI: base `https://cloud-api.near.ai`; `/v1/attestation/report` and `/v1/models` need no key. Send `provider=near`, `signing_algo=ecdsa`, `x-no-aliasing: true`. Run DCAP/NRAS checks sequentially and through `withNetworkRetry` (DNS here is intermittently flaky: ENOTFOUND).
+- `z-ai/glm-5.3-flash` is a reasoning model: hidden reasoning tokens count against `max_tokens`, so a tight cap returns an empty answer. Check `finishReason`/`usage.reasoningTokens` and leave headroom.
 - Testnet RPC `https://test.rpc.fastnear.com`; faucet `POST https://helper.nearprotocol.com/account {newAccountId, newAccountPublicKey}`.
 - near-api-js 7.4.0 (single package); near-sdk 5.30.0 (Rust 1.95+), cargo-near 0.22.0 stable, near-workspaces (Rust) 0.24.0.
 

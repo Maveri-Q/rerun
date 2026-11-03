@@ -48,11 +48,15 @@ async function main() {
     chat = await llm.chat({
       model,
       purpose: "hello",
-      maxTokens: 200,
-      messages: [{ role: "user", content: "In one sentence: why does reproducing published research matter?" }],
+      // Reasoning tokens count against max_tokens, so leave room beyond the short answer.
+      maxTokens: 800,
+      messages: [{ role: "user", content: "In one short sentence: why does reproducing published research matter?" }],
     });
-    console.log(`\nchat ${chat.chatId}  ${chat.usage.promptTokens}+${chat.usage.completionTokens} tokens  $${chat.costUsd.toFixed(6)}`);
-    console.log(`> ${chat.text.trim()}`);
+    const u = chat.usage;
+    console.log(
+      `\nchat ${chat.chatId}  ${u.promptTokens} in / ${u.completionTokens} out (${u.reasoningTokens} reasoning)  finish=${chat.finishReason}  $${chat.costUsd.toFixed(6)}`,
+    );
+    console.log(`> ${chat.text.trim() || "(empty answer)"}`);
     sig = await fetchSignature({ baseUrl: config.baseUrl, apiKey: config.apiKey, chatId: chat.chatId, model });
     signer = sig.signing_address;
     console.log(`signature kind ${sig.signature_kind ?? "(unspecified)"}  signer ${signer}`);

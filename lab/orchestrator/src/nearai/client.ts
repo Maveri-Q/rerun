@@ -48,7 +48,9 @@ export interface ChatResult {
   chatId: string;
   model: string;
   text: string;
-  usage: { promptTokens: number; completionTokens: number };
+  /** "stop", or "length" when max_tokens cut the answer (reasoning tokens count against it). */
+  finishReason: string;
+  usage: { promptTokens: number; completionTokens: number; reasoningTokens: number };
   costUsd: number;
   /** Exact bytes sent and received, needed for signature verification. */
   requestBody: string;
@@ -119,18 +121,24 @@ export class LlmClient {
     if (!res.ok) throw new Error(`chat completion ${res.status}: ${responseBody.slice(0, 300)}`);
     const json = JSON.parse(responseBody) as {
       id: string;
-      choices: { message: { content: string | null } }[];
-      usage?: { prompt_tokens?: number; completion_tokens?: number };
+      choices: { message: { content: string | null }; finish_reason?: string }[];
+      usage?: {
+        prompt_tokens?: number;
+        completion_tokens?: number;
+        completion_tokens_details?: { reasoning_tokens?: number } | null;
+      };
     };
     const usage = {
       promptTokens: json.usage?.prompt_tokens ?? 0,
       completionTokens: json.usage?.completion_tokens ?? 0,
+      reasoningTokens: json.usage?.completion_tokens_details?.reasoning_tokens ?? 0,
     };
     const price = await this.priceOf(model);
     return {
       chatId: json.id,
       model,
       text: json.choices[0]?.message.content ?? "",
+      finishReason: json.choices[0]?.finish_reason ?? "unknown",
       usage,
       costUsd: usage.promptTokens * price.prompt + usage.completionTokens * price.completion,
       requestBody,
@@ -198,7 +206,8 @@ function mockResponse(req: ChatRequest, requestBody: string): ChatResult {
     chatId: `mock-${sha256Hex(requestBody).slice(0, 16)}`,
     model: req.model,
     text,
-    usage: { promptTokens: 0, completionTokens: 0 },
+    finishReason: "stop",
+    usage: { promptTokens: 0, completionTokens: 0, reasoningTokens: 0 },
     costUsd: 0,
     requestBody,
     responseBody,

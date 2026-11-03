@@ -224,19 +224,41 @@ function parseTd(quoteBytes: Buffer) {
   return td;
 }
 
+/**
+ * Retries transient network failures (DNS lookups, resets). Verdict-level errors such as a
+ * bad signature or a non-2xx response are not network errors and are never retried.
+ */
+export async function withNetworkRetry<T>(fn: () => Promise<T>, attempts = 4): Promise<T> {
+  for (let i = 1; ; i++) {
+    try {
+      return await fn();
+    } catch (e) {
+      if (i >= attempts || !isNetworkError(e)) throw e;
+      await new Promise((r) => setTimeout(r, 500 * 2 ** i));
+    }
+  }
+}
+
+function isNetworkError(e: unknown): boolean {
+  const text = errMsg(e);
+  return /fetch failed|ENOTFOUND|EAI_AGAIN|ECONNRESET|ETIMEDOUT|ECONNREFUSED|socket hang up/i.test(text);
+}
+
 async function dcapVerify(quote: Buffer): Promise<{ status: string }> {
-  const verified = await getCollateralAndVerify(quote, process.env.PCCS_URL || PHALA_PCCS_URL);
+  const verified = await withNetworkRetry(() => getCollateralAndVerify(quote, process.env.PCCS_URL || PHALA_PCCS_URL));
   return { status: verified.status };
 }
 
 let jwks: ReturnType<typeof createRemoteJWKSet> | undefined;
 
 async function nrasVerify(payload: unknown): Promise<{ overall: boolean; nonce?: string }> {
-  const res = await fetch(NRAS_GPU_URL, {
-    method: "POST",
-    headers: { "content-type": "application/json", accept: "application/json" },
-    body: JSON.stringify(payload),
-  });
+  const res = await withNetworkRetry(() =>
+    fetch(NRAS_GPU_URL, {
+      method: "POST",
+      headers: { "content-type": "application/json", accept: "application/json" },
+      body: JSON.stringify(payload),
+    }),
+  );
   if (!res.ok) throw new Error(`NRAS ${res.status}: ${(await res.text()).slice(0, 300)}`);
   const body = (await res.json()) as unknown[];
   const first = body[0];
@@ -244,7 +266,8 @@ async function nrasVerify(payload: unknown): Promise<{ overall: boolean; nonce?:
     throw new Error("unexpected NRAS response shape");
   }
   jwks ??= createRemoteJWKSet(new URL(NRAS_JWKS_URL));
-  const { payload: claims } = await jwtVerify(first[1], jwks);
+  const token = first[1];
+  const { payload: claims } = await withNetworkRetry(() => jwtVerify(token, jwks!));
   return {
     overall: claims["x-nvidia-overall-att-result"] === true,
     nonce: typeof claims.eat_nonce === "string" ? claims.eat_nonce : undefined,

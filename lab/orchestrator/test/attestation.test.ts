@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 import {
   replayRtmr3,
   verifyAttestationReport,
+  withNetworkRetry,
   type AttestationReport,
   type EventLogEntry,
   type VerifyDeps,
@@ -75,6 +76,29 @@ describe("verifyAttestationReport (recorded report)", () => {
     delete r.model_attestations;
     const v = await verifyAttestationReport(r, fixture.nonce, fixture.model, offline);
     expect(v.ok).toBe(false);
+  });
+});
+
+describe("withNetworkRetry", () => {
+  it("retries transient DNS failures, then succeeds", async () => {
+    let calls = 0;
+    const result = await withNetworkRetry(async () => {
+      if (++calls < 3) throw new TypeError("fetch failed", { cause: new Error("getaddrinfo ENOTFOUND pccs.phala.network") });
+      return "ok";
+    });
+    expect(result).toBe("ok");
+    expect(calls).toBe(3);
+  });
+
+  it("never retries a verdict error", async () => {
+    let calls = 0;
+    await expect(
+      withNetworkRetry(async () => {
+        calls++;
+        throw new Error("signature mismatch");
+      }),
+    ).rejects.toThrow("signature mismatch");
+    expect(calls).toBe(1);
   });
 });
 
