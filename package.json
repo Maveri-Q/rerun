@@ -7,7 +7,9 @@
     "node": ">=22.22.2"
   },
   "scripts": {
-    "test": "pnpm -r --if-present test",
+    "test": "pnpm -r --if-present test && pnpm test:contracts",
+    "test:contracts": "cargo test --manifest-path contracts/Cargo.toml",
+    "build:contracts": "cd contracts/rerun && cargo near build non-reproducible-wasm --no-abi && cd ../mock-ft && cargo near build non-reproducible-wasm --no-abi",
     "typecheck": "pnpm -r --if-present typecheck",
     "nearai:hello": "pnpm --filter @rerun/orchestrator nearai:hello",
     "testnet:accounts": "pnpm --filter @rerun/scripts testnet:accounts"

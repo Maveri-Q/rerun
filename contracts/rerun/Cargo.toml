@@ -1,0 +1,51 @@
+[package]
+name = "rerun"
+description = "RERUN: forecasting markets on research reproduction, settled by an attested AI Lab"
+version = "0.1.0"
+edition = "2024"
+resolver = "3"
+rust-version = "1.93"
+license = "MIT"
+# NEP-0330 is automatically implemented for all contracts built with https://github.com/near/cargo-near.
+# TODO: set once the GitHub repo exists.
+repository = "https://github.com/<xxx>/<xxx>"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[features]
+default = ["local-labs"]
+# Lets the owner register a Lab without TEE attestation. Testnet/dev only:
+# the mainnet build must use `--no-default-features`.
+local-labs = []
+
+# fields to configure build with WASM reproducibility, according to specs
+# in https://github.com/near/NEPs/blob/master/neps/nep-0330.md
+[package.metadata.near.reproducible_build]
+# docker image, descriptor of build environment
+image = "sourcescan/cargo-near:0.21.1-rust-1.96.0"
+# tag after colon above serves only descriptive purpose; image is identified by digest
+image_digest = "sha256:ccb22bb4e677ed022d8b9d1aa1b32f0af52dd0471ef1c32e48dedbf68ee6ee17"
+passed_env = []
+container_build_command = [
+    "cargo",
+    "near",
+    "build",
+    "non-reproducible-wasm",
+    "--locked",
+]
+
+[dependencies]
+near-sdk = { workspace = true }
+uint = "=0.10.1"
+
+[dev-dependencies]
+near-sdk = { workspace = true, features = ["unit-testing"] }
+proptest = "=1.10.0"
+# near-sdk unit-testing -> near-crypto -> aws-lc-rs; prebuilt NASM objects let it build on Windows.
+aws-lc-sys = { version = "=0.39.1", features = ["prebuilt-nasm"] }
+
+# `cfg(near)` was introduced in `near-sdk` v5.27.0, and is expected cfg now
+[lints.rust.unexpected_cfgs]
+level = "warn"
+check-cfg = ['cfg(near)']
