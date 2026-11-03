@@ -1,0 +1,15 @@
+{
+  "name": "rerun",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@12.16.1",
+  "engines": {
+    "node": ">=22.22.2"
+  },
+  "scripts": {
+    "test": "pnpm -r --if-present test",
+    "typecheck": "pnpm -r --if-present typecheck",
+    "nearai:hello": "pnpm --filter @rerun/orchestrator nearai:hello",
+    "testnet:accounts": "pnpm --filter @rerun/scripts testnet:accounts"
+  }
+}

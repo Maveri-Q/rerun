@@ -1,0 +1,15 @@
+node_modules/
+dist/
+.next/
+target/
+coverage/
+*.log
+
+# secrets and local state: never commit
+.env
+.env.*
+!.env.example
+.near-credentials/
+*.key.json
+lab/orchestrator/.spend/
+submission*.json
