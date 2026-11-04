@@ -2,7 +2,7 @@
 
 **A forecasting market on whether published research results reproduce, settled by an AI agent that actually re-runs the authors' code and data inside a TEE and posts a verifiable receipt on NEAR.**
 
-> Status: early build (NEAR Hackathon 2026, step 4 of 10: the full lifecycle runs end to end on testnet). The Lab does not run in a TEE yet and there is no web app yet. Sections marked _planned_ do not exist yet.
+> Status: early build (NEAR Hackathon 2026, step 5 of 10: a web app over the full testnet lifecycle). The Lab does not run in a TEE yet and the site is not hosted yet. Sections marked _planned_ do not exist yet.
 
 **Deployed on testnet:** market contract [`rerun.rerun-43f5f2.testnet`](https://testnet.nearblocks.io/address/rerun.rerun-43f5f2.testnet), collateral token [`tusdc.rerun-43f5f2.testnet`](https://testnet.nearblocks.io/address/tusdc.rerun-43f5f2.testnet), Lab `rerun-lab-43f5f2.testnet` (registered without TEE attestation, testnet only).
 
@@ -24,13 +24,15 @@ Outcomes: `REPRODUCED` (YES wins), `NOT_REPRODUCED` and `BROKEN` (NO wins), `INV
 Requires Node ≥ 22.22.2 and pnpm 12 (`npm i -g pnpm@12`). Contract tests need Rust (the pinned 1.93.0 toolchain installs itself) and, to build wasm, [cargo-near](https://github.com/near/cargo-near). The Lab needs Docker.
 
 1. `pnpm install`
-2. `pnpm test`: see all tests pass with no network, keys or Docker: 119 TypeScript tests (comparator, private-data encryption, attestation checks against a recorded real NEAR AI report, repair guards, the reproduction pipeline) and 56 contract tests (every market outcome, both challenge paths, attacks, stale refunds, points, money mode, FPMM property tests, and real Lab output replayed through the contract).
+2. `pnpm test`: see all tests pass with no network, keys or Docker: 143 TypeScript tests (comparator, private-data encryption, attestation checks against a recorded real NEAR AI report, repair guards, the reproduction pipeline, the Lab's HTTP server, browser sealing) and 56 contract tests (every market outcome, both challenge paths, attacks, stale refunds, points, money mode, FPMM property tests, and real Lab output replayed through the contract).
 3. `pnpm nearai:hello`: see the NEAR AI Cloud attestation for the Lab's private model verified live:
    Intel TDX quote via DCAP, NVIDIA GPU evidence via NRAS (JWT verified against NVIDIA's keys), key + nonce binding in `report_data`, `MRCONFIGID` bound to the app compose, and the RTMR3 event-log replay, for both the gateway and the model TEE. Each line prints PASS/FAIL.
 4. Optional: put `NEARAI_CLOUD_API_KEY` in `.env` (copy `.env.example`) and run `pnpm nearai:hello` again: it also sends one tiny private chat completion and verifies its ECDSA response signature against the attested model key.
 5. `pnpm sandbox:build`, then `MOCK_LLM=1 pnpm lab:run all`: see six demo claims really execute in sandboxed containers, each printing its stages and a final table: `REPRODUCED`, `NOT_REPRODUCED` (deliberately misreported number), `REPRODUCED` after an environment repair (the diff is printed), `BROKEN` (unpublished dependency), `REPRODUCED` on encrypted private data, and `INVALID` (data swapped after creation). Takes about a minute and spends no credits.
 6. With `NEARAI_CLOUD_API_KEY` set, `pnpm lab:run all`: the same claims, but NEAR AI's private model makes the repair decisions and writes the reports, and every reply is checked against an attested key. About $0.003.
 7. With your own testnet accounts (`pnpm testnet:accounts`, `pnpm build:contracts`, `pnpm deploy:testnet`), `pnpm demo`: see every claim go through create → trade → lock → Lab run → receipt on-chain → finalize → redeem on testnet, with PASS/FAIL checks and explorer links. One market uses tUSDC through `ft_transfer_call` and ends with a withdrawal. Takes about 10 minutes. `pnpm lab:watch` runs the Lab as a loop against the contract.
+
+8. `pnpm lab:watch` in one terminal and `pnpm web` in another, then open http://localhost:3000: see claims read live from testnet. Connect a testnet wallet, claim free points, and buy YES or NO on an open claim to see the odds move. Open a settled claim and its receipt to see your browser re-check the verdict in the "Witnessed by" panel. On a market about to lock, stay on the page to watch the Lab's stages stream live and the verdict stamp land.
 
 _Planned:_ hosted site in points mode, `pnpm judge-demo` (zero-setup testnet lifecycle + attack demo).
 
@@ -68,6 +70,12 @@ Each run follows the same stages: attest the private model → fetch the pinned 
 
 Current limits: dependencies install with unrestricted network during setup (no secrets or private data are present yet; registry-only egress filtering is planned). Local runs have no TEE, so private-data confidentiality there is only as strong as the host, until the Phala deployment. Demo claims are labelled fixtures with `.invalid` URLs that resolve to local files, so the hosted Lab will need them published. The real-claim fetcher is tested against a public GitHub repo, but no real paper has gone through the whole pipeline yet.
 
+## The web app (`web/`)
+
+Next.js, reading directly from the contract, with wallets through NEAR Connect. Claims with live odds and a run feed; a market page with the odds chart, trading, the live re-run, challenges and redemption; a create wizard where the AI drafts a claim from a GitHub repo and you confirm every field (private files are encrypted in the browser before upload); receipts with a panel that recomputes the checks in your browser; the Lab's attestation details; portfolio; and a points leaderboard.
+
+The browser re-checks what it can itself: the claim hash, the data hashes, the patch kinds and the verdict arithmetic. The TEE line shows a note, not a pass, until the Lab runs in one.
+
 ## Repo layout
 
 ```
@@ -76,9 +84,9 @@ contracts/mock-ft/  tUSDC: testnet NEP-141 collateral with an open faucet
 lab/orchestrator/   TypeScript Lab: reproduction pipeline, repair guards, NEAR AI client, attestation
 lab/sandbox/        Sandbox images for untrusted research code (Python 3.11, R 4.4)
 claims/demo/        Six labelled demo claims with synthetic data
-web/                planned: Next.js app
+web/                Next.js app: claims, trading, live re-runs, receipts, create wizard
 packages/shared/    APP_NAME, ClaimSpec/Receipt schemas, canonical JSON + sha256, comparator, sealing
-scripts/            testnet accounts, deploy, end-to-end demo (planned: seed, judge-demo, attack-demo)
+scripts/            testnet accounts, deploy, seed, end-to-end demo (planned: judge-demo, attack-demo)
 docs/               planned: ARCHITECTURE, MECHANISM, THREAT_MODEL, SOURCES, ADOPTION
 ```
 
@@ -94,7 +102,7 @@ Reproduction is not replication: RERUN checks that the published code and data p
 
 ## Built with
 
-near-sdk, near-contract-standards, uint, proptest, near-api-js, zod, scikit-learn and the scientific Python/R stack in the sandbox, @phala/dcap-qvl, ethers, jose, dotenv, vitest, tsx. Code written with Claude Code during the hackathon window (from 2026-10-19).
+near-sdk, near-contract-standards, uint, proptest, near-api-js, Next.js, React, near-connect-hooks, @noble/curves, zod, scikit-learn and the scientific Python/R stack in the sandbox, @phala/dcap-qvl, ethers, jose, dotenv, vitest, tsx. Code written with Claude Code during the hackathon window (from 2026-10-19).
 
 ## License
 

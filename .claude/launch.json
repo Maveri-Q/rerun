@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "web",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--filter", "@rerun/web", "dev"],
+      "port": 3000
+    },
+    {
+      "name": "lab",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["lab:watch"],
+      "port": 8787
+    }
+  ]
+}

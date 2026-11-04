@@ -14,6 +14,7 @@ import { specHash, specJson, type Receipt } from "@rerun/shared";
 import { EXPLORER_TX } from "../lab/orchestrator/src/chain/near.ts";
 import { DEMO_NAMES, loadDemo, type DemoClaim, type DemoName } from "../lab/orchestrator/src/demo/fixtures.ts";
 import { need, testnetChain, testnetWorker } from "../lab/orchestrator/src/lab/setup.ts";
+import { EventHub, saveAttestation } from "../lab/orchestrator/src/lab/store.ts";
 
 const UNIT = 1_000_000n;
 const LOCK_IN_SECS = 75;
@@ -179,9 +180,12 @@ async function main() {
   }
 
   console.log("\nLab running:");
+  const hub = new EventHub();
   const worker = testnetWorker({
     log: (m) => console.log(`  ${m}`),
+    onAttestation: saveAttestation,
     onEvent: (id, e) => {
+      hub.publish(String(id), e);
       console.log(`  market ${id} [${e.stage}] ${e.message}`);
       if (e.diff) console.log(e.diff.replace(/^/gm, "      "));
     },

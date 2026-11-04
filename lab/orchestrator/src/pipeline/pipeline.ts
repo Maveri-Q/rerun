@@ -372,7 +372,7 @@ async function writeReport(a: {
         {
           role: "system",
           content:
-            "Write a short, plain reproduction report (at most 120 words) for a general reader: what ran, what was patched, and the result. Use only the facts given. Reproduction is not replication: do not claim the science is true or false.",
+            "Write a short, plain reproduction report (at most 120 words) for a general reader: what ran, what was patched, and the result. Use only the facts given, in plain paragraphs with no markdown or headings. Reproduction is not replication: do not claim the science is true or false.",
         },
         { role: "user", content: facts },
       ],

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { canonicalHash, canonicalJson } from "./canonical.ts";
+import { canonicalJson } from "./canonical.ts";
 import { parseDecimal } from "./decimal.ts";
 
 /** ClaimSpec and Receipt. Rules mirror contracts/rerun/src/spec.rs and types.rs. */
@@ -13,17 +13,14 @@ const relPath = z
   .refine((p) => !p.startsWith("/") && !p.includes("\\") && !p.split("/").some((seg) => seg === ".." || seg === ""), {
     message: "must be a relative path without '..'",
   });
-const decimal = z.string().refine(
-  (s) => {
-    try {
-      parseDecimal(s);
-      return true;
-    } catch {
-      return false;
-    }
-  },
-  { message: "must be a decimal string" },
-);
+const tryDecimal = (s: string): bigint | null => {
+  try {
+    return parseDecimal(s);
+  } catch {
+    return null;
+  }
+};
+const decimal = z.string().refine((s) => tryDecimal(s) !== null, { message: "must be a decimal string" });
 
 export const ClaimSpec = z.strictObject({
   version: z.literal(1),
@@ -53,7 +50,7 @@ export const ClaimSpec = z.strictObject({
     reported_value: decimal,
     tolerance: z.strictObject({
       type: z.enum(["abs", "rel"]),
-      value: decimal.refine((v) => parseDecimal(v) > 0n, { message: "must be > 0" }),
+      value: decimal.refine((v) => (tryDecimal(v) ?? 1n) > 0n, { message: "must be > 0" }),
     }),
     comparison: z.literal("within_tolerance"),
   }),
@@ -69,7 +66,6 @@ export const ClaimSpec = z.strictObject({
 export type ClaimSpec = z.infer<typeof ClaimSpec>;
 
 export const specJson = (spec: ClaimSpec): string => canonicalJson(spec);
-export const specHash = (spec: ClaimSpec): string => canonicalHash(spec);
 
 export const Outcome = z.enum(["REPRODUCED", "NOT_REPRODUCED", "BROKEN", "INVALID"]);
 export type Outcome = z.infer<typeof Outcome>;

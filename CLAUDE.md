@@ -11,6 +11,7 @@ RERUN: NEAR Hackathon 2026 entry. The full spec is the human's build plan (`RERU
 - `DOCKER_TESTS=1 pnpm --filter @rerun/orchestrator test` adds real-container isolation tests
 - After changing specs, receipts or demo claims: `MOCK_LLM=1 pnpm lab:run all && pnpm --filter @rerun/orchestrator export:vectors`, then `pnpm test:contracts`
 - `pnpm deploy:testnet` (idempotent; `pnpm deploy` is pnpm's own command), `pnpm demo [names] [--resume]` (end to end on testnet), `pnpm lab:watch` (Lab loop)
+- `pnpm web` (site on :3000), `pnpm seed` (open markets with odds). `pnpm lab:watch` also serves the Lab's API on :8787
 - `pnpm test:contracts` (cargo unit + property tests), `pnpm build:contracts` (testnet wasm into `contracts/target/near/`)
 - Mainnet contract build: `cd contracts/rerun && cargo near build non-reproducible-wasm --no-abi --no-default-features` (drops `register_lab_local`)
 
@@ -27,6 +28,8 @@ RERUN: NEAR Hackathon 2026 entry. The full spec is the human's build plan (`RERU
 - Research code never shares a container with keys. `Sandbox` (`lab/orchestrator/src/sandbox/`) passes no environment in; the network is off during the run phase.
 - Repair edits go through `checkEdit` in `lab/orchestrator/src/pipeline/guards.ts`; when loosening it, add a test showing science still cannot change.
 - Private-data claims: nothing derived from the run may reach the LLM, stream, stored logs or receipt tail. `pipeline.test.ts` greps for leaks.
+- Web: `@rerun/shared/browser` is the browser-safe entry point (no `node:crypto`). Design rules: quadrille paper, Besley for claims, Spline Sans Mono for readings, sentence case; the stamp is the one loud element. Bar any new animation that isn't a response to the user or the verdict.
+- Automated UI tests sign via `localStorage["rerun.test-wallet"]="1"` and `/api/dev-test-wallet`, which is dev-only and localhost-only. Never put a private key in a browser tool call.
 - Secrets only in `.env` / `.env.testnet` (gitignored). Check history for keys before any push.
 
 ## Verified facts (2026-11-03)
@@ -35,6 +38,9 @@ RERUN: NEAR Hackathon 2026 entry. The full spec is the human's build plan (`RERU
 - `z-ai/glm-5.3-flash` is a reasoning model: hidden reasoning tokens count against `max_tokens`, so a tight cap returns an empty answer. Check `finishReason`/`usage.reasoningTokens` and leave headroom.
 - Testnet deployment: contract `rerun.rerun-43f5f2.testnet`, token `tusdc.rerun-43f5f2.testnet`, owner `rerun-43f5f2.testnet`, Lab `rerun-lab-43f5f2.testnet`. Keys in `.env.testnet`, which loads before `.env` so empty template lines cannot hide them. A contract state-layout change needs a fresh account or a migration.
 - DNS outages here can last over a minute. Views retry through `withNetworkRetry`; transactions retry only on DNS failures, because a timed-out call may have landed.
+- NEAR Connect's testnet list offers Meteor, Intear, Ledger, Nightly, Ethereum wallets and NEAR CLI; NEAR Mobile, HOT and MyNearWallet are not listed on testnet. Recheck on mainnet.
+- zod 4 runs later refinements even after an earlier one fails, so a refinement must not throw on invalid input.
+- In heredoc Python and printf, `\n` and `\r` can become real control characters. Use a Write-tool file for scripts that contain them.
 - `/v1/models` has no TEE flag; `owned_by: "nearai"` plus a passing attestation is what counts. `Qwen/Qwen3.8-27B` (re-run model) attests fine.
 - jose's default JWKS timeout (5 s) is too short on this network; use `timeoutDuration`.
 - If `docker` is not found in a session started before the install, its binary is in `C:\Program Files\Docker\Docker\resources\bin`.

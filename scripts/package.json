@@ -7,7 +7,8 @@
     "typecheck": "tsc -p .",
     "testnet:accounts": "tsx testnet-accounts.ts",
     "deploy:testnet": "tsx deploy.ts",
-    "demo": "tsx demo.ts"
+    "demo": "tsx demo.ts",
+    "seed": "tsx seed.ts"
   },
   "dependencies": {
     "@rerun/shared": "workspace:*",

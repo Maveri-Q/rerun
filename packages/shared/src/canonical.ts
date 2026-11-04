@@ -1,5 +1,3 @@
-import { createHash } from "node:crypto";
-
 export type Json = null | boolean | number | string | Json[] | { [key: string]: Json };
 
 /**
@@ -39,11 +37,3 @@ function encode(value: unknown, path: string): string {
   }
 }
 
-export function sha256Hex(data: string | Uint8Array): string {
-  return createHash("sha256").update(data).digest("hex");
-}
-
-/** spec_hash as stored on-chain: sha256 of the canonical JSON bytes. */
-export function canonicalHash(value: unknown): string {
-  return sha256Hex(canonicalJson(value));
-}

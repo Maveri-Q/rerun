@@ -31,6 +31,9 @@ export interface WorkerConfig {
   mockResponderFor?: (spec: ClaimSpec) => ((req: ChatRequest) => string | undefined) | undefined;
   store?: (kind: "log" | "report", hash: string, content: string) => Promise<string>;
   onEvent?: (marketId: number, e: StageEvent) => void;
+  onAttestation?: (digest: string, record: unknown) => void | Promise<void>;
+  /** Serialises runs with anything else using the sandbox, such as dry runs. */
+  exclusive?: <T>(fn: () => Promise<T>) => Promise<T>;
   log?: (message: string) => void;
 }
 
@@ -55,7 +58,8 @@ export class LabWorker {
     let handled = 0;
     for (const { m, runIndex, start } of due) {
       try {
-        await this.process(m, runIndex, start);
+        const run = () => this.process(m, runIndex, start);
+        await (this.cfg.exclusive ? this.cfg.exclusive(run) : run());
         handled++;
       } catch (e) {
         // Leave it for the next tick; if the Lab stays down, refund_stale protects traders.
@@ -80,17 +84,19 @@ export class LabWorker {
     const modelId = runIndex === 0 ? this.cfg.modelId : this.cfg.rerunModelId;
     const llm = new LlmClient(this.cfg.llm, this.cfg.mockResponderFor?.(spec));
     llm.newRun();
+    const model = new NearAiModel(llm, modelId);
     const { receipt } = await reproduce(
       { spec, marketId: m.id, runIndex, labAccount: lab.accountId, labCodehash: this.cfg.labCodehash, labKeys: this.cfg.labKeys },
       {
         sandbox: new DockerSandbox({ image: sandboxImage(spec.artifact.runtime), cpus: spec.resources.cpu, memGb: spec.resources.mem_gb }),
-        model: new NearAiModel(llm, modelId),
+        model,
         resolver: this.cfg.resolverFor(spec),
         store: this.cfg.store,
         emit: (e) => this.cfg.onEvent?.(m.id, e),
       },
     );
 
+    await this.cfg.onAttestation?.(receipt.nearai.attestation_digest, model.attestationRecord());
     const method = runIndex === 0 ? "propose_result" : "propose_rerun_result";
     const r = await chain.call(lab, method, { receipt }, { deposit: RECEIPT_DEPOSIT_NEAR, tgas: 200 });
     this.cfg.log?.(`market ${m.id}: ${method} ${receipt.outcome} (${r.txHash})`);

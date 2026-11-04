@@ -16,3 +16,7 @@ submission*.json
 
 # Lab run outputs (logs, reports, receipts)
 lab/orchestrator/.data/
+
+.next/
+next-env.d.ts
+*.tsbuildinfo

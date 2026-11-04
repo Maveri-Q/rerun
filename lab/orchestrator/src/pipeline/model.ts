@@ -74,6 +74,11 @@ export class NearAiModel implements PrivateModel {
     if (this.refs.length < MAX_SIGNATURE_REFS) this.refs.push(id);
   }
 
+  /** Everything verified during this run, for the Lab's public attestation record. */
+  attestationRecord(): { mock: boolean; model: string; reports: ReportVerification[] } {
+    return { mock: this.llm.config.mock, model: this.modelId, reports: [...this.verified.values()] };
+  }
+
   attestationDigest(): string {
     const input = this.llm.config.mock ? `MOCK_LLM:${this.modelId}` : this.digests.join(":");
     return createHash("sha256").update(input).digest("hex");
