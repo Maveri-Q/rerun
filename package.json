@@ -18,6 +18,9 @@
     "deploy:testnet": "pnpm --filter @rerun/scripts deploy:testnet",
     "demo": "pnpm --filter @rerun/scripts demo",
     "seed": "pnpm --filter @rerun/scripts seed",
+    "challenge-demo": "pnpm --filter @rerun/scripts challenge-demo",
+    "attack-demo": "pnpm --filter @rerun/scripts attack-demo",
+    "judge-demo": "pnpm --filter @rerun/scripts judge-demo",
     "web": "pnpm --filter @rerun/web dev",
     "lab:watch": "pnpm --filter @rerun/orchestrator lab:watch"
   }

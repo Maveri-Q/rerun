@@ -12,6 +12,7 @@ RERUN: NEAR Hackathon 2026 entry. The full spec is the human's build plan (`RERU
 - After changing specs, receipts or demo claims: `MOCK_LLM=1 pnpm lab:run all && pnpm --filter @rerun/orchestrator export:vectors`, then `pnpm test:contracts`
 - `pnpm deploy:testnet` (idempotent; `pnpm deploy` is pnpm's own command), `pnpm demo [names] [--resume]` (end to end on testnet), `pnpm lab:watch` (Lab loop)
 - `pnpm web` (site on :3000), `pnpm seed` (open markets with odds). `pnpm lab:watch` also serves the Lab's API on :8787
+- `pnpm judge-demo [--skip-live]` (Node only), `pnpm challenge-demo`, `pnpm attack-demo` (both refuse to run while a Lab is up, because it would race them for markets)
 - `pnpm test:contracts` (cargo unit + property tests), `pnpm build:contracts` (testnet wasm into `contracts/target/near/`)
 - Mainnet contract build: `cd contracts/rerun && cargo near build non-reproducible-wasm --no-abi --no-default-features` (drops `register_lab_local`)
 
@@ -32,6 +33,7 @@ RERUN: NEAR Hackathon 2026 entry. The full spec is the human's build plan (`RERU
 - Automated UI tests sign via `localStorage["rerun.test-wallet"]="1"` and `/api/dev-test-wallet`, which is dev-only and localhost-only. Never put a private key in a browser tool call.
 - Evidence checks (`lab/orchestrator/src/pipeline/evidence.ts`) run after the verdict is fixed and must never settle a market. A failure there only marks the check incomplete. The re-implementation prompt must never contain the reported number or data values.
 - Site copy: plain words. Say claim, forecast, holds up, allowed margin, fingerprint, collect, secure hardware; keep the technical terms for the technical sections. Terms and meanings are listed on `/how`.
+- Demo scripts must not count a transaction failing for the wrong reason as an attack blocked: `Scoreboard.blocked` requires the exact rejection text, and retries only passing network errors.
 - Secrets only in `.env` / `.env.testnet` (gitignored). Check history for keys before any push.
 
 ## Verified facts (2026-11-03)

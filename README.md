@@ -2,7 +2,7 @@
 
 **A forecasting market on whether published research results reproduce, settled by an AI agent that actually re-runs the authors' code and data inside a TEE and posts a verifiable receipt on NEAR.**
 
-> Status: early build (NEAR Hackathon 2026, step 5 of 10: a web app over the full testnet lifecycle, with extra evidence checks). The Lab does not run in a TEE yet and the site is not hosted yet. Sections marked _planned_ do not exist yet.
+> Status: early build (NEAR Hackathon 2026, step 6 of 10: the full lifecycle, challenges and attack checks pass on testnet). The Lab does not run in a TEE yet and the site is not hosted yet. Sections marked _planned_ do not exist yet.
 
 **Deployed on testnet:** market contract [`rerun.rerun-43f5f2.testnet`](https://testnet.nearblocks.io/address/rerun.rerun-43f5f2.testnet), collateral token [`tusdc.rerun-43f5f2.testnet`](https://testnet.nearblocks.io/address/tusdc.rerun-43f5f2.testnet), Lab `rerun-lab-43f5f2.testnet` (registered without TEE attestation, testnet only).
 
@@ -21,7 +21,9 @@ Outcomes: `REPRODUCED` (YES wins), `NOT_REPRODUCED` and `BROKEN` (NO wins), `INV
 
 ## Try it
 
-Requires Node ≥ 22.22.2 and pnpm 12 (`npm i -g pnpm@12`). Contract tests need Rust (the pinned 1.93.0 toolchain installs itself) and, to build wasm, [cargo-near](https://github.com/near/cargo-near). The Lab needs Docker.
+**Fastest:** with only Node ≥ 22.22.2 and pnpm 12 (`npm i -g pnpm@12`), run `pnpm install`, then `pnpm judge-demo`. It makes a throwaway testnet account, claims free points, makes a real forecast, re-checks a finished receipt itself, and tries to cheat, printing PASS or BLOCKED for each. If a Lab is reachable, it also opens a claim and watches it get re-run. No wallet, keys or Docker.
+
+Everything else: Contract tests need Rust (the pinned 1.93.0 toolchain installs itself) and, to build wasm, [cargo-near](https://github.com/near/cargo-near). The Lab needs Docker.
 
 1. `pnpm install`
 2. `pnpm test`: see all tests pass with no network, keys or Docker: 193 TypeScript tests (comparator, private-data encryption, attestation checks against a recorded real NEAR AI report, repair guards, the reproduction pipeline, evidence checks, paper-only statistics against published tables, the Lab's HTTP server, browser sealing) and 56 contract tests (every market outcome, both challenge paths, attacks, stale refunds, points, money mode, FPMM property tests, and real Lab output replayed through the contract).
@@ -34,7 +36,10 @@ Requires Node ≥ 22.22.2 and pnpm 12 (`npm i -g pnpm@12`). Contract tests need 
 
 8. `pnpm lab:watch` in one terminal and `pnpm web` in another, then open http://localhost:3000: see claims read live from testnet. Connect a testnet wallet, claim free points, and buy YES or NO on an open claim to see the odds move. Open a finished claim and its receipt to see the evidence ladder, and your browser re-checking the result in the "Verified" panel. Open **Check a paper** and click **Try an example** to see printed statistics checked with no code, wallet or AI. On a market about to lock, stay on the page to watch the Lab's stages stream live and the verdict stamp land.
 
-_Planned:_ hosted site in points mode, `pnpm judge-demo` (zero-setup testnet lifecycle + attack demo).
+9. `pnpm challenge-demo` (needs the testnet accounts and Docker, with the Lab stopped): see a result challenged, then re-run independently with a different AI. The runs agree, so the challenger loses the deposit.
+10. `pnpm attack-demo` (same needs): see 18 attacks and failure cases on testnet, including fake results, a banned Lab, an AI changing the science, swapped data, two runs that disagree, and a silent Lab. The contract attacks use scripted receipts, because the contract's rules are what's being tested.
+
+_Planned:_ hosted site in points mode.
 
 ## What is verified today
 
@@ -100,7 +105,7 @@ lab/sandbox/        Sandbox images for untrusted research code (Python 3.11, R 4
 claims/demo/        Six labelled demo claims with synthetic data
 web/                Next.js app: claims, trading, live re-runs, receipts, create wizard
 packages/shared/    APP_NAME, ClaimSpec/Receipt schemas, canonical JSON + sha256, comparator, sealing
-scripts/            testnet accounts, deploy, seed, end-to-end demo (planned: judge-demo, attack-demo)
+scripts/            testnet accounts, deploy, seed, end-to-end, challenge, attack and judge demos
 docs/               planned: ARCHITECTURE, MECHANISM, THREAT_MODEL, SOURCES, ADOPTION
 ```
 

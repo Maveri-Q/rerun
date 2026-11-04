@@ -70,6 +70,7 @@ export class Chain {
 }
 
 function toResult(res: Awaited<ReturnType<Account["callFunctionRaw"]>>): CallResult {
+  if (res.status && typeof res.status === "object" && "Failure" in res.status) throw new Error(JSON.stringify(res.status.Failure));
   const logs = res.receipts_outcome.flatMap((r) => r.outcome.logs);
   const gasBurnt =
     BigInt(res.transaction_outcome.outcome.gas_burnt) + res.receipts_outcome.reduce((sum, r) => sum + BigInt(r.outcome.gas_burnt), 0n);
