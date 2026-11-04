@@ -36,8 +36,8 @@ export function MarketTicker({ market }: { market: Market }) {
       : stateLabel(market.state);
 
   return (
-    <motion.article layout={!reduce} transition={SPRING} className={`ticker ${open ? "ticker--open" : ""}`} style={{ borderRadius: open ? 24 : 18 }}>
-      <motion.button layout="position" transition={SPRING} className="ticker-head" aria-expanded={open} onClick={() => setOpen(!open)}>
+    <article className={`ticker ${open ? "ticker--open" : ""}`}>
+      <button className="ticker-head" aria-expanded={open} onClick={() => setOpen(!open)}>
         <span className="ticker-title">
           <span className="ticker-name">{shortTitle(s.title)}</span>
           <span className="ticker-meta">
@@ -60,7 +60,7 @@ export function MarketTicker({ market }: { market: Market }) {
             </>
           )}
         </span>
-      </motion.button>
+      </button>
 
       <AnimatePresence initial={false}>
         {open && (
@@ -91,6 +91,6 @@ export function MarketTicker({ market }: { market: Market }) {
           </motion.div>
         )}
       </AnimatePresence>
-    </motion.article>
+    </article>
   );
 }

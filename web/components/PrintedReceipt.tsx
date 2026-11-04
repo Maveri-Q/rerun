@@ -46,9 +46,9 @@ export function PrintedReceipt({
   print,
   href,
 }: {
-  marketId: number;
+  marketId?: number;
   title: string;
-  outcome: Outcome;
+  outcome: Outcome | null;
   reported: string;
   range: string;
   measured: string | null;
@@ -61,7 +61,7 @@ export function PrintedReceipt({
     <div className={`receipt-paper ${print ? "receipt-paper--print" : ""}`}>
       <div className="receipt-top">
         <b>RERUN</b>
-        <span>CLAIM #{String(marketId).padStart(4, "0")}</span>
+        <span>{marketId === undefined ? "NEW CLAIM" : `CLAIM #${String(marketId).padStart(4, "0")}`}</span>
       </div>
       <p className="receipt-title">{title.replace(/^\[DEMO\]\s*/, "")}</p>
       <dl className="receipt-lines">
@@ -80,11 +80,11 @@ export function PrintedReceipt({
       </dl>
       <div className="receipt-verdict">
         <span>Verdict</span>
-        <strong>{VERDICT[outcome]}</strong>
+        <strong>{outcome ? VERDICT[outcome] : "NOT CHECKED YET"}</strong>
       </div>
-      <Barcode hash={hash} />
+      {hash && <Barcode hash={hash} />}
       <div className="receipt-foot">
-        <span>{hash.slice(0, 20)}</span>
+        <span>{hash ? hash.slice(0, 20) : "The fingerprint appears when the form is complete"}</span>
         {when ? <span>{new Date(when * 1000).toLocaleDateString(undefined, { day: "2-digit", month: "short", year: "numeric" })}</span> : null}
       </div>
     </div>

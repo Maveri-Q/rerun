@@ -54,6 +54,7 @@ export default function ReceiptPage({ params }: { params: Promise<{ market: stri
           measured={r.measured_value}
           hash={r.spec_hash}
           when={r.finished_at}
+          print
         />
         <div style={{ paddingTop: 20 }}>
           <p className="statement" style={{ margin: 0 }}>{outcomeMeaning(r.outcome)}</p>

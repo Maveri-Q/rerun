@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { PrintedReceipt } from "@/components/PrintedReceipt";
+import { RollingNumber } from "@/components/RollingNumber";
 import { Stamp } from "@/components/Stamp";
 import { usePoll } from "@/components/usePoll";
 import { chain } from "@/lib/chain";
@@ -45,11 +47,16 @@ export default function PortfolioPage() {
   if (!account) {
     return (
       <>
-        <h1 style={{ fontSize: "clamp(30px, 4vw, 44px)" }}>Your forecasts</h1>
-        <p className="lede prose">Connect a wallet to see your forecasts, what you can collect, and your balance.</p>
-        <button style={{ marginTop: 16 }} onClick={wallet.signIn} disabled={wallet.loading}>
-          Connect wallet
-        </button>
+        <div className="lab-hero">
+          <div>
+            <h1 className="page-title">Your forecasts print here.</h1>
+            <p className="lede">Connect a wallet to see your forecasts, what you can collect, and your balance. New accounts can claim 1,000 free points.</p>
+            <button style={{ marginTop: 24 }} onClick={wallet.signIn} disabled={wallet.loading}>
+              Connect wallet
+            </button>
+          </div>
+          <PrintedReceipt title="Waiting for your first forecast" outcome={null} reported="?" range="your call" measured={null} hash="" print />
+        </div>
       </>
     );
   }
@@ -71,14 +78,14 @@ export default function PortfolioPage() {
   const d = data.data;
   return (
     <>
-      <h1 style={{ fontSize: "clamp(30px, 4vw, 44px)" }}>Your forecasts</h1>
+      <h1 className="page-title">Your forecasts</h1>
       <div className="figures">
         <div className="figure">
-          <b>{d ? fmtUnits(d.points) : "…"}</b>
+          <b>{d ? <RollingNumber value={fmtUnits(d.points)} /> : "…"}</b>
           <span>points</span>
         </div>
         <div className="figure">
-          <b>{d ? fmtUnits(d.money) : "…"}</b>
+          <b>{d ? <RollingNumber value={fmtUnits(d.money)} /> : "…"}</b>
           <span>tUSDC ready to withdraw</span>
         </div>
       </div>
@@ -101,44 +108,49 @@ export default function PortfolioPage() {
           </p>
         )}
         {d && d.rows.length > 0 && (
-          <div className="scroll-x">
-            <table>
-              <thead>
-                <tr>
-                  <th>Claim</th>
-                  <th className="num">YES</th>
-                  <th className="num">NO</th>
-                  <th className="num">Worth now</th>
-                  <th className="num">Profit or loss</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {d.rows.map(({ market: m, position: p }) => {
-                  const now = worth(m, p);
-                  const pnl = BigInt(p.received) + now - BigInt(p.spent);
-                  const redeemable = m.state === "Final" && (BigInt(p.yes) > 0n || BigInt(p.no) > 0n || BigInt(p.lp) > 0n);
-                  return (
-                    <tr key={m.id}>
-                      <td style={{ minWidth: 220 }}>
-                        <Link href={`/market/${m.id}`}>{m.spec.title}</Link>
-                      </td>
-                      <td className="num mono">{fmtUnits(p.yes)}</td>
-                      <td className="num mono">{fmtUnits(p.no)}</td>
-                      <td className="num mono">
+          <ul className="positions">
+            {d.rows.map(({ market: m, position: p }) => {
+              const now = worth(m, p);
+              const pnl = BigInt(p.received) + now - BigInt(p.spent);
+              const redeemable = m.state === "Final" && (BigInt(p.yes) > 0n || BigInt(p.no) > 0n || BigInt(p.lp) > 0n);
+              return (
+                <li key={m.id} className="position">
+                  <div className="position-head">
+                    <Link href={`/market/${m.id}`}>{m.spec.title.replace(/^\[DEMO\]\s*/, "")}</Link>
+                    {m.outcome ? <Stamp outcome={m.outcome} /> : <span className="chip">{stateLabel(m.state)}</span>}
+                  </div>
+                  <dl className="position-numbers">
+                    <div>
+                      <dt>YES shares</dt>
+                      <dd>{fmtUnits(p.yes)}</dd>
+                    </div>
+                    <div>
+                      <dt>NO shares</dt>
+                      <dd>{fmtUnits(p.no)}</dd>
+                    </div>
+                    <div>
+                      <dt>Worth now</dt>
+                      <dd>
                         {fmtUnits(now)} {modeUnit(m.mode)}
-                      </td>
-                      <td className="num mono">
-                        {pnl >= 0n ? "+" : ""}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt>Profit or loss</dt>
+                      <dd className={pnl >= 0n ? "is-up" : "is-down"}>
+                        {pnl >= 0n ? "↑ +" : "↓ "}
                         {fmtUnits(pnl)}
-                      </td>
-                      <td>{m.outcome ? <Stamp outcome={m.outcome} /> : stateLabel(m.state)}{redeemable && <div><Link href={`/market/${m.id}`}>Collect</Link></div>}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+                      </dd>
+                    </div>
+                  </dl>
+                  {redeemable && (
+                    <Link className="btn btn--small position-collect" href={`/market/${m.id}`}>
+                      Collect
+                    </Link>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
         )}
         <p className="hint">Profit or loss counts what you put in, what you took out, and today&apos;s value of your shares. Money you added to a prize pool isn&apos;t counted until you take it out.</p>
       </section>

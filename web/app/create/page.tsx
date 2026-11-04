@@ -4,6 +4,7 @@ import { canonicalJson, ClaimSpec, specJson } from "@rerun/shared/browser";
 import { nearToYocto } from "near-api-js";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { PrintedReceipt } from "@/components/PrintedReceipt";
 import { RunTerminal } from "@/components/RunTerminal";
 import { ftTransferCall, prepareMoney } from "@/components/TradePanel";
 import { usePoll } from "@/components/usePoll";
@@ -185,6 +186,14 @@ export default function CreatePage() {
     });
   }, [title, statement, sourceType, paperUrl, repoUrl, license, authors, commit, data, runtime, setup, entrypoint, outputPath, extractorType, extractorExpr, metricName, reported, toleranceType, tolerance, privateData, privatePath, wallet.accountId]);
 
+  const previewRange = (() => {
+    try {
+      return reported && tolerance ? rangeText(reported, toleranceType, tolerance) : "?";
+    } catch {
+      return "?";
+    }
+  })();
+
   const [hash, setHash] = useState("");
   useEffect(() => {
     if (built.success) void sha256Hex(specJson(built.data)).then(setHash);
@@ -282,8 +291,9 @@ export default function CreatePage() {
 
   const unit = modeUnit(mode);
   return (
-    <>
-      <h1 style={{ fontSize: "clamp(30px, 4vw, 44px)" }}>Put a result under the microscope</h1>
+    <div className="create-grid">
+      <div>
+      <h1 className="page-title">Put a result under the microscope</h1>
       <p className="lede prose">Have a published result you want tested? Answer these four questions. People can then forecast whether it holds up, and the Lab will re-run it to find out.</p>
       <div style={{ marginTop: 16 }}>
         <button className="quiet" onClick={fillExample}>
@@ -548,6 +558,11 @@ export default function CreatePage() {
           </div>
         )}
       </section>
-    </>
+      </div>
+      <aside className="create-preview" aria-label="Preview of your claim">
+        <p className="hint">Your claim, as it will print</p>
+        <PrintedReceipt title={title || "Your claim appears here"} outcome={null} reported={reported || "?"} range={previewRange} measured={null} hash={hash} print />
+      </aside>
+    </div>
   );
 }

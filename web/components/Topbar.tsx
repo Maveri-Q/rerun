@@ -3,6 +3,7 @@
 import { APP_NAME } from "@rerun/shared/browser";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useRef } from "react";
 import { useWallet } from "@/lib/wallet";
 
 const LINKS = [
@@ -18,12 +19,18 @@ const LINKS = [
 export function Topbar() {
   const pathname = usePathname();
   const wallet = useWallet();
+  const nav = useRef<HTMLElement>(null);
+  useEffect(() => {
+    const strip = nav.current;
+    const link = strip?.querySelector<HTMLElement>('[aria-current="page"]');
+    if (strip && link) strip.scrollLeft = link.offsetLeft - strip.offsetLeft - (strip.clientWidth - link.offsetWidth) / 2;
+  }, [pathname]);
   return (
     <header className="topbar">
       <Link href="/" className="brand">
         {APP_NAME}
       </Link>
-      <nav className="nav" aria-label="Main">
+      <nav ref={nav} className="nav" aria-label="Main">
         {LINKS.map((l) => (
           <Link key={l.href} href={l.href} aria-current={pathname === l.href ? "page" : undefined}>
             {l.label}

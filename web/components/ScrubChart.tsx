@@ -86,6 +86,10 @@ export function ScrubChart({
       onPointerMove={(e) => scrub(e.clientX)}
       onPointerDown={(e) => scrub(e.clientX)}
       onPointerLeave={release}
+      onPointerCancel={release}
+      onPointerUp={(e) => {
+        if (e.pointerType !== "mouse") release();
+      }}
     >
       {width > 0 && points.length > 0 && (
         <svg width={width} height={height} aria-hidden="true">

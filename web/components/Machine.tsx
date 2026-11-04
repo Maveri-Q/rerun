@@ -2,7 +2,7 @@
 
 import { animate, AnimatePresence, motion, useMotionValueEvent, useReducedMotion, useScroll, useSpring, useTransform, type MotionValue } from "motion/react";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 
 const STEPS = [
   { short: "Claim", title: "A claim goes in.", text: "Someone picks a published result, like “93% accurate”. They point to the authors’ exact code and data, and set how close a re-run must get." },
@@ -13,6 +13,8 @@ const STEPS = [
 ];
 
 const N = STEPS.length;
+// On a touch screen the finger already moves smoothly, so extra smoothing would only feel like lag.
+const TOUCH = typeof window !== "undefined" && window.matchMedia("(pointer: coarse)").matches;
 const BELT = 520;
 
 type T = MotionValue<number>;
@@ -27,7 +29,7 @@ function useIn(t: T, a: number, b: number) {
 }
 
 /* The claim itself. It stays with the camera the whole way, big at first, then small on the belt. */
-function Claim({ p, t }: { p: T; t: T }) {
+const Claim = memo(function Claim({ p, t }: { p: T; t: T }) {
   const y = useTransform(p, [0, 0.135, 0.17], [0, 0, 200]);
   const scale = useTransform(p, [0, 0.135, 0.17], [1, 1, 0.2]);
   const opacity = useTransform(p, [0.41, 0.42], [1, 0]);
@@ -82,7 +84,7 @@ function Claim({ p, t }: { p: T; t: T }) {
     </motion.g>
     </g>
   );
-}
+});
 
 const TOKENS = (() => {
   // A fixed order, so the scale wobbles the same way every time you scrub through it.
@@ -106,7 +108,7 @@ function Token({ t, spec, offset }: { t: T; spec: (typeof TOKENS)[number]; offse
   return <motion.circle cx={spec.x} cy={cy} r={13} fill={fill} stroke={spec.side === 0 ? "var(--mint)" : "var(--ink)"} strokeWidth={2} />;
 }
 
-function Scale({ t }: { t: T }) {
+const Scale = memo(function Scale({ t }: { t: T }) {
   const weights = (v: number) => {
     let yes = 0;
     let no = 0;
@@ -166,11 +168,11 @@ function Scale({ t }: { t: T }) {
       </motion.g>
     </g>
   );
-}
+});
 
 const CODE = ["model = LogisticRegression()", "X, y = load_trials(path)", "X_train, X_test = split(X, y)", "model.fit(X_train, y_train)", "score = model.score(X_test)", "print(score)", "# seed 42, no changes to the method"];
 
-function Chamber({ t }: { t: T }) {
+const Chamber = memo(function Chamber({ t }: { t: T }) {
   const doorY = useTransform(t, [0.04, 0.1], [-420, 0]);
   const plugY = useTransform(t, [0.14, 0.22], [0, -70]);
   const plugFade = useIn(t, 0.16, 0.24);
@@ -252,7 +254,7 @@ function Chamber({ t }: { t: T }) {
       </g>
     </g>
   );
-}
+});
 
 function poleX(v: number) {
   return 270 + ((v - 0.8) / 0.2) * 460;
@@ -260,10 +262,10 @@ function poleX(v: number) {
 
 const BARS = [3, 1, 2, 4, 1, 1, 3, 2, 1, 4, 2, 1, 1, 3, 1, 2, 4, 1, 2, 1, 3, 1, 1, 2, 3, 1, 4, 2];
 
-function Printer({ t }: { t: T }) {
+const Printer = memo(function Printer({ t }: { t: T }) {
   const paperY = useTransform(t, [0.05, 0.42], [-360, 0]);
   const fly = useIn(t, 0.46, 0.6);
-  const flyX = useTransform(fly, [0, 1], [620, 862]);
+  const flyX = useTransform(fly, [0, 1], [610, 767]);
   const flyY = useTransform(fly, [0, 0.5, 1], [320, 170, 240]);
   const flyOpacity = useTransform(fly, [0, 0.05, 0.95, 1], [0, 1, 1, 0]);
   const block = useIn(t, 0.58, 0.62);
@@ -319,32 +321,32 @@ function Printer({ t }: { t: T }) {
       <motion.rect x={flyX} y={flyY} width={22} height={22} rx={3} fill="var(--mint)" style={{ opacity: flyOpacity }} />
       {[0, 1, 2].map((i) => (
         <g key={i}>
-          <rect x={740 + i * 62} y={224} width={46} height={46} rx={6} fill="none" stroke={i === 2 ? "transparent" : "var(--ink-3)"} strokeWidth={2} />
-          {i < 2 && <path d={`M${786 + i * 62} 247h16`} stroke="var(--ink-3)" strokeWidth={2} />}
+          <rect x={645 + i * 62} y={224} width={46} height={46} rx={6} fill="none" stroke={i === 2 ? "transparent" : "var(--ink-3)"} strokeWidth={2} />
+          {i < 2 && <path d={`M${691 + i * 62} 247h16`} stroke="var(--ink-3)" strokeWidth={2} />}
         </g>
       ))}
       <motion.g style={{ opacity: block }}>
-        <rect x={864} y={224} width={46} height={46} rx={6} fill="var(--mint)" />
+        <rect x={769} y={224} width={46} height={46} rx={6} fill="var(--mint)" />
       </motion.g>
-      <motion.text x={740} y={306} fill="var(--ink)" fontSize={22} fontFamily="var(--font-funnel-sans)" style={{ opacity: chainText }}>
+      <motion.text x={645} y={306} fill="var(--ink)" fontSize={21} fontFamily="var(--font-funnel-sans)" style={{ opacity: chainText }}>
         On the blockchain
       </motion.text>
       <motion.g style={{ opacity: ringText }}>
-        <circle cx={186} cy={246} r={54} fill="none" stroke="var(--line-strong)" strokeWidth={6} />
-        <motion.circle cx={186} cy={246} r={54} fill="none" stroke="var(--mint)" strokeWidth={6} strokeLinecap="round" transform="rotate(-90 186 246)" style={{ pathLength: ringDraw }} />
-        <text x={186} y={332} fill="var(--ink)" fontSize={22} textAnchor="middle" fontFamily="var(--font-funnel-sans)">
+        <circle cx={270} cy={246} r={54} fill="none" stroke="var(--line-strong)" strokeWidth={6} />
+        <motion.circle cx={270} cy={246} r={54} fill="none" stroke="var(--mint)" strokeWidth={6} strokeLinecap="round" transform="rotate(-90 270 246)" style={{ pathLength: ringDraw }} />
+        <text x={270} y={332} fill="var(--ink)" fontSize={21} textAnchor="middle" fontFamily="var(--font-funnel-sans)">
           Time to challenge
         </text>
       </motion.g>
     </g>
   );
-}
+});
 
 const COINS = Array.from({ length: 18 }, (_, i) => ({ i, start: 0.08 + (i / 18) * 0.62, row: i % 6, col: Math.floor(i / 6) }));
 
 function Coin({ t, c }: { t: T; c: (typeof COINS)[number] }) {
   const f = useTransform(t, [c.start, c.start + 0.12], [0, 1]);
-  const toX = 170 + c.col * 62;
+  const toX = 212 + c.col * 62;
   const toY = 500 - c.row * 18;
   const cx = useTransform(f, (v) => 500 + (toX - 500) * v);
   const cy = useTransform(f, (v) => 340 + (toY - 340) * v - Math.sin(v * Math.PI) * 150);
@@ -352,7 +354,7 @@ function Coin({ t, c }: { t: T; c: (typeof COINS)[number] }) {
   return <motion.ellipse cx={cx} cy={cy} rx={24} ry={9} fill="var(--mint)" stroke="var(--black)" strokeWidth={2} style={{ opacity }} />;
 }
 
-function Collect({ t }: { t: T }) {
+const Collect = memo(function Collect({ t }: { t: T }) {
   const total = useTransform(t, [0.08, 0.82], [0, 100]);
   const paid = useTransform(total, (v) => `+${v.toFixed(0)}`);
   const lost = useTransform(t, [0.12, 0.7], [1, 0]);
@@ -370,23 +372,23 @@ function Collect({ t }: { t: T }) {
       {COINS.map((c) => (
         <Coin key={c.i} t={t} c={c} />
       ))}
-      <motion.text x={232} y={232} fill="var(--mint)" fontSize={72} textAnchor="middle" fontWeight={500} fontFamily="var(--font-funnel-display)">
+      <motion.text x={285} y={232} fill="var(--mint)" fontSize={72} textAnchor="middle" fontWeight={500} fontFamily="var(--font-funnel-display)">
         {paid}
       </motion.text>
-      <text x={232} y={272} fill="var(--ink-2)" fontSize={22} textAnchor="middle" fontFamily="var(--font-funnel-sans)">
+      <text x={285} y={272} fill="var(--ink-2)" fontSize={21} textAnchor="middle" fontFamily="var(--font-funnel-sans)">
         YES forecasts paid
       </text>
       <motion.g style={{ opacity: lost, y: sink }}>
         {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
-          <circle key={i} cx={720 + (i % 4) * 34} cy={490 - Math.floor(i / 4) * 30} r={14} fill="var(--black)" stroke="var(--ink)" strokeWidth={2} />
+          <circle key={i} cx={650 + (i % 4) * 34} cy={490 - Math.floor(i / 4) * 30} r={14} fill="var(--black)" stroke="var(--ink)" strokeWidth={2} />
         ))}
       </motion.g>
-      <text x={772} y={272} fill="var(--ink-2)" fontSize={22} textAnchor="middle" fontFamily="var(--font-funnel-sans)">
+      <text x={710} y={272} fill="var(--ink-2)" fontSize={20} textAnchor="middle" fontFamily="var(--font-funnel-sans)">
         NO shares pay nothing
       </text>
     </g>
   );
-}
+});
 
 function Bar({ p, i, onJump, label, current }: { p: T; i: number; onJump: () => void; label: string; current: boolean }) {
   const scaleX = useTransform(p, [i / N, (i + 1) / N], [0, 1]);
@@ -405,8 +407,10 @@ export function Machine() {
   const reduce = useReducedMotion();
   const box = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: box, offset: ["start start", "end end"] });
-  const p = useSpring(scrollYProgress, { stiffness: 140, damping: 30, mass: 0.4 });
+  const p = useSpring(scrollYProgress, TOUCH ? { stiffness: 900, damping: 80 } : { stiffness: 140, damping: 30, mass: 0.4 });
   const cam = useTransform(p, [0, 0.165, 0.2, 0.365, 0.4, 0.565, 0.6, 0.765, 0.8, 1], [0, 0, -1000, -1000, -2000, -2000, -3000, -3000, -4000, -4000]);
+  const beltTicks = useTransform(cam, (v) => -v);
+  const camShift = useTransform(cam, (v) => `${v / 10}%`);
   const [step, setStep] = useState(0);
   const [intro, setIntro] = useState(true);
   const [playing, setPlaying] = useState(false);
@@ -475,6 +479,8 @@ export function Machine() {
     window.scrollTo({ top: top + (end - top) * ((i + 0.02) / N), behavior: "smooth" });
   };
 
+  const viewBox = narrow ? "170 20 660 560" : "0 0 1000 620";
+
   const list = (
     <ol className={reduce ? "how-steps" : "sr-only"}>
       {STEPS.map((s) => (
@@ -492,25 +498,28 @@ export function Machine() {
     <section ref={box} className="machine" aria-label="How a claim moves through RERUN">
       {list}
       <div className="machine-stage">
-        <svg className="machine-svg" viewBox={narrow ? "170 20 660 560" : "0 0 1000 620"} aria-hidden="true">
-          <motion.g style={{ x: cam }}>
-            <path d={`M-1000 ${BELT}H6000`} stroke="var(--ink-2)" strokeWidth={3} />
-            <path d={`M-1000 ${BELT + 14}H6000`} stroke="var(--line-strong)" strokeWidth={10} strokeDasharray="3 37" />
-            <g transform="translate(1000 0)">
-              <Scale t={t1} />
-            </g>
-            <g transform="translate(2000 0)">
-              <Chamber t={t2} />
-            </g>
-            <g transform="translate(3000 0)">
-              <Printer t={t3} />
-            </g>
-            <g transform="translate(4000 0)">
-              <Collect t={t4} />
-            </g>
-          </motion.g>
-          <Claim p={p} t={t0} />
-        </svg>
+        {/* Each station is its own layer, so moving the camera doesn't redraw anything. */}
+        <div className="machine-svg" aria-hidden="true">
+          <svg viewBox={viewBox}>
+            <path d={`M-1400 ${BELT}H2400`} stroke="var(--ink-2)" strokeWidth={3} />
+            <motion.path d={`M-1400 ${BELT + 14}H2400`} stroke="var(--line-strong)" strokeWidth={10} strokeDasharray="3 37" style={{ strokeDashoffset: beltTicks }} />
+          </svg>
+          <motion.div className="machine-cam" style={{ x: camShift }}>
+            {[
+              <Scale key="scale" t={t1} />,
+              <Chamber key="chamber" t={t2} />,
+              <Printer key="printer" t={t3} />,
+              <Collect key="collect" t={t4} />,
+            ].map((station, i) => (
+              <div key={i} className="machine-station" style={{ left: `${(i + 1) * 100}%`, display: Math.abs(step - (i + 1)) <= 1 ? undefined : "none" }}>
+                <svg viewBox={viewBox}>{station}</svg>
+              </div>
+            ))}
+          </motion.div>
+          <svg viewBox={viewBox} style={{ display: step <= 2 ? undefined : "none" }}>
+            <Claim p={p} t={t0} />
+          </svg>
+        </div>
         <div className="machine-copy">
           <AnimatePresence mode="wait" initial={false}>
             <motion.div key={intro ? "intro" : step} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.18 }}>

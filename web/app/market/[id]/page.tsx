@@ -3,9 +3,10 @@
 import Link from "next/link";
 import { use, useMemo } from "react";
 import { ClaimSpec } from "@rerun/shared/browser";
+import { JumpToForecast } from "@/components/JumpToForecast";
 import { MarketActions } from "@/components/MarketActions";
 import { EvidenceLadder } from "@/components/EvidenceLadder";
-import { OddsBar } from "@/components/MarketRow";
+import { MiniScale } from "@/components/MiniScale";
 import { OddsChart } from "@/components/OddsChart";
 import { RunTerminal } from "@/components/RunTerminal";
 import { PrintedReceipt } from "@/components/PrintedReceipt";
@@ -29,7 +30,7 @@ const SEQUENCE: { state: State; label: string }[] = [
 export default function MarketPage({ params }: { params: Promise<{ id: string }> }) {
   const id = Number(use(params).id);
   const wallet = useWallet();
-  const market = usePoll(() => chain.market(id), [id], 5_000);
+  const market = usePoll(() => chain.market(id), [id], 5_000, `market.${id}`);
   const config = usePoll(() => chain.config(), []);
   const specRaw = usePoll(() => chain.spec(id), [id]);
   const history = usePoll(() => chain.priceHistory(id), [id], 15_000);
@@ -66,9 +67,6 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
   const trading = m.state === "Open" && Date.now() / 1000 < m.lock_time;
   const latestReceipt = receipts.data?.at(-1);
   const stepIndex = m.state === "Challenged" ? 3 : SEQUENCE.findIndex((x) => x.state === m.state);
-  const chartEnd = m.finalized_at ?? Math.min(Math.floor(Date.now() / 1000), m.lock_time);
-  // Only play the stamp when this viewer watched the run finish live.
-  const reveal = stream.liveSeen && stream.events.at(-1)?.stage === "done";
   const shownOutcome = m.outcome ?? latestReceipt?.outcome ?? null;
 
   return (
@@ -76,7 +74,7 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
       <div>
         <span className="page-no">Claim {m.id}</span>
         <h1 className="market-title">{s.title.replace(/^\[DEMO\]\s*/, "")}</h1>
-        <p className="statement">{spec?.statement}</p>
+        <p className="statement">{spec?.statement.replace(/^DEMO FIXTURE,\s*/i, "A demo, ")}</p>
 
         <div className="claim-figure">
           <span className="claim-value">{s.reported_value}</span>
@@ -97,7 +95,7 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
               measured={latestReceipt?.measured_value ?? null}
               hash={s.spec_hash}
               when={m.finalized_at ?? latestReceipt?.finished_at}
-              print={reveal}
+              print
             />
             {latestReceipt && (
               <div style={{ paddingTop: 20 }}>
@@ -112,9 +110,7 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
         )}
 
         {trading && (
-          <a className="btn jump-to-forecast" href="#forecast">
-            Make a forecast
-          </a>
+          <JumpToForecast />
         )}
 
         <ol className="steps" aria-label="Market progress">
@@ -236,7 +232,7 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
         {trading && config.data && <TradePanel market={m} config={config.data} position={position.data} contract={CONTRACT} onDone={refreshAll} />}
         {config.data && <MarketActions market={m} config={config.data} position={position.data} onDone={refreshAll} />}
         <div className="panel">
-          <OddsBar market={m} />
+          <MiniScale market={m} />
           <dl className="defs" style={{ gridTemplateColumns: "1fr auto", marginTop: 16, fontSize: 14 }}>
             <dt>Forecast so far</dt>
             <dd>

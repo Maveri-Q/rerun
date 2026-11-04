@@ -3,12 +3,13 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { MarketTicker } from "@/components/MarketTicker";
-import { CallIt, PaperTape } from "@/components/CallIt";
+import { PaperTape } from "@/components/PaperTape";
+import { PrintedReceipt } from "@/components/PrintedReceipt";
 import { RollingNumber } from "@/components/RollingNumber";
 import { usePoll } from "@/components/usePoll";
 import { chain } from "@/lib/chain";
 import { lab } from "@/lib/lab";
-import { fmtUnits, type Market, type Mode } from "@/lib/market";
+import { fmtUnits, rangeText, type Market, type Mode } from "@/lib/market";
 
 type Filter = "all" | Mode | "settled";
 
@@ -26,8 +27,8 @@ const live = (m: Market) => m.state !== "Final";
 export default function Home() {
   const [filter, setFilter] = useState<Filter>("all");
   const [showAll, setShowAll] = useState(false);
-  const markets = usePoll(() => chain.markets(), [], 15_000);
-  const stats = usePoll(() => chain.stats(), [], 30_000);
+  const markets = usePoll(() => chain.markets(), [], 15_000, "markets");
+  const stats = usePoll(() => chain.stats(), [], 30_000, "stats");
   const feed = usePoll(() => lab.recentRuns(), [], 10_000);
 
   // Pipeline checks are labelled [TEST]; they stay on-chain and reachable by link, but off the front page.
@@ -37,6 +38,10 @@ export default function Home() {
     return [...rows].sort((a, b) => Number(live(b)) - Number(live(a)) || b.id - a.id);
   }, [listed, filter]);
 
+  const latest = useMemo(() => [...listed].filter((m) => m.outcome === "REPRODUCED").sort((a, b) => (b.finalized_at ?? 0) - (a.finalized_at ?? 0))[0], [listed]);
+  const receipts = usePoll(() => (latest ? chain.receipts(latest.id) : Promise.resolve([])), [latest?.id], 0, latest ? `receipts.${latest.id}` : undefined);
+  const measured = receipts.data?.at(-1)?.measured_value ?? null;
+
   const s = stats.data;
   const rate = s?.reproduction_rate_bps === null || !s ? "0" : (s.reproduction_rate_bps / 100).toFixed(0);
   return (
@@ -45,7 +50,7 @@ export default function Home() {
         <div className="hero-copy">
           <h1>Will this research hold up?</h1>
           <p className="lede">
-            Many published results don&apos;t. Here you predict which ones will, then an AI lab re-runs the authors&apos; own code and data and prints public proof. Try it: make a call on a real finished claim.
+            Many published results don&apos;t. Here you predict which ones will, then an AI lab re-runs the authors&apos; own code and data and prints public proof.
           </p>
           <div className="hero-actions">
             <a className="btn" href="#claims">
@@ -76,7 +81,20 @@ export default function Home() {
             </div>
           </div>
         </div>
-        <CallIt markets={listed} />
+        {latest?.outcome && (
+          <PrintedReceipt
+            marketId={latest.id}
+            title={latest.spec.title}
+            outcome={latest.outcome}
+            reported={latest.spec.reported_value}
+            range={rangeText(latest.spec.reported_value, latest.spec.tolerance_kind, latest.spec.tolerance_value)}
+            measured={measured}
+            hash={latest.spec.spec_hash}
+            when={latest.finalized_at}
+            print
+            href={`/market/${latest.id}`}
+          />
+        )}
       </section>
 
       <PaperTape markets={listed} />
