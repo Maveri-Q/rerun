@@ -90,6 +90,14 @@ describe("withNetworkRetry", () => {
     expect(calls).toBe(3);
   });
 
+  it("retries a slow key download", async () => {
+    let calls = 0;
+    await withNetworkRetry(async () => {
+      if (++calls < 2) throw new Error("Failed to parse the JSON Web Key Set HTTP response as JSON: The operation was aborted due to timeout");
+    });
+    expect(calls).toBe(2);
+  });
+
   it("never retries a verdict error", async () => {
     let calls = 0;
     await expect(

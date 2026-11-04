@@ -597,3 +597,50 @@ fn withdraw_requires_one_yocto() {
     as_("creator.testnet", T0);
     let _ = c.withdraw(None);
 }
+
+// ------------------------------------------------------------------ TypeScript <-> Rust agreement
+
+/// Real specs and receipts produced by the TypeScript Lab. Regenerate with the Lab's `export:vectors`.
+#[test]
+fn lab_output_is_accepted_by_the_contract() {
+    #[derive(near_sdk::serde::Deserialize)]
+    #[serde(crate = "near_sdk::serde")]
+    struct Vector {
+        name: String,
+        spec_json: String,
+        spec_hash: String,
+        receipt: Receipt,
+    }
+    let vectors: Vec<Vector> = near_sdk::serde_json::from_str(include_str!("../test-vectors/lab-output.json")).unwrap();
+    assert_eq!(vectors.len(), 5);
+
+    let mut c = contract();
+    paying("creator.testnet", T0);
+    c.claim_points();
+    for v in vectors {
+        let code = v.receipt.lab_codehash.clone();
+        as_("owner.testnet", T0);
+        c.approve_codehash(code.clone());
+        c.register_lab_local(v.receipt.lab_account.clone(), code, LAB_KEY.into());
+        paying("creator.testnet", T0);
+        let id = c.create_market(v.spec_json.clone(), T0 + 3_600, WINDOW, Mode::Points);
+        let m = c.get_market(id).unwrap().market;
+        assert_eq!(m.spec.spec_hash, v.spec_hash, "{}: Rust and TypeScript disagree on spec_hash", v.name);
+
+        paying("creator.testnet", T0);
+        c.fund_market(id, U128(100 * UNIT));
+        let lab = v.receipt.lab_account.to_string();
+        as_("anyone.testnet", T0 + 3_600);
+        c.lock(id);
+        as_(&lab, T0 + 3_601);
+        c.start_run(id);
+        let mut r = v.receipt;
+        let expected = r.outcome;
+        r.market_id = id;
+        paying(&lab, T0 + 3_660);
+        c.propose_result(r);
+        as_("anyone.testnet", T0 + 3_660 + WINDOW);
+        c.finalize(id);
+        assert_eq!(c.get_market(id).unwrap().market.outcome, Some(expected), "{}", v.name);
+    }
+}

@@ -1,0 +1,13 @@
+{
+  "expected": "BROKEN",
+  "title": "[DEMO] Analysis that depends on an unpublished private package",
+  "statement": "DEMO FIXTURE, not real research. The code imports a package the authors never released, so no environment repair can make it run. That is a real finding: the result did not reproduce because the code is broken.",
+  "metric": { "name": "accuracy", "reported_value": "0.9", "tolerance": { "type": "abs", "value": "0.01" }, "comparison": "within_tolerance" },
+  "entrypoint": "python reproduce.py",
+  "setup": ["pip install -r requirements.txt"],
+  "output": { "path": "results.json", "extractor": { "type": "jsonpath", "expr": "$.accuracy" } },
+  "data": [{ "file": "trials.csv", "path": "data/trials.csv" }],
+  "mock_llm": {
+    "repair": "{\"give_up\":true,\"reason\":\"labtools_internal is an unpublished package that holds the analysis itself; replacing it would change the science.\",\"edits\":[]}"
+  }
+}

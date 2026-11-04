@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { appendFile, mkdir, readFile } from "node:fs/promises";
 import path from "node:path";
+import { withNetworkRetry } from "./attestation.ts";
 
 /**
  * The single wrapper every LLM call in the Lab goes through (build plan §0.7, §5.4):
@@ -71,7 +72,11 @@ export class LlmClient {
   private callsThisRun = 0;
   private pricing = new Map<string, Pricing>();
 
-  constructor(readonly config: LlmConfig) {}
+  /** `mockResponder` scripts MOCK_LLM replies, e.g. a demo claim's expected repair. */
+  constructor(
+    readonly config: LlmConfig,
+    private readonly mockResponder?: (req: ChatRequest) => string | undefined,
+  ) {}
 
   /** Start a new reproduction run; resets the per-run call counter. */
   newRun(): void {
@@ -97,7 +102,7 @@ export class LlmClient {
     });
 
     const result = this.config.mock
-      ? mockResponse(req, requestBody)
+      ? mockResponse(req, requestBody, this.mockResponder?.(req))
       : await this.send(req.model, requestBody);
 
     await this.logSpend(req, result);
@@ -106,16 +111,18 @@ export class LlmClient {
 
   private async send(model: string, requestBody: string): Promise<ChatResult> {
     if (!this.config.apiKey) throw new Error("NEARAI_CLOUD_API_KEY is not set (or use MOCK_LLM=1)");
-    const res = await fetch(new URL("/v1/chat/completions", this.config.baseUrl), {
-      method: "POST",
-      headers: {
-        authorization: `Bearer ${this.config.apiKey}`,
-        "content-type": "application/json",
-        accept: "application/json",
-        "accept-encoding": "identity",
-      },
-      body: requestBody,
-    });
+    const res = await withNetworkRetry(() =>
+      fetch(new URL("/v1/chat/completions", this.config.baseUrl), {
+        method: "POST",
+        headers: {
+          authorization: `Bearer ${this.config.apiKey}`,
+          "content-type": "application/json",
+          accept: "application/json",
+          "accept-encoding": "identity",
+        },
+        body: requestBody,
+      }),
+    );
     const bytes = Buffer.from(await res.arrayBuffer());
     const responseBody = bytes.toString("utf8");
     if (!res.ok) throw new Error(`chat completion ${res.status}: ${responseBody.slice(0, 300)}`);
@@ -152,7 +159,7 @@ export class LlmClient {
   /** USD per token, from the public /v1/models catalogue. */
   private async priceOf(model: string): Promise<Pricing> {
     if (this.pricing.size === 0) {
-      const res = await fetch(new URL("/v1/models", this.config.baseUrl));
+      const res = await withNetworkRetry(() => fetch(new URL("/v1/models", this.config.baseUrl)));
       if (res.ok) {
         const { data } = (await res.json()) as { data: { id: string; pricing?: { prompt?: string; completion?: string } }[] };
         for (const m of data) {
@@ -198,9 +205,9 @@ export class LlmClient {
   }
 }
 
-function mockResponse(req: ChatRequest, requestBody: string): ChatResult {
+function mockResponse(req: ChatRequest, requestBody: string, scripted?: string): ChatResult {
   const last = req.messages.at(-1)?.content ?? "";
-  const text = `MOCK(${req.purpose}): ${last.slice(0, 80)}`;
+  const text = scripted ?? `MOCK(${req.purpose}): ${last.slice(0, 80)}`;
   const responseBody = JSON.stringify({ id: `mock-${sha256Hex(requestBody).slice(0, 16)}`, choices: [{ message: { content: text } }] });
   return {
     chatId: `mock-${sha256Hex(requestBody).slice(0, 16)}`,

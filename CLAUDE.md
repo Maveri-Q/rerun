@@ -7,6 +7,9 @@ RERUN: NEAR Hackathon 2026 entry. The full spec is the human's build plan (`RERU
 - `pnpm install`, `pnpm test` (all packages, offline, `MOCK_LLM`-safe), `pnpm typecheck`
 - `pnpm nearai:hello`: live NEAR AI attestation (+ chat and signature with an API key)
 - `pnpm testnet:accounts`: creates faucet-funded testnet accounts into `.env.testnet`
+- `pnpm sandbox:build` (Docker images), `MOCK_LLM=1 pnpm lab:run all` (demo claims, no credits), `pnpm lab:run <name> [--rerun]` (real private model)
+- `DOCKER_TESTS=1 pnpm --filter @rerun/orchestrator test` adds real-container isolation tests
+- After changing specs, receipts or demo claims: `MOCK_LLM=1 pnpm lab:run all && pnpm --filter @rerun/orchestrator export:vectors`, then `pnpm test:contracts`
 - `pnpm test:contracts` (cargo unit + property tests), `pnpm build:contracts` (testnet wasm into `contracts/target/near/`)
 - Mainnet contract build: `cd contracts/rerun && cargo near build non-reproducible-wasm --no-abi --no-default-features` (drops `register_lab_local`)
 
@@ -17,15 +20,21 @@ RERUN: NEAR Hackathon 2026 entry. The full spec is the human's build plan (`RERU
 - App name lives only in `packages/shared/src/config.ts` (`APP_NAME`).
 - Every LLM call goes through `LlmClient` in `lab/orchestrator/src/nearai/client.ts` (token/call/daily caps, spend log, `MOCK_LLM=1`).
 - Only NEAR-hosted private models (`owned_by: "nearai"` in `/v1/models`). Default `z-ai/glm-5.3-flash`; re-runs use a different one.
-- The deterministic comparator decides outcomes, never the LLM. It exists twice and must stay identical: `contracts/rerun/src/math.rs` (on-chain) and the Lab's TypeScript copy.
+- The deterministic comparator decides outcomes, never the LLM. It exists twice and must stay identical: `contracts/rerun/src/math.rs` and `packages/shared/src/decimal.ts`.
 - ClaimSpec metric values are decimal strings (`"0.912"`), never JSON floats; the contract rejects floats and non-canonical JSON.
 - Contracts: Cargo workspace in `contracts/`, scaffolded with `cargo near new`, Rust pinned to 1.93.0 by `contracts/rust-toolchain.toml`, near-sdk 5.29.1. Unit tests use near-sdk's mocked chain (`testing_env!`).
+- Research code never shares a container with keys. `Sandbox` (`lab/orchestrator/src/sandbox/`) passes no environment in; the network is off during the run phase.
+- Repair edits go through `checkEdit` in `lab/orchestrator/src/pipeline/guards.ts`; when loosening it, add a test showing science still cannot change.
+- Private-data claims: nothing derived from the run may reach the LLM, stream, stored logs or receipt tail. `pipeline.test.ts` greps for leaks.
 - Secrets only in `.env` / `.env.testnet` (gitignored). Check history for keys before any push.
 
 ## Verified facts (2026-11-03)
 
 - NEAR AI: base `https://cloud-api.near.ai`; `/v1/attestation/report` and `/v1/models` need no key. Send `provider=near`, `signing_algo=ecdsa`, `x-no-aliasing: true`. Run DCAP/NRAS checks sequentially and through `withNetworkRetry` (DNS here is intermittently flaky: ENOTFOUND).
 - `z-ai/glm-5.3-flash` is a reasoning model: hidden reasoning tokens count against `max_tokens`, so a tight cap returns an empty answer. Check `finishReason`/`usage.reasoningTokens` and leave headroom.
+- `/v1/models` has no TEE flag; `owned_by: "nearai"` plus a passing attestation is what counts. `Qwen/Qwen3.8-27B` (re-run model) attests fine.
+- jose's default JWKS timeout (5 s) is too short on this network; use `timeoutDuration`.
+- If `docker` is not found in a session started before the install, its binary is in `C:\Program Files\Docker\Docker\resources\bin`.
 - Testnet RPC `https://test.rpc.fastnear.com`; faucet `POST https://helper.nearprotocol.com/account {newAccountId, newAccountPublicKey}`.
 - near-api-js 7.4.0 (single package); near-sdk 5.29.1 used (5.30.0 exists, Rust 1.95+); cargo-near 0.22.0.
 - Windows limits: near-sandbox does not run (Linux/macOS only) and cargo-near's ABI step fails to link, so build with `--no-abi`. `aws-lc-sys` (via near-sdk unit-testing) needs the `prebuilt-nasm` feature, set as a dev-dependency.

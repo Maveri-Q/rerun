@@ -1,0 +1,208 @@
+[
+  {
+    "name": "reproduces",
+    "spec_json": "{\"artifact\":{\"commit\":\"563c58831162400e57dc0129eb2d2744fb3a1368\",\"data\":[{\"path\":\"data/trials.csv\",\"sha256\":\"be35dcd48bdcc0222a5c4d5ef769adb4a58e77c1914af80d8aa457ad742f9b7d\",\"url\":\"https://rerun.invalid/demo/data/trials.csv\"}],\"entrypoint\":\"python reproduce.py\",\"output\":{\"extractor\":{\"expr\":\"$.accuracy\",\"type\":\"jsonpath\"},\"path\":\"results.json\"},\"repo_url\":\"https://rerun.invalid/demo/reproduces.git\",\"runtime\":\"python3.11\",\"setup\":[\"pip install -r requirements.txt\"]},\"metric\":{\"comparison\":\"within_tolerance\",\"name\":\"accuracy\",\"reported_value\":\"0.93\",\"tolerance\":{\"type\":\"abs\",\"value\":\"0.02\"}},\"private_data\":null,\"resources\":{\"cpu\":2,\"max_minutes\":3,\"mem_gb\":2},\"source\":{\"authors\":\"RERUN demo fixture\",\"license\":\"MIT\",\"type\":\"report\",\"url\":\"https://rerun.invalid/demo/reproduces\"},\"statement\":\"DEMO FIXTURE, not real research. The released code trains a logistic regression on the synthetic trials dataset and reaches the reported test accuracy.\",\"title\":\"[DEMO] A logistic model predicts trial response with 93% accuracy\",\"version\":1}",
+    "spec_hash": "5082cac3ebc8904e3559bca9af1c2d8f4c68df3c4565be2c5547e61f4ae3bbd8",
+    "receipt": {
+      "market_id": 0,
+      "spec_hash": "5082cac3ebc8904e3559bca9af1c2d8f4c68df3c4565be2c5547e61f4ae3bbd8",
+      "outcome": "REPRODUCED",
+      "invalid_reason": null,
+      "measured_value": "0.93",
+      "reported_value": "0.93",
+      "tolerance": "abs:0.02",
+      "commit": "563c58831162400e57dc0129eb2d2744fb3a1368",
+      "data_hashes": [
+        "be35dcd48bdcc0222a5c4d5ef769adb4a58e77c1914af80d8aa457ad742f9b7d"
+      ],
+      "env_lock_hash": "8dab88328537f15c219ff04f4c55b0150f9867347067f4b5868ed8b0769249af",
+      "patches": [],
+      "patches_diff_excerpt": "",
+      "log_hash": "d703a3caeb7c8920890384d9dd62da26793a4f1eaee9ffc5e6ec84fe3aa12357",
+      "log_tail": "accuracy=0.93\n",
+      "full_log_uri": "rerun-lab://local/logs/d703a3caeb7c8920890384d9dd62da26793a4f1eaee9ffc5e6ec84fe3aa12357",
+      "report_hash": "393386d4bdd31dd7c2db4d766625c041bd2e0b68397fde8ebee07fb079b1af37",
+      "report_uri": "rerun-lab://local/reports/393386d4bdd31dd7c2db4d766625c041bd2e0b68397fde8ebee07fb079b1af37",
+      "runtime_secs": 4,
+      "exit_code": 0,
+      "lab_codehash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "lab_account": "local-lab.testnet",
+      "nearai": {
+        "model_id": "z-ai/glm-5.3-flash",
+        "attestation_digest": "bb8a7976104d871a735c0da6d0f0b244382f42c97202b1b1efc9cfd40c1de8d6",
+        "response_signature_refs": [
+          "mock-7a13ad34abc22549"
+        ]
+      },
+      "run_index": 0,
+      "started_at": 1793776307,
+      "finished_at": 1793776318
+    }
+  },
+  {
+    "name": "misreported",
+    "spec_json": "{\"artifact\":{\"commit\":\"8977800218ee404231d5dd457efed7546023334d\",\"data\":[{\"path\":\"data/trials.csv\",\"sha256\":\"be35dcd48bdcc0222a5c4d5ef769adb4a58e77c1914af80d8aa457ad742f9b7d\",\"url\":\"https://rerun.invalid/demo/data/trials.csv\"}],\"entrypoint\":\"python reproduce.py\",\"output\":{\"extractor\":{\"expr\":\"final test accuracy: ([0-9.]+)\",\"type\":\"regex\"},\"path\":\"results.txt\"},\"repo_url\":\"https://rerun.invalid/demo/misreported.git\",\"runtime\":\"python3.11\",\"setup\":[\"pip install -r requirements.txt\"]},\"metric\":{\"comparison\":\"within_tolerance\",\"name\":\"accuracy\",\"reported_value\":\"0.97\",\"tolerance\":{\"type\":\"abs\",\"value\":\"0.01\"}},\"private_data\":null,\"resources\":{\"cpu\":2,\"max_minutes\":3,\"mem_gb\":2},\"source\":{\"authors\":\"RERUN demo fixture\",\"license\":\"MIT\",\"type\":\"report\",\"url\":\"https://rerun.invalid/demo/misreported\"},\"statement\":\"DEMO FIXTURE, not real research. Same code and data as the true claim, but the number in the claim was deliberately misreported as 97%.\",\"title\":\"[DEMO] A logistic model predicts trial response with 97% accuracy\",\"version\":1}",
+    "spec_hash": "913616f92919657ffae80932f9e0f250d322c71acf60c17a3ae1a810795a39d7",
+    "receipt": {
+      "market_id": 1,
+      "spec_hash": "913616f92919657ffae80932f9e0f250d322c71acf60c17a3ae1a810795a39d7",
+      "outcome": "NOT_REPRODUCED",
+      "invalid_reason": null,
+      "measured_value": "0.93",
+      "reported_value": "0.97",
+      "tolerance": "abs:0.01",
+      "commit": "8977800218ee404231d5dd457efed7546023334d",
+      "data_hashes": [
+        "be35dcd48bdcc0222a5c4d5ef769adb4a58e77c1914af80d8aa457ad742f9b7d"
+      ],
+      "env_lock_hash": "8dab88328537f15c219ff04f4c55b0150f9867347067f4b5868ed8b0769249af",
+      "patches": [],
+      "patches_diff_excerpt": "",
+      "log_hash": "d703a3caeb7c8920890384d9dd62da26793a4f1eaee9ffc5e6ec84fe3aa12357",
+      "log_tail": "accuracy=0.93\n",
+      "full_log_uri": "rerun-lab://local/logs/d703a3caeb7c8920890384d9dd62da26793a4f1eaee9ffc5e6ec84fe3aa12357",
+      "report_hash": "e7a068be43a68738cfcf088623515d77ba1bbe7aa23987d5c8074eabbb2e8cf7",
+      "report_uri": "rerun-lab://local/reports/e7a068be43a68738cfcf088623515d77ba1bbe7aa23987d5c8074eabbb2e8cf7",
+      "runtime_secs": 4,
+      "exit_code": 0,
+      "lab_codehash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "lab_account": "local-lab.testnet",
+      "nearai": {
+        "model_id": "z-ai/glm-5.3-flash",
+        "attestation_digest": "bb8a7976104d871a735c0da6d0f0b244382f42c97202b1b1efc9cfd40c1de8d6",
+        "response_signature_refs": [
+          "mock-c3a1041ed30f5f88"
+        ]
+      },
+      "run_index": 0,
+      "started_at": 1793776319,
+      "finished_at": 1793776329
+    }
+  },
+  {
+    "name": "repairable",
+    "spec_json": "{\"artifact\":{\"commit\":\"d1f86938a1b89aab8b29421e8c6bf0c9ea54c6e4\",\"data\":[{\"path\":\"data/trials.csv\",\"sha256\":\"be35dcd48bdcc0222a5c4d5ef769adb4a58e77c1914af80d8aa457ad742f9b7d\",\"url\":\"https://rerun.invalid/demo/data/trials.csv\"}],\"entrypoint\":\"python reproduce.py\",\"output\":{\"extractor\":{\"expr\":\"$.accuracy\",\"type\":\"jsonpath\"},\"path\":\"results.json\"},\"repo_url\":\"https://rerun.invalid/demo/repairable.git\",\"runtime\":\"python3.11\",\"setup\":[\"pip install -r requirements.txt\"]},\"metric\":{\"comparison\":\"within_tolerance\",\"name\":\"accuracy\",\"reported_value\":\"0.93\",\"tolerance\":{\"type\":\"abs\",\"value\":\"0.02\"}},\"private_data\":null,\"resources\":{\"cpu\":2,\"max_minutes\":3,\"mem_gb\":2},\"source\":{\"authors\":\"RERUN demo fixture\",\"license\":\"MIT\",\"type\":\"report\",\"url\":\"https://rerun.invalid/demo/repairable\"},\"statement\":\"DEMO FIXTURE, not real research. The script reads data from a path on the author's laptop. The Lab fixes only that path, shows the diff, and the unchanged analysis reproduces the result.\",\"title\":\"[DEMO] A paper's code with a hardcoded laptop path still reproduces\",\"version\":1}",
+    "spec_hash": "7307d651f5e782ddb931062bca81ec13b420e9015fd094c8f637f1147b164cf9",
+    "receipt": {
+      "market_id": 2,
+      "spec_hash": "7307d651f5e782ddb931062bca81ec13b420e9015fd094c8f637f1147b164cf9",
+      "outcome": "REPRODUCED",
+      "invalid_reason": null,
+      "measured_value": "0.93",
+      "reported_value": "0.93",
+      "tolerance": "abs:0.02",
+      "commit": "d1f86938a1b89aab8b29421e8c6bf0c9ea54c6e4",
+      "data_hashes": [
+        "be35dcd48bdcc0222a5c4d5ef769adb4a58e77c1914af80d8aa457ad742f9b7d"
+      ],
+      "env_lock_hash": "8dab88328537f15c219ff04f4c55b0150f9867347067f4b5868ed8b0769249af",
+      "patches": [
+        {
+          "file": "reproduce.py",
+          "kind": "PATH",
+          "diff_hash": "8821df483523adcd8f4faf2f591c498fc49b48d14427a213152ca04d65b862bd"
+        }
+      ],
+      "patches_diff_excerpt": "--- reproduce.py [PATH] Point the hardcoded laptop path at the repository's data file; the analysis is unchanged.\n- pd.read_csv(\"/home/drsmith/project/data/trials.csv\")\n+ pd.read_csv(\"data/trials.csv\")\n",
+      "log_hash": "d703a3caeb7c8920890384d9dd62da26793a4f1eaee9ffc5e6ec84fe3aa12357",
+      "log_tail": "accuracy=0.93\n",
+      "full_log_uri": "rerun-lab://local/logs/d703a3caeb7c8920890384d9dd62da26793a4f1eaee9ffc5e6ec84fe3aa12357",
+      "report_hash": "22902c0a447016f5d59a43eb011f29ca845d7fe46f96445d0180aa8ac052ca97",
+      "report_uri": "rerun-lab://local/reports/22902c0a447016f5d59a43eb011f29ca845d7fe46f96445d0180aa8ac052ca97",
+      "runtime_secs": 7,
+      "exit_code": 0,
+      "lab_codehash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "lab_account": "local-lab.testnet",
+      "nearai": {
+        "model_id": "z-ai/glm-5.3-flash",
+        "attestation_digest": "bb8a7976104d871a735c0da6d0f0b244382f42c97202b1b1efc9cfd40c1de8d6",
+        "response_signature_refs": [
+          "mock-cc7353e3e00db26d",
+          "mock-2c9559da6199a67b"
+        ]
+      },
+      "run_index": 0,
+      "started_at": 1793776329,
+      "finished_at": 1793776344
+    }
+  },
+  {
+    "name": "broken",
+    "spec_json": "{\"artifact\":{\"commit\":\"4657282b6cdd46e0645cf2c6f9febea99f66fed3\",\"data\":[{\"path\":\"data/trials.csv\",\"sha256\":\"be35dcd48bdcc0222a5c4d5ef769adb4a58e77c1914af80d8aa457ad742f9b7d\",\"url\":\"https://rerun.invalid/demo/data/trials.csv\"}],\"entrypoint\":\"python reproduce.py\",\"output\":{\"extractor\":{\"expr\":\"$.accuracy\",\"type\":\"jsonpath\"},\"path\":\"results.json\"},\"repo_url\":\"https://rerun.invalid/demo/broken.git\",\"runtime\":\"python3.11\",\"setup\":[\"pip install -r requirements.txt\"]},\"metric\":{\"comparison\":\"within_tolerance\",\"name\":\"accuracy\",\"reported_value\":\"0.9\",\"tolerance\":{\"type\":\"abs\",\"value\":\"0.01\"}},\"private_data\":null,\"resources\":{\"cpu\":2,\"max_minutes\":3,\"mem_gb\":2},\"source\":{\"authors\":\"RERUN demo fixture\",\"license\":\"MIT\",\"type\":\"report\",\"url\":\"https://rerun.invalid/demo/broken\"},\"statement\":\"DEMO FIXTURE, not real research. The code imports a package the authors never released, so no environment repair can make it run. That is a real finding: the result did not reproduce because the code is broken.\",\"title\":\"[DEMO] Analysis that depends on an unpublished private package\",\"version\":1}",
+    "spec_hash": "095cd48cf1aac81d27e9ac8df19b66e4fbfc698a7c58c110e4f6d8a33edef6a8",
+    "receipt": {
+      "market_id": 3,
+      "spec_hash": "095cd48cf1aac81d27e9ac8df19b66e4fbfc698a7c58c110e4f6d8a33edef6a8",
+      "outcome": "BROKEN",
+      "invalid_reason": null,
+      "measured_value": null,
+      "reported_value": "0.9",
+      "tolerance": "abs:0.01",
+      "commit": "4657282b6cdd46e0645cf2c6f9febea99f66fed3",
+      "data_hashes": [
+        "be35dcd48bdcc0222a5c4d5ef769adb4a58e77c1914af80d8aa457ad742f9b7d"
+      ],
+      "env_lock_hash": "8dab88328537f15c219ff04f4c55b0150f9867347067f4b5868ed8b0769249af",
+      "patches": [],
+      "patches_diff_excerpt": "",
+      "log_hash": "db84011ef2fa752bbd43273ab1d60812dfb31830fb346e4c44d6e9704f5dc973",
+      "log_tail": "Traceback (most recent call last):\n  File \"/work/repo/reproduce.py\", line 3, in <module>\n    import labtools_internal as lt  # the lab's private package; never published\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nModuleNotFoundError: No module named 'labtools_internal'\n",
+      "full_log_uri": "rerun-lab://local/logs/db84011ef2fa752bbd43273ab1d60812dfb31830fb346e4c44d6e9704f5dc973",
+      "report_hash": "a3a74e37ca38487efa22ca4b6319d9dd86c0c9ae40f05311ac1972a71e166a4b",
+      "report_uri": "rerun-lab://local/reports/a3a74e37ca38487efa22ca4b6319d9dd86c0c9ae40f05311ac1972a71e166a4b",
+      "runtime_secs": 2,
+      "exit_code": 1,
+      "lab_codehash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "lab_account": "local-lab.testnet",
+      "nearai": {
+        "model_id": "z-ai/glm-5.3-flash",
+        "attestation_digest": "bb8a7976104d871a735c0da6d0f0b244382f42c97202b1b1efc9cfd40c1de8d6",
+        "response_signature_refs": [
+          "mock-9b7da63f1f475a58",
+          "mock-84aed9a1e114b947"
+        ]
+      },
+      "run_index": 0,
+      "started_at": 1793776344,
+      "finished_at": 1793776353
+    }
+  },
+  {
+    "name": "private",
+    "spec_json": "{\"artifact\":{\"commit\":\"9001edcd704673bca341d56a56d72f1e6383d7a9\",\"data\":[],\"entrypoint\":\"python analyze.py\",\"output\":{\"extractor\":{\"expr\":\"0:value\",\"type\":\"csv_cell\"},\"path\":\"results.csv\"},\"repo_url\":\"https://rerun.invalid/demo/private.git\",\"runtime\":\"python3.11\",\"setup\":[\"pip install -r requirements.txt\"]},\"metric\":{\"comparison\":\"within_tolerance\",\"name\":\"auc\",\"reported_value\":\"0.94\",\"tolerance\":{\"type\":\"abs\",\"value\":\"0.03\"}},\"private_data\":{\"ciphertext_ref\":\"https://rerun.invalid/demo/sealed/private.bin\",\"owner\":\"demo-hospital.testnet\",\"path\":\"private/readmissions.csv\",\"sha256_plain\":\"45d60ab42de9d9a09a9fa970e08034e01674a76c9f2eeef040b3d53c6c7f4473\"},\"resources\":{\"cpu\":2,\"max_minutes\":3,\"mem_gb\":2},\"source\":{\"authors\":\"RERUN demo fixture\",\"license\":\"MIT\",\"type\":\"report\",\"url\":\"https://rerun.invalid/demo/private\"},\"statement\":\"DEMO FIXTURE, not real research: the hospital records are synthetic. The data is encrypted to the attested Lab and never revealed; only hashes and the result leave.\",\"title\":\"[DEMO] Readmission model reaches the reported AUC on private hospital data\",\"version\":1}",
+    "spec_hash": "931a3cb90d3fe9d60d89c7e048dffc6b25ae2b81bfb69e9c69b7e191ec1c01de",
+    "receipt": {
+      "market_id": 4,
+      "spec_hash": "931a3cb90d3fe9d60d89c7e048dffc6b25ae2b81bfb69e9c69b7e191ec1c01de",
+      "outcome": "REPRODUCED",
+      "invalid_reason": null,
+      "measured_value": "0.937216",
+      "reported_value": "0.94",
+      "tolerance": "abs:0.03",
+      "commit": "9001edcd704673bca341d56a56d72f1e6383d7a9",
+      "data_hashes": [],
+      "env_lock_hash": "8dab88328537f15c219ff04f4c55b0150f9867347067f4b5868ed8b0769249af",
+      "patches": [],
+      "patches_diff_excerpt": "",
+      "log_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "log_tail": "",
+      "full_log_uri": "",
+      "report_hash": "11a31cf05351f309be9ee05adfc660dc52e6c236e6e1bad3245cd8c24b5062c3",
+      "report_uri": "rerun-lab://local/reports/11a31cf05351f309be9ee05adfc660dc52e6c236e6e1bad3245cd8c24b5062c3",
+      "runtime_secs": 4,
+      "exit_code": 0,
+      "lab_codehash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "lab_account": "local-lab.testnet",
+      "nearai": {
+        "model_id": "z-ai/glm-5.3-flash",
+        "attestation_digest": "bb8a7976104d871a735c0da6d0f0b244382f42c97202b1b1efc9cfd40c1de8d6",
+        "response_signature_refs": [
+          "mock-ee09e7164331717b"
+        ]
+      },
+      "run_index": 0,
+      "started_at": 1793776354,
+      "finished_at": 1793776364
+    }
+  }
+]

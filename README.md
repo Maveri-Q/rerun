@@ -2,7 +2,7 @@
 
 **A forecasting market on whether published research results reproduce, settled by an AI agent that actually re-runs the authors' code and data inside a TEE and posts a verifiable receipt on NEAR.**
 
-> Status: early build (NEAR Hackathon 2026, step 2 of 10: market contract with full lifecycle and tests). Sections marked _planned_ do not exist yet.
+> Status: early build (NEAR Hackathon 2026, step 3 of 10: market contract and a local Lab that really re-runs claims). The Lab does not run in a TEE yet and nothing is deployed. Sections marked _planned_ do not exist yet.
 
 ## The problem
 
@@ -19,13 +19,15 @@ Outcomes: `REPRODUCED` (YES wins), `NOT_REPRODUCED` and `BROKEN` (NO wins), `INV
 
 ## Try it
 
-Requires Node ≥ 22.22.2 and pnpm 12 (`npm i -g pnpm@12`). Contract tests need Rust (the pinned 1.93.0 toolchain installs itself) and, to build wasm, [cargo-near](https://github.com/near/cargo-near).
+Requires Node ≥ 22.22.2 and pnpm 12 (`npm i -g pnpm@12`). Contract tests need Rust (the pinned 1.93.0 toolchain installs itself) and, to build wasm, [cargo-near](https://github.com/near/cargo-near). The Lab needs Docker.
 
 1. `pnpm install`
-2. `pnpm test`: see all tests pass with no network or keys: 25 TypeScript tests (canonical JSON hashing, attestation checks against a recorded real NEAR AI report, signature checks, LLM cost caps) and 55 contract tests (every market outcome, both challenge paths, the attacks the contract must block, stale refunds, pause, storage, points, money mode, and 2,000-case FPMM property tests).
+2. `pnpm test`: see all tests pass with no network, keys or Docker: 119 TypeScript tests (comparator, private-data encryption, attestation checks against a recorded real NEAR AI report, repair guards, the reproduction pipeline) and 56 contract tests (every market outcome, both challenge paths, attacks, stale refunds, points, money mode, FPMM property tests, and real Lab output replayed through the contract).
 3. `pnpm nearai:hello`: see the NEAR AI Cloud attestation for the Lab's private model verified live:
    Intel TDX quote via DCAP, NVIDIA GPU evidence via NRAS (JWT verified against NVIDIA's keys), key + nonce binding in `report_data`, `MRCONFIGID` bound to the app compose, and the RTMR3 event-log replay, for both the gateway and the model TEE. Each line prints PASS/FAIL.
 4. Optional: put `NEARAI_CLOUD_API_KEY` in `.env` (copy `.env.example`) and run `pnpm nearai:hello` again: it also sends one tiny private chat completion and verifies its ECDSA response signature against the attested model key.
+5. `pnpm sandbox:build`, then `MOCK_LLM=1 pnpm lab:run all`: see five demo claims really execute in sandboxed containers, each printing its stages and a final table: `REPRODUCED`, `NOT_REPRODUCED` (deliberately misreported number), `REPRODUCED` after an environment repair (the diff is printed), `BROKEN` (unpublished dependency), and `REPRODUCED` on encrypted private data. Takes about a minute and spends no credits.
+6. With `NEARAI_CLOUD_API_KEY` set, `pnpm lab:run all`: the same claims, but NEAR AI's private model makes the repair decisions and writes the reports, and every reply is checked against an attested key. About $0.003 for all five.
 
 _Planned:_ hosted site in points mode, `pnpm judge-demo` (zero-setup testnet lifecycle + attack demo).
 
@@ -52,15 +54,27 @@ _Planned:_ hosted site in points mode, `pnpm judge-demo` (zero-setup testnet lif
 - **Challenges:** anyone can bond and challenge during the window; the Lab's independent re-run must use a different model. Agreement keeps the result (bond forfeited); disagreement makes the market INVALID and rewards the challenger from the creation bond.
 - **Events:** NEP-297, standard `rerun`. Storage is charged to the caller and the excess refunded.
 
+## The Lab (`lab/`)
+
+Each run follows the same stages: attest the private model → fetch the pinned commit → verify every data hash → install dependencies → decrypt private data if any → run with the network off → repair the environment if needed → extract the metric → compare in code → write the report and receipt.
+
+- **Isolation:** research code runs in throwaway containers holding only the run's workspace: no secrets or environment passed in, non-root, all capabilities dropped, read-only system, CPU, memory, PID and time limits. `DOCKER_TESTS=1 pnpm --filter @rerun/orchestrator test` checks these against real containers.
+- **The LLM cannot change the science.** It can propose environment patches (at most 3 rounds), which pass through code guards: no changed numbers, no analysis or output vocabulary, no data or output files, no packages from arbitrary sources. Every applied patch goes in the receipt; rejected ones are never applied. It can suggest where a metric lives, but code reads the value.
+- **No attested model, no run.** The model's TEE is verified before work starts and each reply's signature afterwards. A failure stops the run.
+- **Private data:** sealed to the Lab's X25519 key and decrypted only after setup has finished. Once it is in the workspace, the network stays off and no logs or outputs reach the LLM, the stream or the receipt. Only hashes and the result leave, and the workspace is deleted afterwards. Failures on private claims therefore get no AI repair.
+
+Current limits: dependencies install with unrestricted network during setup (no secrets or private data are present yet; registry-only egress filtering is planned). Local runs have no TEE, so private-data confidentiality there is only as strong as the host, until the Phala deployment. Demo claims are labelled fixtures with `.invalid` URLs that resolve to local files. The real-claim fetcher has not yet run against a live repository.
+
 ## Repo layout
 
 ```
 contracts/rerun/    Rust market contract: specs, FPMM, lifecycle, receipts, points, lab registry
 contracts/mock-ft/  tUSDC: testnet NEP-141 collateral with an open faucet
-lab/orchestrator/   TypeScript Lab agent: NEAR AI client (single capped LLM wrapper), attestation
-lab/sandbox/        planned: sandbox container for untrusted research code
+lab/orchestrator/   TypeScript Lab: reproduction pipeline, repair guards, NEAR AI client, attestation
+lab/sandbox/        Sandbox images for untrusted research code (Python 3.11, R 4.4)
+claims/demo/        Five labelled demo claims with synthetic data
 web/                planned: Next.js app
-packages/shared/    APP_NAME, canonical JSON + sha256 (spec_hash)
+packages/shared/    APP_NAME, ClaimSpec/Receipt schemas, canonical JSON + sha256, comparator, sealing
 scripts/            testnet-accounts.ts (planned: deploy, seed, demo, judge-demo, attack-demo)
 docs/               planned: ARCHITECTURE, MECHANISM, THREAT_MODEL, SOURCES, ADOPTION
 ```
@@ -77,7 +91,7 @@ Reproduction is not replication: RERUN checks that the published code and data p
 
 ## Built with
 
-near-sdk, near-contract-standards, uint, proptest, near-api-js, @phala/dcap-qvl, ethers, jose, dotenv, vitest, tsx. Code written with Claude Code during the hackathon window (from 2026-10-19).
+near-sdk, near-contract-standards, uint, proptest, near-api-js, zod, scikit-learn and the scientific Python/R stack in the sandbox, @phala/dcap-qvl, ethers, jose, dotenv, vitest, tsx. Code written with Claude Code during the hackathon window (from 2026-10-19).
 
 ## License
 

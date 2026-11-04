@@ -6,14 +6,17 @@
   "scripts": {
     "test": "vitest run",
     "typecheck": "tsc -p .",
-    "nearai:hello": "tsx scripts/nearai-hello.ts"
+    "nearai:hello": "tsx scripts/nearai-hello.ts",
+    "lab:run": "tsx scripts/run-claim.ts",
+    "export:vectors": "tsx scripts/export-vectors.ts"
   },
   "dependencies": {
     "@phala/dcap-qvl": "0.7.0",
     "@rerun/shared": "workspace:*",
     "dotenv": "18.0.9",
     "ethers": "6.17.0",
-    "jose": "6.2.15"
+    "jose": "6.2.15",
+    "zod": "4.6.7"
   },
   "devDependencies": {
     "@types/node": "26.6.6",

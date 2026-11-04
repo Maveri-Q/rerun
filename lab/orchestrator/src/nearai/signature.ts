@@ -1,6 +1,6 @@
 import { verifyMessage } from "ethers";
 import type { ChatResult } from "./client.ts";
-import type { ReportVerification } from "./attestation.ts";
+import { withNetworkRetry, type ReportVerification } from "./attestation.ts";
 
 /**
  * Per-response signatures (https://docs.near.ai/cloud/verification/cloud-api/response-signatures).
@@ -38,7 +38,9 @@ export async function fetchSignature(opts: {
   url.searchParams.set("signing_algo", "ecdsa");
   const retries = opts.retries ?? 5;
   for (let attempt = 0; ; attempt++) {
-    const res = await fetch(url, { headers: { authorization: `Bearer ${opts.apiKey}`, accept: "application/json" } });
+    const res = await withNetworkRetry(() =>
+      fetch(url, { headers: { authorization: `Bearer ${opts.apiKey}`, accept: "application/json" } }),
+    );
     if (res.status === 404 && attempt < retries) {
       await new Promise((r) => setTimeout(r, 1000));
       continue;

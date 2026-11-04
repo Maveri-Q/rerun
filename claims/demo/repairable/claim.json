@@ -1,0 +1,14 @@
+{
+  "expected": "REPRODUCED",
+  "expected_patches": 1,
+  "title": "[DEMO] A paper's code with a hardcoded laptop path still reproduces",
+  "statement": "DEMO FIXTURE, not real research. The script reads data from a path on the author's laptop. The Lab fixes only that path, shows the diff, and the unchanged analysis reproduces the result.",
+  "metric": { "name": "accuracy", "reported_value": "0.93", "tolerance": { "type": "abs", "value": "0.02" }, "comparison": "within_tolerance" },
+  "entrypoint": "python reproduce.py",
+  "setup": ["pip install -r requirements.txt"],
+  "output": { "path": "results.json", "extractor": { "type": "jsonpath", "expr": "$.accuracy" } },
+  "data": [{ "file": "trials.csv", "path": "data/trials.csv" }],
+  "mock_llm": {
+    "repair": "{\"give_up\":false,\"reason\":\"The script reads from an absolute path on the author's machine; the file is at data/trials.csv in the repo.\",\"edits\":[{\"file\":\"reproduce.py\",\"kind\":\"PATH\",\"justification\":\"Point the hardcoded laptop path at the repository's data file; the analysis is unchanged.\",\"search\":\"pd.read_csv(\\\"/home/drsmith/project/data/trials.csv\\\")\",\"replace\":\"pd.read_csv(\\\"data/trials.csv\\\")\"}]}"
+  }
+}

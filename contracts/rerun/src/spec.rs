@@ -103,6 +103,7 @@ struct PrivateData {
     ciphertext_ref: String,
     sha256_plain: String,
     owner: AccountId,
+    path: String,
 }
 
 /// The parts of a spec the contract needs later to check receipts.
@@ -195,6 +196,7 @@ pub fn validate(spec_json: &str) -> Result<SpecSummary, String> {
         check_len("private_data.ciphertext_ref", &p.ciphertext_ref, 1, 300)?;
         check(is_hex(&p.sha256_plain, 64), "private_data.sha256_plain must be 64 lowercase hex chars")?;
         let _ = &p.owner; // validated by AccountId deserialisation
+        check_rel_path("private_data.path", &p.path)?;
     }
 
     Ok(SpecSummary {
@@ -311,5 +313,6 @@ pub(crate) mod tests {
         bad(&|v| v["metric"]["reported_value"] = 0.912.into(), "decimal strings");
         bad(&|v| v["artifact"]["repo_url"] = "http://github.com/x".into(), "https://");
         bad(&|v| v["extra"] = 1.into(), "unknown field");
+        bad(&|v| v["private_data"] = serde_json::json!({ "ciphertext_ref": "x", "sha256_plain": "ab".repeat(32), "owner": "a.testnet", "path": "../secret.csv" }), "relative path");
     }
 }

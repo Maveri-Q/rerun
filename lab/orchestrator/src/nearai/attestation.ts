@@ -93,7 +93,7 @@ export async function fetchAttestationReport(opts: {
   if (opts.signingAddress) url.searchParams.set("signing_address", opts.signingAddress);
   const headers: Record<string, string> = { accept: "application/json", "x-no-aliasing": "true" };
   if (opts.apiKey) headers.authorization = `Bearer ${opts.apiKey}`;
-  const res = await fetch(url, { headers });
+  const res = await withNetworkRetry(() => fetch(url, { headers }));
   if (!res.ok) throw new Error(`attestation report ${res.status}: ${(await res.text()).slice(0, 300)}`);
   return (await res.json()) as AttestationReport;
 }
@@ -241,7 +241,7 @@ export async function withNetworkRetry<T>(fn: () => Promise<T>, attempts = 4): P
 
 function isNetworkError(e: unknown): boolean {
   const text = errMsg(e);
-  return /fetch failed|ENOTFOUND|EAI_AGAIN|ECONNRESET|ETIMEDOUT|ECONNREFUSED|socket hang up/i.test(text);
+  return /fetch failed|ENOTFOUND|EAI_AGAIN|ECONNRESET|ETIMEDOUT|ECONNREFUSED|socket hang up|timeout|aborted/i.test(text);
 }
 
 async function dcapVerify(quote: Buffer): Promise<{ status: string }> {
@@ -265,7 +265,7 @@ async function nrasVerify(payload: unknown): Promise<{ overall: boolean; nonce?:
   if (!Array.isArray(first) || first[0] !== "JWT" || typeof first[1] !== "string") {
     throw new Error("unexpected NRAS response shape");
   }
-  jwks ??= createRemoteJWKSet(new URL(NRAS_JWKS_URL));
+  jwks ??= createRemoteJWKSet(new URL(NRAS_JWKS_URL), { timeoutDuration: 20_000 });
   const token = first[1];
   const { payload: claims } = await withNetworkRetry(() => jwtVerify(token, jwks!));
   return {
