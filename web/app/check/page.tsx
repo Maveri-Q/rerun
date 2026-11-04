@@ -1,6 +1,7 @@
 "use client";
 
 import { checkPaperText, type MeanFinding, type PaperCheck, type StatFinding } from "@rerun/shared/browser";
+import { motion, useReducedMotion } from "motion/react";
 import { useState } from "react";
 
 const SAMPLE = `Students taught with the new method scored higher than the control group, t(28) = 2.20, p = .036. The effect of practice time was significant, F(2, 30) = 1.00, p < .01. Students rated the course highly (M = 3.47, SD = 1.20, n = 20).`;
@@ -68,64 +69,84 @@ function summarize(found: number, flagged: number): string {
 export default function CheckPage() {
   const [text, setText] = useState("");
   const [result, setResult] = useState<PaperCheck | null>(null);
+  const [scanning, setScanning] = useState(false);
+  const reduce = useReducedMotion();
 
   const findings = result ? [...result.statistics.map(fromStatistic), ...result.means.map(fromMean)].sort((a, b) => ORDER[a.tone] - ORDER[b.tone]) : [];
 
-  return (
-    <>
-      <h1 style={{ fontSize: "clamp(30px, 4vw, 44px)" }}>Do a paper&apos;s numbers add up?</h1>
-      <p className="lede prose">
-        A research paper prints numbers that depend on each other, like the items and the total on a receipt. Paste some text from a paper and this checks that they agree. You don&apos;t need the code or the data, and what you paste stays in your browser.
-      </p>
+  const check = (value: string) => {
+    setResult(null);
+    setScanning(true);
+    window.setTimeout(() => {
+      setResult(checkPaperText(value));
+      setScanning(false);
+    }, 950);
+  };
 
-      <section style={{ marginTop: 32 }}>
-        <div style={{ marginBottom: 20 }}>
-          <button onClick={() => { setText(SAMPLE); setResult(checkPaperText(SAMPLE)); }}>Try an example</button>
+  return (
+    <div className="check-grid">
+      <div>
+        <h1 className="check-title">Do a paper&apos;s numbers add up?</h1>
+        <p className="lede">
+          A research paper prints numbers that depend on each other, like the items and the total on a receipt. Paste some text from a paper and this checks that they agree. You don&apos;t need the code or the data, and what you paste stays in your browser.
+        </p>
+        <div style={{ margin: "24px 0 20px" }}>
+          <button onClick={() => { setText(SAMPLE); check(SAMPLE); }}>Try an example</button>
         </div>
         <label className="field">
           <span>Or paste the results section of a paper</span>
-          <textarea rows={7} value={text} onChange={(e) => { setText(e.target.value); setResult(null); }} />
+          <span className={`check-input ${scanning ? "is-scanning" : ""}`}>
+            <textarea rows={7} value={text} onChange={(e) => { setText(e.target.value); setResult(null); }} />
+          </span>
         </label>
-        <button className="quiet" disabled={!text.trim()} onClick={() => setResult(checkPaperText(text))}>
+        <button className="quiet" disabled={!text.trim() || scanning} onClick={() => check(text)}>
           Check the numbers
         </button>
-      </section>
+      </div>
 
-      {result && (
-        <section className="section" aria-live="polite">
-          <div className="section-head">
-            <h2>{summarize(findings.length, result.flagged)}</h2>
-          </div>
-          {findings.length === 0 && <p className="prose">This check reads results in the format most science papers use. Try pasting the paragraphs where the paper reports its results.</p>}
-          {findings.length > 0 && (
-            <ul className="paper-results">
-              {findings.map((f, i) => (
-                <li key={i}>
-                  <span className={`paper-mark ${TONE_CLASS[f.tone]}`} aria-hidden="true">
-                    {MARK[f.tone]}
-                  </span>
-                  <div>
-                    <h3>{f.headline}</h3>
-                    <p>{f.explanation}</p>
-                    <details>
-                      <summary>Show the numbers</summary>
-                      <p>
-                        <code className="mono">{f.printed}</code>
-                      </p>
-                      {f.detail && <p>{f.detail}</p>}
-                    </details>
-                  </div>
-                </li>
-              ))}
-            </ul>
+      <div className="check-printer" aria-live="polite">
+        <div className="receipt-slot" aria-hidden="true" />
+        <div className="check-feed">
+          {!result && <p className="check-wait">{scanning ? "Reading the numbers…" : "Your results print here."}</p>}
+          {result && (
+            <motion.div className="check-paper" initial={reduce ? false : { y: "-100%" }} animate={{ y: 0 }} transition={{ type: "spring", stiffness: 70, damping: 18 }}>
+              <div className="receipt-top">
+                <b>NUMBER CHECK</b>
+                <span>{findings.length} found</span>
+              </div>
+              <h2>{summarize(findings.length, result.flagged)}</h2>
+              {findings.length === 0 && <p>This check reads results in the format most science papers use. Try pasting the paragraphs where the paper reports its results.</p>}
+              {findings.length > 0 && (
+                <ul className="paper-results">
+                  {findings.map((f, i) => (
+                    <li key={i}>
+                      <span className={`paper-mark ${TONE_CLASS[f.tone]}`} aria-hidden="true">
+                        {MARK[f.tone]}
+                      </span>
+                      <div>
+                        <h3>{f.headline}</h3>
+                        <p>{f.explanation}</p>
+                        <details>
+                          <summary>Show the numbers</summary>
+                          <p>
+                            <code className="mono">{f.printed}</code>
+                          </p>
+                          {f.detail && <p>{f.detail}</p>}
+                        </details>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {findings.length > 0 && (
+                <p className="check-note">
+                  A warning means someone should take a closer look. It&apos;s often just a typo, and it doesn&apos;t prove the research is wrong. A tick only means these numbers agree with each other, not that the research is right.
+                </p>
+              )}
+            </motion.div>
           )}
-          {findings.length > 0 && (
-            <p className="notice prose">
-              A warning means someone should take a closer look. It&apos;s often just a typo, and it doesn&apos;t prove the research is wrong. A tick only means these numbers agree with each other, not that the research is right.
-            </p>
-          )}
-        </section>
-      )}
-    </>
+        </div>
+      </div>
+    </div>
   );
 }

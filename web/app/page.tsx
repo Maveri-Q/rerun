@@ -3,12 +3,12 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { MarketTicker } from "@/components/MarketTicker";
-import { PrintedReceipt } from "@/components/PrintedReceipt";
+import { CallIt, PaperTape } from "@/components/CallIt";
 import { RollingNumber } from "@/components/RollingNumber";
 import { usePoll } from "@/components/usePoll";
 import { chain } from "@/lib/chain";
 import { lab } from "@/lib/lab";
-import { fmtUnits, rangeText, type Market, type Mode } from "@/lib/market";
+import { fmtUnits, type Market, type Mode } from "@/lib/market";
 
 type Filter = "all" | Mode | "settled";
 
@@ -36,9 +36,6 @@ export default function Home() {
     const rows = listed.filter((m) => (filter === "all" ? true : filter === "settled" ? m.state === "Final" : m.mode === filter));
     return [...rows].sort((a, b) => Number(live(b)) - Number(live(a)) || b.id - a.id);
   }, [listed, filter]);
-  const latest = useMemo(() => [...listed].filter((m) => m.outcome === "REPRODUCED").sort((a, b) => (b.finalized_at ?? 0) - (a.finalized_at ?? 0))[0], [listed]);
-  const receipts = usePoll(() => (latest ? chain.receipts(latest.id) : Promise.resolve([])), [latest?.id]);
-  const measured = receipts.data?.at(-1)?.measured_value ?? null;
 
   const s = stats.data;
   const rate = s?.reproduction_rate_bps === null || !s ? "0" : (s.reproduction_rate_bps / 100).toFixed(0);
@@ -46,9 +43,9 @@ export default function Home() {
     <>
       <section className="hero">
         <div className="hero-copy">
-          <h1>Will this research hold up? Predict it, then watch an AI check it.</h1>
+          <h1>Will this research hold up?</h1>
           <p className="lede">
-            Many published results don&apos;t hold up, but checking takes months, so it rarely happens. Here you predict whether a result will hold up. Then an AI lab re-runs the authors&apos; own code and data, and prints public proof of what it found.
+            Many published results don&apos;t. Here you predict which ones will, then an AI lab re-runs the authors&apos; own code and data and prints public proof. Try it: make a call on a real finished claim.
           </p>
           <div className="hero-actions">
             <a className="btn" href="#claims">
@@ -79,27 +76,16 @@ export default function Home() {
             </div>
           </div>
         </div>
-        {latest?.outcome && (
-          <PrintedReceipt
-            marketId={latest.id}
-            title={latest.spec.title}
-            outcome={latest.outcome}
-            reported={latest.spec.reported_value}
-            range={rangeText(latest.spec.reported_value, latest.spec.tolerance_kind, latest.spec.tolerance_value)}
-            measured={measured}
-            hash={latest.spec.spec_hash}
-            when={latest.finalized_at}
-            print
-            href={`/market/${latest.id}`}
-          />
-        )}
+        <CallIt markets={listed} />
       </section>
+
+      <PaperTape markets={listed} />
 
       <section className="band">
         <div className="band-inner">
           <div className="section-head">
             <h2>From a published claim to printed proof, in four steps.</h2>
-            <Link href="/how">Read the full guide</Link>
+            <Link className="band-cta" href="/how">Watch the machine run</Link>
           </div>
           <ol className="how-short">
             <li>

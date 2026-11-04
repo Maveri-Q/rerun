@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Funnel_Display, Funnel_Sans, Geist_Mono } from "next/font/google";
+import { BigFoot } from "@/components/BigFoot";
 import { Providers } from "@/components/Providers";
 import { Topbar } from "@/components/Topbar";
 import { APP_NAME } from "@rerun/shared/browser";
@@ -23,6 +24,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <Topbar />
             <main>{children}</main>
           </div>
+          <BigFoot />
         </Providers>
       </body>
     </html>
