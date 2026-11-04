@@ -1,0 +1,38 @@
+{
+  "expected": "REPRODUCED",
+  "spec": {
+    "version": 1,
+    "title": "A timing model for a forest pest: Candy's 1991 slope of -0.0457",
+    "statement": "Candy (Environmental Entomology, 1991) modelled how spruce budworm, a forest pest, moves through its life stages as the season warms. He reports a slope of -0.0457 for the cumulative logit model. This re-runs an independent R replication by Boersch-Supan, published in ReScience C, on the same counts.",
+    "source": {
+      "type": "paper",
+      "url": "https://doi.org/10.5281/zenodo.5006005",
+      "doi": "10.5281/zenodo.5006005",
+      "license": "CC-BY-4.0",
+      "authors": "Replication: P. H. Boersch-Supan. Original: S. G. Candy."
+    },
+    "artifact": {
+      "repo_url": "https://github.com/pboesu/replication_candy_1991",
+      "commit": "98329d447ef025c260879f28316015fc0b24fb08",
+      "data": [],
+      "runtime": "r4.4",
+      "setup": [
+        "mkdir -p /work/.rlib",
+        "Rscript --vanilla -e \"install.packages(c('gtools','VGAM','ordinal'), lib='/work/.rlib', repos='https://cloud.r-project.org')\""
+      ],
+      "entrypoint": "Rscript --vanilla -e \"source('code/02_fit_candy_1991_models.R'); cat(sprintf('slope %.6f\\n', logit_cm_candy_nll\\$par[7]))\" > rerun_output.txt",
+      "output": {
+        "path": "rerun_output.txt",
+        "extractor": { "type": "regex", "expr": "slope (-?[0-9.]+)" }
+      }
+    },
+    "metric": {
+      "name": "slope of the cumulative logit model",
+      "reported_value": "-0.0457",
+      "tolerance": { "type": "rel", "value": "0.01" },
+      "comparison": "within_tolerance"
+    },
+    "resources": { "cpu": 2, "mem_gb": 2, "max_minutes": 15 },
+    "private_data": null
+  }
+}

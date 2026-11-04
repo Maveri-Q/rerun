@@ -1,0 +1,35 @@
+{
+  "expected": "REPRODUCED",
+  "spec": {
+    "version": 1,
+    "title": "Temperature explains about 15% of yearly forest water loss after wildfires",
+    "statement": "Bond-Lamberty et al. (Global Change Biology, 2009) studied water loss from Canadian boreal forests after fire. Their regression of yearly evapotranspiration on average temperature has an R-squared of 0.1495, as recorded in the author's 2008 output file. This re-runs the author's own original script, unchanged, on the published data.",
+    "source": {
+      "type": "paper",
+      "url": "https://doi.org/10.5281/zenodo.4617894",
+      "doi": "10.5281/zenodo.4617894",
+      "license": "MIT",
+      "authors": "B. Bond-Lamberty, S. D. Peckham, S. T. Gower, B. E. Ewers"
+    },
+    "artifact": {
+      "repo_url": "https://github.com/bpbond/ten-years-paper33",
+      "commit": "c28b8a2e3149f7d90f2dc0179f9c976785e762b1",
+      "data": [],
+      "runtime": "r4.4",
+      "setup": [],
+      "entrypoint": "Rscript --vanilla ET.r > rerun_output.txt",
+      "output": {
+        "path": "rerun_output.txt",
+        "extractor": { "type": "regex", "expr": "ET ~ Tavg[\\s\\S]*?Multiple R-squared:\\s+([0-9.]+)" }
+      }
+    },
+    "metric": {
+      "name": "R-squared of evapotranspiration on average temperature",
+      "reported_value": "0.1495",
+      "tolerance": { "type": "abs", "value": "0.0005" },
+      "comparison": "within_tolerance"
+    },
+    "resources": { "cpu": 1, "mem_gb": 1, "max_minutes": 5 },
+    "private_data": null
+  }
+}

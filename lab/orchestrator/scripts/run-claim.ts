@@ -4,11 +4,13 @@
  *   MOCK_LLM=1 pnpm lab:run all      # scripted LLM, no credits
  *   pnpm lab:run repairable          # real NEAR AI private model (spends a little credit)
  *   pnpm lab:run reproduces --rerun  # as an independent second run, with the re-run model
+ *   MOCK_LLM=1 pnpm lab:run real     # published papers from claims/real, cloned from GitHub
  */
 import { mkdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { generateLabKeyPair, specHash } from "@rerun/shared";
 import { DEMO_NAMES, loadDemo, type DemoName } from "../src/demo/fixtures.ts";
+import { loadReal, REAL_NAMES } from "../src/demo/real.ts";
 import { loadEnv } from "../src/env.ts";
 import { LlmClient, llmConfigFromEnv } from "../src/nearai/client.ts";
 import { NearAiModel } from "../src/pipeline/model.ts";
@@ -23,10 +25,10 @@ const LOCAL_CODEHASH = "0".repeat(64); // a local Lab has no TEE codehash; real 
 const args = process.argv.slice(2);
 const rerun = args.includes("--rerun");
 const wanted = args.filter((a) => !a.startsWith("--"));
-const names = (wanted.length === 0 || wanted.includes("all") ? DEMO_NAMES : wanted) as DemoName[];
+const names: string[] = wanted.length === 0 || wanted.includes("all") ? [...DEMO_NAMES] : wanted.includes("real") ? REAL_NAMES : wanted;
 
 for (const n of names) {
-  if (!DEMO_NAMES.includes(n)) throw new Error(`unknown demo '${n}'; choose from ${DEMO_NAMES.join(", ")} or all`);
+  if (!(DEMO_NAMES as readonly string[]).includes(n) && !REAL_NAMES.includes(n)) throw new Error(`unknown claim '${n}'; choose from ${[...DEMO_NAMES, ...REAL_NAMES].join(", ")}, all or real`);
 }
 
 const config = llmConfigFromEnv();
@@ -50,7 +52,7 @@ async function main() {
   const results: { name: string; expected: string; outcome: string; measured: string; patches: number; secs: number; ok: boolean }[] = [];
 
   for (const [i, name] of names.entries()) {
-    const demo = loadDemo(name, labKeys);
+    const demo = REAL_NAMES.includes(name) ? loadReal(name) : loadDemo(name as DemoName, labKeys);
     console.log(`=== ${name}: ${demo.spec.title}\n    spec_hash ${specHash(demo.spec)}`);
     const llm = new LlmClient(config, demo.mockResponder);
     llm.newRun();
@@ -76,7 +78,7 @@ async function main() {
     console.log(`  robustness: ${evidence.robustness.status} ${evidence.robustness.runs.map((r) => r.value ?? "-").join(" ")}`);
     console.log(`  re-implementation: ${evidence.reimplementation.status} ${evidence.reimplementation.value ?? evidence.reimplementation.reason ?? ""}`);
     if (rejectedEdits.length) console.log(`  rejected edits: ${JSON.stringify(rejectedEdits)}`);
-    const ok = receipt.outcome === demo.expected && receipt.patches.length === demo.expectedPatches;
+    const ok = receipt.outcome === demo.expected && (demo.expectedPatches === null || receipt.patches.length === demo.expectedPatches);
     results.push({
       name,
       expected: demo.expected,

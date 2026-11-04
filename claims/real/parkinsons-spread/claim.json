@@ -1,0 +1,35 @@
+{
+  "expected": "REPRODUCED",
+  "spec": {
+    "version": 1,
+    "title": "A brain-wiring model predicts how Parkinson's-linked protein spreads in mice, r = 0.696",
+    "statement": "Henderson et al. (Nature Neuroscience, 2019) modelled how alpha-synuclein, the protein linked to Parkinson's disease, spreads along the mouse brain's wiring. They report that the model's predictions match lab measurements with a correlation of 0.696 at 3 months. This re-runs an independent Python replication by Bourdenx and Paul, published in ReScience C, on the study's data.",
+    "source": {
+      "type": "paper",
+      "url": "https://doi.org/10.5281/zenodo.5379631",
+      "doi": "10.5281/zenodo.5379631",
+      "license": "MIT (replication code and data in the repository)",
+      "authors": "Replication: M. Bourdenx, T. Paul. Original: M. Henderson et al."
+    },
+    "artifact": {
+      "repo_url": "https://github.com/MathieuBo/PathoSpreading",
+      "commit": "3031496c581800ebec3fb892f6dd05936e341dcb",
+      "data": [],
+      "runtime": "python3.11",
+      "setup": ["pip install seaborn==0.13.2 tqdm==4.67.1"],
+      "entrypoint": "python Pipeline.py > rerun_output.txt",
+      "output": {
+        "path": "rerun_output.txt",
+        "extractor": { "type": "regex", "expr": "Month Post Injection 3\\s[\\s\\S]*?Pearson correlation coefficient ([0-9.]+)" }
+      }
+    },
+    "metric": {
+      "name": "correlation between predicted and measured pathology at 3 months",
+      "reported_value": "0.696",
+      "tolerance": { "type": "abs", "value": "0.005" },
+      "comparison": "within_tolerance"
+    },
+    "resources": { "cpu": 2, "mem_gb": 4, "max_minutes": 15 },
+    "private_data": null
+  }
+}

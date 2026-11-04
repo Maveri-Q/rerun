@@ -7,7 +7,7 @@ RERUN: NEAR Hackathon 2026 entry. The full spec is the human's build plan (`RERU
 - `pnpm install`, `pnpm test` (all packages, offline, `MOCK_LLM`-safe), `pnpm typecheck`
 - `pnpm nearai:hello`: live NEAR AI attestation (+ chat and signature with an API key)
 - `pnpm testnet:accounts`: creates faucet-funded testnet accounts into `.env.testnet`
-- `pnpm sandbox:build` (Docker images), `MOCK_LLM=1 pnpm lab:run all` (demo claims, no credits), `pnpm lab:run <name> [--rerun]` (real private model)
+- `pnpm sandbox:build` (Docker images), `MOCK_LLM=1 pnpm lab:run all` (demo claims, no credits), `pnpm lab:run <name> [--rerun]` (real private model), `MOCK_LLM=1 pnpm lab:run real` (published papers in `claims/real`, sources in `docs/SOURCES.md`)
 - `DOCKER_TESTS=1 pnpm --filter @rerun/orchestrator test` adds real-container isolation tests
 - After changing specs, receipts or demo claims: `MOCK_LLM=1 pnpm lab:run all && pnpm --filter @rerun/orchestrator export:vectors`, then `pnpm test:contracts`
 - `pnpm deploy:testnet` (idempotent; `pnpm deploy` is pnpm's own command), `pnpm demo [names] [--resume]` (end to end on testnet), `pnpm lab:watch` (Lab loop)
