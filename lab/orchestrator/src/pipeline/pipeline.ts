@@ -10,6 +10,7 @@ import {
   type Receipt,
 } from "@rerun/shared";
 import type { ExecResult, Sandbox } from "../sandbox/types.ts";
+import { runReimplementation, runRobustness, summarizeEvidence, type Evidence, type ReimplementationResult, type RobustnessResult } from "./evidence.ts";
 import { extractMetric, MAX_OUTPUT_BYTES, type ExtractorType } from "./extract.ts";
 import { parseJsonReply } from "./guards.ts";
 import { ModelVerificationError, type PrivateModel } from "./model.ts";
@@ -37,6 +38,8 @@ export type Stage =
   | "repairing"
   | "extracting"
   | "comparing"
+  | "stress_testing"
+  | "reimplementing"
   | "reporting"
   | "done";
 
@@ -66,6 +69,8 @@ export interface RunInput {
   labAccount: string;
   labCodehash: string;
   labKeys?: LabKeys;
+  /** The paper's methods section, for the independent re-implementation check. */
+  methods?: string;
 }
 
 export interface RunDeps {
@@ -73,8 +78,10 @@ export interface RunDeps {
   model: PrivateModel;
   resolver: ArtifactResolver;
   emit?: (e: StageEvent) => void;
-  /** Stores a log or report and returns its URI. Not called with private-run logs. */
-  store?: (kind: "log" | "report", hash: string, content: string) => Promise<string>;
+  /** A fresh workspace with none of the authors' code. Without it, re-implementation is skipped. */
+  newSandbox?: () => Sandbox;
+  /** Stores a log, report or evidence file and returns its URI. Not called with private-run logs. */
+  store?: (kind: "log" | "report" | "evidence", hash: string, content: string) => Promise<string>;
   now?: () => number;
 }
 
@@ -82,6 +89,7 @@ export interface RunResult {
   receipt: Receipt;
   report: string;
   rejectedEdits: { file: string; reason: string }[];
+  evidence: Evidence;
 }
 
 class Stop extends Error {
@@ -100,12 +108,15 @@ export async function reproduce(input: RunInput, deps: RunDeps): Promise<RunResu
   const emit = deps.emit ?? (() => {});
   const nowSecs = deps.now ?? (() => Math.floor(Date.now() / 1000));
   const startedAt = nowSecs();
-  emit({ stage: "attesting", message: `verifying the TEE attestation of ${model.modelId}` });
+  emit({ stage: "attesting", message: `checking that the AI (${model.modelId}) runs on secure hardware` });
   await model.attest(); // no attested model, no run
   const isPrivate = spec.private_data !== null;
   const { artifact } = spec;
 
   const dataHashes: string[] = [];
+  const dataBytes = new Map<string, Uint8Array>();
+  let robustness: RobustnessResult = { status: "not_attempted", reason: "The run did not produce a result to stress-test.", runs: [] };
+  let baseRunMs = 0;
   const patches: AppliedPatch[] = [];
   const rejectedEdits: RunResult["rejectedEdits"] = [];
   const attempts: string[] = [];
@@ -127,7 +138,7 @@ export async function reproduce(input: RunInput, deps: RunDeps): Promise<RunResu
   /** One repair round. Returns false once no further attempt is possible. */
   const repair = async (phase: "setup" | "run", errorLog: string): Promise<boolean> => {
     if (attempts.length >= MAX_REPAIR_ATTEMPTS) return false;
-    emit({ stage: "repairing", message: `asking the private model about the ${phase} failure (attempt ${attempts.length + 1}/${MAX_REPAIR_ATTEMPTS})` });
+    emit({ stage: "repairing", message: `the code failed, so the AI is looking for a setup problem it can fix (try ${attempts.length + 1} of ${MAX_REPAIR_ATTEMPTS})` });
     const result = await proposeAndApplyRepair({
       model,
       sandbox,
@@ -140,11 +151,11 @@ export async function reproduce(input: RunInput, deps: RunDeps): Promise<RunResu
     });
     for (const r of result.rejected) {
       rejectedEdits.push(r);
-      emit({ stage: "repairing", message: `guard rejected an edit to ${r.file}: ${r.reason}` });
+      emit({ stage: "repairing", message: `blocked an AI edit to ${r.file}: ${r.reason}` });
     }
     for (const p of result.applied) {
       patches.push(p);
-      emit({ stage: "repairing", message: `applied ${p.kind} patch to ${p.file}`, diff: p.diff });
+      emit({ stage: "repairing", message: `fixed a setup problem in ${p.file}`, diff: p.diff });
     }
     attempts.push(
       `attempt ${attempts.length + 1}: ${result.reason}; applied ${result.applied.map((p) => p.file).join(", ") || "nothing"}; rejected ${
@@ -162,7 +173,7 @@ export async function reproduce(input: RunInput, deps: RunDeps): Promise<RunResu
   };
 
   try {
-    emit({ stage: "fetching", message: `fetching ${artifact.repo_url} at ${artifact.commit.slice(0, 12)}` });
+    emit({ stage: "fetching", message: `downloading the code from ${artifact.repo_url}, at the exact version in the claim` });
     await sandbox.create();
     if (!(await resolver.fetchRepo(spec, sandbox))) {
       throw new Stop("INVALID", "DATA_UNAVAILABLE", "could not fetch the repository at the pinned commit");
@@ -172,7 +183,7 @@ export async function reproduce(input: RunInput, deps: RunDeps): Promise<RunResu
       throw new Stop("INVALID", "HASH_MISMATCH", `repository HEAD ${head.log.trim().slice(0, 40)} is not the pinned commit`);
     }
 
-    emit({ stage: "verifying_hashes", message: `verifying ${artifact.data.length} data file(s)` });
+    emit({ stage: "verifying_hashes", message: artifact.data.length === 0 ? "this claim has no public data files" : `checking that the data files have not changed` });
     for (const d of artifact.data) {
       let bytes: Uint8Array;
       try {
@@ -184,12 +195,13 @@ export async function reproduce(input: RunInput, deps: RunDeps): Promise<RunResu
       dataHashes.push(hash);
       if (hash !== d.sha256) throw new Stop("INVALID", "HASH_MISMATCH", `${d.path} has sha256 ${hash}, spec says ${d.sha256}`);
       await sandbox.writeFile(d.path, bytes);
-      emit({ stage: "verifying_hashes", message: `${d.path} ok (${hash.slice(0, 12)})` });
+      dataBytes.set(d.path, bytes);
+      emit({ stage: "verifying_hashes", message: `${d.path} matches the claim` });
     }
 
     // Setup: network on, no private data present yet, so logs are safe to share with the model.
     while (true) {
-      emit({ stage: "installing", message: artifact.setup.length ? "installing dependencies" : "no setup commands" });
+      emit({ stage: "installing", message: artifact.setup.length ? "installing what the code needs" : "nothing to install" });
       if (artifact.setup.length === 0) break;
       lastExec = await sandbox.exec(artifact.setup.join(" && "), { network: true, timeoutMs: SETUP_TIMEOUT_MS });
       if (lastExec.exitCode === 0) break;
@@ -202,7 +214,7 @@ export async function reproduce(input: RunInput, deps: RunDeps): Promise<RunResu
     envLockHash = sha256(lock.log);
 
     if (spec.private_data) {
-      emit({ stage: "decrypting", message: "decrypting private data inside the Lab" });
+      emit({ stage: "decrypting", message: "unlocking the private data inside the Lab" });
       if (!input.labKeys) throw new Stop("INVALID", "DATA_UNAVAILABLE", "this Lab has no decryption key");
       let plain: Buffer;
       try {
@@ -219,12 +231,13 @@ export async function reproduce(input: RunInput, deps: RunDeps): Promise<RunResu
 
     // Run: network off, resource limits, at most MAX_REPAIR_ATTEMPTS repairs.
     while (true) {
-      emit({ stage: "running", message: `running ${isPrivate ? "the analysis" : artifact.entrypoint} with the network off` });
+      emit({ stage: "running", message: `running ${isPrivate ? "the analysis" : artifact.entrypoint}, with the internet cut off` });
       lastExec = await sandbox.exec(artifact.entrypoint, {
         network: false,
         timeoutMs: spec.resources.max_minutes * 60_000,
       });
       runtimeSecs += Math.ceil(lastExec.durationMs / 1000);
+      baseRunMs = lastExec.durationMs;
       exitCode = lastExec.exitCode;
       if (lastExec.timedOut) throw new Stop("BROKEN", null, `the run exceeded its ${spec.resources.max_minutes}-minute limit`);
       if (lastExec.exitCode === 0) break;
@@ -232,11 +245,11 @@ export async function reproduce(input: RunInput, deps: RunDeps): Promise<RunResu
       if (!(await repair("run", lastExec.tail))) throw new Stop("BROKEN", null, "the run failed and could not be repaired");
     }
 
-    emit({ stage: "extracting", message: `extracting ${spec.metric.name}` });
+    emit({ stage: "extracting", message: `reading the ${spec.metric.name} from the output` });
     measured = await extract(spec, sandbox, model, isPrivate);
     if (measured === null) throw new Stop("INVALID", "EXTRACTION_FAILED", `could not extract ${spec.metric.name}`);
 
-    emit({ stage: "comparing", message: `measured ${measured}, reported ${spec.metric.reported_value}, tolerance ${toleranceString(spec)}` });
+    emit({ stage: "comparing", message: `got ${measured}; the paper says ${spec.metric.reported_value} (allowed margin ${spec.metric.tolerance.value})` });
     const within = withinTolerance(
       parseDecimal(measured),
       parseDecimal(spec.metric.reported_value),
@@ -245,6 +258,21 @@ export async function reproduce(input: RunInput, deps: RunDeps): Promise<RunResu
     );
     outcome = within ? "REPRODUCED" : "NOT_REPRODUCED";
     summary = within ? "The measured value is within tolerance." : "The code ran, but the measured value is outside tolerance.";
+
+    // The verdict is fixed above. From here on, a failure only marks a check as incomplete.
+    if (isPrivate) {
+      robustness = { status: "not_attempted", reason: "This claim uses private data, so no extra runs are made.", runs: [] };
+    } else {
+      const measuredValue = measured;
+      robustness = await runRobustness({
+        spec,
+        sandbox,
+        measured: measuredValue,
+        baseRunMs,
+        data: dataBytes,
+        emit: (message) => emit({ stage: "stress_testing", message }),
+      }).catch((e: Error): RobustnessResult => ({ status: "could_not_complete", reason: e.message.slice(0, 200), runs: [] }));
+    }
   } catch (e) {
     if (!(e instanceof Stop)) throw e;
     outcome = e.outcome;
@@ -255,13 +283,37 @@ export async function reproduce(input: RunInput, deps: RunDeps): Promise<RunResu
     await sandbox.destroy();
   }
 
+  // Needs the data to be verified. Runs in its own workspace, so the main one is already gone.
+  let reimplementation: ReimplementationResult = { status: "not_attempted", reason: "The claim's data could not be verified." };
+  if (reason === null) {
+    reimplementation = await runReimplementation({
+      spec,
+      methods: input.methods,
+      data: dataBytes,
+      newSandbox: deps.newSandbox,
+      model,
+      emit: (message) => emit({ stage: "reimplementing", message }),
+    }).catch((e: Error): ReimplementationResult => ({ status: "could_not_complete", reason: e.message.slice(0, 200), model: model.modelId }));
+  }
+  const evidence: Evidence = {
+    version: 1,
+    note: "Extra evidence. It does not settle the market: only the normal re-run does. The re-implementation is experimental, and a difference does not mean the paper is wrong.",
+    robustness,
+    reimplementation,
+  };
+
   // Private runs publish no log content, only the hash of what was produced.
   const logBody = lastExec?.log ?? summary;
   const logHash = lastExec?.logHash ?? sha256(summary);
   const logUri = isPrivate ? "" : ((await deps.store?.("log", logHash, logBody)) ?? "");
 
-  emit({ stage: "reporting", message: "writing the reproduction report" });
-  const report = await writeReport({ spec, model, outcome, reason, measured, patches, attempts, summary, isPrivate, runtimeSecs });
+  emit({ stage: "reporting", message: "writing up the result" });
+  // The evidence file's hash goes inside the report, and the report's hash goes on-chain.
+  const evidenceJson = JSON.stringify(evidence, null, 2);
+  const evidenceHash = sha256(evidenceJson);
+  await deps.store?.("evidence", evidenceHash, evidenceJson);
+  const body = await writeReport({ spec, model, outcome, reason, measured, patches, attempts, summary, isPrivate, runtimeSecs, evidenceSummary: summarizeEvidence(evidence, spec) });
+  const report = `${body.trimEnd()}\n\nEvidence file sha256: ${evidenceHash}\n`;
   const reportHash = sha256(report);
   const reportUri = (await deps.store?.("report", reportHash, report)) ?? "";
 
@@ -293,7 +345,7 @@ export async function reproduce(input: RunInput, deps: RunDeps): Promise<RunResu
     finished_at: nowSecs(),
   };
   emit({ stage: "done", message: `${outcome}${reason ? ` (${reason})` : ""}` });
-  return { receipt, report, rejectedEdits };
+  return { receipt, report, rejectedEdits, evidence };
 }
 
 /** The spec's extractor first. If it fails, the model may suggest a new location, but code still reads the number. */
@@ -350,6 +402,7 @@ async function writeReport(a: {
   summary: string;
   isPrivate: boolean;
   runtimeSecs: number;
+  evidenceSummary: string;
 }): Promise<string> {
   const facts = [
     `Claim: ${a.spec.title}`,
@@ -360,6 +413,7 @@ async function writeReport(a: {
     `Runtime: ${a.runtimeSecs}s`,
     `Environment patches: ${a.patches.map((p) => `${p.kind} ${p.file}: ${p.justification}`).join("; ") || "none"}`,
     `Repair attempts: ${a.attempts.join(" | ") || "none"}`,
+    a.evidenceSummary,
     a.isPrivate ? "This claim used private data that was never revealed; do not speculate about its contents." : "",
   ]
     .filter(Boolean)

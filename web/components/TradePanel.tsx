@@ -4,7 +4,7 @@ import { nearToYocto } from "near-api-js";
 import { useState } from "react";
 import { chain } from "@/lib/chain";
 import { FT } from "@/lib/config";
-import { fmtUnits, modeUnit, parseUnits, quoteBuy, quoteSell, type Config, type Market, type Position, type Side } from "@/lib/market";
+import { fmtUnits, modeUnit, parseUnits, quoteBuy, quoteSell, relativeTime, type Config, type Market, type Position, type Side } from "@/lib/market";
 import { explainError, useWallet } from "@/lib/wallet";
 import { usePoll } from "./usePoll";
 
@@ -81,7 +81,7 @@ export function TradePanel({ market, config, position, contract, onDone }: { mar
         wallet.call("sell", { market_id: market.id, outcome: side, shares: parsed.toString(), min_collateral_out: minOut.toString() }, { deposit: STORAGE_NEAR() }),
       );
     }
-    const label = `Bought ${side} with ${amount} ${unit}.`;
+    const label = `Bought ${side} with ${amount} ${unit}. Forecasting ends ${relativeTime(market.lock_time)}, then the Lab re-runs the claim. If ${side} wins, collect from this page or your Portfolio.`;
     if (market.mode === "points") {
       return run("Buying…", label, () =>
         wallet.call("buy", { market_id: market.id, outcome: side, amount: parsed.toString(), min_shares_out: minOut.toString() }, { deposit: STORAGE_NEAR() }),
@@ -111,7 +111,8 @@ export function TradePanel({ market, config, position, contract, onDone }: { mar
 
   return (
     <div className="panel">
-      <h2 style={{ marginBottom: 12 }}>Make a forecast</h2>
+      <h2 style={{ marginBottom: 4 }}>Make a forecast</h2>
+      <p className="hint" style={{ margin: "0 0 12px" }}>YES means you expect this claim to hold up. NO means you don&apos;t.</p>
       <div className="seg" role="group" aria-label="Buy or sell">
         <button aria-pressed={action === "buy"} onClick={() => setAction("buy")}>
           Buy
@@ -151,13 +152,13 @@ export function TradePanel({ market, config, position, contract, onDone }: { mar
               </b>
             </div>
             <div className="row">
-              <span>YES price after</span>
+              <span>Chance of YES after</span>
               <span>{(quote.yesPriceAfterPpm / 10_000).toFixed(1)}%</span>
             </div>
             {action === "buy" && (
               <div className="row">
-                <span>Pays if it resolves {side}</span>
-                <span>{fmtUnits(quote.out)}</span>
+                <span>You win if {side} is right</span>
+                <span>{fmtUnits(quote.out)} {unit}</span>
               </div>
             )}
           </>
@@ -200,15 +201,15 @@ export function TradePanel({ market, config, position, contract, onDone }: { mar
       {message && <p className={`notice ${message.ok ? "notice--ok" : "notice--error"}`} role="status">{message.text}</p>}
 
       <details style={{ marginTop: 16 }}>
-        <summary>Provide liquidity</summary>
+        <summary>Add to the prize pool (advanced)</summary>
         <p className="hint" style={{ marginBottom: 8 }}>
-          Liquidity providers earn {(config.fee_bps * (10_000 - config.treasury_fee_share_bps)) / 10_000 / 100}% of each trade and take on the risk of holding both sides.
+          Adding money makes the odds harder to move. You earn {(config.fee_bps * (10_000 - config.treasury_fee_share_bps)) / 10_000 / 100}% of every trade, but you can lose money depending on the verdict.
         </p>
         <button
           className="quiet w-full"
           disabled={!parsed || busy !== null}
           onClick={() =>
-            void run("Adding…", `Added ${amount} ${unit} of liquidity.`, async () => {
+            void run("Adding…", `Added ${amount} ${unit} to the pool.`, async () => {
               if (market.mode === "points") {
                 await wallet.call("add_liquidity", { market_id: market.id, amount: parsed!.toString() }, { deposit: STORAGE_NEAR() });
               } else {
@@ -225,9 +226,9 @@ export function TradePanel({ market, config, position, contract, onDone }: { mar
             className="quiet w-full"
             style={{ marginTop: 8 }}
             disabled={busy !== null}
-            onClick={() => void run("Removing…", "Removed your liquidity. Your shares are in your position.", () => wallet.call("remove_liquidity", { market_id: market.id }, { deposit: STORAGE_NEAR() }))}
+            onClick={() => void run("Removing…", "Took your money out of the pool. You now hold YES and NO shares instead.", () => wallet.call("remove_liquidity", { market_id: market.id }, { deposit: STORAGE_NEAR() }))}
           >
-            Remove my liquidity
+            Take my money out of the pool
           </button>
         )}
       </details>

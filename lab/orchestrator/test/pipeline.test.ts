@@ -129,6 +129,7 @@ describe("reproduce: outcomes", () => {
     expect(receipt.env_lock_hash).toMatch(/^[0-9a-f]{64}$/);
     expect(receipt.nearai.response_signature_refs).toEqual(["chat-1"]);
     expect(report).toContain("AI-written");
+    expect(report).toMatch(/Evidence file sha256: [0-9a-f]{64}/);
     expect(model.attested).toBe(true);
     expect(sandbox.destroyed).toBe(true);
   });

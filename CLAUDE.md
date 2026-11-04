@@ -30,6 +30,8 @@ RERUN: NEAR Hackathon 2026 entry. The full spec is the human's build plan (`RERU
 - Private-data claims: nothing derived from the run may reach the LLM, stream, stored logs or receipt tail. `pipeline.test.ts` greps for leaks.
 - Web: `@rerun/shared/browser` is the browser-safe entry point (no `node:crypto`). Design rules: quadrille paper, Besley for claims, Spline Sans Mono for readings, sentence case; the stamp is the one loud element. Bar any new animation that isn't a response to the user or the verdict.
 - Automated UI tests sign via `localStorage["rerun.test-wallet"]="1"` and `/api/dev-test-wallet`, which is dev-only and localhost-only. Never put a private key in a browser tool call.
+- Evidence checks (`lab/orchestrator/src/pipeline/evidence.ts`) run after the verdict is fixed and must never settle a market. A failure there only marks the check incomplete. The re-implementation prompt must never contain the reported number or data values.
+- Site copy: plain words. Say claim, forecast, holds up, allowed margin, fingerprint, collect, secure hardware; keep the technical terms for the technical sections. Terms and meanings are listed on `/how`.
 - Secrets only in `.env` / `.env.testnet` (gitignored). Check history for keys before any push.
 
 ## Verified facts (2026-11-03)

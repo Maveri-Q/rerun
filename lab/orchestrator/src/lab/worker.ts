@@ -29,7 +29,9 @@ export interface WorkerConfig {
   llm: LlmConfig;
   resolverFor: (spec: ClaimSpec) => ArtifactResolver;
   mockResponderFor?: (spec: ClaimSpec) => ((req: ChatRequest) => string | undefined) | undefined;
-  store?: (kind: "log" | "report", hash: string, content: string) => Promise<string>;
+  /** The paper's methods section, if anyone provided it. */
+  methodsFor?: (spec: ClaimSpec) => string | undefined;
+  store?: (kind: "log" | "report" | "evidence", hash: string, content: string) => Promise<string>;
   onEvent?: (marketId: number, e: StageEvent) => void;
   onAttestation?: (digest: string, record: unknown) => void | Promise<void>;
   /** Serialises runs with anything else using the sandbox, such as dry runs. */
@@ -86,10 +88,11 @@ export class LabWorker {
     llm.newRun();
     const model = new NearAiModel(llm, modelId);
     const { receipt } = await reproduce(
-      { spec, marketId: m.id, runIndex, labAccount: lab.accountId, labCodehash: this.cfg.labCodehash, labKeys: this.cfg.labKeys },
+      { spec, marketId: m.id, runIndex, labAccount: lab.accountId, labCodehash: this.cfg.labCodehash, labKeys: this.cfg.labKeys, methods: this.cfg.methodsFor?.(spec) },
       {
         sandbox: new DockerSandbox({ image: sandboxImage(spec.artifact.runtime), cpus: spec.resources.cpu, memGb: spec.resources.mem_gb }),
         model,
+        newSandbox: () => new DockerSandbox({ image: sandboxImage(spec.artifact.runtime), cpus: spec.resources.cpu, memGb: spec.resources.mem_gb }),
         resolver: this.cfg.resolverFor(spec),
         store: this.cfg.store,
         emit: (e) => this.cfg.onEvent?.(m.id, e),

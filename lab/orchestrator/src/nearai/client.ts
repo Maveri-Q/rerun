@@ -14,6 +14,8 @@ export interface LlmConfig {
   baseUrl: string;
   apiKey?: string;
   maxTokensPerCall: number;
+  /** Cap for calls marked `long`, such as writing a whole analysis script. */
+  maxTokensLongCall?: number;
   maxCallsPerRun: number;
   dailyUsdCap: number;
   mock: boolean;
@@ -25,6 +27,7 @@ export function llmConfigFromEnv(env: NodeJS.ProcessEnv = process.env): LlmConfi
     baseUrl: env.NEARAI_CLOUD_BASE_URL || "https://cloud-api.near.ai",
     apiKey: env.NEARAI_CLOUD_API_KEY || undefined,
     maxTokensPerCall: Number(env.LLM_MAX_TOKENS_PER_CALL || 2000),
+    maxTokensLongCall: Number(env.LLM_MAX_TOKENS_LONG_CALL || 5000),
     maxCallsPerRun: Number(env.LLM_MAX_CALLS_PER_RUN || 12),
     dailyUsdCap: Number(env.LLM_DAILY_USD_CAP || 1),
     mock: env.MOCK_LLM === "1",
@@ -41,6 +44,7 @@ export interface ChatRequest {
   model: string;
   messages: ChatMessage[];
   maxTokens?: number;
+  long?: boolean;
   /** Free-form tag for the spend log, e.g. "repair" or "report". */
   purpose: string;
 }
@@ -87,7 +91,8 @@ export class LlmClient {
     if (this.callsThisRun >= this.config.maxCallsPerRun) {
       throw new BudgetError(`max ${this.config.maxCallsPerRun} LLM calls per run reached`);
     }
-    const maxTokens = Math.min(req.maxTokens ?? this.config.maxTokensPerCall, this.config.maxTokensPerCall);
+    const cap = req.long ? (this.config.maxTokensLongCall ?? this.config.maxTokensPerCall * 2) : this.config.maxTokensPerCall;
+    const maxTokens = Math.min(req.maxTokens ?? cap, cap);
     const spentToday = await this.spentToday();
     if (spentToday >= this.config.dailyUsdCap) {
       throw new BudgetError(`daily LLM cap $${this.config.dailyUsdCap} reached (spent $${spentToday.toFixed(4)})`);

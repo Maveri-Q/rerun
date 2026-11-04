@@ -11,7 +11,7 @@ export const DATA_DIR = path.resolve(import.meta.dirname, "../../.data");
 const HEX64 = /^[0-9a-f]{64}$/;
 const SAFE_RUN_KEY = /^[A-Za-z0-9-]{1,64}$/;
 
-export function readHashed(kind: "logs" | "reports" | "attestations" | "sealed", hash: string): Buffer | null {
+export function readHashed(kind: "logs" | "reports" | "evidences" | "attestations" | "sealed", hash: string): Buffer | null {
   if (!HEX64.test(hash)) return null;
   const file = path.join(DATA_DIR, kind, hash + (kind === "attestations" ? ".json" : ""));
   return existsSync(file) ? readFileSync(file) : null;
@@ -36,6 +36,22 @@ export function saveSealed(bytes: Buffer): string {
   const hash = sha256Hex(bytes);
   writeFileSync(path.join(dir, hash), bytes);
   return hash;
+}
+
+const safeSpecHash = (hash: string) => (HEX64.test(hash) ? path.join(DATA_DIR, "methods", `${hash}.md`) : null);
+
+/** A paper's methods section, kept beside the claim. The first submission for a claim stands. */
+export function saveMethods(specHash: string, methods: string): boolean {
+  const file = safeSpecHash(specHash);
+  if (!file || existsSync(file)) return false;
+  mkdirSync(path.dirname(file), { recursive: true });
+  writeFileSync(file, methods);
+  return true;
+}
+
+export function readMethods(specHash: string): string | undefined {
+  const file = safeSpecHash(specHash);
+  return file && existsSync(file) ? readFileSync(file, "utf8") : undefined;
 }
 
 /** Real claims, plus sealed files uploaded to this Lab (stored locally, so no self-fetch). */

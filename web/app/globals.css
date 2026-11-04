@@ -880,7 +880,108 @@ details > summary {
   display: none;
 }
 
+/* How it works: real sequences, so they get real numbers. */
+.how-short {
+  list-style: none;
+  counter-reset: how;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 24px;
+  margin: 16px 0 0;
+  padding: 0;
+}
+
+.how-short li {
+  counter-increment: how;
+}
+
+.how-short li::before {
+  content: counter(how);
+  display: block;
+  font: 500 32px/40px var(--font-spline-mono), monospace;
+  color: var(--yes);
+}
+
+.how-short p {
+  margin: 4px 0 0;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--ink-2);
+}
+
+.how-steps {
+  padding-left: 28px;
+  margin: 16px 0 0;
+}
+
+.how-steps li {
+  margin-bottom: 16px;
+}
+
+.how-steps li::marker {
+  font-family: var(--font-spline-mono), monospace;
+  color: var(--yes);
+}
+
+.how-steps p {
+  margin: 2px 0 0;
+}
+
+.ladder {
+  margin-top: 8px;
+}
+
+.ladder ol {
+  list-style: none;
+  margin: 12px 0;
+  padding: 0;
+}
+
+.ladder ol > li {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr);
+  gap: 8px;
+  padding: 12px 0;
+  border-top: 1px solid var(--rule);
+}
+
+.rung-body p {
+  margin: 2px 0 0;
+}
+
+.paper-results {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.paper-results li {
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr);
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.paper-results p {
+  margin: 4px 0 0;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--ink-2);
+}
+
 /* Wizard */
+.technical {
+  border: 1.5px solid var(--rule);
+  background: var(--paper);
+  padding: 8px 16px;
+}
+
+.technical > summary {
+  font-weight: 700;
+  font-size: 17px;
+}
+
 .form-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -922,6 +1023,10 @@ details > summary {
   .jump-to-forecast {
     display: inline-block;
     margin-top: 16px;
+  }
+
+  .how-short {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 

@@ -15,7 +15,7 @@ const FILTERS: { key: Filter; label: string }[] = [
   { key: "all", label: "All" },
   { key: "points", label: "Points" },
   { key: "money", label: "tUSDC" },
-  { key: "settled", label: "Settled" },
+  { key: "settled", label: "Finished" },
 ];
 
 const live = (m: Market) => m.state !== "Final";
@@ -39,14 +39,14 @@ export default function Home() {
     <>
       <section className="hero">
         <div>
-          <h1>Will this research result reproduce? Forecast it, then watch it get re-run.</h1>
+          <h1>Will this research hold up? Predict it, then watch an AI check it.</h1>
           <p className="lede">
-            Many published results don&apos;t hold up, and checking takes people months. Here an AI lab re-runs the authors&apos; own code and data in a sandbox, then posts a receipt anyone can verify on NEAR. Forecasters who called it right get paid.
+            Many published results don&apos;t hold up, but checking takes months, so it rarely happens. Here you predict whether a result will hold up. Then an AI lab re-runs the authors&apos; own code and data and posts public proof of what it found. If you called it right, you win.
           </p>
           <div className="figures">
             <div className="figure">
               <b>{s ? (s.reproduction_rate_bps === null ? "None yet" : `${(s.reproduction_rate_bps / 100).toFixed(0)}%`) : "…"}</b>
-              <span>of settled claims reproduced</span>
+              <span>of checked claims held up</span>
             </div>
             <div className="figure">
               <b>{s ? s.markets : "…"}</b>
@@ -54,11 +54,11 @@ export default function Home() {
             </div>
             <div className="figure">
               <b>{s ? fmtUnits(s.volume_points, 0) : "…"}</b>
-              <span>points forecast</span>
+              <span>points predicted</span>
             </div>
             <div className="figure">
               <b>{s ? fmtUnits(s.volume_money, 0) : "…"}</b>
-              <span>tUSDC forecast</span>
+              <span>test tUSDC predicted</span>
             </div>
           </div>
         </div>
@@ -72,7 +72,32 @@ export default function Home() {
 
       <section className="section">
         <div className="section-head">
-          <h2>Claims under the microscope</h2>
+          <h2>How it works</h2>
+          <Link href="/how">Read the full guide</Link>
+        </div>
+        <ol className="how-short">
+          <li>
+            <h3>Pick a claim</h3>
+            <p>A published result, such as &quot;this model is 93% accurate&quot;.</p>
+          </li>
+          <li>
+            <h3>Make a forecast</h3>
+            <p>Buy YES if you think it holds up, NO if you don&apos;t. Points are free.</p>
+          </li>
+          <li>
+            <h3>The Lab checks it</h3>
+            <p>An AI lab re-runs the original code. You can watch it live.</p>
+          </li>
+          <li>
+            <h3>Winners collect</h3>
+            <p>The verdict goes on the blockchain and right forecasts pay out.</p>
+          </li>
+        </ol>
+      </section>
+
+      <section className="section">
+        <div className="section-head">
+          <h2>Claims you can forecast</h2>
           <div className="filters" role="group" aria-label="Filter claims">
             {FILTERS.map((f) => (
               <button key={f.key} aria-pressed={filter === f.key} onClick={() => setFilter(f.key)}>
@@ -81,8 +106,8 @@ export default function Home() {
             ))}
           </div>
         </div>
-        {markets.error && !markets.data && <p className="notice notice--error">The chain did not answer: {markets.error}. This page retries by itself.</p>}
-        {markets.loading && !markets.data && <p className="empty dim">Reading claims from the chain…</p>}
+        {markets.error && !markets.data && <p className="notice notice--error">Unable to load claims from the blockchain. This page keeps trying.</p>}
+        {markets.loading && !markets.data && <p className="empty dim">Loading claims…</p>}
         {markets.data && shown.length === 0 && (
           <p className="empty">
             No claims match this filter. <Link href="/create">Open the first one</Link>.
@@ -95,7 +120,7 @@ export default function Home() {
 
       <section className="section">
         <div className="section-head">
-          <h2>On the bench</h2>
+          <h2>What the Lab is doing</h2>
           <Link href="/lab">How the Lab works</Link>
         </div>
         {feed.data && feed.data.length > 0 ? (
@@ -111,7 +136,7 @@ export default function Home() {
             ))}
           </ul>
         ) : (
-          <p className="empty dim">{feed.loading ? "Asking the Lab what it's working on…" : "The Lab's activity feed is offline. Verdicts still appear above, because they come from the chain."}</p>
+          <p className="empty dim">{feed.loading ? "Checking on the Lab…" : "The Lab's live feed is offline. Verdicts still appear above."}</p>
         )}
       </section>
     </>

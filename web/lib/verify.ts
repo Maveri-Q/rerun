@@ -1,6 +1,7 @@
 import { parseDecimal, withinTolerance, type ToleranceKind } from "@rerun/shared/browser";
 import { chain } from "./chain";
-import { lab, type AttestationRecord } from "./lab";
+import { evidenceHashIn, lab, type AttestationRecord } from "./lab";
+import { LAB_URL } from "./config";
 import type { Market, Receipt } from "./market";
 import { sha256Hex } from "./seal";
 
@@ -34,49 +35,49 @@ export async function verifyReceipt(market: Market, r: Receipt): Promise<Verific
   ]);
 
   add(
-    "Lab code is approved",
+    "The Lab is approved",
     approved ? "pass" : "fail",
-    approved ? `The contract lists code ${r.lab_codehash.slice(0, 12)}… as approved.` : "This code hash is no longer approved by the contract.",
+    approved ? "The contract still lists this Lab's code as approved to post results." : "The contract no longer approves this Lab's code.",
   );
 
-  if (!registered) add("Lab runs in a verified TEE", "fail", `${r.lab_account} is not registered with the contract.`);
-  else if (registered.local) add("Lab runs in a verified TEE", "warn", "Not yet. This testnet Lab is registered locally, without TEE attestation.");
-  else add("Lab runs in a verified TEE", "pass", "The contract checked this Lab's attestation at registration.");
+  if (!registered) add("The Lab runs on secure hardware", "fail", `${r.lab_account} is not registered with the contract.`);
+  else if (registered.local) add("The Lab runs on secure hardware", "warn", "Not yet. This practice Lab runs on an ordinary computer. It moves to secure hardware before launch.");
+  else add("The Lab runs on secure hardware", "pass", "The contract checked the hardware's proof when this Lab registered.");
 
   if (!attestation) {
-    add("AI model attestation", "warn", "The Lab's record could not be fetched, so this browser cannot show it.");
+    add("The AI ran on secure hardware", "warn", "The Lab's record couldn't be loaded, so this can't be shown right now.");
   } else if (attestation.mock) {
-    add("AI model attestation", "warn", "This run used a scripted test model, so there is nothing to attest.");
+    add("The AI ran on secure hardware", "warn", "This run used a scripted test AI, so there is nothing to prove.");
   } else {
     const ok = attestation.reports.length > 0 && attestation.reports.every((x) => x.ok);
     add(
-      "AI model attestation",
+      "The AI ran on secure hardware",
       ok ? "pass" : "fail",
-      ok ? `${attestation.model}: Intel TDX and NVIDIA GPU quotes verified. Signed replies: ${r.nearai.response_signature_refs.length}.` : `The record for ${attestation.model} contains a failed check.`,
+      ok ? `Intel and NVIDIA proofs for ${attestation.model} were checked. Replies signed by it: ${r.nearai.response_signature_refs.length}.` : `A hardware proof for ${attestation.model} failed.`,
     );
   }
 
   const specHash = specJson ? await sha256Hex(specJson) : null;
   add(
-    "Claim matches the receipt",
+    "The receipt is about this exact claim",
     specHash === r.spec_hash ? "pass" : "fail",
-    specHash === r.spec_hash ? `This browser hashed the on-chain claim and got ${r.spec_hash.slice(0, 12)}….` : "The on-chain claim hashes to something else.",
+    specHash === r.spec_hash ? "Your browser fingerprinted the claim stored on-chain, and it matches the receipt." : "The claim stored on-chain has a different fingerprint from the receipt.",
   );
 
   const sameData = JSON.stringify(r.data_hashes) === JSON.stringify(market.spec.data_hashes);
   if (r.outcome === "INVALID" && r.invalid_reason === "HASH_MISMATCH") {
-    add("Data matches the claim", "warn", "The data the Lab received did not match the claim, which is why this market is invalid.");
+    add("The data is what the claim promised", "warn", "The data the Lab received did not match the claim, which is why this market is invalid.");
   } else if (r.outcome === "INVALID" && !sameData) {
-    add("Data matches the claim", "warn", "The Lab could not get all the data, which is why this market is invalid.");
+    add("The data is what the claim promised", "warn", "The Lab could not get all the data, which is why this market is invalid.");
   } else {
-    add("Data matches the claim", sameData ? "pass" : "fail", r.data_hashes.length === 0 && sameData ? "This claim has no public data files." : sameData ? `All ${r.data_hashes.length} file hashes equal the claim's.` : "The data hashes differ from the claim's.");
+    add("The data is what the claim promised", sameData ? "pass" : "fail", r.data_hashes.length === 0 && sameData ? "This claim has no public data files." : sameData ? "Every data file's fingerprint matches the claim." : "The data files' fingerprints differ from the claim.");
   }
 
   const allowed = r.patches.every((p) => ["ENV", "PATH", "DEPENDENCY"].includes(p.kind));
   add(
-    "Only the environment was patched",
+    "The AI only fixed setup problems",
     allowed ? "pass" : "fail",
-    r.patches.length === 0 ? "No patches were needed." : `Patches: ${r.patches.map((p) => `${p.file} (${p.kind})`).join(", ")}. The diff is on this page.`,
+    r.patches.length === 0 ? "No fixes were needed." : `Changed: ${r.patches.map((p) => p.file).join(", ")}. The exact change is on the receipt.`,
   );
 
   if (r.measured_value !== null) {
@@ -84,9 +85,27 @@ export async function verifyReceipt(market: Market, r: Receipt): Promise<Verific
     const within = withinTolerance(parseDecimal(r.measured_value), parseDecimal(r.reported_value), kind as ToleranceKind, parseDecimal(value));
     const consistent = within === (r.outcome === "REPRODUCED");
     add(
-      "Verdict follows from the numbers",
+      "The verdict follows from the numbers",
       consistent ? "pass" : "fail",
-      `Measured ${r.measured_value} is ${within ? "inside" : "outside"} ${r.reported_value} ± ${kind === "rel" ? `${value} (relative)` : value}. Recomputed here.`,
+      `The Lab got ${r.measured_value}, which is ${within ? "inside" : "outside"} the allowed range. Your browser redid this sum.`,
+    );
+  }
+
+  const report = await lab.report(r.report_hash);
+  if (report === null) {
+    add("The write-up hasn't changed", "warn", "The Lab's write-up couldn't be loaded, so this can't be shown right now.");
+  } else {
+    const same = (await sha256Hex(report)) === r.report_hash;
+    const evidenceHash = evidenceHashIn(report);
+    let evidenceOk = true;
+    if (same && evidenceHash) {
+      const res = await fetch(`${LAB_URL}/evidence/${evidenceHash}`).catch(() => null);
+      evidenceOk = res?.ok ? (await sha256Hex(await res.text())) === evidenceHash : false;
+    }
+    add(
+      "The write-up hasn't changed",
+      same && evidenceOk ? "pass" : "fail",
+      same && evidenceOk ? "The write-up and its evidence match the fingerprint recorded on-chain." : "The write-up or its evidence doesn't match the fingerprint recorded on-chain.",
     );
   }
 

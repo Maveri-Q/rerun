@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { generateLabKeyPair, openSealed } from "@rerun/shared";
 import { sealForLab, sha256Hex } from "../lib/seal";
-import { fmtUnits, parseUnits, quoteBuy, quoteSell, relativeTime, toleranceText, type Market } from "../lib/market";
+import { fmtUnits, parseUnits, quoteBuy, quoteSell, rangeText, relativeTime, toleranceText, type Market } from "../lib/market";
 
 describe("browser sealing", () => {
   it("produces files the Lab can open", async () => {
@@ -36,6 +36,12 @@ describe("display", () => {
   it("describes tolerance", () => {
     expect(toleranceText("abs", "0.01")).toBe("± 0.01");
     expect(toleranceText("rel", "0.05")).toBe("± 5%");
+  });
+
+  it("spells out the range that counts", () => {
+    expect(rangeText("0.93", "abs", "0.02")).toBe("0.91 to 0.95");
+    expect(rangeText("200", "rel", "0.05")).toBe("190 to 210");
+    expect(rangeText("-1.5", "abs", "0.25")).toBe("-1.75 to -1.25");
   });
 
   it("describes time", () => {

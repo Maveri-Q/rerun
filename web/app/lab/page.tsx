@@ -40,18 +40,18 @@ export default function LabPage() {
     <>
       <h1 style={{ fontSize: "clamp(30px, 4vw, 44px)" }}>The Lab</h1>
       <p className="lede prose">
-        The Lab is an AI agent that re-runs a claim&apos;s code and data in a sandbox with the network off. Its private AI model can only repair the environment. Plain code reads the number and decides the verdict.
+        The Lab is an AI agent that re-runs a claim&apos;s code and data in a locked-down container with the internet cut off. The AI can only fix setup problems. Plain code reads the number and decides the verdict.
       </p>
 
       {local && (
         <p className="notice" style={{ maxWidth: "66ch", marginTop: 24 }}>
-          This testnet Lab runs outside a TEE for now, so the &quot;TEE&quot; line on receipts shows a note, not a pass. The AI model it talks to is attested today; the Lab itself moves to a Phala TEE before mainnet.
+          This practice Lab runs on an ordinary computer for now, so receipts show a note rather than a pass on that line. The AI it uses already runs on secure hardware, and the Lab moves there before launch.
         </p>
       )}
 
       <section className="section">
         <div className="section-head">
-          <h2>What this Lab is</h2>
+          <h2>About this Lab</h2>
         </div>
         {entry ? (
           <dl className="defs mono">
@@ -59,14 +59,14 @@ export default function LabPage() {
             <dd>
               <a href={accountLink(entry[0])}>{entry[0]}</a>
             </dd>
-            <dt>Code hash</dt>
+            <dt>Code fingerprint</dt>
             <dd>{entry[1].codehash}</dd>
-            <dt>Encryption key</dt>
+            <dt>Key for private data</dt>
             <dd>{entry[1].enc_pubkey}</dd>
             <dt>Registered</dt>
             <dd>{relativeTime(entry[1].registered_at)}</dd>
             <dt>Status</dt>
-            <dd>{health.data ? `Online, using ${health.data.model}${health.data.mock_llm ? " (scripted test mode)" : ""}` : "Not reachable from this browser"}</dd>
+            <dd>{health.data ? `Online, using ${health.data.model}${health.data.mock_llm ? " (scripted test AI)" : ""}` : "Not reachable from this browser"}</dd>
           </dl>
         ) : (
           <p className="dim">{labs.loading ? "Reading the Lab registry…" : "No Lab is registered yet."}</p>
@@ -75,16 +75,16 @@ export default function LabPage() {
 
       <section className="section">
         <div className="section-head">
-          <h2>Its track record</h2>
+          <h2>Results so far</h2>
         </div>
         {stats.data ? (
           <div className="scroll-x">
             <table className="mono">
               <thead>
                 <tr>
-                  <th className="num">Claims opened</th>
-                  <th className="num">Reproduced</th>
-                  <th className="num">Not reproduced</th>
+                  <th className="num">Claims</th>
+                  <th className="num">Held up</th>
+                  <th className="num">Did not</th>
                   <th className="num">Broken</th>
                   <th className="num">Invalid</th>
                 </tr>
@@ -103,41 +103,41 @@ export default function LabPage() {
         ) : (
           <p className="dim">Loading…</p>
         )}
-        <p className="hint">Accuracy on the CORE-Bench benchmark of papers with known answers has not been measured yet. So far these are demo claims.</p>
+        <p className="hint">The Lab's accuracy on papers with known answers hasn't been measured yet. So far these are demo claims.</p>
       </section>
 
       <section className="section">
         <div className="section-head">
-          <h2>AI model attestation</h2>
+          <h2>Proof the AI runs on secure hardware</h2>
           {attestation.data && <span className="dim">Checked {relativeTime(attestation.data.recorded_at)}</span>}
         </div>
         {attestation.data?.mock && <p className="notice">The Lab is in scripted test mode, so there is no attestation to show.</p>}
         {report ? (
           <div className="witness">
             <p>
-              Before each run the Lab asks NEAR AI Cloud for proof that <span className="mono">{attestation.data?.model}</span> runs on genuine confidential hardware, with a fresh random nonce so old proofs can&apos;t be replayed.
+              Before each run the Lab asks for fresh proof that <span className="mono">{attestation.data?.model}</span> runs on genuine secure hardware. Intel and NVIDIA vouch for that hardware.
             </p>
-            <Quote title="Gateway TEE" q={report.gateway} />
+            <Quote title="The service that routes requests" q={report.gateway} />
             {report.models.map((q) => (
-              <Quote key={q.signingAddress} title="Model TEE" q={q} />
+              <Quote key={q.signingAddress} title="The AI model itself" q={q} />
             ))}
           </div>
         ) : (
-          !attestation.data?.mock && <p className="dim">{attestation.loading ? "Loading…" : "The Lab's attestation record is not reachable right now. `pnpm nearai:hello` checks it yourself."}</p>
+          !attestation.data?.mock && <p className="dim">{attestation.loading ? "Loading…" : "The Lab's proof isn't available right now. The check-it-yourself steps below still work."}</p>
         )}
       </section>
 
       <section className="section prose">
         <div className="section-head">
-          <h2>Check it yourself</h2>
+          <h2>Check it yourself (technical)</h2>
         </div>
-        <p>Every line of the Lab&apos;s verification can be repeated without trusting this site:</p>
+        <p>Developers can repeat these checks without trusting this site:</p>
         <pre className="log">{`git clone <this repository>
 pnpm install
 pnpm nearai:hello      # verifies the model's Intel and NVIDIA proofs live
 pnpm sandbox:build
 MOCK_LLM=1 pnpm lab:run all   # runs every demo claim on your machine`}</pre>
-        <p className="hint">Once the Lab is in a TEE, a reproducible Docker build will let you compare your build&apos;s hash to the code hash above.</p>
+        <p className="hint">Once the Lab is on secure hardware, you&apos;ll be able to build the same code and compare fingerprints.</p>
       </section>
     </>
   );

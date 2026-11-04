@@ -21,9 +21,9 @@
       "log_hash": "d703a3caeb7c8920890384d9dd62da26793a4f1eaee9ffc5e6ec84fe3aa12357",
       "log_tail": "accuracy=0.93\n",
       "full_log_uri": "rerun-lab://local/logs/d703a3caeb7c8920890384d9dd62da26793a4f1eaee9ffc5e6ec84fe3aa12357",
-      "report_hash": "393386d4bdd31dd7c2db4d766625c041bd2e0b68397fde8ebee07fb079b1af37",
-      "report_uri": "rerun-lab://local/reports/393386d4bdd31dd7c2db4d766625c041bd2e0b68397fde8ebee07fb079b1af37",
-      "runtime_secs": 4,
+      "report_hash": "2df18ef758fc7e42e59dab7ebd4b0a833ba45c30ddcc8e9e8c2202fbd7fe4520",
+      "report_uri": "rerun-lab://local/reports/2df18ef758fc7e42e59dab7ebd4b0a833ba45c30ddcc8e9e8c2202fbd7fe4520",
+      "runtime_secs": 2,
       "exit_code": 0,
       "lab_codehash": "0000000000000000000000000000000000000000000000000000000000000000",
       "lab_account": "local-lab.testnet",
@@ -31,12 +31,13 @@
         "model_id": "z-ai/glm-5.3-flash",
         "attestation_digest": "bb8a7976104d871a735c0da6d0f0b244382f42c97202b1b1efc9cfd40c1de8d6",
         "response_signature_refs": [
-          "mock-7a13ad34abc22549"
+          "mock-17599eb416be9bb7",
+          "mock-883a99ae9cd32ef8"
         ]
       },
       "run_index": 0,
-      "started_at": 1793780758,
-      "finished_at": 1793780768
+      "started_at": 1793791012,
+      "finished_at": 1793791039
     }
   },
   {
@@ -61,9 +62,9 @@
       "log_hash": "d703a3caeb7c8920890384d9dd62da26793a4f1eaee9ffc5e6ec84fe3aa12357",
       "log_tail": "accuracy=0.93\n",
       "full_log_uri": "rerun-lab://local/logs/d703a3caeb7c8920890384d9dd62da26793a4f1eaee9ffc5e6ec84fe3aa12357",
-      "report_hash": "e7a068be43a68738cfcf088623515d77ba1bbe7aa23987d5c8074eabbb2e8cf7",
-      "report_uri": "rerun-lab://local/reports/e7a068be43a68738cfcf088623515d77ba1bbe7aa23987d5c8074eabbb2e8cf7",
-      "runtime_secs": 3,
+      "report_hash": "b6f294cd47558a6f0bf51b412515224bd3f760786b7611b85dfda1eb4b84962e",
+      "report_uri": "rerun-lab://local/reports/b6f294cd47558a6f0bf51b412515224bd3f760786b7611b85dfda1eb4b84962e",
+      "runtime_secs": 2,
       "exit_code": 0,
       "lab_codehash": "0000000000000000000000000000000000000000000000000000000000000000",
       "lab_account": "local-lab.testnet",
@@ -71,12 +72,13 @@
         "model_id": "z-ai/glm-5.3-flash",
         "attestation_digest": "bb8a7976104d871a735c0da6d0f0b244382f42c97202b1b1efc9cfd40c1de8d6",
         "response_signature_refs": [
-          "mock-80bdf3f3a1e20147"
+          "mock-17599eb416be9bb7",
+          "mock-009d5266ce4491c5"
         ]
       },
       "run_index": 0,
-      "started_at": 1793780768,
-      "finished_at": 1793780778
+      "started_at": 1793791039,
+      "finished_at": 1793791066
     }
   },
   {
@@ -107,9 +109,9 @@
       "log_hash": "d703a3caeb7c8920890384d9dd62da26793a4f1eaee9ffc5e6ec84fe3aa12357",
       "log_tail": "accuracy=0.93\n",
       "full_log_uri": "rerun-lab://local/logs/d703a3caeb7c8920890384d9dd62da26793a4f1eaee9ffc5e6ec84fe3aa12357",
-      "report_hash": "22902c0a447016f5d59a43eb011f29ca845d7fe46f96445d0180aa8ac052ca97",
-      "report_uri": "rerun-lab://local/reports/22902c0a447016f5d59a43eb011f29ca845d7fe46f96445d0180aa8ac052ca97",
-      "runtime_secs": 6,
+      "report_hash": "8476bfbe303e60c764be8d4587c0b1683bd3be792061c6f2fdf1833227c981b8",
+      "report_uri": "rerun-lab://local/reports/8476bfbe303e60c764be8d4587c0b1683bd3be792061c6f2fdf1833227c981b8",
+      "runtime_secs": 5,
       "exit_code": 0,
       "lab_codehash": "0000000000000000000000000000000000000000000000000000000000000000",
       "lab_account": "local-lab.testnet",
@@ -118,12 +120,13 @@
         "attestation_digest": "bb8a7976104d871a735c0da6d0f0b244382f42c97202b1b1efc9cfd40c1de8d6",
         "response_signature_refs": [
           "mock-cc7353e3e00db26d",
-          "mock-d2bd207d136f7522"
+          "mock-17599eb416be9bb7",
+          "mock-36c6b3b7bb404226"
         ]
       },
       "run_index": 0,
-      "started_at": 1793780779,
-      "finished_at": 1793780792
+      "started_at": 1793791067,
+      "finished_at": 1793791096
     }
   },
   {
@@ -148,8 +151,8 @@
       "log_hash": "db84011ef2fa752bbd43273ab1d60812dfb31830fb346e4c44d6e9704f5dc973",
       "log_tail": "Traceback (most recent call last):\n  File \"/work/repo/reproduce.py\", line 3, in <module>\n    import labtools_internal as lt  # the lab's private package; never published\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nModuleNotFoundError: No module named 'labtools_internal'\n",
       "full_log_uri": "rerun-lab://local/logs/db84011ef2fa752bbd43273ab1d60812dfb31830fb346e4c44d6e9704f5dc973",
-      "report_hash": "a3a74e37ca38487efa22ca4b6319d9dd86c0c9ae40f05311ac1972a71e166a4b",
-      "report_uri": "rerun-lab://local/reports/a3a74e37ca38487efa22ca4b6319d9dd86c0c9ae40f05311ac1972a71e166a4b",
+      "report_hash": "81df97c0a172c57eec908f370883cf39de4551105e3112876162bad402d66f18",
+      "report_uri": "rerun-lab://local/reports/81df97c0a172c57eec908f370883cf39de4551105e3112876162bad402d66f18",
       "runtime_secs": 2,
       "exit_code": 1,
       "lab_codehash": "0000000000000000000000000000000000000000000000000000000000000000",
@@ -159,12 +162,13 @@
         "attestation_digest": "bb8a7976104d871a735c0da6d0f0b244382f42c97202b1b1efc9cfd40c1de8d6",
         "response_signature_refs": [
           "mock-9b7da63f1f475a58",
-          "mock-84aed9a1e114b947"
+          "mock-17599eb416be9bb7",
+          "mock-e7cdf5da9a767b4e"
         ]
       },
       "run_index": 0,
-      "started_at": 1793780793,
-      "finished_at": 1793780801
+      "started_at": 1793791097,
+      "finished_at": 1793791109
     }
   },
   {
@@ -187,8 +191,8 @@
       "log_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "log_tail": "",
       "full_log_uri": "",
-      "report_hash": "11a31cf05351f309be9ee05adfc660dc52e6c236e6e1bad3245cd8c24b5062c3",
-      "report_uri": "rerun-lab://local/reports/11a31cf05351f309be9ee05adfc660dc52e6c236e6e1bad3245cd8c24b5062c3",
+      "report_hash": "52377737ac7dd11a154602818cfdf46ac04ee61a74ad642c49bd73fb8a298ae0",
+      "report_uri": "rerun-lab://local/reports/52377737ac7dd11a154602818cfdf46ac04ee61a74ad642c49bd73fb8a298ae0",
       "runtime_secs": 3,
       "exit_code": 0,
       "lab_codehash": "0000000000000000000000000000000000000000000000000000000000000000",
@@ -197,12 +201,12 @@
         "model_id": "z-ai/glm-5.3-flash",
         "attestation_digest": "bb8a7976104d871a735c0da6d0f0b244382f42c97202b1b1efc9cfd40c1de8d6",
         "response_signature_refs": [
-          "mock-88cf18dcd446cee9"
+          "mock-46a7e63ffc215345"
         ]
       },
       "run_index": 0,
-      "started_at": 1793780802,
-      "finished_at": 1793780811
+      "started_at": 1793791109,
+      "finished_at": 1793791118
     }
   },
   {
@@ -227,8 +231,8 @@
       "log_hash": "69cc0f4d9573047991afede09158c3332f7d6758c2073b58dcf5bd6d31460446",
       "log_tail": "data/trials.csv has sha256 65cb2675a54874bae05839ad7314c1742157cf1291320d522b6268b5d468a46b, spec says be35dcd48bdcc0222a5c4d5ef769adb4a58e77c1914af80d8aa457ad742f9b7d",
       "full_log_uri": "rerun-lab://local/logs/69cc0f4d9573047991afede09158c3332f7d6758c2073b58dcf5bd6d31460446",
-      "report_hash": "3b512983252e9e8a9ebd8e1872a5feddf3c36f4309f04c4885ec7ab22aec2553",
-      "report_uri": "rerun-lab://local/reports/3b512983252e9e8a9ebd8e1872a5feddf3c36f4309f04c4885ec7ab22aec2553",
+      "report_hash": "71a6bcae13c3d5dd04847723752e8de6d72994ad6985d69e959e279397df26d9",
+      "report_uri": "rerun-lab://local/reports/71a6bcae13c3d5dd04847723752e8de6d72994ad6985d69e959e279397df26d9",
       "runtime_secs": 0,
       "exit_code": 0,
       "lab_codehash": "0000000000000000000000000000000000000000000000000000000000000000",
@@ -237,12 +241,12 @@
         "model_id": "z-ai/glm-5.3-flash",
         "attestation_digest": "bb8a7976104d871a735c0da6d0f0b244382f42c97202b1b1efc9cfd40c1de8d6",
         "response_signature_refs": [
-          "mock-bdddee521b087b21"
+          "mock-3c1f754c74acc87f"
         ]
       },
       "run_index": 0,
-      "started_at": 1793780811,
-      "finished_at": 1793780814
+      "started_at": 1793791118,
+      "finished_at": 1793791121
     }
   }
 ]

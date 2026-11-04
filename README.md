@@ -2,7 +2,7 @@
 
 **A forecasting market on whether published research results reproduce, settled by an AI agent that actually re-runs the authors' code and data inside a TEE and posts a verifiable receipt on NEAR.**
 
-> Status: early build (NEAR Hackathon 2026, step 5 of 10: a web app over the full testnet lifecycle). The Lab does not run in a TEE yet and the site is not hosted yet. Sections marked _planned_ do not exist yet.
+> Status: early build (NEAR Hackathon 2026, step 5 of 10: a web app over the full testnet lifecycle, with extra evidence checks). The Lab does not run in a TEE yet and the site is not hosted yet. Sections marked _planned_ do not exist yet.
 
 **Deployed on testnet:** market contract [`rerun.rerun-43f5f2.testnet`](https://testnet.nearblocks.io/address/rerun.rerun-43f5f2.testnet), collateral token [`tusdc.rerun-43f5f2.testnet`](https://testnet.nearblocks.io/address/tusdc.rerun-43f5f2.testnet), Lab `rerun-lab-43f5f2.testnet` (registered without TEE attestation, testnet only).
 
@@ -24,7 +24,7 @@ Outcomes: `REPRODUCED` (YES wins), `NOT_REPRODUCED` and `BROKEN` (NO wins), `INV
 Requires Node ≥ 22.22.2 and pnpm 12 (`npm i -g pnpm@12`). Contract tests need Rust (the pinned 1.93.0 toolchain installs itself) and, to build wasm, [cargo-near](https://github.com/near/cargo-near). The Lab needs Docker.
 
 1. `pnpm install`
-2. `pnpm test`: see all tests pass with no network, keys or Docker: 143 TypeScript tests (comparator, private-data encryption, attestation checks against a recorded real NEAR AI report, repair guards, the reproduction pipeline, the Lab's HTTP server, browser sealing) and 56 contract tests (every market outcome, both challenge paths, attacks, stale refunds, points, money mode, FPMM property tests, and real Lab output replayed through the contract).
+2. `pnpm test`: see all tests pass with no network, keys or Docker: 193 TypeScript tests (comparator, private-data encryption, attestation checks against a recorded real NEAR AI report, repair guards, the reproduction pipeline, evidence checks, paper-only statistics against published tables, the Lab's HTTP server, browser sealing) and 56 contract tests (every market outcome, both challenge paths, attacks, stale refunds, points, money mode, FPMM property tests, and real Lab output replayed through the contract).
 3. `pnpm nearai:hello`: see the NEAR AI Cloud attestation for the Lab's private model verified live:
    Intel TDX quote via DCAP, NVIDIA GPU evidence via NRAS (JWT verified against NVIDIA's keys), key + nonce binding in `report_data`, `MRCONFIGID` bound to the app compose, and the RTMR3 event-log replay, for both the gateway and the model TEE. Each line prints PASS/FAIL.
 4. Optional: put `NEARAI_CLOUD_API_KEY` in `.env` (copy `.env.example`) and run `pnpm nearai:hello` again: it also sends one tiny private chat completion and verifies its ECDSA response signature against the attested model key.
@@ -32,7 +32,7 @@ Requires Node ≥ 22.22.2 and pnpm 12 (`npm i -g pnpm@12`). Contract tests need 
 6. With `NEARAI_CLOUD_API_KEY` set, `pnpm lab:run all`: the same claims, but NEAR AI's private model makes the repair decisions and writes the reports, and every reply is checked against an attested key. About $0.003.
 7. With your own testnet accounts (`pnpm testnet:accounts`, `pnpm build:contracts`, `pnpm deploy:testnet`), `pnpm demo`: see every claim go through create → trade → lock → Lab run → receipt on-chain → finalize → redeem on testnet, with PASS/FAIL checks and explorer links. One market uses tUSDC through `ft_transfer_call` and ends with a withdrawal. Takes about 10 minutes. `pnpm lab:watch` runs the Lab as a loop against the contract.
 
-8. `pnpm lab:watch` in one terminal and `pnpm web` in another, then open http://localhost:3000: see claims read live from testnet. Connect a testnet wallet, claim free points, and buy YES or NO on an open claim to see the odds move. Open a settled claim and its receipt to see your browser re-check the verdict in the "Witnessed by" panel. On a market about to lock, stay on the page to watch the Lab's stages stream live and the verdict stamp land.
+8. `pnpm lab:watch` in one terminal and `pnpm web` in another, then open http://localhost:3000: see claims read live from testnet. Connect a testnet wallet, claim free points, and buy YES or NO on an open claim to see the odds move. Open a finished claim and its receipt to see the evidence ladder, and your browser re-checking the result in the "Verified" panel. Open **Check a paper** and click **Try an example** to see printed statistics checked with no code, wallet or AI. On a market about to lock, stay on the page to watch the Lab's stages stream live and the verdict stamp land.
 
 _Planned:_ hosted site in points mode, `pnpm judge-demo` (zero-setup testnet lifecycle + attack demo).
 
@@ -70,11 +70,25 @@ Each run follows the same stages: attest the private model → fetch the pinned 
 
 Current limits: dependencies install with unrestricted network during setup (no secrets or private data are present yet; registry-only egress filtering is planned). Local runs have no TEE, so private-data confidentiality there is only as strong as the host, until the Phala deployment. Demo claims are labelled fixtures with `.invalid` URLs that resolve to local files, so the hosted Lab will need them published. The real-claim fetcher is tested against a public GitHub repo, but no real paper has gone through the whole pipeline yet.
 
+## Evidence beyond the verdict
+
+A verdict shows that the authors' code and data produce their number. That can't prove the science is true, so receipts also show how much evidence stands behind a result. **None of these extra checks can change who wins a market.**
+
+| Check | What it does | Needs |
+|---|---|---|
+| **Paper-only check** | Recalculates p-values from the statistics printed in a paper, and flags averages impossible for whole-number data (the GRIM test). Runs entirely in the browser. | Only the paper's text |
+| **Stress test** | Re-runs the unchanged code with shifted random seeds and on resampled CSV data, to see if the number depends on luck. | Public data |
+| **Rebuilt from the description (experimental)** | An AI writes its own analysis from the methods section, in a fresh workspace with the data but not the authors' code and with the published number hidden. Plain code reads its result. | Python, public data, a methods section |
+
+The evidence file's hash sits inside the written report, and the report's hash is on-chain, so neither can be changed later. A flag or a difference means someone should look, not that the paper is wrong. The rebuild is limited to simple analyses, and its success rate on real papers hasn't been measured. Replication on new data and requesting missing code from authors are not built.
+
+The demos show why this matters: the `reproduces` claim gets 0.93 with the authors' seed, but mostly 0.88 to 0.90 with other random splits, so it reproduces and is flagged as partly luck.
+
 ## The web app (`web/`)
 
-Next.js, reading directly from the contract, with wallets through NEAR Connect. Claims with live odds and a run feed; a market page with the odds chart, trading, the live re-run, challenges and redemption; a create wizard where the AI drafts a claim from a GitHub repo and you confirm every field (private files are encrypted in the browser before upload); receipts with a panel that recomputes the checks in your browser; the Lab's attestation details; portfolio; and a points leaderboard.
+Next.js, reading directly from the contract, with wallets through NEAR Connect. Claims with live odds and a run feed; a market page with the odds chart, trading, the live re-run, challenges and redemption; a guide and glossary; a paper-only check; a create wizard where the AI drafts a claim from a GitHub repo and you confirm it, with technical fields folded away (private files are encrypted in the browser before upload); receipts with a panel that recomputes the checks in your browser; the Lab's attestation details; portfolio; and a points leaderboard.
 
-The browser re-checks what it can itself: the claim hash, the data hashes, the patch kinds and the verdict arithmetic. The TEE line shows a note, not a pass, until the Lab runs in one.
+The browser re-checks what it can itself: the claim hash, the data hashes, the patch kinds and the verdict arithmetic. The secure-hardware line for the Lab shows a note, not a pass, until the Lab runs in a TEE.
 
 ## Repo layout
 

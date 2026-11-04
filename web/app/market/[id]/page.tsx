@@ -4,6 +4,7 @@ import Link from "next/link";
 import { use, useMemo } from "react";
 import { ClaimSpec } from "@rerun/shared/browser";
 import { MarketActions } from "@/components/MarketActions";
+import { EvidenceLadder } from "@/components/EvidenceLadder";
 import { OddsBar } from "@/components/MarketRow";
 import { OddsChart } from "@/components/OddsChart";
 import { RunTerminal } from "@/components/RunTerminal";
@@ -14,15 +15,15 @@ import { VerifiedPanel } from "@/components/VerifiedPanel";
 import { chain } from "@/lib/chain";
 import { accountLink, CONTRACT } from "@/lib/config";
 import { useRunStream } from "@/lib/lab";
-import { fmtUnits, modeUnit, relativeTime, stateLabel, toleranceText, type State } from "@/lib/market";
+import { fmtUnits, modeUnit, outcomeMeaning, rangeText, relativeTime, stateLabel, toleranceText, type State } from "@/lib/market";
 import { useWallet } from "@/lib/wallet";
 
 const SEQUENCE: { state: State; label: string }[] = [
-  { state: "Open", label: "Forecasting" },
-  { state: "Locked", label: "Locked" },
-  { state: "Running", label: "Lab re-runs it" },
-  { state: "Proposed", label: "Receipt posted" },
-  { state: "Final", label: "Settled, winners redeem" },
+  { state: "Open", label: "People forecast" },
+  { state: "Locked", label: "Forecasting ends" },
+  { state: "Running", label: "The Lab re-runs it" },
+  { state: "Proposed", label: "Verdict posted" },
+  { state: "Final", label: "Winners collect" },
 ];
 
 export default function MarketPage({ params }: { params: Promise<{ id: string }> }) {
@@ -50,11 +51,11 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
   };
 
   if (market.error && !market.data) return <p className="notice notice--error">The chain did not answer: {market.error}. This page retries by itself.</p>;
-  if (market.loading && market.data === undefined) return <p className="empty dim">Opening page {id} of the notebook…</p>;
+  if (market.loading && market.data === undefined) return <p className="empty dim">Loading this claim…</p>;
   if (!market.data) {
     return (
       <p className="empty">
-        There is no market {id}. <Link href="/">See all claims</Link>.
+        There is no claim {id}. <Link href="/">See all claims</Link>.
       </p>
     );
   }
@@ -82,7 +83,9 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
         <div className="claim-figure">
           <span className="claim-value">{s.reported_value}</span>
           <span className="claim-tol">{toleranceText(s.tolerance_kind, s.tolerance_value)}</span>
-          <span className="dim">{spec?.metric.name}, as reported. It reproduces if the re-run lands inside this range.</span>
+          <span className="dim">
+            The paper reports this {spec?.metric.name}. The claim holds up if the Lab gets {rangeText(s.reported_value, s.tolerance_kind, s.tolerance_value)}.
+          </span>
         </div>
 
         {shownOutcome && (
@@ -91,11 +94,12 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
             {latestReceipt && (
               <div>
                 <div className="mono">
-                  Measured {latestReceipt.measured_value ?? "nothing"}
+                  The Lab got {latestReceipt.measured_value ?? "no number"}
                   <br />
-                  {m.outcome ? "Final" : "Proposed, can still be challenged"}
+                  {m.outcome ? "This is final" : "This can still be challenged"}
                 </div>
-                <Link href={`/receipt/${m.id}/${latestReceipt.run_index}`}>Open the receipt</Link>
+                <p className="hint" style={{ maxWidth: "38ch" }}>{outcomeMeaning(latestReceipt.outcome)}</p>
+                <Link href={`/receipt/${m.id}/${latestReceipt.run_index}`}>See the full receipt</Link>
               </div>
             )}
           </div>
@@ -121,7 +125,7 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
 
         <section className="section">
           <div className="section-head">
-            <h2>Watch the re-run</h2>
+            <h2>Watch the Lab work</h2>
             <span className="dim">{stateLabel(m.state)}</span>
           </div>
           <RunTerminal
@@ -140,16 +144,19 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
         {latestReceipt && (
           <section className="section">
             <div className="section-head">
-              <h2>Receipt</h2>
-              <Link href={`/receipt/${m.id}/${latestReceipt.run_index}`}>All fields</Link>
+              <h2>The evidence</h2>
+              <Link href={`/receipt/${m.id}/${latestReceipt.run_index}`}>See the full receipt</Link>
             </div>
-            <VerifiedPanel market={m} receipt={latestReceipt} />
+            <EvidenceLadder receipt={latestReceipt} reportHash={latestReceipt.report_hash} />
+            <div style={{ marginTop: 24 }}>
+              <VerifiedPanel market={m} receipt={latestReceipt} />
+            </div>
           </section>
         )}
 
         <section className="section">
           <div className="section-head">
-            <h2>What exactly gets re-run</h2>
+            <h2>What the Lab re-runs</h2>
           </div>
           {spec ? (
             <dl className="defs">
@@ -161,13 +168,13 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
                   {spec.source.authors}, {spec.source.license}
                 </span>
               </dd>
-              <dt>Code</dt>
+              <dt>Code, at this exact version</dt>
               <dd className="mono">
                 {spec.artifact.repo_url.includes(".invalid") ? spec.artifact.repo_url : <a href={spec.artifact.repo_url}>{spec.artifact.repo_url}</a>}
                 <br />
                 commit {spec.artifact.commit}
               </dd>
-              <dt>Runs with</dt>
+              <dt>Commands</dt>
               <dd className="mono">
                 {spec.artifact.runtime}
                 <br />
@@ -179,7 +186,7 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
                 ))}
                 $ {spec.artifact.entrypoint}
               </dd>
-              <dt>Result is read from</dt>
+              <dt>Where the result is read</dt>
               <dd className="mono">
                 {spec.artifact.output.path} using {spec.artifact.output.extractor.type} {spec.artifact.output.extractor.expr}
               </dd>
@@ -190,15 +197,15 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
                   <span key={d.path}>
                     {d.path}
                     <br />
-                    <span className="dim">sha256 {d.sha256}</span>
+                    <span className="dim">fingerprint {d.sha256}</span>
                     <br />
                   </span>
                 ))}
                 {spec.private_data && (
                   <span>
-                    Private data, encrypted to the Lab and never revealed
+                    Private data, encrypted so only the Lab can read it, and never revealed
                     <br />
-                    <span className="dim">sha256 of the plaintext {spec.private_data.sha256_plain}</span>
+                    <span className="dim">fingerprint {spec.private_data.sha256_plain}</span>
                   </span>
                 )}
               </dd>
@@ -206,14 +213,14 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
               <dd className="mono">
                 {spec.resources.cpu} CPU, {spec.resources.mem_gb} GB, {spec.resources.max_minutes} minutes
               </dd>
-              <dt>Claim hash</dt>
+              <dt>Claim fingerprint</dt>
               <dd className="mono">{s.spec_hash}</dd>
             </dl>
           ) : (
             <p className="dim">Loading the claim…</p>
           )}
           <details style={{ marginTop: 12 }}>
-            <summary>Show the claim exactly as stored on-chain</summary>
+            <summary>Show the claim exactly as stored on the blockchain</summary>
             <pre className="log">{specRaw.data}</pre>
           </details>
         </section>
@@ -225,22 +232,22 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
         <div className="panel">
           <OddsBar market={m} />
           <dl className="defs mono" style={{ gridTemplateColumns: "1fr auto", marginTop: 16 }}>
-            <dt>Volume</dt>
+            <dt>Forecast so far</dt>
             <dd>
               {fmtUnits(m.volume)} {unit}
             </dd>
-            <dt>Trades</dt>
+            <dt>Forecasts</dt>
             <dd>{m.trades}</dd>
-            <dt>{m.state === "Open" ? "Locks" : "Locked"}</dt>
+            <dt>{m.state === "Open" ? "Forecasting ends" : "Forecasting ended"}</dt>
             <dd>{relativeTime(m.lock_time)}</dd>
           </dl>
           <p className="hint" style={{ marginTop: 12 }}>
-            Opened by <a href={accountLink(m.creator)}>{m.creator}</a>. Creators may trade their own claims, so weigh the odds with that in mind.
+            Opened by <a href={accountLink(m.creator)}>{m.creator}</a>. Creators can forecast on their own claims, so keep that in mind when reading the odds.
           </p>
           {position.data && (
             <p className="hint">
               Your position: {fmtUnits(position.data.yes)} YES, {fmtUnits(position.data.no)} NO
-              {BigInt(position.data.lp) > 0n ? `, ${fmtUnits(position.data.lp)} liquidity (fees ${fmtUnits(position.data.pending_lp_fees)})` : ""}.
+              {BigInt(position.data.lp) > 0n ? `, ${fmtUnits(position.data.lp)} in the prize pool (earned ${fmtUnits(position.data.pending_lp_fees)})` : ""}.
             </p>
           )}
         </div>

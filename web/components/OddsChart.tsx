@@ -27,7 +27,7 @@ export function OddsChart({ points, endTime }: { points: Point[]; endTime: numbe
     return () => observer.disconnect();
   }, []);
 
-  if (points.length === 0) return <p className="empty dim">No forecasts yet. The first trade starts this chart.</p>;
+  if (points.length === 0) return <p className="empty dim">No forecasts yet. The first one starts this chart.</p>;
 
   const first = points[0]!.t;
   const last = Math.max(endTime, points.at(-1)!.t, first + 1);
@@ -58,7 +58,7 @@ export function OddsChart({ points, endTime }: { points: Point[]; endTime: numbe
   return (
     <div>
       <div className="row" style={{ alignItems: "baseline", marginBottom: 8 }}>
-        <h3>Chance of reproducing, as priced by forecasters</h3>
+        <h3>Chance it holds up, according to forecasters</h3>
         <button className="quiet" onClick={() => setAsTable(!asTable)} aria-pressed={asTable}>
           {asTable ? "Show chart" : "Show table"}
         </button>
@@ -69,7 +69,7 @@ export function OddsChart({ points, endTime }: { points: Point[]; endTime: numbe
             <thead>
               <tr>
                 <th>Time</th>
-                <th className="num">YES price</th>
+                <th className="num">Chance of YES</th>
               </tr>
             </thead>
             <tbody>

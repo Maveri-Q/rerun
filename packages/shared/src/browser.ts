@@ -3,3 +3,4 @@ export * from "./config.ts";
 export * from "./canonical.ts";
 export * from "./decimal.ts";
 export * from "./spec.ts";
+export * from "./papercheck.ts";

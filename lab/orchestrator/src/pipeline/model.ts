@@ -56,7 +56,7 @@ export class NearAiModel implements PrivateModel {
   }
 
   async ask(purpose: string, messages: ChatMessage[], maxTokens?: number): Promise<string> {
-    const chat = await this.llm.chat({ model: this.modelId, purpose, messages, maxTokens });
+    const chat = await this.llm.chat({ model: this.modelId, purpose, messages, maxTokens, long: purpose === "reimplement" });
     if (chat.mock) {
       this.addRef(chat.chatId);
       return chat.text;

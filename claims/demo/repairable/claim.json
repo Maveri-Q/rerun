@@ -1,4 +1,5 @@
 {
+  "methods": "methods-trials.md",
   "expected": "REPRODUCED",
   "expected_patches": 1,
   "title": "[DEMO] A paper's code with a hardcoded laptop path still reproduces",

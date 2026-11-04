@@ -5,7 +5,7 @@ import { NearAiModel } from "../pipeline/model.ts";
 import { reproduce, type ArtifactResolver } from "../pipeline/pipeline.ts";
 import { DockerSandbox, sandboxImage } from "../sandbox/docker.ts";
 import { draftClaim } from "./draft.ts";
-import { latestAttestation, readHashed, saveSealed, type EventHub } from "./store.ts";
+import { latestAttestation, readHashed, readMethods, saveMethods, saveSealed, type EventHub } from "./store.ts";
 
 /**
  * The Lab's public HTTP surface: live run streams (SSE), reports, logs, attestation records, AI
@@ -49,6 +49,11 @@ export function startLabServer(port: number, opts: ServerOptions) {
       if (url.pathname === "/attestations/latest") return bytes(res, latestAttestation(), "application/json");
       if (parts[0] === "attestations" && parts[1]) return bytes(res, readHashed("attestations", parts[1]), "application/json");
       if (parts[0] === "reports" && parts[1]) return bytes(res, readHashed("reports", parts[1]), "text/plain; charset=utf-8");
+      if (parts[0] === "evidence" && parts[1]) return bytes(res, readHashed("evidences", parts[1]), "application/json");
+      if (parts[0] === "methods" && parts[1]) {
+        const text = readMethods(parts[1]);
+        return bytes(res, text === undefined ? null : Buffer.from(text), "text/plain; charset=utf-8");
+      }
       if (parts[0] === "logs" && parts[1]) return bytes(res, readHashed("logs", parts[1]), "text/plain; charset=utf-8");
       if (parts[0] === "sealed" && parts[1]) return bytes(res, readHashed("sealed", parts[1]), "application/octet-stream");
     }
@@ -69,6 +74,12 @@ export function startLabServer(port: number, opts: ServerOptions) {
         } catch (e) {
           return json(res, 422, { error: (e as Error).message.slice(0, 300) });
         }
+      }
+      if (url.pathname === "/methods") {
+        const body = JSON.parse((await readBody(req, MAX_JSON_BYTES)).toString("utf8")) as { spec_hash?: string; methods?: string };
+        if (!body.methods?.trim() || body.methods.length > 20_000) return json(res, 422, { error: "Paste the methods section, up to 20,000 characters." });
+        const saved = saveMethods(body.spec_hash ?? "", body.methods);
+        return json(res, saved ? 201 : 409, saved ? { ok: true } : { error: "Methods were already added for this claim." });
       }
       if (url.pathname === "/sealed") {
         const hash = saveSealed(await readBody(req, MAX_SEALED_BYTES));
@@ -111,6 +122,7 @@ export function startLabServer(port: number, opts: ServerOptions) {
           sandbox: new DockerSandbox({ image: sandboxImage(spec.artifact.runtime), cpus: spec.resources.cpu, memGb: spec.resources.mem_gb }),
           model: new NearAiModel(llm, opts.modelId),
           resolver: opts.resolverFor(spec),
+          newSandbox: () => new DockerSandbox({ image: sandboxImage(spec.artifact.runtime), cpus: spec.resources.cpu, memGb: spec.resources.mem_gb }),
           emit: (e) => opts.hub.publish(run, e),
         },
       );

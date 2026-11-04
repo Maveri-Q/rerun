@@ -38,7 +38,7 @@ const labKeys =
     ? { privateKey: process.env.LAB_ENC_PRIVATE_KEY, publicKey: process.env.LAB_ENC_PUBLIC_KEY }
     : generateLabKeyPair();
 
-async function store(kind: "log" | "report", hash: string, content: string): Promise<string> {
+async function store(kind: "log" | "report" | "evidence", hash: string, content: string): Promise<string> {
   const dir = path.join(DATA_DIR, `${kind}s`);
   mkdirSync(dir, { recursive: true });
   writeFileSync(path.join(dir, hash), content);
@@ -56,12 +56,13 @@ async function main() {
     llm.newRun();
     const { spec } = demo;
     const started = Date.now();
-    const { receipt, report, rejectedEdits } = await reproduce(
-      { spec, marketId: i, runIndex: rerun ? 1 : 0, labAccount: "local-lab.testnet", labCodehash: LOCAL_CODEHASH, labKeys },
+    const { receipt, report, rejectedEdits, evidence } = await reproduce(
+      { spec, marketId: i, runIndex: rerun ? 1 : 0, labAccount: "local-lab.testnet", labCodehash: LOCAL_CODEHASH, labKeys, methods: demo.methods },
       {
         sandbox: new DockerSandbox({ image: sandboxImage(spec.artifact.runtime), cpus: spec.resources.cpu, memGb: spec.resources.mem_gb }),
         model: new NearAiModel(llm, modelId),
         resolver: demo.resolver,
+        newSandbox: () => new DockerSandbox({ image: sandboxImage(spec.artifact.runtime), cpus: spec.resources.cpu, memGb: spec.resources.mem_gb }),
         store,
         emit: (e) => {
           console.log(`  [${e.stage}] ${e.message}`);
@@ -72,6 +73,8 @@ async function main() {
     mkdirSync(path.join(DATA_DIR, "receipts"), { recursive: true });
     writeFileSync(path.join(DATA_DIR, "receipts", `${name}-run${receipt.run_index}.json`), JSON.stringify(receipt, null, 2));
     console.log(`  report:\n${report.trim().replace(/^/gm, "    ")}`);
+    console.log(`  robustness: ${evidence.robustness.status} ${evidence.robustness.runs.map((r) => r.value ?? "-").join(" ")}`);
+    console.log(`  re-implementation: ${evidence.reimplementation.status} ${evidence.reimplementation.value ?? evidence.reimplementation.reason ?? ""}`);
     if (rejectedEdits.length) console.log(`  rejected edits: ${JSON.stringify(rejectedEdits)}`);
     const ok = receipt.outcome === demo.expected && receipt.patches.length === demo.expectedPatches;
     results.push({

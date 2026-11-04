@@ -46,7 +46,7 @@ export default function PortfolioPage() {
     return (
       <>
         <h1 style={{ fontSize: "clamp(30px, 4vw, 44px)" }}>Your forecasts</h1>
-        <p className="lede prose">Connect a wallet to see your positions, what you can redeem, and your balance.</p>
+        <p className="lede prose">Connect a wallet to see your forecasts, what you can collect, and your balance.</p>
         <button style={{ marginTop: 16 }} onClick={wallet.signIn} disabled={wallet.loading}>
           Connect wallet
         </button>
@@ -79,7 +79,7 @@ export default function PortfolioPage() {
         </div>
         <div className="figure">
           <b>{d ? fmtUnits(d.money) : "…"}</b>
-          <span>tUSDC on the contract</span>
+          <span>tUSDC ready to withdraw</span>
         </div>
       </div>
       {d && BigInt(d.money) > 0n && (
@@ -91,10 +91,10 @@ export default function PortfolioPage() {
 
       <section className="section">
         <div className="section-head">
-          <h2>Positions</h2>
+          <h2>Your forecasts</h2>
         </div>
-        {data.error && !d && <p className="notice notice--error">The chain did not answer: {data.error}</p>}
-        {data.loading && !d && <p className="dim">Reading your positions…</p>}
+        {data.error && !d && <p className="notice notice--error">Unable to load your forecasts. This page keeps trying.</p>}
+        {data.loading && !d && <p className="dim">Loading your forecasts…</p>}
         {d && d.rows.length === 0 && (
           <p className="empty">
             You have no forecasts yet. <Link href="/">Pick a claim</Link> and make your first one.
@@ -132,7 +132,7 @@ export default function PortfolioPage() {
                         {pnl >= 0n ? "+" : ""}
                         {fmtUnits(pnl)}
                       </td>
-                      <td>{m.outcome ? <Stamp outcome={m.outcome} size="sm" /> : stateLabel(m.state)}{redeemable && <div><Link href={`/market/${m.id}`}>Redeem</Link></div>}</td>
+                      <td>{m.outcome ? <Stamp outcome={m.outcome} size="sm" /> : stateLabel(m.state)}{redeemable && <div><Link href={`/market/${m.id}`}>Collect</Link></div>}</td>
                     </tr>
                   );
                 })}
@@ -140,7 +140,7 @@ export default function PortfolioPage() {
             </table>
           </div>
         )}
-        <p className="hint">Profit or loss counts what you put in, what you took out, and today&apos;s price of what you still hold. It excludes liquidity still in the pool.</p>
+        <p className="hint">Profit or loss counts what you put in, what you took out, and today&apos;s value of your shares. Money you added to a prize pool isn&apos;t counted until you take it out.</p>
       </section>
     </>
   );

@@ -9,8 +9,8 @@ const besley = Besley({ subsets: ["latin"], variable: "--font-besley", display: 
 const splineMono = Spline_Sans_Mono({ subsets: ["latin"], variable: "--font-spline-mono", display: "swap" });
 
 export const metadata: Metadata = {
-  title: `${APP_NAME}: will this research result reproduce?`,
-  description: "Forecast whether published research reproduces. An AI lab re-runs the authors' code and data and posts a verifiable receipt on NEAR.",
+  title: `${APP_NAME}: will this research hold up?`,
+  description: "Predict whether published research holds up. An AI lab re-runs the authors' code and data and posts public proof on NEAR.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

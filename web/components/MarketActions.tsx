@@ -76,7 +76,7 @@ export function MarketActions({ market, config, position, onDone }: { market: Ma
 
   if (!needsLock && !windowOpen && !canFinalize && !stale && !canRedeem) {
     if (message) return <p className={`notice ${message.ok ? "notice--ok" : "notice--error"}`} role="status" style={{ marginBottom: 24 }}>{message.text}</p>;
-    return market.state === "Final" && wallet.accountId ? <p className="hint" style={{ marginBottom: 24 }}>You have nothing to redeem in this market.</p> : null;
+    return market.state === "Final" && wallet.accountId ? <p className="hint" style={{ marginBottom: 24 }}>You have nothing to collect from this claim.</p> : null;
   }
 
   return (
@@ -84,22 +84,22 @@ export function MarketActions({ market, config, position, onDone }: { market: Ma
       {stale && (
         <>
           <h2>The Lab missed its deadline</h2>
-          <p className="hint">Anyone can resolve this market as invalid, so funds never get stuck. Every share then redeems at 0.5.</p>
-          <div style={{ marginTop: 12 }}>{needsWallet ? connect : <button disabled={busy} onClick={() => void run("Resolved as invalid.", () => wallet.call("refund_stale", { market_id: market.id }))}>Resolve as invalid</button>}</div>
+          <p className="hint">Anyone can close this claim as invalid, so money never gets stuck. Every share then pays back half.</p>
+          <div style={{ marginTop: 12 }}>{needsWallet ? connect : <button disabled={busy} onClick={() => void run("Closed as invalid.", () => wallet.call("refund_stale", { market_id: market.id }))}>Close as invalid</button>}</div>
         </>
       )}
       {needsLock && !stale && (
         <>
-          <h2>Ready to lock</h2>
-          <p className="hint">Trading has ended. Anyone can lock this market so the Lab can start, and the Lab also does it by itself.</p>
-          <div style={{ marginTop: 12 }}>{needsWallet ? connect : <button disabled={busy} onClick={() => void run("Locked.", () => wallet.call("lock", { market_id: market.id }))}>Lock market</button>}</div>
+          <h2>Forecasting has ended</h2>
+          <p className="hint">The Lab normally starts by itself. Anyone can lock the claim to help it along.</p>
+          <div style={{ marginTop: 12 }}>{needsWallet ? connect : <button disabled={busy} onClick={() => void run("Locked. The Lab can start now.", () => wallet.call("lock", { market_id: market.id }))}>Lock this claim</button>}</div>
         </>
       )}
       {windowOpen && (
         <>
-          <h2>Challenge this result</h2>
+          <h2>Think this result is wrong?</h2>
           <p className="hint">
-            <span className="mono">{countdown(market.challenge_deadline! - now)}</span> left. Post a bond of {fmtUnits(bond)} {unit} and the Lab must re-run independently with a different AI model. If both runs agree you lose the bond. If they disagree the market becomes invalid and you earn a reward.
+            <span className="mono">{countdown(market.challenge_deadline! - now)}</span> left to challenge it. Put down {fmtUnits(bond)} {unit} and the Lab must run it again with a different AI. If both runs agree, you lose that deposit. If they disagree, the claim becomes invalid and you get it back plus a reward.
           </p>
           {needsWallet ? (
             <div style={{ marginTop: 12 }}>{connect}</div>
@@ -116,7 +116,7 @@ export function MarketActions({ market, config, position, onDone }: { market: Ma
                 </select>
               </label>
               <label className="field">
-                <span>Your evidence (only its hash goes on-chain)</span>
+                <span>Your reasoning (only a fingerprint of it goes on-chain)</span>
                 <textarea rows={3} value={note} onChange={(e) => setNote(e.target.value)} />
               </label>
               <button
@@ -132,7 +132,7 @@ export function MarketActions({ market, config, position, onDone }: { market: Ma
                   })
                 }
               >
-                Post {fmtUnits(bond)} {unit} and challenge
+                Challenge for {fmtUnits(bond)} {unit}
               </button>
             </div>
           )}
@@ -140,19 +140,19 @@ export function MarketActions({ market, config, position, onDone }: { market: Ma
       )}
       {canFinalize && (
         <>
-          <h2>Challenge window closed</h2>
-          <p className="hint">The window closed {market.challenge_deadline ? relativeTime(market.challenge_deadline, now * 1000) : ""} with no challenge. Anyone can finalize this result now.</p>
-          <div style={{ marginTop: 12 }}>{needsWallet ? connect : <button disabled={busy} onClick={() => void run("Finalized.", () => wallet.call("finalize", { market_id: market.id }))}>Finalize</button>}</div>
+          <h2>No challenges came in</h2>
+          <p className="hint">The time to challenge ended {market.challenge_deadline ? relativeTime(market.challenge_deadline, now * 1000) : ""}. Anyone can make this result final so winners can collect.</p>
+          <div style={{ marginTop: 12 }}>{needsWallet ? connect : <button disabled={busy} onClick={() => void run("The result is final. Winners can collect now.", () => wallet.call("finalize", { market_id: market.id }))}>Make it final</button>}</div>
         </>
       )}
       {canRedeem && (
         <>
-          <h2>Redeem your position</h2>
+          <h2>Collect your payout</h2>
           <p className="hint">
-            {market.outcome === "INVALID" ? "This market is invalid, so each YES and NO share pays 0.5." : `Winning ${market.outcome === "REPRODUCED" ? "YES" : "NO"} shares pay 1 ${unit} each.`} Any liquidity you provided is withdrawn too.
+            {market.outcome === "INVALID" ? "This claim is invalid, so each YES and NO share pays back half." : `Winning ${market.outcome === "REPRODUCED" ? "YES" : "NO"} shares pay 1 ${unit} each.`} Anything you added to the prize pool comes back too.
           </p>
-          <button style={{ marginTop: 12 }} disabled={busy} onClick={() => void run("Redeemed. It's in your balance.", () => wallet.call("redeem", { market_id: market.id }, { deposit: STORAGE() }))}>
-            Redeem
+          <button style={{ marginTop: 12 }} disabled={busy} onClick={() => void run("Collected. It's in your balance.", () => wallet.call("redeem", { market_id: market.id }, { deposit: STORAGE() }))}>
+            Collect
           </button>
         </>
       )}

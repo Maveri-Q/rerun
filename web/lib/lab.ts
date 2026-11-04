@@ -21,6 +21,26 @@ export interface LabHealth {
   tee: boolean;
 }
 
+export interface Evidence {
+  note: string;
+  robustness: {
+    status: "stable" | "sensitive" | "could_not_complete" | "not_attempted";
+    reason?: string;
+    seed_had_effect?: boolean;
+    measured?: string;
+    runs: { kind: "seed" | "resample"; label: string; value: string | null }[];
+  };
+  reimplementation: {
+    status: "agrees" | "differs" | "could_not_complete" | "not_attempted";
+    reason?: string;
+    value?: string;
+    model?: string;
+    script?: string;
+  };
+}
+
+export const evidenceHashIn = (report: string): string | null => /Evidence file sha256: ([0-9a-f]{64})/.exec(report)?.[1] ?? null;
+
 export interface AttestationCheck {
   name: string;
   ok: boolean;
@@ -65,6 +85,15 @@ export const lab = {
     } catch {
       return null;
     }
+  },
+  /** The evidence file named inside a report, if there is one. */
+  async evidenceForReport(reportHash: string): Promise<Evidence | null> {
+    const report = await lab.report(reportHash);
+    const hash = report && evidenceHashIn(report);
+    return hash ? get<Evidence>(`/evidence/${hash}`) : null;
+  },
+  async saveMethods(specHash: string, methods: string): Promise<void> {
+    await fetch(`${LAB_URL}/methods`, { method: "POST", body: JSON.stringify({ spec_hash: specHash, methods }) }).catch(() => {});
   },
   async uploadSealed(bytes: Uint8Array): Promise<string> {
     const res = await fetch(`${LAB_URL}/sealed`, { method: "POST", body: bytes as BodyInit });

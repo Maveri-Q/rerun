@@ -1,4 +1,5 @@
 {
+  "methods": "methods-trials.md",
   "expected": "BROKEN",
   "title": "[DEMO] Analysis that depends on an unpublished private package",
   "statement": "DEMO FIXTURE, not real research. The code imports a package the authors never released, so no environment repair can make it run. That is a real finding: the result did not reproduce because the code is broken.",

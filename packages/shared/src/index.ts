@@ -4,3 +4,4 @@ export * from "./hash.ts";
 export * from "./decimal.ts";
 export * from "./crypto.ts";
 export * from "./spec.ts";
+export * from "./papercheck.ts";

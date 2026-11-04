@@ -46,17 +46,17 @@ const FIELD_NAMES: Record<string, string> = {
   "source.license": "License",
   "source.authors": "Authors",
   "artifact.repo_url": "Public GitHub repository",
-  "artifact.commit": "Commit",
+  "artifact.commit": "Code version",
   "artifact.entrypoint": "Command that produces the result",
   "artifact.setup": "Setup commands",
   "artifact.output.path": "File the result is written to",
-  "artifact.output.extractor.expr": "Expression",
+  "artifact.output.extractor.expr": "Where in the file",
   "artifact.data.url": "Data file URL",
   "artifact.data.sha256": "Data file sha256",
   "artifact.data.path": "Data file path",
-  "metric.name": "Metric name",
-  "metric.reported_value": "Reported value",
-  "metric.tolerance.value": "Tolerance",
+  "metric.name": "What is being measured",
+  "metric.reported_value": "The number the paper reports",
+  "metric.tolerance.value": "Allowed margin",
   "private_data.path": "Private file path",
 };
 
@@ -97,6 +97,9 @@ export default function CreatePage() {
   const [toleranceType, setToleranceType] = useState("abs");
   const [tolerance, setTolerance] = useState("");
   const [data, setData] = useState<DataRow[]>([]);
+
+  const [methods, setMethods] = useState("");
+  const [technicalOpen, setTechnicalOpen] = useState(false);
 
   const [privateFile, setPrivateFile] = useState<File | null>(null);
   const [privatePath, setPrivatePath] = useState("private/data.csv");
@@ -183,6 +186,7 @@ export default function CreatePage() {
       ]
         .reverse()
         .slice(0, 8);
+  const hasTechnicalIssue = !built.success && built.error.issues.some((i) => i.path[0] === "artifact" || i.path[0] === "source");
   const params = config.data ? (mode === "money" ? config.data.money : config.data.points) : null;
   const liquidityUnits = parseUnits(liquidity);
   const totalUp = params && liquidityUnits ? liquidityUnits + BigInt(params.creation_bond) + BigInt(params.repro_fee) : null;
@@ -218,7 +222,7 @@ export default function CreatePage() {
     const json = canonicalJson(built.data);
     setOutcome(null);
     try {
-      setBusy("Storing your claim on-chain…");
+      setBusy("Saving your claim…");
       // Storage is about 10 KB per 0.1 NEAR; the contract refunds the excess.
       const deposit = nearToYocto((0.1 + json.length / 50_000).toFixed(4) as `${number}`).toString();
       await wallet.call("create_market", { spec_json: json, lock_time: lockTime, challenge_window: windowSecs, mode }, { deposit, tgas: 150 });
@@ -226,14 +230,15 @@ export default function CreatePage() {
       const mine = recent.find((m) => m.creator === wallet.accountId && m.spec.spec_hash === hash);
       if (!mine) throw new Error("The claim was stored, but it could not be found to fund it. Check your portfolio.");
 
-      setBusy("Funding your market…");
+      setBusy("Opening your claim…");
       if (mode === "points") {
         await wallet.call("fund_market", { market_id: mine.id, initial_liquidity: liquidityUnits.toString() }, { deposit: nearToYocto("0.02").toString() });
       } else {
         await prepareMoney(wallet);
         await ftTransferCall(wallet, CONTRACT, totalUp, { action: "fund", market_id: mine.id, initial_liquidity: liquidityUnits.toString() });
       }
-      setOutcome({ ok: true, text: "Your market is open.", marketId: mine.id });
+      if (methods.trim()) await lab.saveMethods(hash, methods);
+      setOutcome({ ok: true, text: "Your claim is open.", marketId: mine.id });
     } catch (e) {
       setOutcome({ ok: false, text: explainError(e) });
     } finally {
@@ -254,16 +259,16 @@ export default function CreatePage() {
   const unit = modeUnit(mode);
   return (
     <>
-      <h1 style={{ fontSize: "clamp(30px, 4vw, 44px)" }}>Put a result under the microscope</h1>
-      <p className="lede prose">Paste a code repository and let the AI draft the claim. You confirm every field before anything goes on-chain.</p>
+      <h1 style={{ fontSize: "clamp(30px, 4vw, 44px)" }}>Open a new claim</h1>
+      <p className="lede prose">Put a published result up for forecasting. Paste a link to its code and the AI fills in the form. Nothing goes on the blockchain until you&apos;ve checked it.</p>
 
       <section className="section">
         <div className="step-title">
           <b>1</b>
-          <h2>Where the code is</h2>
+          <h2>Paste the link to the code</h2>
         </div>
         <div className="form-grid">
-          <Field label="Public GitHub repository" hint="The commit is pinned from GitHub, so later changes to the repo can't affect the claim.">
+          <Field label="Public GitHub repository" hint="The claim locks to today's exact version, so later changes to the code can't affect it.">
             <input value={repoUrl} onChange={(e) => setRepoUrl(e.target.value)} placeholder="https://github.com/owner/name" />
           </Field>
           <Field label="Paper or report (optional)">
@@ -279,52 +284,35 @@ export default function CreatePage() {
       <section className="section">
         <div className="step-title">
           <b>2</b>
-          <h2>The claim</h2>
+          <h2>Check the claim</h2>
         </div>
         <div className="form-grid">
           <div className="span-2">
-            <Field label="Title" hint="A plain statement, 120 characters at most.">
+            <Field label="Title" hint="One plain sentence, 120 characters at most.">
               <input value={title} maxLength={120} onChange={(e) => setTitle(e.target.value)} />
             </Field>
-            <Field label="Statement" hint="What would have to be true, 600 characters at most.">
+            <Field label="Statement" hint="Explain what the paper says, 600 characters at most.">
               <textarea rows={3} value={statement} maxLength={600} onChange={(e) => setStatement(e.target.value)} />
             </Field>
           </div>
-          <Field label="Authors">
-            <input value={authors} onChange={(e) => setAuthors(e.target.value)} />
-          </Field>
-          <Field label="License" hint="Use only openly licensed material.">
-            <input value={license} onChange={(e) => setLicense(e.target.value)} placeholder="MIT" />
-          </Field>
-          <Field label="Source type">
-            <select value={sourceType} onChange={(e) => setSourceType(e.target.value)}>
-              <option value="paper">Paper</option>
-              <option value="report">Report</option>
-              <option value="dataset">Dataset</option>
-              <option value="onchain">On-chain data</option>
-            </select>
-          </Field>
-          <Field label="Commit" hint="The full 40-character SHA.">
-            <input className="mono" value={commit} onChange={(e) => setCommit(e.target.value.trim())} />
-          </Field>
         </div>
 
         <div className="panel" style={{ marginTop: 8 }}>
-          <h3 style={{ marginBottom: 12 }}>The number being claimed. Check this most carefully.</h3>
+          <h3 style={{ marginBottom: 12 }}>The number being tested. Check this most carefully.</h3>
           <div className="form-grid">
-            <Field label="Metric name">
+            <Field label="What is being measured">
               <input value={metricName} onChange={(e) => setMetricName(e.target.value)} placeholder="accuracy" />
             </Field>
-            <Field label="Reported value" hint="As a decimal, such as 0.912.">
+            <Field label="The number the paper reports" hint="As a decimal, such as 0.912.">
               <input className="mono" value={reported} onChange={(e) => setReported(e.target.value.trim())} />
             </Field>
-            <Field label="Tolerance type">
+            <Field label="How to measure the margin">
               <select value={toleranceType} onChange={(e) => setToleranceType(e.target.value)}>
-                <option value="abs">Absolute (± this amount)</option>
-                <option value="rel">Relative (± this fraction of the value)</option>
+                <option value="abs">A fixed amount, such as ± 0.01</option>
+                <option value="rel">A share of the number, such as ± 5%</option>
               </select>
             </Field>
-            <Field label="Tolerance" hint="Fixed forever once the market opens. A re-run inside this range counts as reproduced.">
+            <Field label="Allowed margin" hint="How close the re-run must get. It can&apos;t change once the claim opens.">
               <input className="mono" value={tolerance} onChange={(e) => setTolerance(e.target.value.trim())} placeholder="0.01" />
             </Field>
           </div>
@@ -332,10 +320,30 @@ export default function CreatePage() {
       </section>
 
       <section className="section">
-        <div className="step-title">
-          <b>3</b>
-          <h2>How to re-run it</h2>
-        </div>
+        <details className="technical" open={technicalOpen} onToggle={(e) => setTechnicalOpen(e.currentTarget.open)}>
+          <summary>Technical details</summary>
+          <p className="hint">How the Lab runs the code. The AI fills in what it can, so you can usually leave this alone.</p>
+          <h3 style={{ margin: "16px 0 8px" }}>About the source</h3>
+          <div className="form-grid">
+          <Field label="Authors">
+            <input value={authors} onChange={(e) => setAuthors(e.target.value)} />
+            </Field>
+            <Field label="License" hint="Use only openly licensed material.">
+            <input value={license} onChange={(e) => setLicense(e.target.value)} placeholder="MIT" />
+            </Field>
+            <Field label="Source type">
+            <select value={sourceType} onChange={(e) => setSourceType(e.target.value)}>
+              <option value="paper">Paper</option>
+              <option value="report">Report</option>
+              <option value="dataset">Dataset</option>
+              <option value="onchain">On-chain data</option>
+            </select>
+            </Field>
+            <Field label="Code version (commit)" hint="The exact version of the code: a 40-character ID from GitHub.">
+            <input className="mono" value={commit} onChange={(e) => setCommit(e.target.value.trim())} />
+            </Field>
+          </div>
+          <h3 style={{ margin: "16px 0 8px" }}>How to run it</h3>
         <div className="form-grid">
           <Field label="Runtime">
             <select value={runtime} onChange={(e) => setRuntime(e.target.value)}>
@@ -347,7 +355,7 @@ export default function CreatePage() {
             <input className="mono" value={entrypoint} onChange={(e) => setEntrypoint(e.target.value)} placeholder="python reproduce.py" />
           </Field>
           <div className="span-2">
-            <Field label="Setup commands, one per line" hint="These run with network access. The result command runs with the network off.">
+            <Field label="Setup commands, one per line" hint="These can use the internet. The command that produces the result can't.">
               <textarea className="mono" rows={2} value={setup} onChange={(e) => setSetup(e.target.value)} />
             </Field>
           </div>
@@ -355,18 +363,23 @@ export default function CreatePage() {
             <input className="mono" value={outputPath} onChange={(e) => setOutputPath(e.target.value)} placeholder="results.json" />
           </Field>
           <div className="form-grid">
-            <Field label="How to read it">
+            <Field label="How to find the number in that file">
               <select value={extractorType} onChange={(e) => setExtractorType(e.target.value)}>
                 <option value="jsonpath">JSON path</option>
                 <option value="regex">Regex</option>
                 <option value="csv_cell">CSV cell</option>
               </select>
             </Field>
-            <Field label="Expression">
+            <Field label="Where in the file">
               <input className="mono" value={extractorExpr} onChange={(e) => setExtractorExpr(e.target.value)} placeholder="$.accuracy" />
             </Field>
           </div>
         </div>
+
+        <h3 style={{ margin: "16px 0 8px" }}>How the authors did it (optional)</h3>
+        <Field label="The paper's methods section" hint="Used for the experimental rebuild check, where an AI writes its own analysis from this description. It needs public data files too. This text is public.">
+          <textarea rows={4} value={methods} maxLength={20000} onChange={(e) => setMethods(e.target.value)} />
+        </Field>
 
         <h3 style={{ margin: "16px 0 8px" }}>Public data files</h3>
         {data.map((row, i) => (
@@ -377,10 +390,10 @@ export default function CreatePage() {
             <Field label="Path inside the repo">
               <input className="mono" value={row.path} onChange={(e) => setData((rows) => rows.map((r, j) => (j === i ? { ...r, path: e.target.value } : r)))} />
             </Field>
-            <Field label="sha256" hint="Paste it, or choose your copy of the file and it's hashed here, without uploading.">
+            <Field label="File fingerprint (sha256)" hint="Paste it, or choose your copy below and it&apos;s worked out here, without uploading.">
               <input className="mono" value={row.sha256} onChange={(e) => setData((rows) => rows.map((r, j) => (j === i ? { ...r, sha256: e.target.value.trim() } : r)))} />
             </Field>
-            <Field label="Hash a local copy">
+            <Field label="Get the fingerprint from your copy">
               <input type="file" onChange={(e) => e.target.files?.[0] && void hashDataFile(i, e.target.files[0])} />
             </Field>
             <div className="span-2" style={{ marginBottom: 12 }}>
@@ -396,10 +409,10 @@ export default function CreatePage() {
 
         <details style={{ marginTop: 16 }}>
           <summary>This claim uses private data</summary>
-          <p className="hint">The file is encrypted in your browser to the Lab&apos;s key, then uploaded. The plaintext hash goes on-chain and the data is only decrypted inside the Lab, after setup. Logs from private runs are never published, and failures get no AI repair.</p>
+          <p className="hint">Your file is encrypted in your browser so only the Lab can read it. Only its fingerprint goes on the blockchain. Logs from private runs are never published, and the AI never sees the data, so it can&apos;t fix setup problems for these runs.</p>
           {privateData ? (
             <p className="notice notice--ok">
-              {privateData.name} is encrypted and uploaded. Plaintext sha256 {privateData.sha.slice(0, 16)}…
+              {privateData.name} is encrypted and uploaded. Fingerprint {privateData.sha.slice(0, 16)}…
             </p>
           ) : (
             <div className="form-grid" style={{ marginTop: 12 }}>
@@ -417,27 +430,28 @@ export default function CreatePage() {
             </div>
           )}
         </details>
+        </details>
       </section>
 
       <section className="section">
         <div className="step-title">
-          <b>4</b>
-          <h2>The market</h2>
+          <b>3</b>
+          <h2>Forecasting settings</h2>
         </div>
         <div className="form-grid">
           <Field label="Forecast with">
             <select value={mode} onChange={(e) => setMode(e.target.value as Mode)}>
               <option value="points">Free points</option>
-              <option value="money">tUSDC, a test token on testnet</option>
+              <option value="money">tUSDC, a test token</option>
             </select>
           </Field>
-          <Field label={`Starting liquidity, in ${unit}`} hint={params ? `At least ${fmtUnits(params.min_liquidity, 0)}. More liquidity makes the odds harder to move.` : undefined}>
+          <Field label={`Starting prize pool, in ${unit}`} hint={params ? `At least ${fmtUnits(params.min_liquidity, 0)}. A bigger pool makes the odds harder to move.` : undefined}>
             <input className="mono" value={liquidity} onChange={(e) => setLiquidity(e.target.value)} />
           </Field>
-          <Field label="Lock after this many days" hint="Forecasting stops and the Lab starts.">
+          <Field label="Forecasting ends after this many days" hint="Then the Lab starts.">
             <input className="mono" inputMode="decimal" value={lockDays} onChange={(e) => setLockDays(e.target.value)} />
           </Field>
-          <Field label="Challenge window, in hours" hint={config.data ? `Between ${config.data.min_challenge_window / 60} minutes and ${config.data.max_challenge_window / 86400} days.` : undefined}>
+          <Field label="Time to challenge the result, in hours" hint={config.data ? `Anything up to ${config.data.max_challenge_window / 86400} days.` : undefined}>
             <input className="mono" inputMode="decimal" value={windowHours} onChange={(e) => setWindowHours(e.target.value)} />
           </Field>
         </div>
@@ -445,12 +459,14 @@ export default function CreatePage() {
 
       <section className="section">
         <div className="step-title">
-          <b>5</b>
+          <b>4</b>
           <h2>Review and open</h2>
         </div>
-        {issues.length > 0 ? (
+        {!repoUrl && !title ? (
+          <p className="hint">Start by pasting a link to the code in step 1.</p>
+        ) : issues.length > 0 ? (
           <div className="notice">
-            Still needed before this claim is valid:
+            Still needed{hasTechnicalIssue ? ", including some under Technical details" : ""}:
             <ul style={{ margin: "4px 0 0", paddingLeft: 20 }}>
               {issues.map((i) => (
                 <li key={i}>{i}</li>
@@ -459,40 +475,40 @@ export default function CreatePage() {
           </div>
         ) : (
           <>
-            <p className="mono break">Claim hash {hash}</p>
+            <p className="mono break">Claim fingerprint {hash}</p>
             <details>
-              <summary>Show the exact claim that goes on-chain</summary>
+              <summary>Show the exact claim that goes on the blockchain</summary>
               <pre className="log">{built.success ? JSON.stringify(built.data, null, 2) : ""}</pre>
             </details>
           </>
         )}
         {params && totalUp && (
           <p>
-            You put up <b className="mono">{fmtUnits(totalUp)} {unit}</b>: {fmtUnits(liquidityUnits!)} liquidity, a {fmtUnits(params.creation_bond)} bond (refunded unless the claim turns out to be invalid because of a bad spec), and a {fmtUnits(params.repro_fee)} fee that pays for the Lab&apos;s compute.
+            Opening this costs <b className="mono">{fmtUnits(totalUp)} {unit}</b>: {fmtUnits(liquidityUnits!)} for the prize pool, a {fmtUnits(params.creation_bond)} deposit (you get it back unless the claim was set up badly), and a {fmtUnits(params.repro_fee)} fee that pays for the Lab&apos;s work.
           </p>
         )}
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 8 }}>
           {wallet.accountId ? (
             <button disabled={!built.success || !totalUp || busy !== null} onClick={() => void create()}>
-              {busy ?? "Open this market"}
+              {busy ?? "Open this claim"}
             </button>
           ) : (
-            <button onClick={wallet.signIn}>Connect wallet to open this market</button>
+            <button onClick={wallet.signIn}>Connect wallet to open this claim</button>
           )}
           {health.data?.dry_run && !built.data?.private_data && (
             <button className="quiet" disabled={!built.success} onClick={() => void startDryRun()}>
-              Test it with a dry run first
+              Test it first without opening
             </button>
           )}
         </div>
         {outcome && (
           <p className={`notice ${outcome.ok ? "notice--ok" : "notice--error"}`} role="status">
-            {outcome.text} {outcome.marketId !== undefined && <Link href={`/market/${outcome.marketId}`}>Go to your market</Link>}
+            {outcome.text} {outcome.marketId !== undefined && <Link href={`/market/${outcome.marketId}`}>Go to your claim</Link>}
           </p>
         )}
         {dryRun && (
           <div style={{ marginTop: 16 }}>
-            <h3 style={{ marginBottom: 8 }}>Dry run, no market involved</h3>
+            <h3 style={{ marginBottom: 8 }}>Test run, no forecasts involved</h3>
             <RunTerminal events={stream.events} status={stream.status} waitingText="Queued. The Lab runs one job at a time." />
           </div>
         )}

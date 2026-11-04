@@ -23,6 +23,7 @@ interface ClaimFile {
   expected_patches?: number;
   /** Serve different bytes than the spec pins: the attack the hash check exists for. */
   swap_data?: boolean;
+  methods?: string;
   title: string;
   statement: string;
   metric: ClaimSpec["metric"];
@@ -41,6 +42,8 @@ export interface DemoClaim {
   expectedPatches: number;
   resolver: ArtifactResolver;
   mockResponder: (req: ChatRequest) => string | undefined;
+  /** The fixture's methods section, for the re-implementation check. */
+  methods?: string;
 }
 
 const sha256 = (b: Uint8Array) => createHash("sha256").update(b).digest("hex");
@@ -160,8 +163,10 @@ export function loadDemo(name: DemoName, labKeys: LabKeys): DemoClaim {
     expected: claim.expected,
     expectedPatches: claim.expected_patches ?? 0,
     resolver,
+    methods: claim.methods ? readFileSync(path.join(DEMO_ROOT, "_data", claim.methods), "utf8") : undefined,
     mockResponder: (req) => {
       if (req.purpose === "repair") return claim.mock_llm?.repair;
+      if (req.purpose === "reimplement") return readFileSync(path.join(DEMO_ROOT, "_data", "mock-reimplementation.md"), "utf8");
       if (req.purpose === "report") return `MOCK report: the claim "${claim.title}" was re-run. See the receipt for the outcome.`;
       return undefined;
     },

@@ -1,4 +1,5 @@
 {
+  "methods": "methods-trials.md",
   "expected": "REPRODUCED",
   "title": "[DEMO] A logistic model predicts trial response with 93% accuracy",
   "statement": "DEMO FIXTURE, not real research. The released code trains a logistic regression on the synthetic trials dataset and reaches the reported test accuracy.",

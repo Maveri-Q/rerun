@@ -8,6 +8,8 @@ import { useWallet } from "@/lib/wallet";
 
 const LINKS = [
   { href: "/", label: "Claims" },
+  { href: "/how", label: "How it works" },
+  { href: "/check", label: "Check a paper" },
   { href: "/create", label: "New claim" },
   { href: "/portfolio", label: "Portfolio" },
   { href: "/leaderboard", label: "Leaderboard" },

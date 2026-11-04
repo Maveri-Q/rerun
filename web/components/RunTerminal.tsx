@@ -4,17 +4,19 @@ import { useEffect, useRef } from "react";
 import type { StageEvent, StreamStatus } from "@/lib/lab";
 
 const STAGE_LABEL: Record<string, string> = {
-  attesting: "attesting",
-  fetching: "fetching",
+  attesting: "safety check",
+  fetching: "downloading",
   verifying_hashes: "checking data",
-  installing: "installing",
-  decrypting: "decrypting",
+  installing: "setting up",
+  decrypting: "unlocking",
   running: "running",
-  repairing: "repairing",
-  extracting: "extracting",
+  repairing: "fixing setup",
+  extracting: "reading result",
   comparing: "comparing",
-  reporting: "reporting",
-  done: "done",
+  stress_testing: "stress test",
+  reimplementing: "rebuilding",
+  reporting: "writing up",
+  done: "verdict",
 };
 
 /** The Lab's notebook, live: what it is doing as it does it. Private-data content is never streamed. */

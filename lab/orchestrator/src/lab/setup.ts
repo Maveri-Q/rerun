@@ -1,11 +1,11 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
-import type { ClaimSpec } from "@rerun/shared";
+import { specHash, type ClaimSpec } from "@rerun/shared";
 import { Chain } from "../chain/near.ts";
 import { demoForSpec } from "../demo/fixtures.ts";
 import { loadEnv } from "../env.ts";
 import { llmConfigFromEnv } from "../nearai/client.ts";
-import { LabResolver } from "./store.ts";
+import { LabResolver, readMethods } from "./store.ts";
 import { LabWorker } from "./worker.ts";
 
 const DATA_DIR = path.resolve(import.meta.dirname, "../../.data");
@@ -25,7 +25,7 @@ export function testnetChain(): Chain {
   return new Chain(process.env.NEAR_TESTNET_RPC_URL || "https://test.rpc.fastnear.com", need("TESTNET_CONTRACT_ACCOUNT"));
 }
 
-export async function storeRunFile(kind: "log" | "report", hash: string, content: string): Promise<string> {
+export async function storeRunFile(kind: "log" | "report" | "evidence", hash: string, content: string): Promise<string> {
   const dir = path.join(DATA_DIR, `${kind}s`);
   mkdirSync(dir, { recursive: true });
   writeFileSync(path.join(dir, hash), content);
@@ -48,6 +48,7 @@ export function testnetWorker(hooks: Pick<ConstructorParameters<typeof LabWorker
     resolverFor: (spec: ClaimSpec) => demoForSpec(spec, labKeys)?.resolver ?? network,
     mockResponderFor: (spec: ClaimSpec) => demoForSpec(spec, labKeys)?.mockResponder,
     store: storeRunFile,
+    methodsFor: (spec: ClaimSpec) => demoForSpec(spec, labKeys)?.methods ?? readMethods(specHash(spec)),
     ...hooks,
   });
 }

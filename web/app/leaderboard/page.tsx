@@ -13,12 +13,12 @@ export default function LeaderboardPage() {
   const wallet = useWallet();
   return (
     <>
-      <h1 style={{ fontSize: "clamp(30px, 4vw, 44px)" }}>Reputation for being right</h1>
+      <h1 style={{ fontSize: "clamp(30px, 4vw, 44px)" }}>Best forecasters</h1>
       <p className="lede prose">Everyone starts with 1,000 free points. Points can&apos;t be bought or transferred, so the only way up this list is forecasting well.</p>
       <section className="section">
-        {board.error && !board.data && <p className="notice notice--error">The chain did not answer: {board.error}</p>}
-        {board.loading && !board.data && <p className="dim">Reading the leaderboard…</p>}
-        {board.data && board.data.length === 0 && <p className="empty">Nobody has claimed points yet. Open a points market to be first.</p>}
+        {board.error && !board.data && <p className="notice notice--error">Unable to load the leaderboard. This page keeps trying.</p>}
+        {board.loading && !board.data && <p className="dim">Loading the leaderboard…</p>}
+        {board.data && board.data.length === 0 && <p className="empty">Nobody has claimed points yet. Open any claim that uses points to be first.</p>}
         {board.data && board.data.length > 0 && (
           <div className="scroll-x">
             <table>
@@ -53,7 +53,7 @@ export default function LeaderboardPage() {
             </table>
           </div>
         )}
-        <p className="hint">Points tied up in open positions don&apos;t count until they are redeemed. Fee-collecting system accounts are not listed.</p>
+        <p className="hint">Points in open forecasts don&apos;t count until you collect them, so someone with many open forecasts may rank lower for now.</p>
       </section>
     </>
   );

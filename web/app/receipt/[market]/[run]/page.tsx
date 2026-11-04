@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { use } from "react";
+import { EvidenceLadder } from "@/components/EvidenceLadder";
 import { Stamp } from "@/components/Stamp";
 import { usePoll } from "@/components/usePoll";
 import { VerifiedPanel } from "@/components/VerifiedPanel";
@@ -25,7 +26,7 @@ export default function ReceiptPage({ params }: { params: Promise<{ market: stri
   if (!receipt || !market.data) {
     return (
       <p className="empty">
-        Market {marketId} has no receipt for run {runIndex + 1} yet. <Link href={`/market/${marketId}`}>Back to the market</Link>.
+        Claim {marketId} has no receipt for run {runIndex + 1} yet. <Link href={`/market/${marketId}`}>Back to the claim</Link>.
       </p>
     );
   }
@@ -37,7 +38,7 @@ export default function ReceiptPage({ params }: { params: Promise<{ market: stri
         p.{m.id}
       </span>
       <p className="dim" style={{ margin: 0 }}>
-        Reproduction receipt, run {r.run_index + 1}
+        Receipt for run {r.run_index + 1}: the Lab&apos;s permanent record of what it did
       </p>
       <h1 style={{ fontSize: "clamp(26px, 3.4vw, 38px)" }}>
         <Link href={`/market/${m.id}`} className="plain-link">
@@ -47,26 +48,28 @@ export default function ReceiptPage({ params }: { params: Promise<{ market: stri
       <div className="verdict-line">
         <Stamp outcome={r.outcome} size="xl" />
         <div className="mono">
-          Measured {r.measured_value ?? "nothing"}
+          The Lab got {r.measured_value ?? "no number"}
           <br />
-          Reported {r.reported_value}, tolerance {r.tolerance.replace(":", " ")}
+          The paper reports {r.reported_value}, allowed margin {r.tolerance.split(":")[1]}{r.tolerance.startsWith("rel") ? " (as a fraction)" : ""}
           {r.invalid_reason && (
             <>
               <br />
-              Reason {r.invalid_reason}
+              Why: {r.invalid_reason.replaceAll("_", " ").toLowerCase()}
             </>
           )}
         </div>
       </div>
 
-      <div className="two-col">
+      <EvidenceLadder receipt={r} reportHash={r.report_hash} />
+
+      <div className="two-col" style={{ marginTop: 32 }}>
         <VerifiedPanel market={m} receipt={r} />
         <section>
-          <h2>What the Lab reported</h2>
-          {report.data ? <div className="report">{report.data}</div> : <p className="dim">The written report is not available right now. Its hash is below.</p>}
+          <h2>The write-up</h2>
+          {report.data ? <div className="report">{report.data}</div> : <p className="dim">The write-up isn't available right now. Its fingerprint is below.</p>}
           {r.patches.length > 0 && (
             <>
-              <h3 style={{ marginTop: 24 }}>Environment patches</h3>
+              <h3 style={{ marginTop: 24 }}>Setup fixes the AI made</h3>
               <pre className="diff">{r.patches_diff_excerpt}</pre>
             </>
           )}
@@ -75,19 +78,19 @@ export default function ReceiptPage({ params }: { params: Promise<{ market: stri
 
       <section className="section">
         <div className="section-head">
-          <h2>Every field on-chain</h2>
-          <a href={accountLink(CONTRACT)}>See the contract on the explorer</a>
+          <h2>The full record (technical)</h2>
+          <a href={accountLink(CONTRACT)}>See it on the blockchain explorer</a>
         </div>
         <dl className="defs mono">
           <dt>Outcome</dt>
           <dd>{r.outcome}</dd>
-          <dt>Claim hash</dt>
+          <dt>Claim fingerprint</dt>
           <dd>{r.spec_hash}</dd>
           <dt>Commit</dt>
           <dd>{r.commit}</dd>
-          <dt>Data hashes</dt>
+          <dt>Data fingerprints</dt>
           <dd>{r.data_hashes.length ? r.data_hashes.join(", ") : "None"}</dd>
-          <dt>Environment lock hash</dt>
+          <dt>Software versions fingerprint</dt>
           <dd>{r.env_lock_hash || "None"}</dd>
           <dt>Runtime</dt>
           <dd>
@@ -101,19 +104,19 @@ export default function ReceiptPage({ params }: { params: Promise<{ market: stri
           <dd>
             <a href={accountLink(r.lab_account)}>{r.lab_account}</a>
           </dd>
-          <dt>Lab code hash</dt>
+          <dt>Lab code fingerprint</dt>
           <dd>{r.lab_codehash}</dd>
-          <dt>AI model</dt>
+          <dt>AI used</dt>
           <dd>{r.nearai.model_id}</dd>
-          <dt>Attestation digest</dt>
+          <dt>Hardware proof fingerprint</dt>
           <dd>{r.nearai.attestation_digest}</dd>
           <dt>Signed AI replies</dt>
           <dd>{r.nearai.response_signature_refs.join(", ") || "None"}</dd>
-          <dt>Log hash</dt>
+          <dt>Log fingerprint</dt>
           <dd>
             {r.full_log_uri ? <a href={`${LAB_URL}/logs/${r.log_hash}`}>{r.log_hash}</a> : r.log_hash}
           </dd>
-          <dt>Report hash</dt>
+          <dt>Write-up fingerprint</dt>
           <dd>
             <a href={`${LAB_URL}/reports/${r.report_hash}`}>{r.report_hash}</a>
           </dd>
@@ -124,7 +127,7 @@ export default function ReceiptPage({ params }: { params: Promise<{ market: stri
             <pre className="log">{r.log_tail}</pre>
           </details>
         ) : (
-          m.spec.private_data && <p className="hint">This claim uses private data, so no log content is published. Only the log&apos;s hash is on-chain.</p>
+          m.spec.private_data && <p className="hint">This claim uses private data, so no log content is published. Only the log&apos;s fingerprint is on-chain.</p>
         )}
       </section>
     </>

@@ -1,5 +1,7 @@
 /** Contract view types, plus the display and quote maths the UI needs. */
 
+import { parseDecimal } from "@rerun/shared/browser";
+
 export type Mode = "money" | "points";
 export type State = "Draft" | "Open" | "Locked" | "Running" | "Proposed" | "Challenged" | "Final";
 export type Outcome = "REPRODUCED" | "NOT_REPRODUCED" | "BROKEN" | "INVALID";
@@ -154,6 +156,29 @@ export function toleranceText(kind: string, value: string): string {
 
 const trimZeros = (s: string) => s.replace(/\.?0+$/, "");
 
+const SCALE = 10n ** 18n;
+const fmtDecimal = (v: bigint): string => {
+  const abs = v < 0n ? -v : v;
+  const frac = (abs % SCALE).toString().padStart(18, "0").replace(/0+$/, "");
+  return `${v < 0n ? "-" : ""}${abs / SCALE}${frac ? `.${frac}` : ""}`;
+};
+
+/** The range a re-run must land in, such as "0.91 to 0.95". */
+export function rangeText(reported: string, kind: string, value: string): string {
+  const r = parseDecimal(reported);
+  const t = parseDecimal(value);
+  const margin = kind === "rel" ? ((r < 0n ? -r : r) * t) / SCALE : t;
+  return `${fmtDecimal(r - margin)} to ${fmtDecimal(r + margin)}`;
+}
+
+const OUTCOME_MEANING: Record<Outcome, string> = {
+  REPRODUCED: "The Lab re-ran the authors' code and data and got a number inside the claim's range. YES wins.",
+  NOT_REPRODUCED: "The code ran, but the number came out outside the claim's range. NO wins.",
+  BROKEN: "The code wouldn't run, even after the AI tried to fix setup problems. NO wins.",
+  INVALID: "The test couldn't be run fairly, for example because the data changed. Every share pays back half.",
+};
+export const outcomeMeaning = (o: Outcome) => OUTCOME_MEANING[o];
+
 const OUTCOME_LABEL: Record<Outcome, string> = {
   REPRODUCED: "Reproduced",
   NOT_REPRODUCED: "Not reproduced",
@@ -163,12 +188,12 @@ const OUTCOME_LABEL: Record<Outcome, string> = {
 export const outcomeLabel = (o: Outcome) => OUTCOME_LABEL[o];
 
 const STATE_LABEL: Record<State, string> = {
-  Draft: "Not funded yet",
+  Draft: "Not open yet",
   Open: "Open for forecasts",
-  Locked: "Locked, waiting for the Lab",
+  Locked: "Forecasting has ended, waiting for the Lab",
   Running: "The Lab is re-running this",
-  Proposed: "Result posted, challenge window open",
-  Challenged: "Challenged, second run under way",
+  Proposed: "Result posted, can still be challenged",
+  Challenged: "Challenged, the Lab is checking again",
   Final: "Settled",
 };
 export const stateLabel = (s: State) => STATE_LABEL[s];
