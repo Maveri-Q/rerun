@@ -10,7 +10,7 @@ import { usePoll } from "@/components/usePoll";
 import { chain } from "@/lib/chain";
 import { CONTRACT } from "@/lib/config";
 import { lab, useRunStream } from "@/lib/lab";
-import { fmtUnits, modeUnit, parseUnits, type Mode } from "@/lib/market";
+import { fmtUnits, modeUnit, parseUnits, rangeText, type Mode } from "@/lib/market";
 import { sealForLab, sha256Hex } from "@/lib/seal";
 import { explainError, useWallet } from "@/lib/wallet";
 
@@ -40,12 +40,12 @@ interface DataRow {
 
 /** Validation speaks in the form's own labels, not schema paths. */
 const FIELD_NAMES: Record<string, string> = {
-  title: "Title",
-  statement: "Statement",
-  "source.url": "Repository or paper URL",
+  title: "The claim in one sentence",
+  statement: "A little more detail",
+  "source.url": "Link to the code or paper",
   "source.license": "License",
   "source.authors": "Authors",
-  "artifact.repo_url": "Public GitHub repository",
+  "artifact.repo_url": "Link to the code",
   "artifact.commit": "Code version",
   "artifact.entrypoint": "Command that produces the result",
   "artifact.setup": "Setup commands",
@@ -54,9 +54,9 @@ const FIELD_NAMES: Record<string, string> = {
   "artifact.data.url": "Data file URL",
   "artifact.data.sha256": "Data file sha256",
   "artifact.data.path": "Data file path",
-  "metric.name": "What is being measured",
-  "metric.reported_value": "The number the paper reports",
-  "metric.tolerance.value": "Allowed margin",
+  "metric.name": "What the number measures",
+  "metric.reported_value": "The number in the paper",
+  "metric.tolerance.value": "How close is close enough",
   "private_data.path": "Private file path",
 };
 
@@ -100,6 +100,7 @@ export default function CreatePage() {
 
   const [methods, setMethods] = useState("");
   const [technicalOpen, setTechnicalOpen] = useState(false);
+  const [isExample, setIsExample] = useState(false);
 
   const [privateFile, setPrivateFile] = useState<File | null>(null);
   const [privatePath, setPrivatePath] = useState("private/data.csv");
@@ -114,6 +115,23 @@ export default function CreatePage() {
   const [outcome, setOutcome] = useState<{ ok: boolean; text: string; marketId?: number } | null>(null);
   const [dryRun, setDryRun] = useState<string | null>(null);
   const stream = useRunStream(dryRun);
+
+  const fillExample = () => {
+    setRepoUrl("https://github.com/example/trial-model");
+    setPaperUrl("https://example.org/paper");
+    setCommit("0123456789abcdef0123456789abcdef01234567");
+    setTitle("This model predicts trial results with 93% accuracy");
+    setStatement("The researchers trained a model on 800 patient trial records and tested it on records it hadn't seen. They report that it predicted the result correctly 93% of the time.");
+    setAuthors("A. Researcher and B. Scientist");
+    setLicense("MIT");
+    setMetricName("accuracy");
+    setReported("0.93");
+    setTolerance("0.02");
+    setEntrypoint("python reproduce.py");
+    setOutputPath("results.json");
+    setExtractorExpr("$.accuracy");
+    setIsExample(true);
+  };
 
   const applyDraft = (d: Draft) => {
     setCommit(d.commit);
@@ -186,6 +204,12 @@ export default function CreatePage() {
       ]
         .reverse()
         .slice(0, 8);
+  let rangeSentence = "Enter the number and the margin to see what will count.";
+  try {
+    if (reported && tolerance) rangeSentence = `The claim holds up if the Lab gets ${rangeText(reported, toleranceType, tolerance)}.`;
+  } catch {
+    rangeSentence = "Write the number and the margin as plain decimals, such as 0.93.";
+  }
   const hasTechnicalIssue = !built.success && built.error.issues.some((i) => i.path[0] === "artifact" || i.path[0] === "source");
   const params = config.data ? (mode === "money" ? config.data.money : config.data.points) : null;
   const liquidityUnits = parseUnits(liquidity);
@@ -259,24 +283,30 @@ export default function CreatePage() {
   const unit = modeUnit(mode);
   return (
     <>
-      <h1 style={{ fontSize: "clamp(30px, 4vw, 44px)" }}>Open a new claim</h1>
-      <p className="lede prose">Put a published result up for forecasting. Paste a link to its code and the AI fills in the form. Nothing goes on the blockchain until you&apos;ve checked it.</p>
+      <h1 style={{ fontSize: "clamp(30px, 4vw, 44px)" }}>Put a result under the microscope</h1>
+      <p className="lede prose">Have a published result you want tested? Answer these four questions. People can then forecast whether it holds up, and the Lab will re-run it to find out.</p>
+      <div style={{ marginTop: 16 }}>
+        <button className="quiet" onClick={fillExample}>
+          Fill in an example
+        </button>
+        {isExample && <p className="notice prose">This is a made-up example so you can see what a finished form looks like. It can&apos;t be opened. To test a real result, change the link in step 1.</p>}
+      </div>
 
       <section className="section">
         <div className="step-title">
           <b>1</b>
-          <h2>Paste the link to the code</h2>
+          <h2>Where is the code?</h2>
         </div>
         <div className="form-grid">
-          <Field label="Public GitHub repository" hint="The claim locks to today's exact version, so later changes to the code can't affect it.">
-            <input value={repoUrl} onChange={(e) => setRepoUrl(e.target.value)} placeholder="https://github.com/owner/name" />
+          <Field label="Link to the code on GitHub" hint="The claim locks to today's exact version, so later changes can't affect it.">
+            <input value={repoUrl} onChange={(e) => { setRepoUrl(e.target.value); setIsExample(false); }} placeholder="https://github.com/owner/name" />
           </Field>
-          <Field label="Paper or report (optional)">
+          <Field label="Link to the paper (optional)">
             <input value={paperUrl} onChange={(e) => setPaperUrl(e.target.value)} placeholder="https://arxiv.org/abs/..." />
           </Field>
         </div>
         <button disabled={drafting || !repoUrl} onClick={() => void draftWithAi()}>
-          {drafting ? "The AI is reading the repository…" : "Draft the claim with AI"}
+          {drafting ? "The AI is reading the code…" : "Fill in the rest with AI"}
         </button>
         {draftNote && <p className={`notice ${draftNote.ok ? "notice--ok" : "notice--error"}`} role="status">{draftNote.text}</p>}
       </section>
@@ -284,45 +314,40 @@ export default function CreatePage() {
       <section className="section">
         <div className="step-title">
           <b>2</b>
-          <h2>Check the claim</h2>
+          <h2>What does the paper claim?</h2>
         </div>
         <div className="form-grid">
           <div className="span-2">
-            <Field label="Title" hint="One plain sentence, 120 characters at most.">
+            <Field label="The claim in one sentence" hint="For example: This model predicts trial results with 93% accuracy.">
               <input value={title} maxLength={120} onChange={(e) => setTitle(e.target.value)} />
             </Field>
-            <Field label="Statement" hint="Explain what the paper says, 600 characters at most.">
+            <Field label="A little more detail" hint="What did the researchers do and find? Two or three sentences is enough.">
               <textarea rows={3} value={statement} maxLength={600} onChange={(e) => setStatement(e.target.value)} />
             </Field>
           </div>
         </div>
 
         <div className="panel" style={{ marginTop: 8 }}>
-          <h3 style={{ marginBottom: 12 }}>The number being tested. Check this most carefully.</h3>
+          <h3 style={{ marginBottom: 12 }}>What number should the Lab get?</h3>
           <div className="form-grid">
-            <Field label="What is being measured">
+            <Field label="What does the number measure?">
               <input value={metricName} onChange={(e) => setMetricName(e.target.value)} placeholder="accuracy" />
             </Field>
-            <Field label="The number the paper reports" hint="As a decimal, such as 0.912.">
+            <Field label="The number in the paper" hint="As a decimal: write 93% as 0.93.">
               <input className="mono" value={reported} onChange={(e) => setReported(e.target.value.trim())} />
             </Field>
-            <Field label="How to measure the margin">
-              <select value={toleranceType} onChange={(e) => setToleranceType(e.target.value)}>
-                <option value="abs">A fixed amount, such as ± 0.01</option>
-                <option value="rel">A share of the number, such as ± 5%</option>
-              </select>
-            </Field>
-            <Field label="Allowed margin" hint="How close the re-run must get. It can&apos;t change once the claim opens.">
-              <input className="mono" value={tolerance} onChange={(e) => setTolerance(e.target.value.trim())} placeholder="0.01" />
+            <Field label="How close is close enough?" hint="Re-runs rarely match exactly, so allow a small margin. It can&apos;t change once the claim opens.">
+              <input className="mono" value={tolerance} onChange={(e) => setTolerance(e.target.value.trim())} placeholder="0.02" />
             </Field>
           </div>
+          <p style={{ margin: 0 }}><b>{rangeSentence}</b></p>
         </div>
       </section>
 
       <section className="section">
         <details className="technical" open={technicalOpen} onToggle={(e) => setTechnicalOpen(e.currentTarget.open)}>
           <summary>Technical details</summary>
-          <p className="hint">How the Lab runs the code. The AI fills in what it can, so you can usually leave this alone.</p>
+          <p className="hint">The commands the Lab needs to run the code. The AI fills in what it can. If you aren&apos;t technical, ask the paper&apos;s authors to check this part.</p>
           <h3 style={{ margin: "16px 0 8px" }}>About the source</h3>
           <div className="form-grid">
           <Field label="Authors">
@@ -341,6 +366,18 @@ export default function CreatePage() {
             </Field>
             <Field label="Code version (commit)" hint="The exact version of the code: a 40-character ID from GitHub.">
             <input className="mono" value={commit} onChange={(e) => setCommit(e.target.value.trim())} />
+            </Field>
+          </div>
+          <h3 style={{ margin: "16px 0 8px" }}>The margin and the time to challenge</h3>
+          <div className="form-grid">
+            <Field label="Measure the margin as">
+              <select value={toleranceType} onChange={(e) => setToleranceType(e.target.value)}>
+                <option value="abs">A fixed amount, such as ± 0.02</option>
+                <option value="rel">A share of the number, such as ± 5%</option>
+              </select>
+            </Field>
+            <Field label="Time to challenge the result, in hours" hint={config.data ? `Anything up to ${config.data.max_challenge_window / 86400} days.` : undefined}>
+              <input className="mono" inputMode="decimal" value={windowHours} onChange={(e) => setWindowHours(e.target.value)} />
             </Field>
           </div>
           <h3 style={{ margin: "16px 0 8px" }}>How to run it</h3>
@@ -436,23 +473,20 @@ export default function CreatePage() {
       <section className="section">
         <div className="step-title">
           <b>3</b>
-          <h2>Forecasting settings</h2>
+          <h2>How should people forecast?</h2>
         </div>
         <div className="form-grid">
-          <Field label="Forecast with">
+          <Field label="What do people forecast with?">
             <select value={mode} onChange={(e) => setMode(e.target.value as Mode)}>
               <option value="points">Free points</option>
               <option value="money">tUSDC, a test token</option>
             </select>
           </Field>
-          <Field label={`Starting prize pool, in ${unit}`} hint={params ? `At least ${fmtUnits(params.min_liquidity, 0)}. A bigger pool makes the odds harder to move.` : undefined}>
+          <Field label={`Starting pool, in ${unit}`} hint={params ? `You put this in so people can start forecasting. At least ${fmtUnits(params.min_liquidity, 0)}. A bigger pool makes the odds harder to move.` : undefined}>
             <input className="mono" value={liquidity} onChange={(e) => setLiquidity(e.target.value)} />
           </Field>
-          <Field label="Forecasting ends after this many days" hint="Then the Lab starts.">
+          <Field label="How many days can people forecast?" hint="After that, the Lab re-runs the code.">
             <input className="mono" inputMode="decimal" value={lockDays} onChange={(e) => setLockDays(e.target.value)} />
-          </Field>
-          <Field label="Time to challenge the result, in hours" hint={config.data ? `Anything up to ${config.data.max_challenge_window / 86400} days.` : undefined}>
-            <input className="mono" inputMode="decimal" value={windowHours} onChange={(e) => setWindowHours(e.target.value)} />
           </Field>
         </div>
       </section>
@@ -460,10 +494,10 @@ export default function CreatePage() {
       <section className="section">
         <div className="step-title">
           <b>4</b>
-          <h2>Review and open</h2>
+          <h2>Check it and open it</h2>
         </div>
         {!repoUrl && !title ? (
-          <p className="hint">Start by pasting a link to the code in step 1.</p>
+          <p className="hint">Start by pasting a link to the code in step 1, or fill in the example above.</p>
         ) : issues.length > 0 ? (
           <div className="notice">
             Still needed{hasTechnicalIssue ? ", including some under Technical details" : ""}:
@@ -475,9 +509,10 @@ export default function CreatePage() {
           </div>
         ) : (
           <>
-            <p className="mono break">Claim fingerprint {hash}</p>
+            <p>Your claim is complete. Check it once more, because it can&apos;t be changed after it opens.</p>
             <details>
               <summary>Show the exact claim that goes on the blockchain</summary>
+              <p className="mono break">Fingerprint {hash}</p>
               <pre className="log">{built.success ? JSON.stringify(built.data, null, 2) : ""}</pre>
             </details>
           </>
@@ -489,8 +524,8 @@ export default function CreatePage() {
         )}
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 8 }}>
           {wallet.accountId ? (
-            <button disabled={!built.success || !totalUp || busy !== null} onClick={() => void create()}>
-              {busy ?? "Open this claim"}
+            <button disabled={!built.success || !totalUp || busy !== null || isExample} onClick={() => void create()}>
+              {busy ?? (isExample ? "Examples can't be opened" : "Open this claim")}
             </button>
           ) : (
             <button onClick={wallet.signIn}>Connect wallet to open this claim</button>

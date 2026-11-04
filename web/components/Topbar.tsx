@@ -3,17 +3,16 @@
 import { APP_NAME } from "@rerun/shared/browser";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { NETWORK } from "@/lib/config";
 import { useWallet } from "@/lib/wallet";
 
 const LINKS = [
   { href: "/", label: "Claims" },
   { href: "/how", label: "How it works" },
   { href: "/check", label: "Check a paper" },
-  { href: "/create", label: "New claim" },
   { href: "/portfolio", label: "Portfolio" },
   { href: "/leaderboard", label: "Leaderboard" },
   { href: "/lab", label: "The Lab" },
+  { href: "/create", label: "For researchers" },
 ];
 
 export function Topbar() {
@@ -38,7 +37,7 @@ export function Topbar() {
           </button>
         ) : (
           <button onClick={wallet.signIn} disabled={wallet.loading}>
-            Connect {NETWORK} wallet
+            Connect wallet
           </button>
         )}
       </div>
