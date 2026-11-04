@@ -224,17 +224,20 @@ function parseTd(quoteBytes: Buffer) {
   return td;
 }
 
+/** Rides out DNS outages of about 90 seconds, which do happen on real networks. */
+export const NETWORK_RETRY_DELAYS_MS = [1_000, 2_000, 4_000, 8_000, 15_000, 30_000, 30_000];
+
 /**
  * Retries transient network failures (DNS lookups, resets). Verdict-level errors such as a
  * bad signature or a non-2xx response are not network errors and are never retried.
  */
-export async function withNetworkRetry<T>(fn: () => Promise<T>, attempts = 4): Promise<T> {
-  for (let i = 1; ; i++) {
+export async function withNetworkRetry<T>(fn: () => Promise<T>): Promise<T> {
+  for (let i = 0; ; i++) {
     try {
       return await fn();
     } catch (e) {
-      if (i >= attempts || !isNetworkError(e)) throw e;
-      await new Promise((r) => setTimeout(r, 500 * 2 ** i));
+      if (i >= NETWORK_RETRY_DELAYS_MS.length || !isNetworkError(e)) throw e;
+      await new Promise((r) => setTimeout(r, NETWORK_RETRY_DELAYS_MS[i]));
     }
   }
 }

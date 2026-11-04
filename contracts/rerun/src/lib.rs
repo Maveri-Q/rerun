@@ -100,6 +100,7 @@ pub struct LeaderboardEntry {
 #[near]
 impl Contract {
     #[init]
+    #[private] // only the contract account itself, so nobody can front-run initialisation
     pub fn new(owner: AccountId, collateral_token: AccountId, treasury: AccountId, lab_fee_recipient: AccountId) -> Self {
         // Defaults sized for a 6-decimal stablecoin; points use the same 6-decimal unit.
         const UNIT: u128 = 1_000_000;

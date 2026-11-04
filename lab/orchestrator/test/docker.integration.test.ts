@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
+import type { ClaimSpec } from "@rerun/shared";
 import { lockCommand } from "../src/pipeline/pipeline.ts";
+import { NetworkResolver } from "../src/pipeline/resolver.ts";
 import { DockerSandbox, sandboxImage } from "../src/sandbox/docker.ts";
 
 // Needs Docker and the sandbox images (`pnpm sandbox:build`): DOCKER_TESTS=1 pnpm --filter @rerun/orchestrator test
@@ -97,6 +99,22 @@ describe.skipIf(!enabled)("DockerSandbox isolation (real containers)", () => {
     } finally {
       await s.destroy();
     }
+  }, 180_000);
+
+  it("the real-claim fetcher clones a public repo at its pinned commit", async () => {
+    // GitHub's long-standing public sample repository.
+    const commit = "7fd1a60b01f91b314f59955a4e4d4e80d8edf11d";
+    const spec = { artifact: { repo_url: "https://github.com/octocat/Hello-World.git", commit } } as ClaimSpec;
+    await withSandbox(async (s) => {
+      expect(await new NetworkResolver().fetchRepo(spec, s)).toBe(true);
+      const head = await s.exec("git rev-parse HEAD", { network: false, timeoutMs: 30_000 });
+      expect(head.log.trim()).toBe(commit);
+      expect(await s.readFile("README", 1024)).not.toBeNull();
+    });
+    await withSandbox(async (s) => {
+      const missing = { artifact: { ...spec.artifact, commit: "f".repeat(40) } } as ClaimSpec;
+      expect(await new NetworkResolver().fetchRepo(missing, s)).toBe(false);
+    });
   }, 180_000);
 
   it("deletes the workspace when destroyed", async () => {

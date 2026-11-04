@@ -14,6 +14,9 @@
     "nearai:hello": "pnpm --filter @rerun/orchestrator nearai:hello",
     "lab:run": "pnpm --filter @rerun/orchestrator lab:run",
     "sandbox:build": "docker build -t rerun-sandbox:python3.11 -f lab/sandbox/python.Dockerfile lab/sandbox && docker build -t rerun-sandbox:r4.4 -f lab/sandbox/r.Dockerfile lab/sandbox",
-    "testnet:accounts": "pnpm --filter @rerun/scripts testnet:accounts"
+    "testnet:accounts": "pnpm --filter @rerun/scripts testnet:accounts",
+    "deploy:testnet": "pnpm --filter @rerun/scripts deploy:testnet",
+    "demo": "pnpm --filter @rerun/scripts demo",
+    "lab:watch": "pnpm --filter @rerun/orchestrator lab:watch"
   }
 }

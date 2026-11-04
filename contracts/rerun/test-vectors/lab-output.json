@@ -35,8 +35,8 @@
         ]
       },
       "run_index": 0,
-      "started_at": 1793776307,
-      "finished_at": 1793776318
+      "started_at": 1793780758,
+      "finished_at": 1793780768
     }
   },
   {
@@ -63,7 +63,7 @@
       "full_log_uri": "rerun-lab://local/logs/d703a3caeb7c8920890384d9dd62da26793a4f1eaee9ffc5e6ec84fe3aa12357",
       "report_hash": "e7a068be43a68738cfcf088623515d77ba1bbe7aa23987d5c8074eabbb2e8cf7",
       "report_uri": "rerun-lab://local/reports/e7a068be43a68738cfcf088623515d77ba1bbe7aa23987d5c8074eabbb2e8cf7",
-      "runtime_secs": 4,
+      "runtime_secs": 3,
       "exit_code": 0,
       "lab_codehash": "0000000000000000000000000000000000000000000000000000000000000000",
       "lab_account": "local-lab.testnet",
@@ -71,12 +71,12 @@
         "model_id": "z-ai/glm-5.3-flash",
         "attestation_digest": "bb8a7976104d871a735c0da6d0f0b244382f42c97202b1b1efc9cfd40c1de8d6",
         "response_signature_refs": [
-          "mock-c3a1041ed30f5f88"
+          "mock-80bdf3f3a1e20147"
         ]
       },
       "run_index": 0,
-      "started_at": 1793776319,
-      "finished_at": 1793776329
+      "started_at": 1793780768,
+      "finished_at": 1793780778
     }
   },
   {
@@ -109,7 +109,7 @@
       "full_log_uri": "rerun-lab://local/logs/d703a3caeb7c8920890384d9dd62da26793a4f1eaee9ffc5e6ec84fe3aa12357",
       "report_hash": "22902c0a447016f5d59a43eb011f29ca845d7fe46f96445d0180aa8ac052ca97",
       "report_uri": "rerun-lab://local/reports/22902c0a447016f5d59a43eb011f29ca845d7fe46f96445d0180aa8ac052ca97",
-      "runtime_secs": 7,
+      "runtime_secs": 6,
       "exit_code": 0,
       "lab_codehash": "0000000000000000000000000000000000000000000000000000000000000000",
       "lab_account": "local-lab.testnet",
@@ -118,12 +118,12 @@
         "attestation_digest": "bb8a7976104d871a735c0da6d0f0b244382f42c97202b1b1efc9cfd40c1de8d6",
         "response_signature_refs": [
           "mock-cc7353e3e00db26d",
-          "mock-2c9559da6199a67b"
+          "mock-d2bd207d136f7522"
         ]
       },
       "run_index": 0,
-      "started_at": 1793776329,
-      "finished_at": 1793776344
+      "started_at": 1793780779,
+      "finished_at": 1793780792
     }
   },
   {
@@ -163,8 +163,8 @@
         ]
       },
       "run_index": 0,
-      "started_at": 1793776344,
-      "finished_at": 1793776353
+      "started_at": 1793780793,
+      "finished_at": 1793780801
     }
   },
   {
@@ -189,7 +189,7 @@
       "full_log_uri": "",
       "report_hash": "11a31cf05351f309be9ee05adfc660dc52e6c236e6e1bad3245cd8c24b5062c3",
       "report_uri": "rerun-lab://local/reports/11a31cf05351f309be9ee05adfc660dc52e6c236e6e1bad3245cd8c24b5062c3",
-      "runtime_secs": 4,
+      "runtime_secs": 3,
       "exit_code": 0,
       "lab_codehash": "0000000000000000000000000000000000000000000000000000000000000000",
       "lab_account": "local-lab.testnet",
@@ -197,12 +197,52 @@
         "model_id": "z-ai/glm-5.3-flash",
         "attestation_digest": "bb8a7976104d871a735c0da6d0f0b244382f42c97202b1b1efc9cfd40c1de8d6",
         "response_signature_refs": [
-          "mock-ee09e7164331717b"
+          "mock-88cf18dcd446cee9"
         ]
       },
       "run_index": 0,
-      "started_at": 1793776354,
-      "finished_at": 1793776364
+      "started_at": 1793780802,
+      "finished_at": 1793780811
+    }
+  },
+  {
+    "name": "swapped-data",
+    "spec_json": "{\"artifact\":{\"commit\":\"563c58831162400e57dc0129eb2d2744fb3a1368\",\"data\":[{\"path\":\"data/trials.csv\",\"sha256\":\"be35dcd48bdcc0222a5c4d5ef769adb4a58e77c1914af80d8aa457ad742f9b7d\",\"url\":\"https://rerun.invalid/demo/data/trials.csv\"}],\"entrypoint\":\"python reproduce.py\",\"output\":{\"extractor\":{\"expr\":\"$.accuracy\",\"type\":\"jsonpath\"},\"path\":\"results.json\"},\"repo_url\":\"https://rerun.invalid/demo/swapped-data.git\",\"runtime\":\"python3.11\",\"setup\":[\"pip install -r requirements.txt\"]},\"metric\":{\"comparison\":\"within_tolerance\",\"name\":\"accuracy\",\"reported_value\":\"0.93\",\"tolerance\":{\"type\":\"abs\",\"value\":\"0.02\"}},\"private_data\":null,\"resources\":{\"cpu\":2,\"max_minutes\":3,\"mem_gb\":2},\"source\":{\"authors\":\"RERUN demo fixture\",\"license\":\"MIT\",\"type\":\"report\",\"url\":\"https://rerun.invalid/demo/swapped-data\"},\"statement\":\"DEMO FIXTURE, not real research. The dataset at the claim's URL no longer matches the hash pinned in the spec, so the Lab refuses to run it. Both sides redeem at 0.5 and the creator's bond is forfeited.\",\"title\":\"[DEMO] A claim whose data file was swapped after the market opened\",\"version\":1}",
+    "spec_hash": "241c10238cc7508879569640c22b66789c0ab85246b8aada234abb043756fbc9",
+    "receipt": {
+      "market_id": 5,
+      "spec_hash": "241c10238cc7508879569640c22b66789c0ab85246b8aada234abb043756fbc9",
+      "outcome": "INVALID",
+      "invalid_reason": "HASH_MISMATCH",
+      "measured_value": null,
+      "reported_value": "0.93",
+      "tolerance": "abs:0.02",
+      "commit": "563c58831162400e57dc0129eb2d2744fb3a1368",
+      "data_hashes": [
+        "65cb2675a54874bae05839ad7314c1742157cf1291320d522b6268b5d468a46b"
+      ],
+      "env_lock_hash": "",
+      "patches": [],
+      "patches_diff_excerpt": "",
+      "log_hash": "69cc0f4d9573047991afede09158c3332f7d6758c2073b58dcf5bd6d31460446",
+      "log_tail": "data/trials.csv has sha256 65cb2675a54874bae05839ad7314c1742157cf1291320d522b6268b5d468a46b, spec says be35dcd48bdcc0222a5c4d5ef769adb4a58e77c1914af80d8aa457ad742f9b7d",
+      "full_log_uri": "rerun-lab://local/logs/69cc0f4d9573047991afede09158c3332f7d6758c2073b58dcf5bd6d31460446",
+      "report_hash": "3b512983252e9e8a9ebd8e1872a5feddf3c36f4309f04c4885ec7ab22aec2553",
+      "report_uri": "rerun-lab://local/reports/3b512983252e9e8a9ebd8e1872a5feddf3c36f4309f04c4885ec7ab22aec2553",
+      "runtime_secs": 0,
+      "exit_code": 0,
+      "lab_codehash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "lab_account": "local-lab.testnet",
+      "nearai": {
+        "model_id": "z-ai/glm-5.3-flash",
+        "attestation_digest": "bb8a7976104d871a735c0da6d0f0b244382f42c97202b1b1efc9cfd40c1de8d6",
+        "response_signature_refs": [
+          "mock-bdddee521b087b21"
+        ]
+      },
+      "run_index": 0,
+      "started_at": 1793780811,
+      "finished_at": 1793780814
     }
   }
 ]

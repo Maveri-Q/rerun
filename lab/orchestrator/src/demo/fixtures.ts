@@ -3,7 +3,7 @@ import { createHash } from "node:crypto";
 import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { ClaimSpec, sealToLab, type Outcome } from "@rerun/shared";
+import { ClaimSpec, sealToLab, specHash, type Outcome } from "@rerun/shared";
 import type { ChatRequest } from "../nearai/client.ts";
 import type { ArtifactResolver, LabKeys } from "../pipeline/pipeline.ts";
 import type { Sandbox } from "../sandbox/types.ts";
@@ -15,12 +15,14 @@ import type { Sandbox } from "../sandbox/types.ts";
  */
 
 const DEMO_ROOT = path.resolve(import.meta.dirname, "../../../../claims/demo");
-export const DEMO_NAMES = ["reproduces", "misreported", "repairable", "broken", "private"] as const;
+export const DEMO_NAMES = ["reproduces", "misreported", "repairable", "broken", "private", "swapped-data"] as const;
 export type DemoName = (typeof DEMO_NAMES)[number];
 
 interface ClaimFile {
   expected: Outcome;
   expected_patches?: number;
+  /** Serve different bytes than the spec pins: the attack the hash check exists for. */
+  swap_data?: boolean;
   title: string;
   statement: string;
   metric: ClaimSpec["metric"];
@@ -102,7 +104,7 @@ export function loadDemo(name: DemoName, labKeys: LabKeys): DemoClaim {
   const data = claim.data.map((d) => {
     const bytes = lf(readFileSync(path.join(DEMO_ROOT, "_data", d.file)));
     const url = `https://rerun.invalid/demo/data/${d.file}`;
-    files.set(url, bytes);
+    files.set(url, claim.swap_data ? Buffer.concat([bytes, Buffer.from("99,99,9.999,1")]) : bytes);
     return { url, sha256: sha256(bytes), path: d.path };
   });
 
@@ -164,4 +166,14 @@ export function loadDemo(name: DemoName, labKeys: LabKeys): DemoClaim {
       return undefined;
     },
   };
+}
+
+/** The demo fixture behind an on-chain spec, if it is one. Real claims return undefined. */
+export function demoForSpec(spec: ClaimSpec, labKeys: LabKeys): DemoClaim | undefined {
+  if (!spec.artifact.repo_url.startsWith("https://rerun.invalid/demo/")) return undefined;
+  for (const name of DEMO_NAMES) {
+    const demo = loadDemo(name, labKeys);
+    if (specHash(demo.spec) === specHash(spec)) return demo;
+  }
+  return undefined;
 }

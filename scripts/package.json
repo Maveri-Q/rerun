@@ -5,9 +5,12 @@
   "type": "module",
   "scripts": {
     "typecheck": "tsc -p .",
-    "testnet:accounts": "tsx testnet-accounts.ts"
+    "testnet:accounts": "tsx testnet-accounts.ts",
+    "deploy:testnet": "tsx deploy.ts",
+    "demo": "tsx demo.ts"
   },
   "dependencies": {
+    "@rerun/shared": "workspace:*",
     "dotenv": "18.0.9",
     "near-api-js": "7.4.0"
   },

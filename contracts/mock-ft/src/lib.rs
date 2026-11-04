@@ -29,6 +29,7 @@ pub struct Contract {
 #[near]
 impl Contract {
     #[init]
+    #[private]
     pub fn new() -> Self {
         Self { token: FungibleToken::new(StorageKey::Token) }
     }

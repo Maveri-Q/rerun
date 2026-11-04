@@ -612,7 +612,7 @@ fn lab_output_is_accepted_by_the_contract() {
         receipt: Receipt,
     }
     let vectors: Vec<Vector> = near_sdk::serde_json::from_str(include_str!("../test-vectors/lab-output.json")).unwrap();
-    assert_eq!(vectors.len(), 5);
+    assert_eq!(vectors.len(), 6);
 
     let mut c = contract();
     paying("creator.testnet", T0);

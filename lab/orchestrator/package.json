@@ -8,6 +8,7 @@
     "typecheck": "tsc -p .",
     "nearai:hello": "tsx scripts/nearai-hello.ts",
     "lab:run": "tsx scripts/run-claim.ts",
+    "lab:watch": "tsx scripts/watch.ts",
     "export:vectors": "tsx scripts/export-vectors.ts"
   },
   "dependencies": {
@@ -16,6 +17,7 @@
     "dotenv": "18.0.9",
     "ethers": "6.17.0",
     "jose": "6.2.15",
+    "near-api-js": "7.4.0",
     "zod": "4.6.7"
   },
   "devDependencies": {

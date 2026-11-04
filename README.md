@@ -2,7 +2,9 @@
 
 **A forecasting market on whether published research results reproduce, settled by an AI agent that actually re-runs the authors' code and data inside a TEE and posts a verifiable receipt on NEAR.**
 
-> Status: early build (NEAR Hackathon 2026, step 3 of 10: market contract and a local Lab that really re-runs claims). The Lab does not run in a TEE yet and nothing is deployed. Sections marked _planned_ do not exist yet.
+> Status: early build (NEAR Hackathon 2026, step 4 of 10: the full lifecycle runs end to end on testnet). The Lab does not run in a TEE yet and there is no web app yet. Sections marked _planned_ do not exist yet.
+
+**Deployed on testnet:** market contract [`rerun.rerun-43f5f2.testnet`](https://testnet.nearblocks.io/address/rerun.rerun-43f5f2.testnet), collateral token [`tusdc.rerun-43f5f2.testnet`](https://testnet.nearblocks.io/address/tusdc.rerun-43f5f2.testnet), Lab `rerun-lab-43f5f2.testnet` (registered without TEE attestation, testnet only).
 
 ## The problem
 
@@ -26,8 +28,9 @@ Requires Node ≥ 22.22.2 and pnpm 12 (`npm i -g pnpm@12`). Contract tests need 
 3. `pnpm nearai:hello`: see the NEAR AI Cloud attestation for the Lab's private model verified live:
    Intel TDX quote via DCAP, NVIDIA GPU evidence via NRAS (JWT verified against NVIDIA's keys), key + nonce binding in `report_data`, `MRCONFIGID` bound to the app compose, and the RTMR3 event-log replay, for both the gateway and the model TEE. Each line prints PASS/FAIL.
 4. Optional: put `NEARAI_CLOUD_API_KEY` in `.env` (copy `.env.example`) and run `pnpm nearai:hello` again: it also sends one tiny private chat completion and verifies its ECDSA response signature against the attested model key.
-5. `pnpm sandbox:build`, then `MOCK_LLM=1 pnpm lab:run all`: see five demo claims really execute in sandboxed containers, each printing its stages and a final table: `REPRODUCED`, `NOT_REPRODUCED` (deliberately misreported number), `REPRODUCED` after an environment repair (the diff is printed), `BROKEN` (unpublished dependency), and `REPRODUCED` on encrypted private data. Takes about a minute and spends no credits.
-6. With `NEARAI_CLOUD_API_KEY` set, `pnpm lab:run all`: the same claims, but NEAR AI's private model makes the repair decisions and writes the reports, and every reply is checked against an attested key. About $0.003 for all five.
+5. `pnpm sandbox:build`, then `MOCK_LLM=1 pnpm lab:run all`: see six demo claims really execute in sandboxed containers, each printing its stages and a final table: `REPRODUCED`, `NOT_REPRODUCED` (deliberately misreported number), `REPRODUCED` after an environment repair (the diff is printed), `BROKEN` (unpublished dependency), `REPRODUCED` on encrypted private data, and `INVALID` (data swapped after creation). Takes about a minute and spends no credits.
+6. With `NEARAI_CLOUD_API_KEY` set, `pnpm lab:run all`: the same claims, but NEAR AI's private model makes the repair decisions and writes the reports, and every reply is checked against an attested key. About $0.003.
+7. With your own testnet accounts (`pnpm testnet:accounts`, `pnpm build:contracts`, `pnpm deploy:testnet`), `pnpm demo`: see every claim go through create → trade → lock → Lab run → receipt on-chain → finalize → redeem on testnet, with PASS/FAIL checks and explorer links. One market uses tUSDC through `ft_transfer_call` and ends with a withdrawal. Takes about 10 minutes. `pnpm lab:watch` runs the Lab as a loop against the contract.
 
 _Planned:_ hosted site in points mode, `pnpm judge-demo` (zero-setup testnet lifecycle + attack demo).
 
@@ -63,7 +66,7 @@ Each run follows the same stages: attest the private model → fetch the pinned 
 - **No attested model, no run.** The model's TEE is verified before work starts and each reply's signature afterwards. A failure stops the run.
 - **Private data:** sealed to the Lab's X25519 key and decrypted only after setup has finished. Once it is in the workspace, the network stays off and no logs or outputs reach the LLM, the stream or the receipt. Only hashes and the result leave, and the workspace is deleted afterwards. Failures on private claims therefore get no AI repair.
 
-Current limits: dependencies install with unrestricted network during setup (no secrets or private data are present yet; registry-only egress filtering is planned). Local runs have no TEE, so private-data confidentiality there is only as strong as the host, until the Phala deployment. Demo claims are labelled fixtures with `.invalid` URLs that resolve to local files. The real-claim fetcher has not yet run against a live repository.
+Current limits: dependencies install with unrestricted network during setup (no secrets or private data are present yet; registry-only egress filtering is planned). Local runs have no TEE, so private-data confidentiality there is only as strong as the host, until the Phala deployment. Demo claims are labelled fixtures with `.invalid` URLs that resolve to local files, so the hosted Lab will need them published. The real-claim fetcher is tested against a public GitHub repo, but no real paper has gone through the whole pipeline yet.
 
 ## Repo layout
 
@@ -72,10 +75,10 @@ contracts/rerun/    Rust market contract: specs, FPMM, lifecycle, receipts, poin
 contracts/mock-ft/  tUSDC: testnet NEP-141 collateral with an open faucet
 lab/orchestrator/   TypeScript Lab: reproduction pipeline, repair guards, NEAR AI client, attestation
 lab/sandbox/        Sandbox images for untrusted research code (Python 3.11, R 4.4)
-claims/demo/        Five labelled demo claims with synthetic data
+claims/demo/        Six labelled demo claims with synthetic data
 web/                planned: Next.js app
 packages/shared/    APP_NAME, ClaimSpec/Receipt schemas, canonical JSON + sha256, comparator, sealing
-scripts/            testnet-accounts.ts (planned: deploy, seed, demo, judge-demo, attack-demo)
+scripts/            testnet accounts, deploy, end-to-end demo (planned: seed, judge-demo, attack-demo)
 docs/               planned: ARCHITECTURE, MECHANISM, THREAT_MODEL, SOURCES, ADOPTION
 ```
 

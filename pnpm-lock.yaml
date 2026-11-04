@@ -183,6 +183,9 @@ importers:
       jose:
         specifier: 6.2.15
         version: 6.2.15
+      near-api-js:
+        specifier: 7.4.0
+        version: 7.4.0
       zod:
         specifier: 4.6.7
         version: 4.6.7
@@ -218,6 +221,9 @@ importers:
 
   scripts:
     dependencies:
+      '@rerun/shared':
+        specifier: workspace:*
+        version: link:../packages/shared
       dotenv:
         specifier: 18.0.9
         version: 18.0.9
