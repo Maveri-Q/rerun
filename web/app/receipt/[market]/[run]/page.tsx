@@ -3,12 +3,13 @@
 import Link from "next/link";
 import { use } from "react";
 import { EvidenceLadder } from "@/components/EvidenceLadder";
-import { Stamp } from "@/components/Stamp";
+import { PrintedReceipt } from "@/components/PrintedReceipt";
 import { usePoll } from "@/components/usePoll";
 import { VerifiedPanel } from "@/components/VerifiedPanel";
 import { chain } from "@/lib/chain";
 import { accountLink, CONTRACT, LAB_URL } from "@/lib/config";
 import { lab } from "@/lib/lab";
+import { outcomeMeaning, rangeText } from "@/lib/market";
 
 const when = (t: number) => new Date(t * 1000).toLocaleString();
 
@@ -34,29 +35,29 @@ export default function ReceiptPage({ params }: { params: Promise<{ market: stri
   const m = market.data;
   return (
     <>
-      <span className="page-no" style={{ marginTop: 6 }}>
-        p.{m.id}
-      </span>
-      <p className="dim" style={{ margin: 0 }}>
+      <span className="page-no" style={{ marginTop: 36 }}>Claim {m.id}</span>
+      <p className="dim" style={{ margin: "0 0 8px" }}>
         Receipt for run {r.run_index + 1}: the Lab&apos;s permanent record of what it did
       </p>
-      <h1 style={{ fontSize: "clamp(26px, 3.4vw, 38px)" }}>
+      <h1 className="market-title">
         <Link href={`/market/${m.id}`} className="plain-link">
-          {m.spec.title}
+          {m.spec.title.replace(/^\[DEMO\]\s*/, "")}
         </Link>
       </h1>
       <div className="verdict-line">
-        <Stamp outcome={r.outcome} size="xl" />
-        <div className="mono">
-          The Lab got {r.measured_value ?? "no number"}
-          <br />
-          The paper reports {r.reported_value}, allowed margin {r.tolerance.split(":")[1]}{r.tolerance.startsWith("rel") ? " (as a fraction)" : ""}
-          {r.invalid_reason && (
-            <>
-              <br />
-              Why: {r.invalid_reason.replaceAll("_", " ").toLowerCase()}
-            </>
-          )}
+        <PrintedReceipt
+          marketId={m.id}
+          title={m.spec.title}
+          outcome={r.outcome}
+          reported={r.reported_value}
+          range={rangeText(m.spec.reported_value, m.spec.tolerance_kind, m.spec.tolerance_value)}
+          measured={r.measured_value}
+          hash={r.spec_hash}
+          when={r.finished_at}
+        />
+        <div style={{ paddingTop: 20 }}>
+          <p className="statement" style={{ margin: 0 }}>{outcomeMeaning(r.outcome)}</p>
+          {r.invalid_reason && <p className="hint">Why: {r.invalid_reason.replaceAll("_", " ").toLowerCase()}</p>}
         </div>
       </div>
 

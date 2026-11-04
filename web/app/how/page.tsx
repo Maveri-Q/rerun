@@ -53,7 +53,7 @@ export default function HowPage() {
           </li>
           <li>
             <h3>Winners collect</h3>
-            <p>Once the time is up, winning shares pay out. Go to the claim and select Redeem, or find it in your Portfolio.</p>
+            <p>Once the time is up, winning shares pay out. Go to the claim and select Collect, or find it in your Portfolio.</p>
           </li>
         </ol>
       </section>

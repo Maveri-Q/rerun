@@ -78,8 +78,8 @@ export default function CheckPage() {
         A research paper prints numbers that depend on each other, like the items and the total on a receipt. Paste some text from a paper and this checks that they agree. You don&apos;t need the code or the data, and what you paste stays in your browser.
       </p>
 
-      <section className="section">
-        <div style={{ marginBottom: 16 }}>
+      <section style={{ marginTop: 32 }}>
+        <div style={{ marginBottom: 20 }}>
           <button onClick={() => { setText(SAMPLE); setResult(checkPaperText(SAMPLE)); }}>Try an example</button>
         </div>
         <label className="field">

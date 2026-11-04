@@ -132,7 +132,7 @@ export default function PortfolioPage() {
                         {pnl >= 0n ? "+" : ""}
                         {fmtUnits(pnl)}
                       </td>
-                      <td>{m.outcome ? <Stamp outcome={m.outcome} size="sm" /> : stateLabel(m.state)}{redeemable && <div><Link href={`/market/${m.id}`}>Collect</Link></div>}</td>
+                      <td>{m.outcome ? <Stamp outcome={m.outcome} /> : stateLabel(m.state)}{redeemable && <div><Link href={`/market/${m.id}`}>Collect</Link></div>}</td>
                     </tr>
                   );
                 })}

@@ -420,7 +420,7 @@ export default function CreatePage() {
 
         <h3 style={{ margin: "16px 0 8px" }}>Public data files</h3>
         {data.map((row, i) => (
-          <div className="form-grid" key={i} style={{ borderTop: "1px solid var(--rule)", paddingTop: 12 }}>
+          <div className="form-grid" key={i} style={{ borderTop: "1px solid var(--line)", paddingTop: 12 }}>
             <Field label="Download URL">
               <input value={row.url} onChange={(e) => setData((rows) => rows.map((r, j) => (j === i ? { ...r, url: e.target.value } : r)))} />
             </Field>

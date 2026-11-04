@@ -8,7 +8,7 @@ import { EvidenceLadder } from "@/components/EvidenceLadder";
 import { OddsBar } from "@/components/MarketRow";
 import { OddsChart } from "@/components/OddsChart";
 import { RunTerminal } from "@/components/RunTerminal";
-import { Stamp } from "@/components/Stamp";
+import { PrintedReceipt } from "@/components/PrintedReceipt";
 import { TradePanel } from "@/components/TradePanel";
 import { usePoll } from "@/components/usePoll";
 import { VerifiedPanel } from "@/components/VerifiedPanel";
@@ -74,10 +74,8 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
   return (
     <div className="market-grid">
       <div>
-        <span className="page-no" style={{ marginTop: 6 }}>
-          p.{m.id}
-        </span>
-        <h1 style={{ fontSize: "clamp(28px, 3.6vw, 40px)" }}>{s.title}</h1>
+        <span className="page-no">Claim {m.id}</span>
+        <h1 className="market-title">{s.title.replace(/^\[DEMO\]\s*/, "")}</h1>
         <p className="statement">{spec?.statement}</p>
 
         <div className="claim-figure">
@@ -90,16 +88,24 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
 
         {shownOutcome && (
           <div className="verdict-line">
-            <Stamp outcome={shownOutcome} size="xl" reveal={reveal} />
+            <PrintedReceipt
+              marketId={m.id}
+              title={s.title}
+              outcome={shownOutcome}
+              reported={s.reported_value}
+              range={rangeText(s.reported_value, s.tolerance_kind, s.tolerance_value)}
+              measured={latestReceipt?.measured_value ?? null}
+              hash={s.spec_hash}
+              when={m.finalized_at ?? latestReceipt?.finished_at}
+              print={reveal}
+            />
             {latestReceipt && (
-              <div>
-                <div className="mono">
-                  The Lab got {latestReceipt.measured_value ?? "no number"}
-                  <br />
-                  {m.outcome ? "This is final" : "This can still be challenged"}
-                </div>
-                <p className="hint" style={{ maxWidth: "38ch" }}>{outcomeMeaning(latestReceipt.outcome)}</p>
-                <Link href={`/receipt/${m.id}/${latestReceipt.run_index}`}>See the full receipt</Link>
+              <div style={{ paddingTop: 20 }}>
+                <h3>{m.outcome ? "This result is final" : "This can still be challenged"}</h3>
+                <p className="hint" style={{ maxWidth: "38ch", fontSize: 15 }}>{outcomeMeaning(latestReceipt.outcome)}</p>
+                <p style={{ marginTop: 14 }}>
+                  <Link className="btn quiet btn--small" href={`/receipt/${m.id}/${latestReceipt.run_index}`}>See the full receipt</Link>
+                </p>
               </div>
             )}
           </div>
@@ -120,7 +126,7 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
         </ol>
 
         <section className="section">
-          {history.data ? <OddsChart points={history.data} endTime={chartEnd} /> : <p className="empty dim">Loading the price history…</p>}
+          {history.data ? <OddsChart points={history.data} /> : <p className="empty dim">Loading the price history…</p>}
         </section>
 
         <section className="section">
@@ -162,7 +168,7 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
             <dl className="defs">
               <dt>Source</dt>
               <dd>
-                {spec.source.url.includes(".invalid") ? "Demo fixture, not real research" : <a href={spec.source.url}>{spec.source.url}</a>}
+                {spec.source.url.includes(".invalid") ? "A demo, not real research" : <a href={spec.source.url}>{spec.source.url}</a>}
                 <br />
                 <span className="dim">
                   {spec.source.authors}, {spec.source.license}
@@ -231,7 +237,7 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
         {config.data && <MarketActions market={m} config={config.data} position={position.data} onDone={refreshAll} />}
         <div className="panel">
           <OddsBar market={m} />
-          <dl className="defs mono" style={{ gridTemplateColumns: "1fr auto", marginTop: 16 }}>
+          <dl className="defs" style={{ gridTemplateColumns: "1fr auto", marginTop: 16, fontSize: 14 }}>
             <dt>Forecast so far</dt>
             <dd>
               {fmtUnits(m.volume)} {unit}

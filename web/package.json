@@ -16,6 +16,7 @@
     "@rerun/shared": "workspace:*",
     "dotenv": "18.0.9",
     "near-api-js": "7.4.0",
+    "motion": "14.5.0",
     "near-connect-hooks": "1.1.6",
     "next": "16.4.2",
     "react": "19.2.9",
