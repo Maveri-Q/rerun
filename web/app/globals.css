@@ -957,7 +957,7 @@ details > summary {
 
 .paper-results li {
   display: grid;
-  grid-template-columns: 110px minmax(0, 1fr);
+  grid-template-columns: 32px minmax(0, 1fr);
   gap: 12px;
   padding: 12px 0;
   border-bottom: 1px solid var(--rule);
@@ -1110,4 +1110,9 @@ details > summary {
   .figures {
     gap: 12px 32px;
   }
+}
+
+.paper-mark {
+  font: 700 22px/28px var(--font-spline-mono), monospace;
+  text-align: center;
 }
