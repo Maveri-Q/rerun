@@ -1,0 +1,19 @@
+{
+  "title": "Faster teaching via planning (Rafferty et al., rebuilt in ReScience C)",
+  "paper": "https://doi.org/10.5281/zenodo.4242943",
+  "repo_url": "https://github.com/luksurious/faster-teaching",
+  "commit": "1493311d5b723ca3f216f537bda8db5907196443",
+  "license": "MIT",
+  "runtime": "python3.11",
+  "packages": [
+    "tqdm",
+    "termtables",
+    "pandas",
+    "seaborn",
+    "matplotlib",
+    "numpy"
+  ],
+  "entrypoint": "python -u main.py -s --sim_model memoryless random letter > rerun_output.txt",
+  "output_path": "rerun_output.txt",
+  "extractor": "Learning time taken: ([0-9.]+)"
+}

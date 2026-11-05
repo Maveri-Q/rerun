@@ -1,0 +1,20 @@
+{
+  "title": "Echo state network for working memory (Boraud and Strock, ReScience C)",
+  "paper": "https://doi.org/10.5281/zenodo.4655870",
+  "repo_url": "https://github.com/theoboraud/JaegerESN",
+  "commit": "b6d4b318aed6b645f84c399213247db1947555f7",
+  "license": "BSD-style",
+  "runtime": "python3.11",
+  "packages": [
+    "numpy",
+    "scipy",
+    "matplotlib",
+    "scikit-learn",
+    "pillow",
+    "freetype-py",
+    "tqdm"
+  ],
+  "entrypoint": "python ESN.py freemono 9636543291 > rerun_output.txt",
+  "output_path": "rerun_output.txt",
+  "extractor": "Output error rate: ([0-9.]+)%"
+}
