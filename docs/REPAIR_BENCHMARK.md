@@ -8,4 +8,6 @@ Each paper is first run with its packages as of the commit date, using no AI, to
 
 | Paper | Result | Reference | After repair | Changes | Edits blocked | AI cost | Detail |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Parkinson's protein spread rebuild (Bourdenx and Paul, ReScience C) | repaired | 0.6960522094835953 | 0.6960522094835953 | 5 | 2 | $0.0016 | Repaired with 5 change(s). The number matches the baseline. |
+| Parkinson's protein spread rebuild (Bourdenx and Paul, ReScience C) | repaired | 0.6960522094835953 | 0.6960522094835953 | 5 | 3 | $0.0036 | Repaired with 5 change(s). The number matches the baseline. Runs: repaired, repaired, both matched. |
+| Faster teaching via planning (Rafferty et al., rebuilt in ReScience C) | not_broken | 480.6 | 480.6 | 0 | 0 | $0.0006 | It still runs on today's packages, so it doesn't test repair. |
+| Echo state network for working memory (Boraud and Strock, ReScience C) | no_baseline | - | - | 0 | 0 | $0.0000 | No number under the old packages (INVALID). |

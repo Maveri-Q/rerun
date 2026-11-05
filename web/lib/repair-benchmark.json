@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-05T08:03:07.818Z",
+  "generated_at": "2026-11-05T12:47:25.646Z",
   "model": "z-ai/glm-5.3-flash",
   "max_attempts": 6,
   "target_papers": 8,
@@ -15,9 +15,40 @@
       "baseline": "0.6960522094835953",
       "measured": "0.6960522094835953",
       "ai_patches": 5,
-      "blocked_edits": 2,
-      "cost_usd": 0.0015563399999999998,
-      "detail": "Repaired with 5 change(s). The number matches the baseline."
+      "blocked_edits": 3,
+      "cost_usd": 0.0035996199999999996,
+      "detail": "Repaired with 5 change(s). The number matches the baseline. Runs: repaired, repaired, both matched.",
+      "runs": [
+        "repaired",
+        "repaired"
+      ]
+    },
+    {
+      "name": "faster-teaching",
+      "title": "Faster teaching via planning (Rafferty et al., rebuilt in ReScience C)",
+      "paper": "https://doi.org/10.5281/zenodo.4242943",
+      "result": "not_broken",
+      "baseline": "480.6",
+      "measured": "480.6",
+      "ai_patches": 0,
+      "blocked_edits": 0,
+      "cost_usd": 0.00059154,
+      "detail": "It still runs on today's packages, so it doesn't test repair.",
+      "runs": [
+        "not_broken"
+      ]
+    },
+    {
+      "name": "jaeger-working-memory",
+      "title": "Echo state network for working memory (Boraud and Strock, ReScience C)",
+      "paper": "https://doi.org/10.5281/zenodo.4655870",
+      "result": "no_baseline",
+      "baseline": null,
+      "measured": null,
+      "ai_patches": 0,
+      "blocked_edits": 0,
+      "cost_usd": 0,
+      "detail": "No number under the old packages (INVALID)."
     }
   ]
 }
