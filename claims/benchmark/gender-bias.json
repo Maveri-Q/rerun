@@ -1,0 +1,12 @@
+{
+  "title": "Gender bias in misclassification (XKDD workshop, ECML 2023)",
+  "paper": "https://doi.org/10.1007/978-3-031-74633-8_9",
+  "repo_url": "https://github.com/aurorarq/xkdd23-genderbias",
+  "commit": "020a88b82a0c6ac9b9a0adcb2d6f612dc1016415",
+  "license": "MIT",
+  "runtime": "python3.11",
+  "packages": ["dalex", "fairlearn", "numpy", "pandas", "scikit-learn"],
+  "entrypoint": "cd code && python experiment_adult_all_data.py > ../rerun_output.txt",
+  "output_path": "rerun_output.txt",
+  "extractor": "Equalized odds difference: ([0-9.]+)"
+}

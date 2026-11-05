@@ -1,0 +1,21 @@
+{
+  "title": "Authors' own code: brain-wiring model predicts spread of Parkinson's-linked protein in mic",
+  "paper": "https://doi.org/10.1038/s41593-019-0457-5",
+  "repo_url": "https://github.com/ejcorn/connectome_diffusion",
+  "commit": "b967d0851f66073a0bfe25d39374466639b9685f",
+  "license": "MIT",
+  "runtime": "r4.4",
+  "packages": [
+    "R.matlab",
+    "RColorBrewer",
+    "cowplot",
+    "expm",
+    "ggplot2",
+    "lm.beta",
+    "stringr",
+    "viridis"
+  ],
+  "entrypoint": "Rscript --vanilla -e \"params<-list(basedir='./',opdir='out/',grps='NTG');source('code/packages.R');source('code/process/process_pathconn.R');source('code/process/getLout.R');grp<-'NTG';source('code/diffmodel/analyzespread.R');cat('r3',format(r.SC[2],digits=8),'\\n')\" > rerun_output.txt",
+  "output_path": "rerun_output.txt",
+  "extractor": "r3 ([0-9.]+)"
+}

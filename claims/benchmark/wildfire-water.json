@@ -1,0 +1,13 @@
+{
+  "title": "Temperature explains about 15% of yearly forest water loss after wildfires",
+  "paper": "https://doi.org/10.5281/zenodo.4617894",
+  "repo_url": "https://github.com/bpbond/ten-years-paper33",
+  "commit": "c28b8a2e3149f7d90f2dc0179f9c976785e762b1",
+  "license": "MIT",
+  "runtime": "r4.4",
+  "packages": [],
+  "entrypoint": "Rscript --vanilla ET.r > rerun_output.txt",
+  "output_path": "rerun_output.txt",
+  "extractor": "ET ~ Tavg[\\s\\S]*?Multiple R-squared:\\s+([0-9.]+)",
+  "not_before": "2026-11-07T05:15:30Z"
+}

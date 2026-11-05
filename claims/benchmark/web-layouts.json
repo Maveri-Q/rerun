@@ -1,0 +1,12 @@
+{
+  "title": "Synthesis of web layouts from examples (Mango team, FSE 2021)",
+  "paper": "https://doi.org/10.1145/3468264.3468533",
+  "repo_url": "https://github.com/MangoTeam/replication-package",
+  "commit": "df1662df3904da0e8929252d6aee353d0b361d13",
+  "license": "ISC",
+  "runtime": "python3.11",
+  "packages": ["numpy", "matplotlib", "seaborn", "scipy", "more-itertools"],
+  "entrypoint": "cd experiments && python -c \"import plot; plot.plot_error(); c = plot.np.genfromtxt('noise/3/baseline.csv', delimiter=',', skip_header=1, usecols=2, converters={2: plot.converter}); print('Total error', c.sum())\" > ../rerun_output.txt",
+  "output_path": "rerun_output.txt",
+  "extractor": "Total error (-?[0-9.]+)"
+}

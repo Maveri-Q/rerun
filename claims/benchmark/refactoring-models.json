@@ -1,0 +1,12 @@
+{
+  "title": "Optimizing software models by refactoring (Cortellessa et al., Information and Software Technology)",
+  "paper": "https://doi.org/10.1016/j.infsof.2023.107159",
+  "repo_url": "https://github.com/SEALABQualityGroup/2022-ist-replication-package",
+  "commit": "66fee88bc9099d2c3c4d3af84ff3acf2eb3a062d",
+  "license": "GPL-3.0",
+  "runtime": "python3.11",
+  "packages": ["numpy", "pandas", "matplotlib", "seaborn"],
+  "entrypoint": "cd analysis && python rq2_figures.py > ../rerun_output.txt",
+  "output_path": "rerun_output.txt",
+  "extractor": "ImprovementRel \\(Interval\\):\\s+[0-9.e-]+\\s+([0-9.]+)"
+}

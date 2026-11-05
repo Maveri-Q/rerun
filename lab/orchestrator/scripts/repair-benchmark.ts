@@ -46,6 +46,8 @@ interface Case {
   entrypoint: string;
   output_path: string;
   extractor: string;
+  /** A posted claim still open for forecasts can't be run before this time, because the result would be public. */
+  not_before?: string;
 }
 
 type Result = "repaired" | "failed" | "not_broken" | "no_baseline" | "no_verdict";
@@ -66,6 +68,14 @@ interface Row {
 }
 
 const modelId = process.env.NEARAI_MODEL || "z-ai/glm-5.3-flash";
+
+/** Today's newest packages, with no date limit. */
+function todaySetup(c: Case): string[] {
+  if (c.packages.length === 0) return [];
+  if (c.runtime === "python3.11") return [`pip install ${c.packages.join(" ")}`];
+  const list = c.packages.map((p) => `'${p}'`).join(",");
+  return ["mkdir -p /work/.rlib", `Rscript --vanilla -e "install.packages(c(${list}), lib='/work/.rlib', repos='https://cloud.r-project.org')"`];
+}
 
 function specFor(c: Case, setup: string[], reported: string, margin: { type: "abs" | "rel"; value: string }): ClaimSpec {
   return ClaimSpec.parse({
@@ -135,7 +145,7 @@ async function repairRun(c: Case, row: Row, llm: LlmClient, log: (e: StageEvent)
   let repairEvents = 0;
   const broken = await withTimeout(
     runOnce(
-      specFor(c, [`pip install ${c.packages.join(" ")}`], row.baseline!, { type: "rel", value: MATCH_MARGIN }),
+      specFor(c, todaySetup(c), row.baseline!, { type: "rel", value: MATCH_MARGIN }),
       false,
       llm,
       (e) => {
@@ -202,7 +212,12 @@ async function main() {
   const rows = new Map(previous.map((r) => [r.name, r]));
   mkdirSync(path.dirname(DOC_OUT), { recursive: true });
   for (const name of names) {
-    const row = await benchmark(name, JSON.parse(readFileSync(path.join(CASES, `${name}.json`), "utf8")) as Case);
+    const c = JSON.parse(readFileSync(path.join(CASES, `${name}.json`), "utf8")) as Case;
+    if (c.not_before && Date.now() < Date.parse(c.not_before)) {
+      console.log(`--> ${name}: skipped. Forecasting on this claim is open until ${c.not_before}.`);
+      continue;
+    }
+    const row = await benchmark(name, c);
     console.log(`--> ${name}: ${row.result}. ${row.detail}`);
     if (row.result === "no_verdict" && rows.has(name)) {
       console.log(`    keeping the earlier result for ${name}, because this run couldn't finish`);

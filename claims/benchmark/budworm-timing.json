@@ -1,0 +1,17 @@
+{
+  "title": "A timing model for a forest pest: Candy's 1991 slope of -0.0457",
+  "paper": "https://doi.org/10.5281/zenodo.5006005",
+  "repo_url": "https://github.com/pboesu/replication_candy_1991",
+  "commit": "98329d447ef025c260879f28316015fc0b24fb08",
+  "license": "CC-BY-4.0",
+  "runtime": "r4.4",
+  "packages": [
+    "gtools",
+    "VGAM",
+    "ordinal"
+  ],
+  "entrypoint": "Rscript --vanilla -e \"source('code/02_fit_candy_1991_models.R'); cat(sprintf('slope %.6f\\n', logit_cm_candy_nll\\$par[7]))\" > rerun_output.txt",
+  "output_path": "rerun_output.txt",
+  "extractor": "slope (-?[0-9.]+)",
+  "not_before": "2026-11-07T05:15:30Z"
+}
