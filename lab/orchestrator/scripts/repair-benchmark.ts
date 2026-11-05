@@ -95,7 +95,7 @@ async function runOnce(spec: ClaimSpec, dateInstall: boolean, llm: LlmClient, em
   const limits = { image: sandboxImage(spec.artifact.runtime), cpus: spec.resources.cpu, memGb: spec.resources.mem_gb };
   return reproduce(
     { spec, marketId: 0, runIndex: 0, labAccount: "benchmark.testnet", labCodehash: "0".repeat(64) },
-    { sandbox: new DockerSandbox(limits as never), model: new NearAiModel(llm, modelId), resolver: new NetworkResolver(), dateInstall, emit },
+    { sandbox: new DockerSandbox(limits as never), model: new NearAiModel(llm, modelId), resolver: new NetworkResolver(), dateInstall, skipStressTests: true, emit },
   );
 }
 

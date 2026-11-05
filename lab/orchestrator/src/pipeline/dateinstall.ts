@@ -33,6 +33,7 @@ const IMPORT_NAMES: [string, string][] = [
   ["yaml", "pyyaml"],
   ["Bio", "biopython"],
   ["bs4", "beautifulsoup4"],
+  ["mpl_toolkits", "matplotlib"],
 ];
 
 /** Runs inside the sandbox. It parses the repository's files, and never imports or runs them. */

@@ -95,6 +95,8 @@ export interface RunDeps {
   emit?: (e: StageEvent) => void;
   /** A fresh workspace with none of the authors' code. Without it, re-implementation is skipped. */
   newSandbox?: () => Sandbox;
+  /** Skips the extra stress-test runs. The repair benchmark only needs the normal run's number. */
+  skipStressTests?: boolean;
   /** Before any AI repair, try installing the packages as of the commit's date. */
   dateInstall?: boolean;
   /** Stores a log, report or evidence file and returns its URI. Not called with private-run logs. */
@@ -351,6 +353,8 @@ export async function reproduce(input: RunInput, deps: RunDeps): Promise<RunResu
     // The verdict is fixed above. From here on, a failure only marks a check as incomplete.
     if (isPrivate) {
       robustness = { status: "not_attempted", reason: "This claim uses private data, so no extra runs are made.", runs: [] };
+    } else if (deps.skipStressTests) {
+      robustness = { status: "not_attempted", reason: "Stress tests were skipped for this run.", runs: [] };
     } else {
       const measuredValue = measured;
       robustness = await runRobustness({
