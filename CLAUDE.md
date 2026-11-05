@@ -38,7 +38,7 @@ RERUN: NEAR Hackathon 2026 entry. The full spec is the human's build plan (`RERU
 - Automated UI tests sign via `localStorage["rerun.test-wallet"]="1"` and `/api/dev-test-wallet`, which is dev-only and localhost-only. Never put a private key in a browser tool call.
 - Evidence checks (`lab/orchestrator/src/pipeline/evidence.ts`) run after the verdict is fixed and must never settle a market. A failure there only marks the check incomplete. The re-implementation prompt must never contain the reported number or data values.
 - Site copy: plain words. Say claim, forecast, holds up, allowed margin, fingerprint, collect, secure hardware; keep the technical terms for the technical sections. Terms and meanings are listed on `/how`.
-- Community notes and conflict-of-interest declarations live in `lab/orchestrator/src/lab/notes.ts`: wallet-signed (NEP-413), stored by the Lab, no transaction. They never reach the AI, a run, a receipt or a verdict.
+- Community notes and conflict-of-interest declarations live on the contract (`contracts/rerun/src/notes.rs`) under their own storage keys, so they keep the state layout and show when the Lab is off. The poster pays storage. They never reach the AI, a run, a receipt or a verdict.
 - NEAR Intents in `web/lib/intents.ts` only asks for dry quotes, so nothing can move. Real deposits wait for the real-money decision.
 - Open claims in `claims/benchmark` carry `not_before`, so the repair benchmark can't run them before forecasting closes.
 - Demo scripts must not count a transaction failing for the wrong reason as an attack blocked: `Scoreboard.blocked` requires the exact rejection text, and retries only passing network errors.

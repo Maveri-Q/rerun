@@ -14,6 +14,7 @@ mod ft;
 mod labs;
 mod lifecycle;
 mod market;
+pub mod notes;
 pub mod math;
 pub mod spec;
 pub mod types;

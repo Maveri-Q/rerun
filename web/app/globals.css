@@ -3187,3 +3187,4 @@ a {
 .note-declare { margin-top: 16px; max-width: 720px; }
 .note-declare summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; color: var(--ink-2); }
 .note-declare select { margin: 8px 8px 8px 0; min-height: 44px; }
+.any-chain-label { margin: 8px 0; font-weight: 600; color: var(--ink); }

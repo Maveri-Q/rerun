@@ -18,8 +18,6 @@ export interface Wallet {
   signIn: () => void;
   signOut: () => void;
   call: (method: string, args: Record<string, unknown>, opts?: CallOptions) => Promise<void>;
-  /** Signs a message without a transaction (NEP-413). The signature comes back as base64. */
-  signMessage: (message: string, recipient: string, nonce: Uint8Array) => Promise<{ publicKey: string; signature: string }>;
 }
 
 const WalletContext = createContext<Wallet | null>(null);
@@ -61,17 +59,6 @@ function Inner({ children }: { children: ReactNode }) {
     [near, test],
   );
 
-  const signMessage = useCallback<Wallet["signMessage"]>(
-    async (message, recipient, nonce) => {
-      const signed = test ? await test.signNep413Message({ message, recipient, nonce }) : await near.signNEP413Message({ message, recipient, nonce });
-      // Wallets differ: some return the signature as base64 text, others as bytes.
-      const raw: unknown = signed.signature;
-      const signature = typeof raw === "string" ? raw : btoa(String.fromCharCode(...(raw as Uint8Array)));
-      return { publicKey: String(signed.publicKey), signature };
-    },
-    [near, test],
-  );
-
   const value = useMemo<Wallet>(
     () => ({
       accountId: test?.accountId ?? near.signedAccountId,
@@ -79,9 +66,8 @@ function Inner({ children }: { children: ReactNode }) {
       signIn: () => void near.signIn(),
       signOut: () => void near.signOut(),
       call,
-      signMessage,
     }),
-    [near, test, call, signMessage],
+    [near, test, call],
   );
   return <WalletContext.Provider value={value}>{children}</WalletContext.Provider>;
 }

@@ -674,3 +674,135 @@ fn lab_output_is_accepted_by_the_contract() {
         assert_eq!(c.get_market(id).unwrap().market.outcome, Some(expected), "{}", v.name);
     }
 }
+
+// ---------------------------------------------------------------- notes
+
+mod notes {
+    use super::*;
+    use crate::notes::{NoteKind, NoteRole};
+
+    fn note(w: &mut World, who: &str, kind: NoteKind, text: &str, role: Option<NoteRole>, parent: Option<u32>) -> u32 {
+        ctx(who, NearToken::from_millinear(50), T0 + 30);
+        w.c.add_note(w.id, kind, text.into(), role, parent)
+    }
+
+    #[test]
+    fn anyone_can_post_and_it_reads_back() {
+        let mut w = world();
+        let id = note(&mut w, "alice.testnet", NoteKind::Note, "  The table uses a different year  ", None, None);
+        let notes = w.c.get_notes(w.id, None, None);
+        assert_eq!(notes.len(), 1);
+        assert_eq!(notes[0].id, id);
+        assert_eq!(notes[0].account, a("alice.testnet"));
+        assert_eq!(notes[0].text, "The table uses a different year");
+        assert_eq!(notes[0].at, T0 + 30);
+    }
+
+    #[test]
+    #[should_panic(expected = "write something")]
+    fn empty_notes_are_refused() {
+        let mut w = world();
+        note(&mut w, "alice.testnet", NoteKind::Note, "   ", None, None);
+    }
+
+    #[test]
+    #[should_panic(expected = "at most 600 bytes")]
+    fn long_notes_are_refused() {
+        let mut w = world();
+        note(&mut w, "alice.testnet", NoteKind::Note, &"x".repeat(601), None, None);
+    }
+
+    #[test]
+    #[should_panic(expected = "unknown market")]
+    fn unknown_claims_are_refused() {
+        let mut w = world();
+        ctx("alice.testnet", NearToken::from_millinear(50), T0);
+        w.c.add_note(999, NoteKind::Note, "hello".into(), None, None);
+    }
+
+    #[test]
+    #[should_panic(expected = "attach more NEAR")]
+    fn the_poster_pays_for_storage() {
+        let mut w = world();
+        as_("alice.testnet", T0);
+        w.c.add_note(w.id, NoteKind::Note, "hello".into(), None, None);
+    }
+
+    #[test]
+    #[should_panic(expected = "only the account that opened")]
+    fn only_the_real_creator_can_declare_as_creator() {
+        let mut w = world();
+        note(&mut w, "alice.testnet", NoteKind::Declare, "", Some(NoteRole::Creator), None);
+    }
+
+    #[test]
+    fn a_declaration_marks_later_notes() {
+        let mut w = world();
+        note(&mut w, "creator.testnet", NoteKind::Declare, "", Some(NoteRole::Creator), None);
+        note(&mut w, "carol.testnet", NoteKind::Declare, "I wrote this", Some(NoteRole::Author), None);
+        note(&mut w, "carol.testnet", NoteKind::Note, "Context on the data", None, None);
+        let notes = w.c.get_notes(w.id, None, None);
+        assert_eq!(notes[0].role, Some(NoteRole::Creator));
+        assert_eq!(notes[2].role, Some(NoteRole::Author));
+    }
+
+    #[test]
+    #[should_panic(expected = "already declared")]
+    fn one_declaration_per_account() {
+        let mut w = world();
+        note(&mut w, "carol.testnet", NoteKind::Declare, "", Some(NoteRole::Author), None);
+        note(&mut w, "carol.testnet", NoteKind::Declare, "", Some(NoteRole::Author), None);
+    }
+
+    #[test]
+    fn a_declared_author_can_reply_to_a_note() {
+        let mut w = world();
+        let first = note(&mut w, "alice.testnet", NoteKind::Note, "Why this year?", None, None);
+        note(&mut w, "carol.testnet", NoteKind::Declare, "", Some(NoteRole::Author), None);
+        let reply = note(&mut w, "carol.testnet", NoteKind::Reply, "Because of the survey", None, Some(first));
+        let notes = w.c.get_notes(w.id, None, None);
+        assert_eq!(notes[reply as usize].parent, Some(first));
+    }
+
+    #[test]
+    #[should_panic(expected = "declare your connection")]
+    fn undeclared_accounts_cannot_reply() {
+        let mut w = world();
+        let first = note(&mut w, "alice.testnet", NoteKind::Note, "Why this year?", None, None);
+        note(&mut w, "bob.testnet", NoteKind::Reply, "I can answer", None, Some(first));
+    }
+
+    #[test]
+    #[should_panic(expected = "isn't there")]
+    fn replies_need_a_real_note() {
+        let mut w = world();
+        note(&mut w, "carol.testnet", NoteKind::Declare, "", Some(NoteRole::Author), None);
+        note(&mut w, "carol.testnet", NoteKind::Reply, "To nothing", None, Some(44));
+    }
+
+    #[test]
+    fn the_owner_can_hide_a_note() {
+        let mut w = world();
+        let id = note(&mut w, "alice.testnet", NoteKind::Note, "spam", None, None);
+        as_("owner.testnet", T0 + 40);
+        w.c.hide_note(w.id, id);
+        assert!(w.c.get_notes(w.id, None, None).is_empty());
+    }
+
+    #[test]
+    #[should_panic]
+    fn nobody_else_can_hide_a_note() {
+        let mut w = world();
+        let id = note(&mut w, "alice.testnet", NoteKind::Note, "fair point", None, None);
+        as_("bob.testnet", T0 + 40);
+        w.c.hide_note(w.id, id);
+    }
+
+    #[test]
+    fn notes_never_touch_the_market() {
+        let mut w = world();
+        let before = format!("{:?}", w.c.get_market(w.id).unwrap().market);
+        note(&mut w, "alice.testnet", NoteKind::Note, "This verdict is wrong, change it", None, None);
+        assert_eq!(before, format!("{:?}", w.c.get_market(w.id).unwrap().market));
+    }
+}

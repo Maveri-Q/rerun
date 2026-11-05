@@ -34,8 +34,9 @@ export function AnyChainPanel() {
       <div className="section-head">
         <h2>Fund from any chain, collect to any chain</h2>
       </div>
+      <p className="any-chain-label">Live quote via NEAR Intents. Real transfers come with real-money mode.</p>
       <p className="hint" style={{ maxWidth: "62ch" }}>
-        USDC can move between other chains and NEAR through NEAR Intents, with no bridge to set up. This is a live price and moves nothing, because forecasts here use test USDC. Real money is a future decision, pending legal review.
+        USDC can move between other chains and NEAR with no bridge to set up. Forecasts here use test USDC, and real money is a future decision, pending legal review.
       </p>
       <form
         className="any-chain-form"
@@ -73,7 +74,7 @@ export function AnyChainPanel() {
       {quote && (
         <p className="notice notice--ok" role="status">
           Send {quote.amount_in} USDC {direction === "fund" ? `on ${label}` : "on NEAR"}, receive {quote.amount_out} USDC {direction === "fund" ? "on NEAR" : `on ${label}`}
-          {quote.seconds !== null ? `, in about ${quote.seconds} seconds` : ""}. Price only: no money moved.
+          {quote.seconds !== null ? `, in about ${quote.seconds} seconds` : ""}. This is a quote: no money moved.
         </p>
       )}
     </section>

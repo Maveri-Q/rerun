@@ -3,11 +3,12 @@
 import { useState } from "react";
 import { usePoll } from "@/components/usePoll";
 import { chain } from "@/lib/chain";
-import { lab, type ClaimNote } from "@/lib/lab";
-import { fmtUnits, modeUnit, type Market } from "@/lib/market";
+import { fmtUnits, modeUnit, type ClaimNote, type Market } from "@/lib/market";
 import { explainError, useWallet } from "@/lib/wallet";
 
-const ROLE_LABEL = { author: "Says they're an author", creator: "Opened this claim" } as const;
+const ROLE_LABEL = { Author: "Says they're an author", Creator: "Opened this claim" } as const;
+/** Pays for the note's storage on the blockchain. What it doesn't use comes back. */
+const NOTE_DEPOSIT = "10000000000000000000000";
 
 /** A declared connection, and what that account currently holds, so readers can weigh what it says. */
 function Badge({ note, market }: { note: ClaimNote; market: Market }) {
@@ -22,24 +23,24 @@ function Badge({ note, market }: { note: ClaimNote; market: Market }) {
 
 export function ClaimNotes({ market }: { market: Market }) {
   const wallet = useWallet();
-  const notes = usePoll(() => lab.notes(market.id), [market.id], 30_000);
+  const notes = usePoll(() => chain.notes(market.id), [market.id], 30_000);
   const [text, setText] = useState("");
-  const [replyTo, setReplyTo] = useState<string | null>(null);
-  const [role, setRole] = useState<"author" | "creator">("author");
+  const [replyTo, setReplyTo] = useState<number | null>(null);
+  const [role, setRole] = useState<"Author" | "Creator">("Author");
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
 
   const all = notes.data ?? [];
   const me = wallet.accountId;
-  const declared = all.find((n) => n.kind === "declare" && n.account === me);
-  const declarations = all.filter((n) => n.kind === "declare");
-  const top = all.filter((n) => n.kind === "note");
+  const declared = all.find((n) => n.kind === "Declare" && n.account === me);
+  const declarations = all.filter((n) => n.kind === "Declare");
+  const top = all.filter((n) => n.kind === "Note");
 
-  const post = async (kind: "note" | "reply" | "declare", body: string, parent: string | null, done: string) => {
+  const post = async (kind: ClaimNote["kind"], body: string, parent: number | null, done: string) => {
     setBusy(true);
     setMessage(null);
     try {
-      await lab.addNote(wallet, { market: market.id, kind, text: body, role: kind === "declare" ? role : null, parent });
+      await wallet.call("add_note", { market_id: market.id, kind, text: body, role: kind === "Declare" ? role : null, parent }, { deposit: NOTE_DEPOSIT, tgas: 50 });
       setText("");
       setReplyTo(null);
       setMessage({ ok: true, text: done });
@@ -57,10 +58,10 @@ export function ClaimNotes({ market }: { market: Market }) {
         <h2>Community notes</h2>
       </div>
       <p className="hint" style={{ maxWidth: "62ch" }}>
-        Notes are people&apos;s own words, signed by their wallets. They never change a verdict, and the Lab&apos;s AI never reads them.
+        Notes are people&apos;s own words, kept on the blockchain. They never change a verdict, and the Lab&apos;s AI never reads them. Posting costs a little NEAR for storage, and what isn&apos;t used comes back.
       </p>
 
-      {notes.error && !notes.data && <p className="dim">The Lab keeps these notes, and it isn&apos;t answering right now. The verdict and receipt above don&apos;t depend on it.</p>}
+      {notes.error && !notes.data && <p className="dim">The blockchain didn&apos;t answer, so these notes can&apos;t show right now. This page keeps trying.</p>}
       {declarations.length > 0 && (
         <ul className="coi-list">
           {declarations.map((d) => (
@@ -79,7 +80,7 @@ export function ClaimNotes({ market }: { market: Market }) {
               <p className="note-who"><b className="mono">{n.account}</b> <Badge note={n} market={market} /></p>
               <p>{n.text}</p>
               {all
-                .filter((r) => r.kind === "reply" && r.parent === n.id)
+                .filter((r) => r.kind === "Reply" && r.parent === n.id)
                 .map((r) => (
                   <div key={r.id} className="note note--reply">
                     <p className="note-who"><b className="mono">{r.account}</b> replied <Badge note={r} market={market} /></p>
@@ -103,15 +104,15 @@ export function ClaimNotes({ market }: { market: Market }) {
           className="note-form"
           onSubmit={(e) => {
             e.preventDefault();
-            void post(replyTo ? "reply" : "note", text, replyTo, replyTo ? "Reply posted." : "Note posted.");
+            void post(replyTo !== null ? "Reply" : "Note", text, replyTo, replyTo !== null ? "Reply posted." : "Note posted.");
           }}
         >
-          <label htmlFor="note-text">{replyTo ? "Your reply" : "Your note"}</label>
+          <label htmlFor="note-text">{replyTo !== null ? "Your reply" : "Your note"}</label>
           <textarea id="note-text" value={text} maxLength={600} rows={3} onChange={(e) => setText(e.target.value)} />
           <button type="submit" disabled={busy || !text.trim()}>
-            {busy ? "Waiting for your wallet…" : replyTo ? "Sign and post reply" : "Sign and post note"}
+            {busy ? "Waiting for your wallet…" : replyTo !== null ? "Sign and post reply" : "Sign and post note"}
           </button>
-          {replyTo && <button type="button" className="btn--small" onClick={() => setReplyTo(null)}>Cancel reply</button>}
+          {replyTo !== null && <button type="button" className="btn--small" onClick={() => setReplyTo(null)}>Cancel reply</button>}
         </form>
       )}
 
@@ -119,11 +120,11 @@ export function ClaimNotes({ market }: { market: Market }) {
         <details className="note-declare">
           <summary>Connected to this paper or claim? Declare it</summary>
           <p className="hint">Your account gets a visible badge showing your connection and what you hold here. Authors can then reply to notes.</p>
-          <select aria-label="Your connection" value={role} onChange={(e) => setRole(e.target.value as "author" | "creator")}>
-            <option value="author">I&apos;m an author of the paper</option>
-            {me === market.creator && <option value="creator">I opened this claim</option>}
+          <select aria-label="Your connection" value={role} onChange={(e) => setRole(e.target.value as "Author" | "Creator")}>
+            <option value="Author">I&apos;m an author of the paper</option>
+            {me === market.creator && <option value="Creator">I opened this claim</option>}
           </select>
-          <button disabled={busy} onClick={() => void post("declare", "", null, "Declared. Your badge is showing.")}>
+          <button disabled={busy} onClick={() => void post("Declare", "", null, "Declared. Your badge is showing.")}>
             Sign and declare
           </button>
         </details>

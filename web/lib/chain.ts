@@ -1,6 +1,6 @@
 import { JsonRpcProvider } from "near-api-js";
 import { CONTRACT, RPC } from "./config";
-import type { Config, Lab, Market, Mode, Position, Receipt, State, Stats } from "./market";
+import type { ClaimNote, Config, Lab, Market, Mode, Position, Receipt, State, Stats } from "./market";
 
 const provider = new JsonRpcProvider({ url: RPC });
 
@@ -28,6 +28,7 @@ export const chain = {
   spec: (id: number) => view<string | null>("get_spec", { market_id: id }),
   receipts: (id: number) => view<Receipt[]>("get_receipts", { market_id: id }),
   priceHistory: (id: number) => view<{ t: number; yes_ppm: number }[]>("get_price_history", { market_id: id }),
+  notes: (id: number) => view<ClaimNote[]>("get_notes", { market_id: id }),
   position: (account: string, id: number) => view<Position | null>("get_position", { account_id: account, market_id: id }),
   accountMarkets: (account: string) => view<number[]>("get_account_markets", { account_id: account }),
   balance: (account: string, mode: Mode) => view<string>("get_balance", { account_id: account, mode }),

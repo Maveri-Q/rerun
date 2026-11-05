@@ -53,6 +53,18 @@ export function patchAuthors(excerpt: string): { file: string; kind: string; by:
 }
 export type Side = "YES" | "NO";
 
+/** A community note or declared connection, stored on the contract. */
+export interface ClaimNote {
+  id: number;
+  market_id: number;
+  account: string;
+  kind: "Note" | "Reply" | "Declare";
+  text: string;
+  role: "Author" | "Creator" | null;
+  parent: number | null;
+  at: number;
+}
+
 export interface Market {
   id: number;
   creator: string;

@@ -8,7 +8,6 @@ import { NearAiModel } from "../pipeline/model.ts";
 import { reproduce, type ArtifactResolver } from "../pipeline/pipeline.ts";
 import { DockerSandbox, sandboxImage } from "../sandbox/docker.ts";
 import { draftClaim } from "./draft.ts";
-import { NoteError, type NotesStore, type SignedNote } from "./notes.ts";
 import { latestAttestation, readHashed, readMethods, saveMethods, saveSealed, type EventHub } from "./store.ts";
 
 /**
@@ -32,8 +31,6 @@ export interface ServerOptions {
   labAccount: string;
   modelId: string;
   dryRunEnabled: boolean;
-  /** Community notes and declarations. Without it, those endpoints answer 404. */
-  notes?: NotesStore;
   /** Where the scout keeps its queue. Without it, the scout's endpoints answer 404. */
   scoutDir?: string;
   /** Confirms on-chain that a market came from this candidate and the contract's owner opened it. */
@@ -56,11 +53,6 @@ export function startLabServer(port: number, opts: ServerOptions) {
 
     if (req.method === "GET") {
       if (url.pathname === "/scout" && opts.scoutDir) return json(res, 200, loadScoutState(opts.scoutDir));
-      if (parts[0] === "notes" && parts[1] && opts.notes) {
-        const market = Number(parts[1]);
-        if (!Number.isInteger(market) || market < 0) return json(res, 422, { error: "A claim id is a whole number." });
-        return json(res, 200, opts.notes.list(market));
-      }
       if (url.pathname === "/health") return json(res, 200, { ok: true, dry_run: opts.dryRunEnabled, ...opts.info });
       if (url.pathname === "/runs") return json(res, 200, opts.hub.recent(Math.min(Number(url.searchParams.get("limit") ?? 20), 50)));
       if (parts[0] === "runs" && parts[2] === "stream" && parts[1]) return stream(req, res, parts[1]);
@@ -78,15 +70,6 @@ export function startLabServer(port: number, opts: ServerOptions) {
     }
 
     if (req.method === "POST") {
-      if (url.pathname === "/notes" && opts.notes) {
-        const body = JSON.parse((await readBody(req, MAX_JSON_BYTES)).toString("utf8")) as SignedNote;
-        try {
-          return json(res, 201, await opts.notes.add(body));
-        } catch (e) {
-          if (e instanceof NoteError) return json(res, 422, { error: e.message });
-          throw e;
-        }
-      }
       if (url.pathname === "/try") {
         if (!opts.tryDemo) return json(res, 503, { error: "Demo claims aren't switched on right now. Finished claims below still show their proof." });
         try {
