@@ -18,6 +18,19 @@ RUN pip install --no-cache-dir \
     nbclient==0.10.2 \
     ipykernel==6.31.0
 
+# Packages for claims/real/parkinsons-spread, kept as files only, not installed. Nothing changes for
+# other claims; that claim's own pip install finds them here instead of downloading on a bad connection.
+RUN pip download --no-cache-dir --retries 10 --timeout 120 -d /opt/wheels \
+    numpy==1.26.4 \
+    pandas==1.5.3 \
+    scipy==1.11.4 \
+    statsmodels==0.14.1 \
+    matplotlib==3.8.4 \
+    seaborn==0.12.2 \
+    tqdm==4.67.1
+
+ENV PIP_FIND_LINKS=/opt/wheels
+
 RUN useradd --create-home --uid 1000 runner \
     && mkdir /work \
     && chown runner:runner /work

@@ -24,7 +24,7 @@ replication's code against the number the original paper published.
 
 Nothing in any author's code is edited. Two claims needed a change to how the code is launched, and both are in the claim's public spec:
 
-- `parkinsons-spread`: the code is from 2021 and uses `Index._index_data`, a private pandas feature that newer versions removed. The article's pandas 1.1.5 has no build for Python 3.11, so the command restores that one attribute (it returns the index's values) before running `Pipeline.py` unchanged.
+- `parkinsons-spread`: the code is from 2021 and uses `Index._index_data`, a private pandas feature that newer versions removed. The article's pandas 1.1.5 has no build for Python 3.11, so the command restores that one attribute (it returns the index's values) before running `Pipeline.py` unchanged. It also skips the script's optional robustness controls (150 shuffled repeats, over 15 minutes on 2 CPUs), which run after the correlation is printed and don't change it. The Lab's own stress test still repeats the run.
 - `budworm-spread`: the command runs the script's own lines up to the model fit and skips the table formatting after it, because that needs `kableExtra`, which wouldn't install in the sandbox. It doesn't affect the fit.
 
 ## Margins

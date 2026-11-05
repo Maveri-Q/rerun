@@ -17,7 +17,7 @@
       "data": [],
       "runtime": "python3.11",
       "setup": ["pip install numpy==1.26.4 pandas==1.5.3 scipy==1.11.4 statsmodels==0.14.1 matplotlib==3.8.4 seaborn==0.12.2 tqdm==4.67.1"],
-      "entrypoint": "python -c \"import pandas as pd, runpy; pd.Index._index_data = property(lambda s: s.values); runpy.run_path('Pipeline.py', run_name='__main__')\" > rerun_output.txt",
+      "entrypoint": "python -c \"import pandas as pd, runpy, Robustness_Stability as R; pd.Index._index_data = property(lambda s: s.values); R.random_robustness = lambda *a, **k: None; runpy.run_path('Pipeline.py', run_name='__main__')\" > rerun_output.txt",
       "output": {
         "path": "rerun_output.txt",
         "extractor": { "type": "regex", "expr": "Month Post Injection 3\\s[\\s\\S]*?Pearson correlation coefficient ([0-9.]+)" }
