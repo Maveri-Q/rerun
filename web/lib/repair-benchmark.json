@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-11-05T12:47:25.646Z",
+  "generated_at": "2026-11-05T21:23:49.873Z",
   "model": "z-ai/glm-5.3-flash",
   "max_attempts": 6,
   "target_papers": 5,
-  "papers_counted": 1,
+  "papers_counted": 4,
   "repaired": 1,
   "complete": false,
   "rows": [
@@ -49,6 +49,81 @@
       "blocked_edits": 0,
       "cost_usd": 0,
       "detail": "No number under the old packages (INVALID)."
+    },
+    {
+      "name": "contextual-modulation",
+      "title": "Contextual modulation of information (Mahmoudian, ReScience C)",
+      "paper": "https://doi.org/10.5281/zenodo.3885793",
+      "result": "failed",
+      "baseline": "35841.07630245015",
+      "measured": null,
+      "ai_patches": 4,
+      "blocked_edits": 8,
+      "cost_usd": 0.00725342,
+      "detail": "INVALID (ENV_SETUP_FAILED), measured nothing. Runs: failed, failed.",
+      "runs": [
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "name": "gender-bias",
+      "title": "Gender bias in misclassification (XKDD workshop, ECML 2023)",
+      "paper": "https://doi.org/10.1007/978-3-031-74633-8_9",
+      "result": "no_baseline",
+      "baseline": null,
+      "measured": null,
+      "ai_patches": 0,
+      "blocked_edits": 0,
+      "cost_usd": 0,
+      "detail": "No number under the old packages (INVALID)."
+    },
+    {
+      "name": "refactoring-models",
+      "title": "Optimizing software models by refactoring (Cortellessa et al., Information and Software Technology)",
+      "paper": "https://doi.org/10.1016/j.infsof.2023.107159",
+      "result": "failed",
+      "baseline": "32.68618164802546",
+      "measured": null,
+      "ai_patches": 4,
+      "blocked_edits": 4,
+      "cost_usd": 0.00709816,
+      "detail": "INVALID (ENV_SETUP_FAILED), measured nothing. Runs: failed, failed.",
+      "runs": [
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "name": "web-layouts",
+      "title": "Synthesis of web layouts from examples (Mango team, FSE 2021)",
+      "paper": "https://doi.org/10.1145/3468264.3468533",
+      "result": "failed",
+      "baseline": "2716.232",
+      "measured": null,
+      "ai_patches": 0,
+      "blocked_edits": 0,
+      "cost_usd": 0.00051018,
+      "detail": "INVALID (EXTRACTION_FAILED), measured nothing. Runs: failed, failed.",
+      "runs": [
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "name": "parkinsons-authors",
+      "title": "Authors' own code: brain-wiring model predicts spread of Parkinson's-linked protein in mic",
+      "paper": "https://doi.org/10.1038/s41593-019-0457-5",
+      "result": "not_broken",
+      "baseline": "0.69605221",
+      "measured": "0.69605221",
+      "ai_patches": 0,
+      "blocked_edits": 0,
+      "cost_usd": 0.00015658,
+      "detail": "It still runs on today's packages, so it doesn't test repair.",
+      "runs": [
+        "not_broken"
+      ]
     }
   ]
 }
