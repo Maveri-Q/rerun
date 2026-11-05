@@ -239,6 +239,19 @@ export async function huggingFaceLeads(limit: number): Promise<Lead[]> {
   });
 }
 
+interface OpenAlexWork {
+  cited_by_count?: number;
+  counts_by_year?: { year: number; cited_by_count: number }[];
+}
+
+/** Citations from this year and last count three times, so a paper people still cite ranks above an old one they've moved on from. */
+export function citationAttention(work: OpenAlexWork, year: number): Attention | undefined {
+  const total = work.cited_by_count ?? 0;
+  if (!total) return undefined;
+  const recent = (work.counts_by_year ?? []).filter((y) => y.year >= year - 1).reduce((sum, y) => sum + y.cited_by_count, 0);
+  return { source: "OpenAlex", label: recent ? `${total} citations, ${recent} since ${year - 1}` : `${total} citations`, value: total + recent * 2 };
+}
+
 /**
  * Attention, best source first. Altmetric counts news and social mentions, but has needed a key since
  * November 2025, so it's only used if ALTMETRIC_KEY is set. OpenAlex is free, but counts citations,
@@ -256,8 +269,8 @@ export async function paperAttention(lead: Lead): Promise<Attention | undefined>
   if (lead.doi) {
     const res = await fetch(`https://api.openalex.org/works/https://doi.org/${lead.doi}`, { headers: { "user-agent": "rerun-scout" } }).catch(() => null);
     if (res?.ok) {
-      const d = (await res.json()) as { cited_by_count?: number };
-      if (d.cited_by_count) return { source: "OpenAlex", label: `${d.cited_by_count} citations`, value: d.cited_by_count };
+      const found = citationAttention((await res.json()) as OpenAlexWork, new Date().getUTCFullYear());
+      if (found) return found;
     }
   }
   if (lead.upvotes) return { source: "Hugging Face", label: `${lead.upvotes} upvotes`, value: lead.upvotes };

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { articleFile, type ClaimDraft } from "../src/lab/draft.ts";
 import { checkRepo, hasDataInRepo, isClearNumber, type RepoFacts } from "../src/scout/filters.ts";
-import { addSuggestion, emptyState, interestScore, LIMITS, parseArticleYaml, repoRoot, runScout, SUGGESTED_BY, type Lead } from "../src/scout/scout.ts";
+import { addSuggestion, emptyState, interestScore, LIMITS, parseArticleYaml, repoRoot, runScout, SUGGESTED_BY, type Lead, citationAttention } from "../src/scout/scout.ts";
 
 const facts = (over: Partial<RepoFacts> = {}): RepoFacts => ({ license: "MIT", languages: { Python: 9000, Shell: 100 }, sizeKb: 2000, archived: false, files: ["run.py"], dependencyText: "numpy\npandas", ...over });
 
@@ -213,5 +213,22 @@ describe("a scan", () => {
     const once = await runScout(emptyState(), counting);
     await runScout(once, counting);
     expect(reads).toBe(1);
+  });
+});
+
+describe("citationAttention", () => {
+  const byYear = (entries: [number, number][]) => entries.map(([year, cited_by_count]) => ({ year, cited_by_count }));
+
+  it("ranks a paper still being cited above an older one with the same total", () => {
+    const current = citationAttention({ cited_by_count: 100, counts_by_year: byYear([[2026, 30], [2025, 20]]) }, 2026)!;
+    const faded = citationAttention({ cited_by_count: 100, counts_by_year: byYear([[2015, 60], [2014, 40]]) }, 2026)!;
+    expect(current.value).toBeGreaterThan(faded.value);
+    expect(current.label).toBe("100 citations, 50 since 2025");
+    expect(faded.label).toBe("100 citations");
+  });
+
+  it("finds nothing for an uncited paper", () => {
+    expect(citationAttention({ cited_by_count: 0 }, 2026)).toBeUndefined();
+    expect(citationAttention({}, 2026)).toBeUndefined();
   });
 });
