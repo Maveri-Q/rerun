@@ -27,6 +27,39 @@ export const RepairProposal = z.strictObject({
 });
 export type RepairProposal = z.infer<typeof RepairProposal>;
 
+/**
+ * Without a response format this model writes its thinking into the answer until it runs out of
+ * room: in a live test, 0 of 2 replies were valid and each took about 2 minutes. With a schema,
+ * all were valid in under 10 seconds, using about a twentieth of the words.
+ */
+export const REPAIR_FORMAT = {
+  type: "json_schema",
+  json_schema: {
+    name: "repair",
+    strict: true,
+    schema: {
+      type: "object",
+      properties: {
+        give_up: { type: "boolean" },
+        reason: { type: "string" },
+        edits: {
+          type: "array",
+          items: {
+            type: "object",
+            properties: { file: { type: "string" }, kind: { type: "string", enum: ["ENV", "PATH", "DEPENDENCY"] }, justification: { type: "string" }, search: { type: "string" }, replace: { type: "string" } },
+            required: ["file", "kind", "justification", "search", "replace"],
+            additionalProperties: false,
+          },
+        },
+      },
+      required: ["give_up", "reason", "edits"],
+      additionalProperties: false,
+    },
+  },
+};
+
+export const JSON_OBJECT_FORMAT = { type: "json_object" };
+
 const CONFIG_FILE =
   /^(?:.*\/)?(?:requirements[\w.-]*\.(?:txt|in)|constraints[\w.-]*\.txt|environment\.ya?ml|setup\.py|setup\.cfg|pyproject\.toml|Pipfile|runtime\.txt|\.python-version|DESCRIPTION|renv\.lock|install\.R)$/;
 

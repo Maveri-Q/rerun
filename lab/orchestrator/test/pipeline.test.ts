@@ -1,10 +1,11 @@
-import { pythonForDate } from "../src/pipeline/dateinstall.ts";
+import { pythonForDate, rPackagesIn } from "../src/pipeline/dateinstall.ts";
 import { MAX_REPAIR_ATTEMPTS, REPAIR_COST_CAP_USD } from "../src/pipeline/pipeline.ts";
+import { PARSE_RETRIES } from "../src/pipeline/repair.ts";
 import { createHash } from "node:crypto";
 import { beforeEach, describe, expect, it } from "vitest";
 import { generateLabKeyPair, sealToLab, type ClaimSpec } from "@rerun/shared";
 import { ModelVerificationError, type PrivateModel } from "../src/pipeline/model.ts";
-import { reproduce, type ArtifactResolver, type RunDeps, type StageEvent } from "../src/pipeline/pipeline.ts";
+import { reproduce, type ArtifactResolver, type RunDeps, type RunInput, type StageEvent } from "../src/pipeline/pipeline.ts";
 import type { ExecOptions, ExecResult, Sandbox } from "../src/sandbox/types.ts";
 
 const sha = (b: string | Uint8Array) => createHash("sha256").update(b).digest("hex");
@@ -109,9 +110,9 @@ beforeEach(() => {
   events = [];
 });
 
-const run = (s: ClaimSpec = spec(), deps: Partial<RunDeps> = {}, labKeys?: { privateKey: string; publicKey: string }) =>
+const run = (s: ClaimSpec = spec(), deps: Partial<RunDeps> = {}, labKeys?: { privateKey: string; publicKey: string }, humanPatches?: RunInput["humanPatches"]) =>
   reproduce(
-    { spec: s, marketId: 3, runIndex: 0, labAccount: "lab.testnet", labCodehash: "c".repeat(64), labKeys },
+    { spec: s, marketId: 3, runIndex: 0, labAccount: "lab.testnet", labCodehash: "c".repeat(64), labKeys, humanPatches },
     { sandbox, model, resolver: resolver(), emit: (e) => events.push(e), ...deps },
   );
 
@@ -152,11 +153,12 @@ describe("reproduce: outcomes", () => {
     expect(research.opts.timeoutMs).toBe(60_000);
   });
 
-  it("BROKEN when the model gives up, and the failing log is in the receipt", async () => {
+  it("is inconclusive when the AI gives up, because the AI never decides a verdict, and the log is in the receipt", async () => {
     sandbox.runs = [{ exitCode: 1, log: "ModuleNotFoundError: labtools" }];
     model.replies.repair = ['{"give_up":true,"reason":"unpublished package","edits":[]}'];
     const { receipt } = await run();
-    expect(receipt.outcome).toBe("BROKEN");
+    expect(receipt.outcome).toBe("INVALID");
+    expect(receipt.invalid_reason).toBe("ENV_SETUP_FAILED");
     expect(receipt.exit_code).toBe(1);
     expect(receipt.log_tail).toContain("ModuleNotFoundError");
     expect(receipt.measured_value).toBeNull();
@@ -169,10 +171,10 @@ describe("reproduce: outcomes", () => {
     expect(model.calls.filter((c) => c.purpose === "repair")).toHaveLength(0);
   });
 
-  it("BROKEN when setup cannot be repaired", async () => {
+  it("is inconclusive when setup cannot be repaired", async () => {
     sandbox.setups = [{ exitCode: 1, log: "no matching distribution" }];
     model.replies.repair = ['{"give_up":true,"reason":"gone","edits":[]}'];
-    expect((await run()).receipt.outcome).toBe("BROKEN");
+    expect((await run()).receipt.invalid_reason).toBe("ENV_SETUP_FAILED");
   });
 });
 
@@ -251,15 +253,36 @@ describe("reproduce: repair loop", () => {
     sandbox.runs = [{ exitCode: 1, log: "still failing" }];
     model.replies.repair = ["this is not JSON"];
     await expect(run()).rejects.toThrow(/no verdict is posted/);
-    expect(model.calls.filter((c) => c.purpose === "repair")).toHaveLength(MAX_REPAIR_ATTEMPTS);
+    expect(model.calls.filter((c) => c.purpose === "repair")).toHaveLength(MAX_REPAIR_ATTEMPTS * (PARSE_RETRIES + 1));
   });
 
-  it("says BROKEN only when the AI concludes it can't be fixed", async () => {
-    sandbox.runs = [{ exitCode: 1, log: "still failing" }];
-    model.replies.repair = ["this is not JSON", "this is not JSON", '{"give_up":true,"reason":"nothing to fix","edits":[]}'];
-    const { receipt } = await run();
-    expect(receipt.outcome).toBe("BROKEN");
+  it("asks again after an unreadable reply, without using up a repair try", async () => {
+    sandbox.runs = [{ exitCode: 1, log: "e1" }, { effect: (s) => s.files.set("out.json", Buffer.from('{"acc":0.9}')), log: "ok" }];
+    model.replies.repair = ["this is not JSON", "still not JSON", '{"give_up":false,"reason":"a","edits":[{"file":"requirements.txt","kind":"DEPENDENCY","justification":"added numpy","search":"","replace":"numpy\\n"}]}'];
+    const events: string[] = [];
+    const { receipt } = await run(spec(), { emit: (e) => events.push(e.message) });
+    expect(receipt.outcome).toBe("REPRODUCED");
     expect(model.calls.filter((c) => c.purpose === "repair")).toHaveLength(3);
+    expect(events.filter((m) => m.includes("try ")).length).toBe(1);
+  });
+
+  it("asks for structured output on every repair", async () => {
+    sandbox.runs = [{ exitCode: 1, log: "e1" }];
+    model.replies.repair = ['{"give_up":true,"reason":"no","edits":[]}'];
+    const asked: unknown[] = [];
+    const base = model.ask.bind(model);
+    model.ask = (async (purpose: string, messages: { content: string }[], max?: number, format?: unknown) => {
+      if (purpose === "repair") asked.push(format);
+      return base(purpose, messages);
+    }) as never;
+    await run();
+    expect(asked[0]).toMatchObject({ type: "json_schema" });
+  });
+
+  it("puts a person's launch fixes in the receipt, labelled human", async () => {
+    const { receipt } = await run(spec(), {}, undefined, [{ file: "entrypoint", kind: "ENV", why: "Skips an optional step that takes hours." }]);
+    expect(receipt.patches).toHaveLength(1);
+    expect(receipt.patches_diff_excerpt).toContain("--- entrypoint [ENV by human] Skips an optional step");
   });
 
   it("is inconclusive, never BROKEN, when repair runs out of tries", async () => {
@@ -330,9 +353,14 @@ describe("reproduce: repair loop", () => {
     sandbox.runs = [{ exitCode: 1, log: "AttributeError: gone" }];
     model.replies.repair = ['{"give_up":true,"reason":"no","edits":[]}'];
     const { receipt } = await run(spec(), { dateInstall: true });
-    expect(receipt.outcome).toBe("BROKEN");
+    expect(receipt.invalid_reason).toBe("ENV_SETUP_FAILED");
     expect(model.calls.filter((c) => c.purpose === "repair")).toHaveLength(1);
     expect(sandbox.execs.some((e) => e.script.includes("mv /work/.pydeps.bak"))).toBe(true);
+  });
+
+  it("reads the R packages code loads, leaving out what ships with R", () => {
+    const code = "library(ggplot2)\nrequire('expm')\n# library(commented)\nx <- R.matlab::readMat(f)\nlibrary(stats)\nmgcv::gam(y)\n";
+    expect(rPackagesIn([code])).toEqual(["R.matlab", "expm", "ggplot2"]);
   });
 
   it("picks a Python from the code's era", () => {

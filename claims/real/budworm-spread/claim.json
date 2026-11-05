@@ -1,5 +1,12 @@
 {
   "expected": "NOT_REPRODUCED",
+  "human_patches": [
+    {
+      "file": "entrypoint",
+      "kind": "ENV",
+      "why": "Runs the script's own lines up to the model fit and skips the table formatting after it, which needs kableExtra."
+    }
+  ],
   "spec": {
     "version": 1,
     "title": "A timing model for a forest pest: the 1986 spread value of 1.559",
@@ -23,16 +30,26 @@
       "entrypoint": "Rscript --vanilla -e \"library(dplyr); e <- parse('code/03_fit_dennis_et_al_model.R'); for (x in e[3:5]) eval(x); cat(sprintf('spread %.6f\\n', logit_cm_dennis_nll\\$par[7]))\" > rerun_output.txt",
       "output": {
         "path": "rerun_output.txt",
-        "extractor": { "type": "regex", "expr": "spread (-?[0-9.]+)" }
+        "extractor": {
+          "type": "regex",
+          "expr": "spread (-?[0-9.]+)"
+        }
       }
     },
     "metric": {
       "name": "spread value (b squared) of the logit model",
       "reported_value": "1.559",
-      "tolerance": { "type": "rel", "value": "0.05" },
+      "tolerance": {
+        "type": "rel",
+        "value": "0.05"
+      },
       "comparison": "within_tolerance"
     },
-    "resources": { "cpu": 2, "mem_gb": 2, "max_minutes": 15 },
+    "resources": {
+      "cpu": 2,
+      "mem_gb": 2,
+      "max_minutes": 15
+    },
     "private_data": null
   }
 }

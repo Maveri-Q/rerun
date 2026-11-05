@@ -1,5 +1,12 @@
 {
   "expected": "REPRODUCED",
+  "human_patches": [
+    {
+      "file": "setup",
+      "kind": "DEPENDENCY",
+      "why": "Installs the packages the script needs by hand, skipping the repository's renv setup."
+    }
+  ],
   "spec": {
     "version": 1,
     "title": "A timing model for a forest pest: Candy's 1991 slope of -0.0457",
@@ -23,16 +30,26 @@
       "entrypoint": "Rscript --vanilla -e \"source('code/02_fit_candy_1991_models.R'); cat(sprintf('slope %.6f\\n', logit_cm_candy_nll\\$par[7]))\" > rerun_output.txt",
       "output": {
         "path": "rerun_output.txt",
-        "extractor": { "type": "regex", "expr": "slope (-?[0-9.]+)" }
+        "extractor": {
+          "type": "regex",
+          "expr": "slope (-?[0-9.]+)"
+        }
       }
     },
     "metric": {
       "name": "slope of the cumulative logit model",
       "reported_value": "-0.0457",
-      "tolerance": { "type": "rel", "value": "0.01" },
+      "tolerance": {
+        "type": "rel",
+        "value": "0.01"
+      },
       "comparison": "within_tolerance"
     },
-    "resources": { "cpu": 2, "mem_gb": 2, "max_minutes": 15 },
+    "resources": {
+      "cpu": 2,
+      "mem_gb": 2,
+      "max_minutes": 15
+    },
     "private_data": null
   }
 }

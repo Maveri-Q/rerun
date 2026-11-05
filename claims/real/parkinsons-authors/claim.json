@@ -16,7 +16,7 @@
       "commit": "b967d0851f66073a0bfe25d39374466639b9685f",
       "data": [],
       "runtime": "r4.4",
-      "setup": [],
+      "setup": ["false"],
       "entrypoint": "Rscript --vanilla -e \"params<-list(basedir='./',opdir='out/',grps='NTG');source('code/packages.R');source('code/process/process_pathconn.R');source('code/process/getLout.R');grp<-'NTG';source('code/diffmodel/analyzespread.R');cat('r3',format(r.SC[2],digits=8),'\\n')\" > rerun_output.txt",
       "output": {
         "path": "rerun_output.txt",

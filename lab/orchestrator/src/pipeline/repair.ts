@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import type { PatchKind } from "@rerun/shared";
 import { REPO_DIR, type Sandbox } from "../sandbox/types.ts";
-import { checkEdit, parseJsonReply, RepairProposal, type GuardContext, type RepairEdit } from "./guards.ts";
+import { checkEdit, parseJsonReply, REPAIR_FORMAT, RepairProposal, type GuardContext, type RepairEdit } from "./guards.ts";
 import type { PrivateModel } from "./model.ts";
 
 const SYSTEM_PROMPT = `You repair the software ENVIRONMENT of a published research artifact so its unchanged analysis can run.
@@ -19,6 +19,7 @@ You have few attempts, so fix the whole problem at once. If the same removed fea
 
 // The model's hidden reasoning counts against this. 2000 proved too few on a real repository: the answer came back empty.
 const REPAIR_MAX_TOKENS = 8000;
+export const PARSE_RETRIES = 2;
 
 const SOURCE_FILES_SHOWN = 3;
 const SOURCE_LINES_AROUND = 8;
@@ -101,20 +102,27 @@ export async function proposeAndApplyRepair(args: {
     .filter(Boolean)
     .join("\n\n");
 
-  const reply = await model.ask(
-    "repair",
-    [
-      { role: "system", content: SYSTEM_PROMPT },
-      { role: "user", content: user },
-    ],
-    REPAIR_MAX_TOKENS,
-  );
-
-  let proposal: RepairProposal;
-  try {
-    proposal = RepairProposal.parse(parseJsonReply(reply));
-  } catch (e) {
-    return { gaveUp: false, unusable: true, reason: `unusable model reply: ${(e as Error).message.slice(0, 200)}`, applied: [], rejected: [] };
+  // A reply that can't be read isn't a repair attempt, so asking again doesn't use up a try.
+  let proposal: RepairProposal | null = null;
+  let parseError = "";
+  for (let ask = 0; ask <= PARSE_RETRIES && proposal === null; ask++) {
+    const reply = await model.ask(
+      "repair",
+      [
+        { role: "system", content: SYSTEM_PROMPT },
+        { role: "user", content: user },
+      ],
+      REPAIR_MAX_TOKENS,
+      REPAIR_FORMAT,
+    );
+    try {
+      proposal = RepairProposal.parse(parseJsonReply(reply));
+    } catch (e) {
+      parseError = (e as Error).message;
+    }
+  }
+  if (proposal === null) {
+    return { gaveUp: false, unusable: true, reason: `unusable model reply: ${parseError.slice(0, 200)}`, applied: [], rejected: [] };
   }
   if (proposal.give_up || proposal.edits.length === 0) {
     return { gaveUp: true, reason: proposal.reason, applied: [], rejected: [] };

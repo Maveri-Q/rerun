@@ -12,8 +12,9 @@ import {
 import type { ExecResult, Sandbox } from "../sandbox/types.ts";
 import { runReimplementation, runRobustness, summarizeEvidence, type Evidence, type ReimplementationResult, type RobustnessResult } from "./evidence.ts";
 import { extractMetric, MAX_OUTPUT_BYTES, type ExtractorType } from "./extract.ts";
-import { parseJsonReply } from "./guards.ts";
+import { parseJsonReply, JSON_OBJECT_FORMAT } from "./guards.ts";
 import { ModelUnavailableError, ModelVerificationError, NetworkUnavailableError, type PrivateModel } from "./model.ts";
+import type { PatchKind } from "@rerun/shared";
 import { dateInstall } from "./dateinstall.ts";
 import { proposeAndApplyRepair, type AppliedPatch } from "./repair.ts";
 
@@ -74,6 +75,15 @@ export interface RunInput {
   labKeys?: LabKeys;
   /** The paper's methods section, for the independent re-implementation check. */
   methods?: string;
+  /** Changes a person made to how the code is launched. They go in the receipt, labelled as human. */
+  humanPatches?: HumanPatch[];
+}
+
+export interface HumanPatch {
+  /** One word, as it appears in the diff header, such as "entrypoint". */
+  file: string;
+  kind: PatchKind;
+  why: string;
 }
 
 export interface RunDeps {
@@ -98,6 +108,8 @@ export interface RunResult {
 }
 
 const SETUP_NETWORK_RETRIES = 3;
+/** The AI's opinion never decides a verdict, so "it can't be fixed" settles nothing. */
+const AI_GAVE_UP = "the AI concluded it couldn't get the software running, which says nothing about the research";
 const NETWORK_FAILURE = /read timed out|readtimeouterror|connection (reset|refused|timed out|aborted)|connectionerror|temporary failure in name resolution|could not resolve host|name or service not known|network is unreachable|cannot open url|failed to connect/i;
 
 /** A dropped connection during setup is the Lab's problem, not a finding about the research. */
@@ -133,7 +145,10 @@ export async function reproduce(input: RunInput, deps: RunDeps): Promise<RunResu
   const dataBytes = new Map<string, Uint8Array>();
   let robustness: RobustnessResult = { status: "not_attempted", reason: "The run did not produce a result to stress-test.", runs: [] };
   let baseRunMs = 0;
-  const patches: AppliedPatch[] = [];
+  const patches: AppliedPatch[] = (input.humanPatches ?? []).map((h) => {
+    const diff = `--- ${h.file} [${h.kind} by human] ${h.why}\n`;
+    return { file: h.file, kind: h.kind, by: "human", justification: h.why, diff, diffHash: sha256(diff) };
+  });
   const rejectedEdits: RunResult["rejectedEdits"] = [];
   const attempts: string[] = [];
   let envLockHash = "";
@@ -256,9 +271,7 @@ export async function reproduce(input: RunInput, deps: RunDeps): Promise<RunResu
       if (lastExec.timedOut || isNetworkFailure(lastExec.tail)) throw new NetworkUnavailableError("installing packages kept stalling or failing to connect, so no verdict is posted");
       exitCode = lastExec.exitCode;
       if (await tryDateInstall()) break;
-      if (!(await repair("setup", lastExec.tail))) {
-        throw new Stop("BROKEN", null, "setup failed and could not be repaired");
-      }
+      if (!(await repair("setup", lastExec.tail))) throw new Stop("INVALID", "ENV_SETUP_FAILED", AI_GAVE_UP);
     }
     const lock = await sandbox.exec(lockCommand(artifact.runtime), { network: false, timeoutMs: 120_000 });
     envLockHash = sha256(lock.log);
@@ -298,7 +311,7 @@ export async function reproduce(input: RunInput, deps: RunDeps): Promise<RunResu
         continue;
       }
       const before = patches.length;
-      if (!(await repair("run", lastExec.tail))) throw new Stop("BROKEN", null, "the run failed and could not be repaired");
+      if (!(await repair("run", lastExec.tail))) throw new Stop("INVALID", "ENV_SETUP_FAILED", AI_GAVE_UP);
       // A fix to the package list does nothing until the packages are installed again.
       if (patches.slice(before).some((p) => p.kind === "DEPENDENCY") && artifact.setup.length > 0) {
         emit({ stage: "installing", message: "installing the corrected list of packages" });
@@ -309,7 +322,7 @@ export async function reproduce(input: RunInput, deps: RunDeps): Promise<RunResu
         if (reinstall.exitCode !== 0) {
           lastExec = reinstall;
           exitCode = reinstall.exitCode;
-          if (!(await repair("setup", reinstall.tail))) throw new Stop("BROKEN", null, "setup failed and could not be repaired");
+          if (!(await repair("setup", reinstall.tail))) throw new Stop("INVALID", "ENV_SETUP_FAILED", AI_GAVE_UP);
         }
         const relock = await sandbox.exec(lockCommand(artifact.runtime), { network: false, timeoutMs: 120_000 });
         envLockHash = sha256(relock.log);
@@ -450,6 +463,7 @@ async function extract(spec: ClaimSpec, sandbox: Sandbox, model: PrivateModel, i
       },
     ],
     1500,
+    JSON_OBJECT_FORMAT,
   );
   try {
     const hint = parseJsonReply(reply) as { path?: unknown; type?: unknown; expr?: unknown };

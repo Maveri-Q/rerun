@@ -1,3 +1,4 @@
+import { humanPatchesFor } from "../demo/real.ts";
 import { ClaimSpec, specHash, type Receipt } from "@rerun/shared";
 import type { Account } from "near-api-js";
 import type { Chain } from "../chain/near.ts";
@@ -88,7 +89,7 @@ export class LabWorker {
     llm.newRun();
     const model = new NearAiModel(llm, modelId);
     const { receipt } = await reproduce(
-      { spec, marketId: m.id, runIndex, labAccount: lab.accountId, labCodehash: this.cfg.labCodehash, labKeys: this.cfg.labKeys, methods: this.cfg.methodsFor?.(spec) },
+      { humanPatches: humanPatchesFor(spec), spec, marketId: m.id, runIndex, labAccount: lab.accountId, labCodehash: this.cfg.labCodehash, labKeys: this.cfg.labKeys, methods: this.cfg.methodsFor?.(spec) },
       {
         sandbox: new DockerSandbox({ image: sandboxImage(spec.artifact.runtime), cpus: spec.resources.cpu, memGb: spec.resources.mem_gb }),
         model,

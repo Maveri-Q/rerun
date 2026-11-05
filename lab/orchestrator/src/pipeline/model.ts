@@ -13,7 +13,8 @@ export interface PrivateModel {
   readonly modelId: string;
   /** Throws if the model's TEE cannot be verified. */
   attest(): Promise<void>;
-  ask(purpose: string, messages: ChatMessage[], maxTokens?: number): Promise<string>;
+  /** `responseFormat` asks for structured output, which every JSON reply should use. */
+  ask(purpose: string, messages: ChatMessage[], maxTokens?: number, responseFormat?: unknown): Promise<string>;
   /** Digest of the attestation report(s) verified during this run. */
   attestationDigest(): string;
   signatureRefs(): string[];
@@ -70,8 +71,8 @@ export class NearAiModel implements PrivateModel {
     return this.llm.spentThisRun;
   }
 
-  async ask(purpose: string, messages: ChatMessage[], maxTokens?: number): Promise<string> {
-    const chat = await this.llm.chat({ model: this.modelId, purpose, messages, maxTokens, long: true });
+  async ask(purpose: string, messages: ChatMessage[], maxTokens?: number, responseFormat?: unknown): Promise<string> {
+    const chat = await this.llm.chat({ model: this.modelId, purpose, messages, maxTokens, long: true, responseFormat });
     if (chat.mock) {
       this.addRef(chat.chatId);
       return chat.text;

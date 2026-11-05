@@ -6,7 +6,7 @@ import { useState } from "react";
 const VERDICTS = [
   { word: "HELD UP", who: "YES wins", text: "The code ran and got a number inside the claim's range." },
   { word: "DID NOT HOLD UP", who: "NO wins", text: "The code ran, but the number came out outside the range." },
-  { word: "CODE BROKEN", who: "NO wins", text: "The code can't run, even after fixing setup problems." },
+  { word: "CODE BROKEN", who: "NO wins", text: "The code ran past its time limit. The AI's opinion never decides this." },
   { word: "NO VERDICT", who: "Half back", text: "The test wasn't fair, or the software couldn't be set up. Either way it says nothing about the research, and everyone gets half their shares' value back." },
 ];
 

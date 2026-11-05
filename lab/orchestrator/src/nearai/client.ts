@@ -47,6 +47,8 @@ export interface ChatRequest {
   long?: boolean;
   /** Free-form tag for the spend log, e.g. "repair" or "report". */
   purpose: string;
+  /** Asks the model for structured output, in the OpenAI-compatible `response_format` shape. */
+  responseFormat?: unknown;
 }
 
 export interface ChatResult {
@@ -109,6 +111,7 @@ export class LlmClient {
       // Hidden thinking counts against max_tokens, and on real repositories it used the whole budget
       // and returned nothing. Only writing a whole program from a paper's methods needs it.
       chat_template_kwargs: { enable_thinking: req.purpose === "reimplement" },
+      ...(req.responseFormat ? { response_format: req.responseFormat } : {}),
     });
 
     const result = this.config.mock

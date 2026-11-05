@@ -10,6 +10,7 @@
     "demo": "tsx demo.ts",
     "seed": "tsx seed.ts",
     "post-real": "tsx post-real.ts",
+    "upgrade-contract": "tsx upgrade-contract.ts",
     "challenge-demo": "tsx challenge-demo.ts",
     "attack-demo": "tsx attack-demo.ts",
     "judge-demo": "tsx judge-demo.ts"

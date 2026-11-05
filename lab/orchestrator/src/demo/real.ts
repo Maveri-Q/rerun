@@ -1,9 +1,9 @@
 import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
-import { ClaimSpec, type Outcome } from "@rerun/shared";
+import { ClaimSpec, specHash, type Outcome } from "@rerun/shared";
 import type { ChatRequest } from "../nearai/client.ts";
 import { NetworkResolver } from "../pipeline/resolver.ts";
-import type { ArtifactResolver } from "../pipeline/pipeline.ts";
+import type { ArtifactResolver, HumanPatch } from "../pipeline/pipeline.ts";
 
 /**
  * Real published research, unlike the demo fixtures: the code is cloned from GitHub at a pinned
@@ -25,10 +25,11 @@ export interface RealClaim {
   resolver: ArtifactResolver;
   mockResponder: (req: ChatRequest) => string | undefined;
   methods?: string;
+  humanPatches: HumanPatch[];
 }
 
 export function loadReal(name: string): RealClaim {
-  const file = JSON.parse(readFileSync(path.join(REAL_ROOT, name, "claim.json"), "utf8")) as { expected: Outcome; methods?: string; spec: unknown };
+  const file = JSON.parse(readFileSync(path.join(REAL_ROOT, name, "claim.json"), "utf8")) as { expected: Outcome; methods?: string; spec: unknown; human_patches?: HumanPatch[] };
   const spec = ClaimSpec.parse(file.spec);
   return {
     name,
@@ -38,6 +39,13 @@ export function loadReal(name: string): RealClaim {
     expectedPatches: null,
     resolver: new NetworkResolver(),
     methods: file.methods,
+    humanPatches: file.human_patches ?? [],
     mockResponder: (req) => (req.purpose === "report" ? `MOCK report: "${spec.title}" was re-run. See the receipt for the numbers.` : undefined),
   };
+}
+
+/** The manual launch fixes recorded for a claim, found by its fingerprint. A chain-held spec can't carry them. */
+export function humanPatchesFor(spec: ClaimSpec): HumanPatch[] {
+  const hash = specHash(spec);
+  return REAL_NAMES.map(loadReal).find((c) => specHash(c.spec) === hash)?.humanPatches ?? [];
 }
