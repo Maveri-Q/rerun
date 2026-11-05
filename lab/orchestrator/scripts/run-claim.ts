@@ -59,7 +59,7 @@ async function main() {
     const { spec } = demo;
     const started = Date.now();
     const { receipt, report, rejectedEdits, evidence } = await reproduce(
-      { humanPatches: "humanPatches" in demo ? demo.humanPatches : [], spec, marketId: i, runIndex: rerun ? 1 : 0, labAccount: "local-lab.testnet", labCodehash: LOCAL_CODEHASH, labKeys, methods: demo.methods },
+      { humanPatches: "humanPatches" in demo ? demo.humanPatches : [], independentRebuild: "origin" in demo && demo.origin === "rebuild", spec, marketId: i, runIndex: rerun ? 1 : 0, labAccount: "local-lab.testnet", labCodehash: LOCAL_CODEHASH, labKeys, methods: demo.methods },
       {
         sandbox: new DockerSandbox({ image: sandboxImage(spec.artifact.runtime), cpus: spec.resources.cpu, memGb: spec.resources.mem_gb }),
         model: new NearAiModel(llm, modelId),

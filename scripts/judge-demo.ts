@@ -9,6 +9,7 @@
  * (NEXT_PUBLIC_LAB_URL, or a local `pnpm lab:watch`), it also opens a claim and watches it get re-run.
  * Add --skip-live to leave that part out.
  */
+import { APP_NAME } from "@rerun/shared";
 import { createHash, randomBytes } from "node:crypto";
 import { readFileSync } from "node:fs";
 import path from "node:path";
@@ -105,7 +106,7 @@ async function main() {
   const chain = new Chain(RPC, CONTRACT);
   const board = new Scoreboard();
 
-  console.log(`RERUN on testnet: ${CONTRACT}\n`);
+  console.log(`${APP_NAME} on testnet: ${CONTRACT}\n`);
   console.log("What's on-chain:");
   const stats = await chain.view<{ markets: number; reproduced: number; not_reproduced: number; broken: number; invalid: number }>("get_stats");
   board.add("The contract is live", stats.markets > 0, "PASS", `${stats.markets} claims: ${stats.reproduced} held up, ${stats.not_reproduced} did not, ${stats.broken} broken, ${stats.invalid} invalid`);

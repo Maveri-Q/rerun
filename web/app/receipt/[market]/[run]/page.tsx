@@ -5,11 +5,12 @@ import { use } from "react";
 import { EvidenceLadder } from "@/components/EvidenceLadder";
 import { PrintedReceipt } from "@/components/PrintedReceipt";
 import { usePoll } from "@/components/usePoll";
+import { APP_NAME } from "@rerun/shared/browser";
 import { VerifiedPanel } from "@/components/VerifiedPanel";
 import { chain } from "@/lib/chain";
 import { accountLink, CONTRACT, LAB_URL } from "@/lib/config";
 import { lab } from "@/lib/lab";
-import { INCONCLUSIVE_MEANING, INCONCLUSIVE_REASON, outcomeMeaning, patchAuthors, rangeText } from "@/lib/market";
+import { CHECK_OUT_NOTE, outcomeMeaning, patchAuthors, rangeText, verdictWords } from "@/lib/market";
 
 const when = (t: number) => new Date(t * 1000).toLocaleString();
 
@@ -60,10 +61,17 @@ export default function ReceiptPage({ params }: { params: Promise<{ market: stri
           print
         />
         <div style={{ paddingTop: 20 }}>
-          <p className="statement" style={{ margin: 0 }}>{r.invalid_reason === INCONCLUSIVE_REASON ? INCONCLUSIVE_MEANING : outcomeMeaning(r.outcome)}</p>
+          <p className="statement" style={{ margin: 0 }}>{verdictWords(r.outcome, r.invalid_reason, r.measured_value, r.reported_value)?.reason || outcomeMeaning(r.outcome)}</p>
+          {r.outcome === "REPRODUCED" && <p className="hint">{CHECK_OUT_NOTE}</p>}
           {r.invalid_reason && <p className="hint">Why: {r.invalid_reason.replaceAll("_", " ").toLowerCase()}</p>}
         </div>
       </div>
+
+      <section className="verify-yourself">
+        <h2>Check this yourself</h2>
+        <p>You don&apos;t have to trust us or the secure hardware. With Docker and Node installed, this re-runs the claim on your own computer and compares the number:</p>
+        <pre className="log">{`git clone <this repository> && cd ${APP_NAME.toLowerCase()} && pnpm install && pnpm sandbox:build\npnpm verify-claim ${m.id}`}</pre>
+      </section>
 
       <EvidenceLadder receipt={r} reportHash={r.report_hash} />
 

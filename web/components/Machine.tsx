@@ -1,5 +1,6 @@
 "use client";
 
+import { APP_NAME } from "@rerun/shared/browser";
 import { animate, AnimatePresence, motion, useMotionValueEvent, useReducedMotion, useScroll, useSpring, useTransform, type MotionValue } from "motion/react";
 import Link from "next/link";
 import { memo, useEffect, useRef, useState } from "react";
@@ -285,7 +286,7 @@ const Printer = memo(function Printer({ t }: { t: T }) {
         <motion.g style={{ y: paperY }}>
           <path d="M376 106h248v344l-12.4 12-12.4-12-12.4 12-12.4-12-12.4 12-12.4-12-12.4 12-12.4-12-12.4 12-12.4-12-12.4 12-12.4-12-12.4 12-12.4-12-12.4 12-12.4-12-12.4 12-12.4-12-12.4 12-12.4-12z" fill="var(--paper)" />
           <text x={396} y={146} fill="var(--paper-ink)" fontSize={20} fontWeight={700} fontFamily="var(--font-geist-mono)">
-            RERUN
+            {APP_NAME}
           </text>
           <text x={604} y={146} fill="var(--paper-ink-2)" fontSize={18} textAnchor="end" fontFamily="var(--font-geist-mono)">
             CLAIM 0019
@@ -495,7 +496,7 @@ export function Machine() {
   if (reduce) return list;
 
   return (
-    <section ref={box} className="machine" aria-label="How a claim moves through RERUN">
+    <section ref={box} className="machine" aria-label={`How a claim moves through ${APP_NAME}`}>
       {list}
       <div className="machine-stage">
         {/* Each station is its own layer, so moving the camera doesn't redraw anything. */}

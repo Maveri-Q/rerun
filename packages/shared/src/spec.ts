@@ -70,7 +70,7 @@ export const specJson = (spec: ClaimSpec): string => canonicalJson(spec);
 export const Outcome = z.enum(["REPRODUCED", "NOT_REPRODUCED", "BROKEN", "INVALID"]);
 export type Outcome = z.infer<typeof Outcome>;
 
-export const InvalidReason = z.enum(["SPEC_AMBIGUOUS", "DATA_UNAVAILABLE", "HASH_MISMATCH", "EXTRACTION_FAILED", "ENV_SETUP_FAILED"]);
+export const InvalidReason = z.enum(["SPEC_AMBIGUOUS", "DATA_UNAVAILABLE", "HASH_MISMATCH", "EXTRACTION_FAILED", "ENV_SETUP_FAILED", "REBUILD_MISMATCH"]);
 export type InvalidReason = z.infer<typeof InvalidReason>;
 
 export const PatchKind = z.enum(["ENV", "PATH", "DEPENDENCY"]);

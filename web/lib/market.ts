@@ -10,6 +10,43 @@ export type Outcome = "REPRODUCED" | "NOT_REPRODUCED" | "BROKEN" | "INVALID";
 export const INCONCLUSIVE_REASON = "ENV_SETUP_FAILED";
 export const INCONCLUSIVE_MEANING = "The Lab couldn't get the software running within its limits, so this says nothing about the research. Nobody wins, and everyone gets half their shares' value back.";
 
+/** What people read. The contract's outcome names stay in the technical sections. */
+export interface VerdictWords {
+  mark: string;
+  words: string;
+  /** The concrete reason, on one line. */
+  reason: string;
+  tone: "good" | "bad" | "unsure";
+}
+
+const INCONCLUSIVE_REASONS: Record<string, string> = {
+  ENV_SETUP_FAILED: "The Lab couldn't get the software running within its limits.",
+  REBUILD_MISMATCH: "An independent rebuild got a different number, which could be the rebuild's doing and not the paper's.",
+  DATA_UNAVAILABLE: "The data or code couldn't be downloaded.",
+  HASH_MISMATCH: "The data didn't match the fingerprint in the claim, so the test wouldn't be fair.",
+  EXTRACTION_FAILED: "The code ran, but its result couldn't be read.",
+  SPEC_AMBIGUOUS: "The claim was too unclear to test fairly.",
+  RUNS_DISAGREE: "Two independent runs got different answers.",
+  STALE: "The Lab didn't finish in time.",
+};
+
+export function verdictWords(outcome: Outcome | null | undefined, reason?: string | null, measured?: string | null, reported?: string): VerdictWords | null {
+  if (!outcome) return null;
+  const numbers = measured && reported ? `Paper said ${reported}. We got ${measured}.` : "";
+  switch (outcome) {
+    case "REPRODUCED":
+      return { mark: "\u2713", words: "Numbers check out", reason: numbers, tone: "good" };
+    case "NOT_REPRODUCED":
+      return { mark: "\u2717", words: "Doesn't hold up", reason: numbers, tone: "bad" };
+    case "BROKEN":
+      return { mark: "\u2717", words: "Doesn't hold up", reason: "The code ran past its time limit.", tone: "bad" };
+    case "INVALID":
+      return { mark: "\u26A0", words: "Inconclusive", reason: (reason && INCONCLUSIVE_REASONS[reason]) ?? "The test couldn't be run fairly.", tone: "unsure" };
+  }
+}
+
+export const CHECK_OUT_NOTE = "The authors' code and data produced the same result. This doesn't prove the study's method is right.";
+
 /** Who made each change, read from the receipt's on-chain diff headers. */
 export function patchAuthors(excerpt: string): { file: string; kind: string; by: string; why: string }[] {
   return [...excerpt.matchAll(/^--- (\S+) \[(\w+)(?: by (\w+))?\] (.*)$/gm)].map((m) => ({ file: m[1]!, kind: m[2]!, by: m[3] ?? "ai", why: m[4]! }));
@@ -183,7 +220,7 @@ export function rangeText(reported: string, kind: string, value: string): string
 const OUTCOME_MEANING: Record<Outcome, string> = {
   REPRODUCED: "The Lab re-ran the authors' code and data and got a number inside the claim's range. YES wins.",
   NOT_REPRODUCED: "The code ran, but the number came out outside the claim's range. NO wins.",
-  BROKEN: "The code wouldn't run, even after the AI tried to fix setup problems. NO wins.",
+  BROKEN: "The code ran past its time limit. NO wins.",
   INVALID: "The test couldn't be run fairly, for example because the data changed. Every share pays back half.",
 };
 export const outcomeMeaning = (o: Outcome) => OUTCOME_MEANING[o];

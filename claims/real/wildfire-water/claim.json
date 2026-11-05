@@ -1,5 +1,7 @@
 {
   "expected": "REPRODUCED",
+  "origin": "authors",
+  "human_patches": [],
   "spec": {
     "version": 1,
     "title": "Temperature explains about 15% of yearly forest water loss after wildfires",
@@ -20,16 +22,26 @@
       "entrypoint": "Rscript --vanilla ET.r > rerun_output.txt",
       "output": {
         "path": "rerun_output.txt",
-        "extractor": { "type": "regex", "expr": "ET ~ Tavg[\\s\\S]*?Multiple R-squared:\\s+([0-9.]+)" }
+        "extractor": {
+          "type": "regex",
+          "expr": "ET ~ Tavg[\\s\\S]*?Multiple R-squared:\\s+([0-9.]+)"
+        }
       }
     },
     "metric": {
       "name": "R-squared of evapotranspiration on average temperature",
       "reported_value": "0.1495",
-      "tolerance": { "type": "abs", "value": "0.0005" },
+      "tolerance": {
+        "type": "abs",
+        "value": "0.0005"
+      },
       "comparison": "within_tolerance"
     },
-    "resources": { "cpu": 1, "mem_gb": 1, "max_minutes": 5 },
+    "resources": {
+      "cpu": 1,
+      "mem_gb": 1,
+      "max_minutes": 5
+    },
     "private_data": null
   }
 }

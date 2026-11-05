@@ -4,6 +4,7 @@ import { APP_NAME } from "@rerun/shared/browser";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
+import { Logo } from "./Logo";
 import { useWallet } from "@/lib/wallet";
 
 const LINKS = [
@@ -28,6 +29,7 @@ export function Topbar() {
   return (
     <header className="topbar">
       <Link href="/" className="brand">
+        <Logo />
         {APP_NAME}
       </Link>
       <nav ref={nav} className="nav" aria-label="Main">

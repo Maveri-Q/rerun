@@ -1,14 +1,8 @@
 "use client";
 
+import { APP_NAME } from "@rerun/shared/browser";
 import Link from "next/link";
-import { INCONCLUSIVE_REASON, type Outcome } from "@/lib/market";
-
-const VERDICT: Record<Outcome, string> = {
-  REPRODUCED: "HELD UP",
-  NOT_REPRODUCED: "DID NOT HOLD UP",
-  BROKEN: "CODE BROKEN",
-  INVALID: "NO VERDICT",
-};
+import { verdictWords, type Outcome } from "@/lib/market";
 
 /** Bars taken from the claim's real fingerprint, so every receipt's barcode is its own. */
 function Barcode({ hash }: { hash: string }) {
@@ -59,10 +53,11 @@ export function PrintedReceipt({
   print?: boolean;
   href?: string;
 }) {
+  const words = verdictWords(outcome, invalidReason);
   const paper = (
     <div className={`receipt-paper ${print ? "receipt-paper--print" : ""}`}>
       <div className="receipt-top">
-        <b>RERUN</b>
+        <b>{APP_NAME}</b>
         <span>{marketId === undefined ? "NEW CLAIM" : `CLAIM #${String(marketId).padStart(4, "0")}`}</span>
       </div>
       <p className="receipt-title">{title.replace(/^\[DEMO\]\s*/, "")}</p>
@@ -82,7 +77,8 @@ export function PrintedReceipt({
       </dl>
       <div className="receipt-verdict">
         <span>Verdict</span>
-        <strong>{invalidReason === INCONCLUSIVE_REASON ? "INCONCLUSIVE" : outcome ? VERDICT[outcome] : "NOT CHECKED YET"}</strong>
+        <strong>{words ? `${words.mark} ${words.words.toUpperCase()}` : "NOT CHECKED YET"}</strong>
+        {words?.tone === "unsure" && <span className="receipt-reason">{words.reason}</span>}
       </div>
       {hash && <Barcode hash={hash} />}
       <div className="receipt-foot">

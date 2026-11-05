@@ -26,10 +26,11 @@ export interface RealClaim {
   mockResponder: (req: ChatRequest) => string | undefined;
   methods?: string;
   humanPatches: HumanPatch[];
+  origin: "authors" | "rebuild";
 }
 
 export function loadReal(name: string): RealClaim {
-  const file = JSON.parse(readFileSync(path.join(REAL_ROOT, name, "claim.json"), "utf8")) as { expected: Outcome; methods?: string; spec: unknown; human_patches?: HumanPatch[] };
+  const file = JSON.parse(readFileSync(path.join(REAL_ROOT, name, "claim.json"), "utf8")) as { expected: Outcome; methods?: string; spec: unknown; human_patches?: HumanPatch[]; origin?: "authors" | "rebuild" };
   const spec = ClaimSpec.parse(file.spec);
   return {
     name,
@@ -40,12 +41,21 @@ export function loadReal(name: string): RealClaim {
     resolver: new NetworkResolver(),
     methods: file.methods,
     humanPatches: file.human_patches ?? [],
+    origin: file.origin ?? "authors",
     mockResponder: (req) => (req.purpose === "report" ? `MOCK report: "${spec.title}" was re-run. See the receipt for the numbers.` : undefined),
   };
 }
 
 /** The manual launch fixes recorded for a claim, found by its fingerprint. A chain-held spec can't carry them. */
 export function humanPatchesFor(spec: ClaimSpec): HumanPatch[] {
+  return findReal(spec)?.humanPatches ?? [];
+}
+
+export function isIndependentRebuild(spec: ClaimSpec): boolean {
+  return findReal(spec)?.origin === "rebuild";
+}
+
+function findReal(spec: ClaimSpec): RealClaim | undefined {
   const hash = specHash(spec);
-  return REAL_NAMES.map(loadReal).find((c) => specHash(c.spec) === hash)?.humanPatches ?? [];
+  return REAL_NAMES.map(loadReal).find((c) => specHash(c.spec) === hash);
 }

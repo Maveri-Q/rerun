@@ -1,5 +1,6 @@
 {
   "expected": "REPRODUCED",
+  "origin": "rebuild",
   "human_patches": [
     {
       "file": "entrypoint",

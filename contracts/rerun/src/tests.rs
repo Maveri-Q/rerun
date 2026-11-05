@@ -380,6 +380,22 @@ fn failed_software_setup_is_invalid_and_keeps_the_creation_bond() {
 }
 
 #[test]
+fn get_verdict_reports_the_result_and_whether_it_is_final() {
+    let mut w = world();
+    assert_eq!(w.c.get_verdict(w.id).unwrap().outcome, None);
+    let r = receipt(&w, Outcome::Reproduced, Some("0.912"), 0, "m1");
+    let t = propose(&mut w, |_| r);
+    let before = w.c.get_verdict(w.id).unwrap();
+    assert_eq!(before.outcome, Some(Outcome::Reproduced));
+    assert!(!before.is_final, "still open to challenge");
+    assert_eq!(before.measured_value.as_deref(), Some("0.912"));
+    as_("anyone.testnet", t + WINDOW);
+    w.c.finalize(w.id);
+    assert!(w.c.get_verdict(w.id).unwrap().is_final);
+    assert!(w.c.get_verdict(9999).is_none());
+}
+
+#[test]
 #[should_panic(expected = "set by the contract")]
 fn lab_cannot_claim_runs_disagree() {
     let mut w = world();

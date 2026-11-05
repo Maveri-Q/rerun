@@ -47,6 +47,9 @@ pub enum InvalidReason {
     /// The Lab couldn't get the software running within its limits. That says nothing about the
     /// research, so nobody wins: shares redeem at half, and the creator keeps the bond.
     EnvSetupFailed,
+    /// An independent rebuild got a different number. That could be the rebuild and not the paper,
+    /// so it doesn't count against the paper: nobody wins, and shares redeem at half.
+    RebuildMismatch,
 }
 
 impl InvalidReason {

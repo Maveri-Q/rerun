@@ -9,7 +9,7 @@ export default function HowPage() {
 
       <section className="section">
         <div className="section-head">
-          <h2 className="big-head">Four ways it can end</h2>
+          <h2 className="big-head">Three ways it can end</h2>
         </div>
         <VerdictFan />
       </section>

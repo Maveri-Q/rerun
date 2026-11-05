@@ -4,13 +4,12 @@ import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 
 const VERDICTS = [
-  { word: "HELD UP", who: "YES wins", text: "The code ran and got a number inside the claim's range." },
-  { word: "DID NOT HOLD UP", who: "NO wins", text: "The code ran, but the number came out outside the range." },
-  { word: "CODE BROKEN", who: "NO wins", text: "The code ran past its time limit. The AI's opinion never decides this." },
-  { word: "NO VERDICT", who: "Half back", text: "The test wasn't fair, or the software couldn't be set up. Either way it says nothing about the research, and everyone gets half their shares' value back." },
+  { word: "\u2713 NUMBERS CHECK OUT", who: "YES wins", text: "The code ran and got a number inside the claim's range. That doesn't prove the study's method is right." },
+  { word: "\u2717 DOESN'T HOLD UP", who: "NO wins", text: "The authors' own code ran, but the number came out outside the range." },
+  { word: "\u26A0 INCONCLUSIVE", who: "Half back", text: "The software wouldn't run, the data was missing, or an independent rebuild disagreed. None of that counts against the paper, and every share pays back half." },
 ];
 
-/** The four possible verdicts, as four receipts you can spread out and lift. */
+/** The possible verdicts, as receipts you can spread out and lift. */
 export function VerdictFan() {
   return (
     <ul className="fan">
@@ -20,7 +19,7 @@ export function VerdictFan() {
           className="fan-card"
           style={{ zIndex: i }}
           initial={{ rotate: 0, x: 0, opacity: 0 }}
-          whileInView={{ rotate: (i - 1.5) * 4, opacity: 1 }}
+          whileInView={{ rotate: (i - 1) * 4, opacity: 1 }}
           whileHover={{ y: -26, rotate: 0, scale: 1.04, zIndex: 9 }}
           whileFocus={{ y: -26, rotate: 0, scale: 1.04, zIndex: 9 }}
           viewport={{ once: true, amount: 0.3 }}

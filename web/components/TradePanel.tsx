@@ -183,6 +183,7 @@ export function TradePanel({ market, config, position, contract, onDone }: { mar
           Claim 1,000 free points
         </button>
       )}
+      {market.mode === "money" && <p className="hint">Test USDC on testnet only. Real money is a future decision, pending legal review.</p>}
       {market.mode === "money" && (
         <button
           className="quiet w-full"

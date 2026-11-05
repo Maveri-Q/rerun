@@ -1,5 +1,7 @@
 {
   "expected": "REPRODUCED",
+  "origin": "rebuild",
+  "human_patches": [],
   "spec": {
     "version": 1,
     "title": "[TEST] AI repair check on the Parkinson's rebuild, never posted",
@@ -16,20 +18,32 @@
       "commit": "3031496c581800ebec3fb892f6dd05936e341dcb",
       "data": [],
       "runtime": "python3.11",
-      "setup": ["pip install -r requirements.txt"],
+      "setup": [
+        "pip install -r requirements.txt"
+      ],
       "entrypoint": "python -c \"import runpy, Robustness_Stability as R; R.random_robustness = lambda *a, **k: None; runpy.run_path('Pipeline.py', run_name='__main__')\" > rerun_output.txt",
       "output": {
         "path": "rerun_output.txt",
-        "extractor": { "type": "regex", "expr": "Month Post Injection 3\\s[\\s\\S]*?Pearson correlation coefficient ([0-9.]+)" }
+        "extractor": {
+          "type": "regex",
+          "expr": "Month Post Injection 3\\s[\\s\\S]*?Pearson correlation coefficient ([0-9.]+)"
+        }
       }
     },
     "metric": {
       "name": "correlation between predicted and measured pathology at 3 months",
       "reported_value": "0.696",
-      "tolerance": { "type": "abs", "value": "0.005" },
+      "tolerance": {
+        "type": "abs",
+        "value": "0.005"
+      },
       "comparison": "within_tolerance"
     },
-    "resources": { "cpu": 2, "mem_gb": 4, "max_minutes": 15 },
+    "resources": {
+      "cpu": 2,
+      "mem_gb": 4,
+      "max_minutes": 15
+    },
     "private_data": null
   }
 }

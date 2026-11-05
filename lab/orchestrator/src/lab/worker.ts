@@ -1,4 +1,4 @@
-import { humanPatchesFor } from "../demo/real.ts";
+import { humanPatchesFor, isIndependentRebuild } from "../demo/real.ts";
 import { ClaimSpec, specHash, type Receipt } from "@rerun/shared";
 import type { Account } from "near-api-js";
 import type { Chain } from "../chain/near.ts";
@@ -72,6 +72,13 @@ export class LabWorker {
     return handled;
   }
 
+  /** Runs one market now, for a settled showcase claim. Open claims wait for `tick`. */
+  async runOne(id: number): Promise<Receipt> {
+    const m = await this.cfg.chain.view<MarketView | null>("get_market", { market_id: id });
+    if (!m) throw new Error(`there is no claim ${id}`);
+    return this.process(m, 0, true);
+  }
+
   private async process(m: MarketView, runIndex: number, start: boolean): Promise<Receipt> {
     const { chain, lab } = this.cfg;
     const raw = await chain.view<string | null>("get_spec", { market_id: m.id });
@@ -89,7 +96,7 @@ export class LabWorker {
     llm.newRun();
     const model = new NearAiModel(llm, modelId);
     const { receipt } = await reproduce(
-      { humanPatches: humanPatchesFor(spec), spec, marketId: m.id, runIndex, labAccount: lab.accountId, labCodehash: this.cfg.labCodehash, labKeys: this.cfg.labKeys, methods: this.cfg.methodsFor?.(spec) },
+      { humanPatches: humanPatchesFor(spec), independentRebuild: isIndependentRebuild(spec), spec, marketId: m.id, runIndex, labAccount: lab.accountId, labCodehash: this.cfg.labCodehash, labKeys: this.cfg.labKeys, methods: this.cfg.methodsFor?.(spec) },
       {
         sandbox: new DockerSandbox({ image: sandboxImage(spec.artifact.runtime), cpus: spec.resources.cpu, memGb: spec.resources.mem_gb }),
         model,

@@ -30,6 +30,10 @@ const DOC_OUT = path.join(ROOT, "docs/REPAIR_BENCHMARK.md");
 const TARGET_PAPERS = 8;
 const MATCH_MARGIN = "0.005"; // relative
 const MAX_MINUTES = 15;
+/** Per paper, per run. A paper that takes longer counts as failed. */
+const PAPER_TIMEOUT_MS = 15 * 60_000;
+/** The final score averages this many runs of each paper, because the AI's replies vary. */
+const RUNS_PER_PAPER = 2;
 
 interface Case {
   title: string;
@@ -57,6 +61,8 @@ interface Row {
   blocked_edits: number;
   cost_usd: number;
   detail: string;
+  /** Each repair run's result. `result` is the first run's; the score uses all of them. */
+  runs?: Result[];
 }
 
 const modelId = process.env.NEARAI_MODEL || "z-ai/glm-5.3-flash";
@@ -83,6 +89,10 @@ async function runOnce(spec: ClaimSpec, dateInstall: boolean, llm: LlmClient, em
   );
 }
 
+function withTimeout<T>(work: Promise<T>): Promise<T> {
+  return Promise.race([work, new Promise<T>((_, reject) => setTimeout(() => reject(new Error(`timed out after ${PAPER_TIMEOUT_MS / 60_000} minutes`)), PAPER_TIMEOUT_MS))]);
+}
+
 async function benchmark(name: string, c: Case): Promise<Row> {
   const row: Row = { name, title: c.title, paper: c.paper, result: "no_baseline", baseline: null, measured: null, ai_patches: 0, blocked_edits: 0, cost_usd: 0, detail: "" };
   const log = (e: StageEvent) => console.log(`  [${e.stage}] ${e.message.slice(0, 200)}`);
@@ -90,7 +100,7 @@ async function benchmark(name: string, c: Case): Promise<Row> {
 
   console.log(`\n=== ${name}: baseline, packages as of the commit date`);
   // `false` makes the normal setup fail at once, so the date-pinned step runs straight away.
-  const base = await runOnce(specFor(c, ["false"], "0", { type: "abs", value: "1000000" }), true, llm, log).catch((e: Error) => e);
+  const base = await withTimeout(runOnce(specFor(c, ["false"], "0", { type: "abs", value: "1000000" }), true, llm, log)).catch((e: Error) => e);
   if (base instanceof Error || base.receipt.measured_value === null) {
     row.detail = base instanceof Error ? base.message : `No number under the old packages (${base.receipt.outcome}).`;
     return row;
@@ -102,22 +112,41 @@ async function benchmark(name: string, c: Case): Promise<Row> {
     return row;
   }
 
-  console.log(`=== ${name}: broken, today's packages, AI repair (target ${row.baseline})`);
+  const runs: Result[] = [];
+  let totalCost = 0;
+  let first: Row | null = null;
+  for (let i = 0; i < RUNS_PER_PAPER; i++) {
+    const attempt: Row = { ...row };
+    console.log(`=== ${name}: broken, today's packages, AI repair, run ${i + 1} of ${RUNS_PER_PAPER} (target ${row.baseline})`);
+    await repairRun(c, attempt, llm, log);
+    totalCost += attempt.cost_usd;
+    runs.push(attempt.result);
+    first ??= attempt;
+    // A paper that still runs on today's packages will do so again, so a second run adds nothing.
+    if (attempt.result === "not_broken") break;
+  }
+  const failedRuns = runs.filter((r) => r !== "repaired").length;
+  return { ...first!, runs, cost_usd: totalCost, detail: `${first!.detail}${runs.length > 1 ? ` Runs: ${runs.join(", ")}${failedRuns ? "." : ", both matched."}` : ""}` };
+}
+
+async function repairRun(c: Case, row: Row, llm: LlmClient, log: (e: StageEvent) => void): Promise<void> {
   let repairEvents = 0;
-  const broken = await runOnce(
-    specFor(c, [`pip install ${c.packages.join(" ")}`], row.baseline, { type: "rel", value: MATCH_MARGIN }),
-    false,
-    llm,
-    (e) => {
-      if (e.stage === "repairing") repairEvents++;
-      log(e);
-    },
+  const broken = await withTimeout(
+    runOnce(
+      specFor(c, [`pip install ${c.packages.join(" ")}`], row.baseline!, { type: "rel", value: MATCH_MARGIN }),
+      false,
+      llm,
+      (e) => {
+        if (e.stage === "repairing") repairEvents++;
+        log(e);
+      },
+    ),
   ).catch((e: Error) => e);
   row.cost_usd = llm.spentThisRun;
   if (broken instanceof Error) {
-    row.result = "no_verdict";
+    row.result = /timed out/.test(broken.message) ? "failed" : "no_verdict";
     row.detail = broken.message.slice(0, 200);
-    return row;
+    return;
   }
   const r = broken.receipt;
   row.measured = r.measured_value;
@@ -133,12 +162,15 @@ async function benchmark(name: string, c: Case): Promise<Row> {
     row.result = "failed";
     row.detail = `${r.outcome}${r.invalid_reason ? ` (${r.invalid_reason})` : ""}, measured ${r.measured_value ?? "nothing"}.`;
   }
-  return row;
 }
 
 function write(rows: Row[]) {
-  const counted = rows.filter((r) => r.result === "repaired" || r.result === "failed");
-  const repaired = rows.filter((r) => r.result === "repaired").length;
+  const counted = rows.filter((r) => (r.runs ?? [r.result]).some((x) => x === "repaired" || x === "failed"));
+  // The average across a paper's runs, so 1 of 2 runs counts as half a paper.
+  const repaired = counted.reduce((sum, r) => {
+    const runs = (r.runs ?? [r.result]).filter((x) => x === "repaired" || x === "failed");
+    return sum + runs.filter((x) => x === "repaired").length / runs.length;
+  }, 0);
   const summary = { generated_at: new Date().toISOString(), model: modelId, max_attempts: MAX_REPAIR_ATTEMPTS, target_papers: TARGET_PAPERS, papers_counted: counted.length, repaired, complete: counted.length >= TARGET_PAPERS, rows };
   writeFileSync(JSON_OUT, `${JSON.stringify(summary, null, 2)}\n`);
   const table = rows.map((r) => `| ${r.title} | ${r.result} | ${r.baseline ?? "-"} | ${r.measured ?? "-"} | ${r.ai_patches} | ${r.blocked_edits} | $${r.cost_usd.toFixed(4)} | ${r.detail.replaceAll("|", " ")} |`).join("\n");

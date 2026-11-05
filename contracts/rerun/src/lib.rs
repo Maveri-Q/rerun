@@ -70,6 +70,20 @@ pub struct Contract {
 }
 
 #[near(serializers = [json])]
+pub struct Verdict {
+    pub claim_id: u64,
+    pub state: State,
+    pub is_final: bool,
+    pub outcome: Option<Outcome>,
+    pub invalid_reason: Option<InvalidReason>,
+    pub spec_hash: String,
+    pub reported_value: Option<String>,
+    pub measured_value: Option<String>,
+    pub receipt_run_index: Option<u8>,
+    pub report_hash: Option<String>,
+}
+
+#[near(serializers = [json])]
 pub struct MarketView {
     #[serde(flatten)]
     pub market: Market,
@@ -266,6 +280,26 @@ impl Contract {
 
     pub fn get_config(&self) -> &Config {
         &self.config
+    }
+
+    /// For anything that wants to settle on this result, such as another market or an encyclopedia.
+    /// `is_final` says whether the challenge window has closed.
+    pub fn get_verdict(&self, claim_id: u64) -> Option<Verdict> {
+        let m = self.markets.get(&claim_id)?;
+        let receipts = self.receipts.get(&claim_id);
+        let latest = receipts.and_then(|r| r.last());
+        Some(Verdict {
+            claim_id,
+            state: m.state,
+            is_final: m.state == State::Final,
+            outcome: m.outcome.or(latest.map(|r| r.outcome)),
+            invalid_reason: m.invalid_reason.or(latest.and_then(|r| r.invalid_reason)),
+            spec_hash: m.spec.spec_hash.clone(),
+            reported_value: latest.map(|r| r.reported_value.clone()),
+            measured_value: latest.and_then(|r| r.measured_value.clone()),
+            receipt_run_index: latest.map(|r| r.run_index),
+            report_hash: latest.map(|r| r.report_hash.clone()),
+        })
     }
 
     pub fn get_market(&self, market_id: u64) -> Option<MarketView> {

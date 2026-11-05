@@ -15,9 +15,10 @@ import { usePoll } from "@/components/usePoll";
 import { VerifiedPanel } from "@/components/VerifiedPanel";
 import { chain } from "@/lib/chain";
 import { accountLink, CONTRACT } from "@/lib/config";
-import { useRunStream } from "@/lib/lab";
-import { ORIGIN_LABEL, provenanceOf } from "@/lib/provenance";
-import { INCONCLUSIVE_MEANING, INCONCLUSIVE_REASON, fmtUnits, modeUnit, outcomeMeaning, rangeText, relativeTime, stateLabel, toleranceText, type State } from "@/lib/market";
+import { lab, useRunStream } from "@/lib/lab";
+import { NEVER_CHECKED, ORIGIN_LABEL, PRICE_RULE, provenanceOf } from "@/lib/provenance";
+import { APP_NAME } from "@rerun/shared/browser";
+import { CHECK_OUT_NOTE, fmtUnits, modeUnit, verdictWords, outcomeMeaning, rangeText, relativeTime, stateLabel, toleranceText, type State } from "@/lib/market";
 import { useWallet } from "@/lib/wallet";
 
 const SEQUENCE: { state: State; label: string }[] = [
@@ -27,6 +28,11 @@ const SEQUENCE: { state: State; label: string }[] = [
   { state: "Proposed", label: "Verdict posted" },
   { state: "Final", label: "Winners collect" },
 ];
+
+/** The chain's text can't be edited, so old demo wording is corrected for display only. */
+function readableStatement(statement?: string) {
+  return statement?.replace(/^DEMO FIXTURE,\s*/i, "A demo, ").replace(/That is a real finding: the result did not reproduce because the code is broken\.?/, "The Lab can't install it, so this comes out inconclusive.");
+}
 
 export default function MarketPage({ params }: { params: Promise<{ id: string }> }) {
   const id = Number(use(params).id);
@@ -38,6 +44,8 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
   const receipts = usePoll(() => chain.receipts(id), [id], 8_000);
   const position = usePoll(() => (wallet.accountId ? chain.position(wallet.accountId, id) : Promise.resolve(null)), [wallet.accountId, id], 15_000);
   const stream = useRunStream(String(id));
+  const reportHash = receipts.data?.at(-1)?.report_hash;
+  const evidence = usePoll(() => (reportHash ? lab.evidenceForReport(reportHash) : Promise.resolve(null)), [reportHash]);
 
   const spec = useMemo(() => {
     if (!specRaw.data) return null;
@@ -87,7 +95,7 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
             <Link className="chip" href="/scout">Suggested by the scout agent</Link>
           </p>
         )}
-        <p className="statement">{spec?.statement.replace(/^DEMO FIXTURE,\s*/i, "A demo, ")}</p>
+        <p className="statement">{readableStatement(spec?.statement)}</p>
         {origin && (
           <div className="origin">
             <h2>{origin.why.heading}</h2>
@@ -95,7 +103,16 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
             {origin.why.link && <a href={origin.why.link.href}>{origin.why.link.label}</a>}
           </div>
         )}
-        <p className="hint scope-note">RERUN checks whether the published numbers can be reproduced from the code and data. It does not judge whether the science is correct.</p>
+        {origin?.paperSays && (
+          <blockquote className="paper-says">
+            <span>Paper says</span>
+            <code>{origin.paperSays.quote}</code>
+            <a href={origin.paperSays.href}>{origin.paperSays.where}</a>
+          </blockquote>
+        )}
+        {origin?.whyItMatters && <p className="why-matters">{origin.whyItMatters}</p>}
+        {origin?.testRunEarly && <p className="test-run-note">Test-run during development.</p>}
+        <p className="hint scope-note">{APP_NAME} checks whether the published numbers can be reproduced from the code and data. It does not judge whether the science is correct. {PRICE_RULE}</p>
 
         <div className="claim-figure">
           <span className="claim-value">{s.reported_value}</span>
@@ -122,7 +139,9 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
             {latestReceipt && (
               <div style={{ paddingTop: 20 }}>
                 <h3>{m.outcome ? "This result is final" : "This can still be challenged"}</h3>
-                <p className="hint" style={{ maxWidth: "38ch", fontSize: 15 }}>{latestReceipt.invalid_reason === INCONCLUSIVE_REASON ? INCONCLUSIVE_MEANING : outcomeMeaning(latestReceipt.outcome)}</p>
+                <p className="hint" style={{ maxWidth: "38ch", fontSize: 15 }}>{verdictWords(latestReceipt.outcome, latestReceipt.invalid_reason, latestReceipt.measured_value, latestReceipt.reported_value)?.reason || outcomeMeaning(latestReceipt.outcome)}</p>
+                {latestReceipt.outcome === "REPRODUCED" && <p className="hint" style={{ maxWidth: "38ch" }}>{CHECK_OUT_NOTE}</p>}
+                {evidence.data?.robustness.status === "sensitive" && <p className="hint fragile" style={{ maxWidth: "38ch" }}>{"\u26A0"} Fragile: the number changed when the random seed changed.</p>}
                 <p style={{ marginTop: 14 }}>
                   <Link className="btn quiet btn--small" href={`/receipt/${m.id}/${latestReceipt.run_index}`}>See the full receipt</Link>
                 </p>
@@ -142,6 +161,15 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
             </li>
           ))}
         </ol>
+
+        <section className="not-checked">
+          <h2>What we didn&apos;t check</h2>
+          <ul>
+            {[...NEVER_CHECKED, ...(origin?.notChecked ?? [])].map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+        </section>
 
         <section className="section">
           {history.data ? <OddsChart points={history.data} /> : <p className="empty dim">Loading the price history…</p>}

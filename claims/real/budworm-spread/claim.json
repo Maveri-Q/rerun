@@ -1,5 +1,6 @@
 {
-  "expected": "NOT_REPRODUCED",
+  "expected": "INVALID",
+  "origin": "rebuild",
   "human_patches": [
     {
       "file": "entrypoint",

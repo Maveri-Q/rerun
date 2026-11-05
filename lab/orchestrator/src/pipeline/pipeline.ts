@@ -77,6 +77,8 @@ export interface RunInput {
   methods?: string;
   /** Changes a person made to how the code is launched. They go in the receipt, labelled as human. */
   humanPatches?: HumanPatch[];
+  /** Not the authors' own code. A mismatch could be the rebuild's fault, so it doesn't count against the paper. */
+  independentRebuild?: boolean;
 }
 
 export interface HumanPatch {
@@ -340,6 +342,9 @@ export async function reproduce(input: RunInput, deps: RunDeps): Promise<RunResu
       spec.metric.tolerance.type,
       parseDecimal(spec.metric.tolerance.value),
     );
+    if (!within && input.independentRebuild) {
+      throw new Stop("INVALID", "REBUILD_MISMATCH", `an independent rebuild got ${measured}, but that could be the rebuild's doing and not the paper's`);
+    }
     outcome = within ? "REPRODUCED" : "NOT_REPRODUCED";
     summary = within ? "The measured value is within tolerance." : "The code ran, but the measured value is outside tolerance.";
 
