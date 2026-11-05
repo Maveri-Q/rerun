@@ -3188,3 +3188,37 @@ a {
 .note-declare summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; color: var(--ink-2); }
 .note-declare select { margin: 8px 8px 8px 0; min-height: 44px; }
 .any-chain-label { margin: 8px 0; font-weight: 600; color: var(--ink); }
+
+/* A word with its meaning one hover or tap away. */
+.term {
+  position: relative;
+  display: inline;
+}
+.term-word {
+  all: unset;
+  cursor: help;
+  text-decoration: underline dotted;
+  text-decoration-color: var(--mint-dim);
+  text-underline-offset: 3px;
+}
+.term-word:focus-visible {
+  outline: 2px solid var(--mint);
+  outline-offset: 2px;
+}
+.term-note {
+  position: absolute;
+  z-index: 30;
+  left: 0;
+  top: calc(100% + 6px);
+  width: min(300px, calc(100vw - 32px));
+  padding: 10px 12px;
+  background: var(--paper);
+  color: var(--paper-ink);
+  font-family: var(--font-funnel-sans), system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.4;
+  letter-spacing: normal;
+  text-align: left;
+  white-space: normal;
+}

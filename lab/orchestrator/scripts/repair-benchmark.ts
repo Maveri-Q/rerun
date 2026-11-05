@@ -67,6 +67,7 @@ interface Row {
   runs?: Result[];
 }
 
+const NETWORK_TRIES = 3;
 const modelId = process.env.NEARAI_MODEL || "z-ai/glm-5.3-flash";
 
 /** Today's newest packages, with no date limit. */
@@ -100,7 +101,11 @@ async function runOnce(spec: ClaimSpec, dateInstall: boolean, llm: LlmClient, em
 }
 
 function withTimeout<T>(work: Promise<T>): Promise<T> {
-  return Promise.race([work, new Promise<T>((_, reject) => setTimeout(() => reject(new Error(`timed out after ${PAPER_TIMEOUT_MS / 60_000} minutes`)), PAPER_TIMEOUT_MS))]);
+  let timer: NodeJS.Timeout;
+  const limit = new Promise<T>((_, reject) => {
+    timer = setTimeout(() => reject(new Error(`timed out after ${PAPER_TIMEOUT_MS / 60_000} minutes`)), PAPER_TIMEOUT_MS);
+  });
+  return Promise.race([work, limit]).finally(() => clearTimeout(timer));
 }
 
 async function benchmark(name: string, c: Case): Promise<Row> {
@@ -128,12 +133,18 @@ async function benchmark(name: string, c: Case): Promise<Row> {
   let totalCost = 0;
   let first: Row | null = null;
   for (let i = 0; i < RUNS_PER_PAPER; i++) {
-    const attempt: Row = { ...row };
-    console.log(`=== ${name}: broken, today's packages, AI repair, run ${i + 1} of ${RUNS_PER_PAPER} (target ${row.baseline})`);
-    await repairRun(c, attempt, llm, log);
-    totalCost += attempt.cost_usd;
+    let attempt: Row = { ...row };
+    // A network failure says nothing about the repair, so that run gets another go.
+    for (let tries = 0; tries < NETWORK_TRIES; tries++) {
+      attempt = { ...row };
+      console.log(`=== ${name}: broken, today's packages, AI repair, run ${i + 1} of ${RUNS_PER_PAPER} (target ${row.baseline})`);
+      await repairRun(c, attempt, llm, log);
+      totalCost += attempt.cost_usd;
+      if (attempt.result !== "no_verdict") break;
+      console.log(`    this run couldn't finish: ${attempt.detail}`);
+    }
     runs.push(attempt.result);
-    first ??= attempt;
+    if (!first || first.result === "no_verdict") first = attempt;
     // A paper that still runs on today's packages will do so again, so a second run adds nothing.
     if (attempt.result === "not_broken") break;
   }
@@ -167,6 +178,10 @@ async function repairRun(c: Case, row: Row, llm: LlmClient, log: (e: StageEvent)
   if (repairEvents === 0 && r.outcome === "REPRODUCED") {
     row.result = "not_broken";
     row.detail = "It still runs on today's packages, so it doesn't test repair.";
+  } else if (r.invalid_reason === "DATA_UNAVAILABLE") {
+    // The code couldn't be downloaded, so nothing was tried.
+    row.result = "no_verdict";
+    row.detail = "The code couldn't be downloaded.";
   } else if (r.outcome === "REPRODUCED") {
     row.result = "repaired";
     row.detail = `Repaired with ${r.patches.length} change(s). The number matches the baseline.`;

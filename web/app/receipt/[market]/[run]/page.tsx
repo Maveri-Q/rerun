@@ -10,6 +10,7 @@ import { VerifiedPanel } from "@/components/VerifiedPanel";
 import { chain } from "@/lib/chain";
 import { accountLink, CONTRACT, LAB_URL } from "@/lib/config";
 import { lab } from "@/lib/lab";
+import { Hint } from "@/components/Hint";
 import { CHECK_OUT_NOTE, outcomeMeaning, patchAuthors, rangeText, verdictWords } from "@/lib/market";
 
 const when = (t: number) => new Date(t * 1000).toLocaleString();
@@ -63,13 +64,14 @@ export default function ReceiptPage({ params }: { params: Promise<{ market: stri
         <div style={{ paddingTop: 20 }}>
           <p className="statement" style={{ margin: 0 }}>{verdictWords(r.outcome, r.invalid_reason, r.measured_value, r.reported_value)?.reason || outcomeMeaning(r.outcome)}</p>
           {r.outcome === "REPRODUCED" && <p className="hint">{CHECK_OUT_NOTE}</p>}
+          {r.outcome === "INVALID" && <p className="hint"><Hint term="inconclusive">What does Inconclusive mean?</Hint></p>}
           {r.invalid_reason && <p className="hint">Why: {r.invalid_reason.replaceAll("_", " ").toLowerCase()}</p>}
         </div>
       </div>
 
       <section className="verify-yourself">
         <h2>Check this yourself</h2>
-        <p>You don&apos;t have to trust us or the secure hardware. With Docker and Node installed, this re-runs the claim on your own computer and compares the number:</p>
+        <p>You don&apos;t have to trust us or the <Hint term="hardware">secure hardware</Hint>. With Docker and Node installed, this re-runs the claim on your own computer and compares the number:</p>
         <pre className="log">{`git clone <this repository> && cd ${APP_NAME.toLowerCase()} && pnpm install && pnpm sandbox:build\npnpm verify-claim ${m.id}`}</pre>
       </section>
 
@@ -104,7 +106,7 @@ export default function ReceiptPage({ params }: { params: Promise<{ market: stri
         <dl className="defs mono">
           <dt>Outcome</dt>
           <dd>{r.outcome}</dd>
-          <dt>Claim fingerprint</dt>
+          <dt><Hint term="fingerprint">Claim fingerprint</Hint></dt>
           <dd>{r.spec_hash}</dd>
           <dt>Commit</dt>
           <dd>{r.commit}</dd>
@@ -128,7 +130,7 @@ export default function ReceiptPage({ params }: { params: Promise<{ market: stri
           <dd>{r.lab_codehash}</dd>
           <dt>AI used</dt>
           <dd>{r.nearai.model_id}</dd>
-          <dt>Hardware proof fingerprint</dt>
+          <dt><Hint term="proof">Hardware proof fingerprint</Hint></dt>
           <dd>{r.nearai.attestation_digest}</dd>
           <dt>Signed AI replies</dt>
           <dd>{r.nearai.response_signature_refs.join(", ") || "None"}</dd>

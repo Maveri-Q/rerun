@@ -15,6 +15,7 @@ import { usePoll } from "@/components/usePoll";
 import { ClaimNotes } from "@/components/ClaimNotes";
 import { VerifiedPanel } from "@/components/VerifiedPanel";
 import { chain } from "@/lib/chain";
+import { Hint } from "@/components/Hint";
 import { citedByText, factsFor } from "@/lib/facts";
 import { accountLink, CONTRACT } from "@/lib/config";
 import { lab, useRunStream } from "@/lib/lab";
@@ -120,7 +121,7 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
 
         <div className="claim-figure">
           <span className="claim-value">{s.reported_value}</span>
-          <span className="claim-tol">{toleranceText(s.tolerance_kind, s.tolerance_value)}</span>
+          <span className="claim-tol"><Hint term="margin">{toleranceText(s.tolerance_kind, s.tolerance_value)}</Hint></span>
           <span className="dim">
             The paper reports this {spec?.metric.name}. The claim holds up if the Lab gets {rangeText(s.reported_value, s.tolerance_kind, s.tolerance_value)}.
           </span>
@@ -145,6 +146,8 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
                 <h3>{m.outcome ? "This result is final" : "This can still be challenged"}</h3>
                 <p className="hint" style={{ maxWidth: "38ch", fontSize: 15 }}>{verdictWords(latestReceipt.outcome, latestReceipt.invalid_reason, latestReceipt.measured_value, latestReceipt.reported_value)?.reason || outcomeMeaning(latestReceipt.outcome)}</p>
                 {latestReceipt.outcome === "REPRODUCED" && <p className="hint" style={{ maxWidth: "38ch" }}>{CHECK_OUT_NOTE}</p>}
+                {latestReceipt.outcome === "INVALID" && <p className="hint"><Hint term="inconclusive">What does Inconclusive mean?</Hint></p>}
+                <p className="hint">This slip is the Lab&apos;s <Hint term="receipt">receipt</Hint>.</p>
                 {evidence.data?.robustness.status === "sensitive" && <p className="hint fragile" style={{ maxWidth: "38ch" }}>{"\u26A0"} Fragile: the number changed when the random seed changed.</p>}
                 <p style={{ marginTop: 14 }}>
                   <Link className="btn quiet btn--small" href={`/receipt/${m.id}/${latestReceipt.run_index}`}>See the full receipt</Link>
@@ -269,7 +272,7 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
               <dd className="mono">
                 {spec.resources.cpu} CPU, {spec.resources.mem_gb} GB, {spec.resources.max_minutes} minutes
               </dd>
-              <dt>Claim fingerprint</dt>
+              <dt><Hint term="fingerprint">Claim fingerprint</Hint></dt>
               <dd className="mono">{s.spec_hash}</dd>
             </dl>
           ) : (
