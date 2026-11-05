@@ -10,6 +10,7 @@ import { useWallet } from "@/lib/wallet";
 const LINKS = [
   { href: "/", label: "Claims" },
   { href: "/how", label: "How it works" },
+  { href: "/facts", label: "Verified facts" },
   { href: "/check", label: "Check a paper" },
   { href: "/portfolio", label: "Portfolio" },
   { href: "/leaderboard", label: "Leaderboard" },

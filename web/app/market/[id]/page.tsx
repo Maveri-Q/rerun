@@ -14,6 +14,7 @@ import { TradePanel } from "@/components/TradePanel";
 import { usePoll } from "@/components/usePoll";
 import { VerifiedPanel } from "@/components/VerifiedPanel";
 import { chain } from "@/lib/chain";
+import { citedByText, factsFor } from "@/lib/facts";
 import { accountLink, CONTRACT } from "@/lib/config";
 import { lab, useRunStream } from "@/lib/lab";
 import { NEVER_CHECKED, ORIGIN_LABEL, PRICE_RULE, provenanceOf } from "@/lib/provenance";
@@ -111,6 +112,8 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
           </blockquote>
         )}
         {origin?.whyItMatters && <p className="why-matters">{origin.whyItMatters}</p>}
+        {citedByText(factsFor(s.spec_hash).citedBy) && <p className="test-run-note">{citedByText(factsFor(s.spec_hash).citedBy)}</p>}
+        {origin && m.state === "Final" && <p className="test-run-note"><Link href={`/facts/${m.id}`}>Read the plain-English entry</Link></p>}
         {origin?.testRunEarly && <p className="test-run-note">Test-run during development.</p>}
         <p className="hint scope-note">{APP_NAME} checks whether the published numbers can be reproduced from the code and data. It does not judge whether the science is correct. {PRICE_RULE}</p>
 

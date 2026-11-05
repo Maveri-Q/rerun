@@ -102,7 +102,7 @@ function SuggestPaper() {
       {error && <p className="notice notice--error" role="status">{error}</p>}
       {done && (
         <p className="notice notice--ok" role="status">
-          {done} Meanwhile, <Link href="/#claims">try a live claim</Link>.
+          Thanks! New papers are reviewed within 24 hours. Meanwhile, <Link href="/">try a live demo claim</Link>.
         </p>
       )}
     </div>

@@ -1,0 +1,18 @@
+{
+  "entries": {
+    "53d87974c67eef8008149ef40f0448812042bff87db91a0683551e921a3b2e75": {
+      "summary": "The re-run confirmed the reported correlation: the authors' R code, run on their published mouse-brain data, produced a correlation of about 0.696 between predicted and measured spread of alpha-synuclein, matching the published number.",
+      "background": "Alpha-synuclein is the protein that builds up in the brains of people with Parkinson's disease. The study modelled how this protein would travel along the brain's physical connections in mice, aiming to see if wiring alone can explain where the protein ends up. Getting the model's predictions to line up with actual lab measurements would support the idea that brain connectivity shapes the spread.",
+      "result": "The check re-ran the authors' own R code, with software packages pinned to the date the code was written, on their published data. The measured correlation was 0.69605221 against a reported 0.696, so the number checks out. This only confirms that the same code and data reproduce the same figure; it does not verify that the model is correct, that the data were suitable, or that mouse results apply to humans.",
+      "model": "z-ai/glm-5.3-flash",
+      "writtenAt": "2026-11-05T12:02:10.837Z"
+    }
+  },
+  "citedBy": {
+    "53d87974c67eef8008149ef40f0448812042bff87db91a0683551e921a3b2e75": 302,
+    "a942a4e8eee4390f46ae932c48d15ccd0c83ebc0a39eab408c50e054088f6986": 0,
+    "f63ef50e89f8221d51bde13cebd576b5b89b56f82842ae5fb33321418db60774": 302,
+    "c4a9b60c770317e5f7ec3aacbac1513bd2f133958bb226d29762fa2a39ae86d1": 1,
+    "19ef61085d1bfae1011de7c8c5006c243a97c56f2066c7bbea8d1179e60c8a0f": 1
+  }
+}

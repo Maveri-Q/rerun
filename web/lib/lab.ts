@@ -128,6 +128,14 @@ export const lab = {
     const res = await fetch(`${LAB_URL}/scout/${encodeURIComponent(id)}/approved`, { method: "POST", body: JSON.stringify({ market_id: marketId }) });
     if (!res.ok) throw new Error(`The claim is open, but the Lab couldn't mark the suggestion as approved (${res.status}).`);
   },
+  /** Opens a short demo claim, or finds the one already open. Throws a message fit to show. */
+  async tryNow(): Promise<number> {
+    const res = await fetch(`${LAB_URL}/try`, { method: "POST" }).catch(() => null);
+    if (!res) throw new Error("The Lab is offline, so a new demo can't start. Finished claims below still show their proof.");
+    const body = (await res.json().catch(() => ({}))) as { market_id?: number; error?: string };
+    if (!res.ok || body.market_id === undefined) throw new Error(body.error ?? "The Lab couldn't open a demo claim. Try again in a minute.");
+    return body.market_id;
+  },
   health: () => get<LabHealth>("/health"),
   attestation: (digest: string) => get<AttestationRecord>(`/attestations/${digest}`),
   latestAttestation: () => get<AttestationRecord>("/attestations/latest"),

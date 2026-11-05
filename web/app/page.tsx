@@ -6,6 +6,7 @@ import { MarketTicker } from "@/components/MarketTicker";
 import { PaperTape } from "@/components/PaperTape";
 import { PrintedReceipt } from "@/components/PrintedReceipt";
 import { RollingNumber } from "@/components/RollingNumber";
+import { TryItNow } from "@/components/TryItNow";
 import { usePoll } from "@/components/usePoll";
 import { chain } from "@/lib/chain";
 import { lab } from "@/lib/lab";
@@ -59,8 +60,10 @@ export default function Home() {
           <p className="lede">
             Many published results don&apos;t. Here you predict which ones will, then an AI lab re-runs the authors&apos; own code and data and prints public proof.
           </p>
+          <p className="hero-steps">Predict, we rerun the study, then see the proof and collect.</p>
           <div className="hero-actions">
-            <a className="btn" href="#claims">
+            <TryItNow />
+            <a className="btn quiet" href="#claims">
               See the claims
             </a>
             <Link className="btn quiet" href="/check">

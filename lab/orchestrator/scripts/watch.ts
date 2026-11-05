@@ -8,6 +8,9 @@ import { NearAiModel } from "../src/pipeline/model.ts";
 import { demoForSpec } from "../src/demo/fixtures.ts";
 import { labPublicUrl, need, testnetChain, testnetWorker } from "../src/lab/setup.ts";
 import { startLabServer } from "../src/lab/server.ts";
+import { RollingDemos, type RollingMarket } from "../src/lab/rolling.ts";
+import { loadDemo } from "../src/demo/fixtures.ts";
+import { specJson } from "@rerun/shared";
 import { createQueue, EventHub, LabResolver, saveAttestation } from "../src/lab/store.ts";
 import { allLeads, draftWithModel, githubRepoFacts, loadScoutState, paperAttention, runScout, saveScoutState } from "../src/scout/scout.ts";
 
@@ -25,8 +28,34 @@ const labKeys = { publicKey: need("LAB_ENC_PUBLIC_KEY"), privateKey: need("LAB_E
 const network = new LabResolver();
 const chain = testnetChain();
 
+/** Off by default, because it signs transactions with the owner's key: ROLLING_DEMOS=1 turns it on. */
+const rolling =
+  process.env.ROLLING_DEMOS === "1"
+    ? (() => {
+        const owner = chain.account(need("TESTNET_OWNER_ACCOUNT"), need("TESTNET_OWNER_PRIVATE_KEY"));
+        return new RollingDemos(
+          {
+            list: async () => {
+              const lists = await Promise.all(["Open", "Proposed"].map((state) => chain.view<RollingMarket[]>("list_markets", { state, limit: 100 })));
+              return lists.flat();
+            },
+            post: async (name, lockTime) => {
+              const created = await chain.call(owner, "create_market", { spec_json: specJson(loadDemo(name, labKeys).spec), lock_time: lockTime, challenge_window: 60, mode: "points" }, { deposit: "0.1" });
+              const id = Number(created.value);
+              await chain.call(owner, "fund_market", { market_id: id, initial_liquidity: "40000000" }, { deposit: "0.02" });
+              return id;
+            },
+            finalize: async (id) => void (await chain.call(owner, "finalize", { market_id: id })),
+            log: (m) => console.log(m),
+          },
+          { windowSecs: Number(process.env.ROLLING_WINDOW_SECS || 300), everySecs: Number(process.env.ROLLING_EVERY_MINUTES || 60) * 60, maxPerDay: Number(process.env.ROLLING_MAX_PER_DAY || 48) },
+        );
+      })()
+    : undefined;
+
 startLabServer(port, {
   hub,
+  tryDemo: rolling && (() => rolling.tryNow()),
   scoutDir: DATA_DIR,
   verifyScoutApproval: async (marketId, candidate) => {
     const [market, raw, config] = await Promise.all([
@@ -78,6 +107,12 @@ async function scoutNow() {
 }
 scoutNow().catch((e: Error) => console.error(`scout failed: ${e.message}`));
 setInterval(() => scoutNow().catch((e: Error) => console.error(`scout failed: ${e.message}`)), SCOUT_EVERY_MS);
+
+if (rolling) {
+  const roll = () => rolling.tick().catch((e: Error) => console.error(`demo claims: ${e.message}`));
+  void roll();
+  setInterval(roll, 60_000);
+}
 
 console.log(`Lab watching testnet, serving on http://localhost:${port}. Ctrl+C to stop.`);
 while (true) {

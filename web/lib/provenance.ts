@@ -18,6 +18,12 @@ export interface Provenance {
   paperSays?: { quote: string; where: string; href: string };
   /** One line on why anyone should care. */
   whyItMatters?: string;
+  /** The finding as a question in everyday words. */
+  question?: string;
+  /** The paper whose citations are counted on its pages. */
+  citeDoi?: string;
+  /** Posted with the result already known, so nobody forecast it. */
+  settledShowcase?: boolean;
   /** Extra limits for this claim, added to the standard list. */
   notChecked?: string[];
 }
@@ -42,6 +48,9 @@ export const PROVENANCE: Record<string, Provenance> = {
   "53d87974c67eef8008149ef40f0448812042bff87db91a0683551e921a3b2e75": {
     name: "parkinsons-authors",
     origin: "authors",
+    question: "Does the brain's wiring predict where Parkinson's spreads?",
+    citeDoi: "10.1038/s41593-019-0457-5",
+    settledShowcase: true,
     paperSays: { quote: "Pearson's r 0.696 (Henderson et al.)", where: "Table 2 of the ReScience C article, which quotes the original paper", href: "https://doi.org/10.1038/s41593-019-0457-5" },
     whyItMatters: "If the brain's wiring predicts where Parkinson's spreads, it gives researchers a map of what to protect.",
     notChecked: ["Whether results in mice carry over to people."],
@@ -54,6 +63,8 @@ export const PROVENANCE: Record<string, Provenance> = {
   "a942a4e8eee4390f46ae932c48d15ccd0c83ebc0a39eab408c50e054088f6986": {
     name: "wildfire-water",
     origin: "authors",
+    question: "Does temperature explain how much water forests lose after a wildfire?",
+    citeDoi: "10.5281/zenodo.4617894",
     flagship: true,
     testRunEarly: true,
     paperSays: { quote: "Multiple R-Squared: 0.1495", where: "The author's 2008 output file, line 251, for ET ~ Tavg", href: "https://github.com/bpbond/ten-years-paper33/blob/c28b8a2e3149f7d90f2dc0179f9c976785e762b1/original/R%20output.txt#L251" },
@@ -66,6 +77,8 @@ export const PROVENANCE: Record<string, Provenance> = {
   },
   "f63ef50e89f8221d51bde13cebd576b5b89b56f82842ae5fb33321418db60774": {
     name: "parkinsons-spread",
+    question: "Does the brain's wiring predict where Parkinson's spreads? A separate rebuild",
+    citeDoi: "10.1038/s41593-019-0457-5",
     origin: "rebuild",
     testRunEarly: true,
     paperSays: { quote: "Pearson's r 0.696 (Henderson et al.), 0.696 (Replication)", where: "Table 2 of the ReScience C article", href: "https://doi.org/10.5281/zenodo.5379631" },
@@ -79,6 +92,8 @@ export const PROVENANCE: Record<string, Provenance> = {
   },
   "c4a9b60c770317e5f7ec3aacbac1513bd2f133958bb226d29762fa2a39ae86d1": {
     name: "budworm-timing",
+    question: "Does a 1991 model get the timing of a forest pest right?",
+    citeDoi: "10.5281/zenodo.5006005",
     origin: "rebuild",
     testRunEarly: true,
     paperSays: { quote: "Original -0.0457, logit", where: "Table 2 of the ReScience C article", href: "https://doi.org/10.5281/zenodo.5006005" },
@@ -91,6 +106,8 @@ export const PROVENANCE: Record<string, Provenance> = {
   },
   "19ef61085d1bfae1011de7c8c5006c243a97c56f2066c7bbea8d1179e60c8a0f": {
     name: "budworm-spread",
+    question: "Does a 1986 figure for a forest pest's timing hold up?",
+    citeDoi: "10.5281/zenodo.5006005",
     origin: "rebuild",
     testRunEarly: true,
     paperSays: { quote: "dennis_par = c(121.08, 204.36, 264.41, 342.473, 465.620, 599.57, 1.559)", where: "Kemp et al. 1986 Table 1, as transcribed in the replication's code", href: "https://github.com/pboesu/replication_candy_1991/blob/98329d447ef025c260879f28316015fc0b24fb08/code/03_fit_dennis_et_al_model.R" },

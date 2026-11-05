@@ -19,6 +19,7 @@
     "demo": "pnpm --filter @rerun/scripts demo",
     "seed": "pnpm --filter @rerun/scripts seed",
     "post-real": "pnpm --filter @rerun/scripts post-real",
+    "facts": "pnpm --filter @rerun/scripts facts",
     "settle-claim": "pnpm --filter @rerun/scripts settle-claim",
     "verify-claim": "pnpm --filter @rerun/scripts verify-claim",
     "upgrade-contract:testnet": "pnpm --filter @rerun/scripts upgrade-contract",

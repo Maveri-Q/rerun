@@ -21,6 +21,8 @@ const DRAFTS_PER_HOUR = 10;
 
 export interface ServerOptions {
   hub: EventHub;
+  /** Opens a short demo claim for a visitor. Off unless the operator turned on rolling demos. */
+  tryDemo?: () => Promise<number>;
   publicUrl: string;
   info: Record<string, unknown>;
   exclusive: <T>(fn: () => Promise<T>) => Promise<T>;
@@ -68,6 +70,15 @@ export function startLabServer(port: number, opts: ServerOptions) {
     }
 
     if (req.method === "POST") {
+      if (url.pathname === "/try") {
+        if (!opts.tryDemo) return json(res, 503, { error: "Demo claims aren't switched on right now. Finished claims below still show their proof." });
+        try {
+          return json(res, 200, { market_id: await opts.tryDemo() });
+        } catch (e) {
+          console.error(`try it now: ${(e as Error).message}`);
+          return json(res, 503, { error: /used/.test((e as Error).message) ? "Today's demo claims have all been used. Finished claims below still show their proof." : "The Lab couldn't open a demo claim. Try again in a minute." });
+        }
+      }
       if (url.pathname === "/draft") {
         const now = Date.now();
         while (draftTimes[0] !== undefined && draftTimes[0] < now - 3_600_000) draftTimes.shift();
