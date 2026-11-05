@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { articleFile, type ClaimDraft } from "../src/lab/draft.ts";
 import { checkRepo, hasDataInRepo, isClearNumber, type RepoFacts } from "../src/scout/filters.ts";
-import { emptyState, interestScore, LIMITS, parseArticleYaml, repoRoot, runScout, SUGGESTED_BY, type Lead } from "../src/scout/scout.ts";
+import { addSuggestion, emptyState, interestScore, LIMITS, parseArticleYaml, repoRoot, runScout, SUGGESTED_BY, type Lead } from "../src/scout/scout.ts";
 
 const facts = (over: Partial<RepoFacts> = {}): RepoFacts => ({ license: "MIT", languages: { Python: 9000, Shell: 100 }, sizeKb: 2000, archived: false, files: ["run.py"], dependencyText: "numpy\npandas", ...over });
 
@@ -192,6 +192,19 @@ describe("a scan", () => {
     const drafted: string[] = [];
     await runScout(emptyState(), deps(titled, { draft: async (l: Lead) => (drafted.push(l.title), draft()) }));
     expect(drafted).toEqual(["Sleep and heart disease", "Inflation and wages"]);
+  });
+
+  it("takes a visitor's suggestion through the same checks, and first", async () => {
+    const state = emptyState();
+    expect(addSuggestion(state, "https://github.com/a/suggested/tree/main", "https://doi.org/10.1/x").ok).toBe(true);
+    const c = state.candidates["suggested:https://github.com/a/suggested"]!;
+    expect(c.status).toBe("retry");
+    const checked: string[] = [];
+    const s = await runScout(state, deps([lead(1)], { repoFacts: async (u: string) => (checked.push(u), facts({ license: null })) }));
+    expect(checked[0]).toBe("https://github.com/a/suggested");
+    expect(s.candidates[c.id]!.status).toBe("rejected");
+    expect(addSuggestion(state, "not a link", "https://x.test").ok).toBe(false);
+    expect(addSuggestion(state, "https://github.com/a/b", "nope").ok).toBe(false);
   });
 
   it("doesn't check a paper twice", async () => {

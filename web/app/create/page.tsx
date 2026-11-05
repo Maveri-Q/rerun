@@ -71,7 +71,52 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
   );
 }
 
+function SuggestPaper() {
+  const [repo, setRepo] = useState("");
+  const [paper, setPaper] = useState("");
+  const [done, setDone] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const send = async () => {
+    setError(null);
+    try {
+      setDone(await lab.suggest(repo, paper));
+    } catch (e) {
+      setError(e instanceof Error && !/fetch/i.test(e.message) ? e.message : "The Lab is offline right now, so suggestions can't be taken. Try again later.");
+    }
+  };
+  return (
+    <div style={{ paddingTop: 36 }}>
+      <h1 className="page-title">Suggest a paper to check</h1>
+      <p className="lede">Claims only go live after review. Give us the paper and its code, and the scout runs its checks and drafts a claim for a person to approve.</p>
+      <div className="form-grid" style={{ marginTop: 28, maxWidth: 720 }}>
+        <label className="field">
+          <span>The paper</span>
+          <input value={paper} placeholder="https://doi.org/10.1038/..." onChange={(e) => setPaper(e.target.value)} />
+        </label>
+        <label className="field">
+          <span>Its code on GitHub</span>
+          <input value={repo} placeholder="https://github.com/owner/name" onChange={(e) => setRepo(e.target.value)} />
+        </label>
+      </div>
+      <button disabled={!repo || !paper} onClick={() => void send()}>Suggest this paper</button>
+      {error && <p className="notice notice--error" role="status">{error}</p>}
+      {done && (
+        <p className="notice notice--ok" role="status">
+          {done} Meanwhile, <Link href="/#claims">try a live claim</Link>.
+        </p>
+      )}
+    </div>
+  );
+}
+
+/** Only the contract's owner opens claims directly. Everyone else suggests, and a person reviews. */
 export default function CreatePage() {
+  const wallet = useWallet();
+  const config = usePoll(() => chain.config(), []);
+  return wallet.accountId && wallet.accountId === config.data?.owner ? <FullForm /> : <SuggestPaper />;
+}
+
+function FullForm() {
   const wallet = useWallet();
   const config = usePoll(() => chain.config(), []);
   const health = usePoll(() => lab.health(), []);

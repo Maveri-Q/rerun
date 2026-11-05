@@ -1,4 +1,6 @@
-import { loadScoutState, saveScoutState, type Candidate } from "../scout/scout.ts";
+import { addSuggestion, loadScoutState, saveScoutState, type Candidate } from "../scout/scout.ts";
+
+const SUGGESTIONS_PER_HOUR = 30;
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import { ClaimSpec, specHash } from "@rerun/shared";
 import { LlmClient, llmConfigFromEnv } from "../nearai/client.ts";
@@ -35,6 +37,7 @@ export interface ServerOptions {
 
 export function startLabServer(port: number, opts: ServerOptions) {
   const draftTimes: number[] = [];
+  const suggestionTimes: number[] = [];
   const server = createServer((req, res) => {
     handle(req, res).catch((e: Error) => json(res, 500, { error: e.message.slice(0, 300) }));
   });
@@ -91,6 +94,17 @@ export function startLabServer(port: number, opts: ServerOptions) {
         state.candidates[candidate.id] = { ...candidate, status: "approved", marketId: body.market_id };
         saveScoutState(opts.scoutDir, state);
         return json(res, 200, { ok: true });
+      }
+      if (url.pathname === "/suggestions" && opts.scoutDir) {
+        const now = Date.now();
+        while (suggestionTimes[0] !== undefined && suggestionTimes[0] < now - 3_600_000) suggestionTimes.shift();
+        if (suggestionTimes.length >= SUGGESTIONS_PER_HOUR) return json(res, 429, { error: "Lots of suggestions this hour. Try again later." });
+        suggestionTimes.push(now);
+        const body = JSON.parse((await readBody(req, MAX_JSON_BYTES)).toString("utf8")) as { repo_url?: string; paper_url?: string };
+        const state = loadScoutState(opts.scoutDir);
+        const result = addSuggestion(state, body.repo_url ?? "", body.paper_url ?? "");
+        if (result.ok) saveScoutState(opts.scoutDir, state);
+        return json(res, result.ok ? 201 : 422, result.ok ? { message: result.message } : { error: result.message });
       }
       if (url.pathname === "/methods") {
         const body = JSON.parse((await readBody(req, MAX_JSON_BYTES)).toString("utf8")) as { spec_hash?: string; methods?: string };

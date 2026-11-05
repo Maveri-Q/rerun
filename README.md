@@ -126,3 +126,38 @@ near-sdk, near-contract-standards, uint, proptest, near-api-js, Next.js, React, 
 ## License
 
 MIT, see [LICENSE](LICENSE).
+
+## Questions judges ask
+
+**Is this reproducing the original code, or independently validating the claim?**
+Reproducing, wherever the authors' code is available: it tests whether their code and data give their number. Each claim is labelled "Authors' own code" or "Independent rebuild". A number that checks out doesn't prove the method is right, and every page has a "What we didn't check" box.
+
+**Who sets the success threshold, and can it change after predictions?**
+The claim's creator sets it when the claim opens, a person reviews it, and it's hashed into the on-chain spec. It can't change afterwards.
+
+**What if the code fails or the data is missing?**
+⚠ Inconclusive, with the reason shown, and every share pays back half. First the Lab installs the software as it was on the date of the code, with no AI. If that fails, an AI may try setup repairs. Running out of tries, or the AI giving up, is still Inconclusive. The AI never decides a verdict.
+
+**How is malicious code kept in the sandbox?**
+Research code runs in its own container, as a non-root user, with no secrets, CPU, memory and time limits, a read-only root, and the network cut off during the run. Keys stay in a separate process. See `docs/THREAT_MODEL.md`.
+
+**What exactly is on NEAR, and how do I verify a receipt?**
+The claim's spec, its fingerprint, the trades, and a receipt with the number, the verdict, hashes of the logs and every change made. To check one without trusting us, run `pnpm verify-claim <id>` on your own computer, or read `get_verdict` directly.
+
+**Can the AI change the experiment? How are changes disclosed?**
+Plain code rejects edits touching numbers, analysis or data. Every change is in the receipt, labelled AI, system or human.
+
+**Conflicts of interest, disputes, inconclusive outcomes?**
+Claim creators are shown on the page. Anyone can challenge a result for a limited time with a bond, which triggers a second, independent run with a different AI model; if the runs disagree the claim is Inconclusive. The market price never changes the verdict.
+
+**Does AI repair work?**
+Not proven yet. See `docs/REPAIR_BENCHMARK.md` for the measured score.
+
+## Settling on our results
+
+Building an AI encyclopedia with prediction markets? Use this to settle claims with evidence: the contract's public `get_verdict(claim_id)` returns the verdict and a receipt reference, and `GET /api/verdict/<id>` on the site returns the same.
+
+Science already proved reproducibility markets work. We built the part that settles them.
+
+A TEE receipt proves the AI ran. Our receipt proves the science was checked, and anyone can check it again.
+

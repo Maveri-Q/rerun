@@ -97,7 +97,9 @@ export async function runScout(state: ScoutState, deps: ScoutDeps): Promise<Scou
   const log = deps.log ?? (() => {});
   const next: ScoutState = { ...state, lastScanAt: now.toISOString(), candidates: { ...state.candidates }, draftsByDay: { [today]: state.draftsByDay[today] ?? 0 } };
 
-  const leads = await deps.leads();
+  const found = await deps.leads();
+  const suggested = Object.values(next.candidates).filter((c) => c.id.startsWith("suggested:") && c.status === "retry");
+  const leads = [...suggested, ...found];
   // ReScience publishes one project as many articles, so a repository only counts once.
   const reposSeen = new Set(Object.values(next.candidates).filter((c) => c.status !== "retry").map((c) => c.repoUrl));
   const fresh = leads.filter((l) => {
@@ -108,7 +110,7 @@ export async function runScout(state: ScoutState, deps: ScoutDeps): Promise<Scou
     return true;
   });
   // Papers already through the checks go first, so they aren't checked again and again.
-  const waiting = (l: Lead) => (next.candidates[l.id]?.reasons.some((r) => r.startsWith("Passed the checks")) ? 1000 : 0);
+  const waiting = (l: Lead) => (l.id.startsWith("suggested:") ? 2000 : next.candidates[l.id]?.reasons.some((r) => r.startsWith("Passed the checks")) ? 1000 : 0);
   fresh.sort((a, b) => waiting(b) + titleInterest(b) - waiting(a) - titleInterest(a));
   log(`scout: ${leads.length} leads, ${fresh.length} not checked yet`);
 
@@ -262,6 +264,18 @@ export async function paperAttention(lead: Lead): Promise<Attention | undefined>
   return undefined;
 }
 
+/** Someone suggested a paper on the site. It waits in the queue like any other lead, and a person still reviews it. */
+export function addSuggestion(state: ScoutState, repoUrl: string, paperUrl: string): { ok: boolean; message: string } {
+  const repo = repoRoot(repoUrl);
+  if (!repo) return { ok: false, message: "Enter the code's GitHub address, like https://github.com/owner/name" };
+  if (!/^https:\/\/\S+$/.test(paperUrl)) return { ok: false, message: "Enter the paper's address, starting with https://" };
+  const id = `suggested:${repo}`;
+  if (!state.candidates[id]) {
+    state.candidates[id] = { id, source: "Suggested by a visitor", title: repo.replace("https://github.com/", ""), paperUrl, repoUrl: repo, needsDataCheck: true, status: "retry", reasons: ["Waiting for the next scan."], checkedAt: new Date().toISOString() };
+  }
+  return { ok: true, message: "Thanks! New papers are reviewed within 24 hours." };
+}
+
 export const allLeads = async (): Promise<Lead[]> => {
   const [rescience, huggingFace] = await Promise.allSettled([reScienceLeads(70), huggingFaceLeads(100)]);
   if (rescience.status === "rejected" && huggingFace.status === "rejected") throw new Error(`no source answered: ${String(rescience.reason)}`);
@@ -287,7 +301,7 @@ export function draftWithModel(model: PrivateModel) {
 
 /* Saved state */
 
-const statePath = (dataDir: string) => path.join(dataDir, "scout", "state.json");
+const statePath = (dataDir: string) => process.env.SCOUT_STATE_FILE || path.join(dataDir, "scout", "state.json");
 
 export function loadScoutState(dataDir: string): ScoutState {
   try {

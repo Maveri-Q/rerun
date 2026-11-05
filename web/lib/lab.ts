@@ -111,10 +111,18 @@ export interface ScoutCandidate {
 }
 
 export const lab = {
+  /** From the Lab if it's on, otherwise the log the scheduled scan publishes with the site. */
   scout: async () => {
-    const res = await fetch(`${LAB_URL}/scout`);
-    if (!res.ok) throw new Error(`Lab answered ${res.status}`);
-    return (await res.json()) as { lastScanAt: string | null; candidates: Record<string, ScoutCandidate> };
+    const res = await fetch(`${LAB_URL}/scout`).catch(() => null);
+    const live = res?.ok ? res : await fetch("/scout.json");
+    if (!live.ok) throw new Error(`no scout log (${live.status})`);
+    return (await live.json()) as { lastScanAt: string | null; candidates: Record<string, ScoutCandidate> };
+  },
+  async suggest(repoUrl: string, paperUrl: string): Promise<string> {
+    const res = await fetch(`${LAB_URL}/suggestions`, { method: "POST", body: JSON.stringify({ repo_url: repoUrl, paper_url: paperUrl }) });
+    const body = (await res.json()) as { message?: string; error?: string };
+    if (!res.ok) throw new Error(body.error ?? "The Lab didn't take that suggestion.");
+    return body.message!;
   },
   async scoutApproved(id: string, marketId: number): Promise<void> {
     const res = await fetch(`${LAB_URL}/scout/${encodeURIComponent(id)}/approved`, { method: "POST", body: JSON.stringify({ market_id: marketId }) });

@@ -20,7 +20,6 @@ RERUN: NEAR Hackathon 2026 entry. The full spec is the human's build plan (`RERU
 
 - pnpm 12 workspace; TypeScript runs directly via `tsx`/`vitest` (`.ts` import specifiers, no build step).
 - Pin exact dependency versions. pnpm enforces a minimum release age; prefer an older release to excluding a fresh one.
-- App name lives only in `packages/shared/src/config.ts` (`APP_NAME`).
 - Every LLM call goes through `LlmClient` in `lab/orchestrator/src/nearai/client.ts` (token/call/daily caps, spend log, `MOCK_LLM=1`).
 - Only NEAR-hosted private models (`owned_by: "nearai"` in `/v1/models`). Default `z-ai/glm-5.3-flash`; re-runs use a different one.
 - The deterministic comparator decides outcomes, never the LLM. It exists twice and must stay identical: `contracts/rerun/src/math.rs` and `packages/shared/src/decimal.ts`.
@@ -30,6 +29,9 @@ RERUN: NEAR Hackathon 2026 entry. The full spec is the human's build plan (`RERU
 - A run that fails first tries `dateInstall` (uv, packages as of the commit date), then AI repair. Running out of tries, or the AI concluding it can't be fixed, is INVALID with ENV_SETUP_FAILED. The AI never decides a verdict. BROKEN only comes from a time limit, or a private-data run failing. An AI with no usable reply, or a failed install, posts no verdict.
 - `glm-5.3-flash` writes its thinking into the answer unless `responseFormat` is set, so every JSON request must pass one (`REPAIR_FORMAT`, `JSON_OBJECT_FORMAT`).
 - The scout's relatability score only orders the review queue, and papers below 4 are skipped. It never touches a verdict, and the safety filters apply whatever the score. Citations (OpenAlex) stand in for public attention unless `ALTMETRIC_KEY` is set.
+- Never run an open claim before its forecasting closes. Only settled showcase claims (`pnpm settle-claim`) may be run early. Before the TEE is live, set lock times between 10am and 6pm Lagos time, grouped so one Lab session covers several claims.
+- A mismatch on an independent rebuild is INVALID with REBUILD_MISMATCH, never NOT_REPRODUCED. A BROKEN market isn't required any more.
+- The product name and logo live only in `packages/shared/src/config.ts`.
 - Repair edits go through `checkEdit` in `lab/orchestrator/src/pipeline/guards.ts`; when loosening it, add a test showing science still cannot change.
 - Private-data claims: nothing derived from the run may reach the LLM, stream, stored logs or receipt tail. `pipeline.test.ts` greps for leaks.
 - Web: `@rerun/shared/browser` is the browser-safe entry point (no `node:crypto`). Design rules ("printed proof"): black stage, white receipt paper, a trace of mint (`--mint`) only for what is live or rising; falling values are grey with an arrow, coral only for real errors. Funnel Display and Funnel Sans, Geist Mono for figures, sentence case. The printed receipt is the one loud element; it slides out of its slot on the home, claim and receipt pages. The human asked for a lively site: the scroll-driven machine on `/how`, the sliding receipts and the paper tape are wanted. Every animation must respect reduced motion.

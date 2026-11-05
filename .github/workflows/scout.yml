@@ -1,0 +1,41 @@
+# Runs the scout agent on a schedule, for free, while the Lab itself runs elsewhere. It only reads
+# public metadata and asks the private AI for drafts. It never runs anyone's code, signs anything or
+# posts anything. Its results are committed to web/public/scout.json, which the website shows.
+#
+# Repository secrets needed: NEARAI_CLOUD_API_KEY. GITHUB_TOKEN is provided by Actions.
+name: Scout
+
+on:
+  schedule:
+    - cron: "17 6,18 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency: scout
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Scan
+        env:
+          NEARAI_CLOUD_API_KEY: ${{ secrets.NEARAI_CLOUD_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SCOUT_STATE_FILE: web/public/scout.json
+        run: pnpm scout
+      - name: Save the log
+        run: |
+          git config user.name "scout agent"
+          git config user.email "scout@users.noreply.github.com"
+          git add web/public/scout.json
+          git diff --cached --quiet || (git commit -m "Scout: update the log" && git push)

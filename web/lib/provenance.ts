@@ -39,6 +39,18 @@ export const ORIGIN_LABEL: Record<CodeOrigin, string> = {
 };
 
 export const PROVENANCE: Record<string, Provenance> = {
+  "53d87974c67eef8008149ef40f0448812042bff87db91a0683551e921a3b2e75": {
+    name: "parkinsons-authors",
+    origin: "authors",
+    paperSays: { quote: "Pearson's r 0.696 (Henderson et al.)", where: "Table 2 of the ReScience C article, which quotes the original paper", href: "https://doi.org/10.1038/s41593-019-0457-5" },
+    whyItMatters: "If the brain's wiring predicts where Parkinson's spreads, it gives researchers a map of what to protect.",
+    notChecked: ["Whether results in mice carry over to people."],
+    why: {
+      heading: "Whose code is this?",
+      text: "Henderson and colleagues' own R code, run on their published data with packages from the date of the code. It's a settled showcase, so there was no forecasting. The same result also came from an independent rebuild (claim 21).",
+      link: { label: "See the code", href: "https://github.com/ejcorn/connectome_diffusion" },
+    },
+  },
   "a942a4e8eee4390f46ae932c48d15ccd0c83ebc0a39eab408c50e054088f6986": {
     name: "wildfire-water",
     origin: "authors",

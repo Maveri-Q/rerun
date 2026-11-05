@@ -14,7 +14,7 @@ const LINKS = [
   { href: "/portfolio", label: "Portfolio" },
   { href: "/leaderboard", label: "Leaderboard" },
   { href: "/lab", label: "The Lab" },
-  { href: "/create", label: "For researchers" },
+  { href: "/create", label: "Suggest a paper" },
 ];
 
 export function Topbar() {
