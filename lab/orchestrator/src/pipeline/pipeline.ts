@@ -16,7 +16,7 @@ import { parseJsonReply, JSON_OBJECT_FORMAT } from "./guards.ts";
 import { ModelUnavailableError, ModelVerificationError, NetworkUnavailableError, type PrivateModel } from "./model.ts";
 import type { PatchKind } from "@rerun/shared";
 import { dateInstall } from "./dateinstall.ts";
-import { proposeAndApplyRepair, type AppliedPatch } from "./repair.ts";
+import { proposeAndApplyRepair, SEARCH_MISSED, type AppliedPatch } from "./repair.ts";
 
 /**
  * One reproduction run (build plan §5.2). The LLM can only repair the environment and point at
@@ -210,6 +210,7 @@ export async function reproduce(input: RunInput, deps: RunDeps): Promise<RunResu
       previous: attempts,
       kept: patches,
       installCommand,
+      missed: [...new Set(rejectedEdits.filter((r) => r.reason.startsWith(SEARCH_MISSED)).map((r) => r.file.replace(/^\.\//, "")))],
     });
     if (result.unusable) unusableReplies++;
     for (const r of result.rejected) {

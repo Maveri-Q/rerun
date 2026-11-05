@@ -125,5 +125,6 @@
         "not_broken"
       ]
     }
-  ]
+  ],
+  "changed_after_results": "The first complete run scored 1 of 4. After seeing that, on 2026-11-05, we changed what the AI is shown: it now gets the exact text of the files it edits, because many of its blocked edits were for text it couldn't see. The safety checks on its edits did not change."
 }

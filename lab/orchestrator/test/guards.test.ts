@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { proposeAndApplyRepair, resolveRepoFile, sourceForRepair } from "../src/pipeline/repair.ts";
 import { checkEdit, parseJsonReply, type RepairEdit } from "../src/pipeline/guards.ts";
 
 const ctx = { dataPaths: ["data/trials.csv"], outputPath: "results.json", privatePath: "private/x.csv", fileExists: true };
@@ -73,5 +74,88 @@ describe("parseJsonReply on real model replies", () => {
 
   it("rejects a reply cut off part way through", () => {
     expect(() => parseJsonReply('{"a":1')).toThrow(/no complete JSON/);
+  });
+});
+
+describe("the code shown to the repair AI", () => {
+  const entrypoint = "cd code && python -c \"import runpy; runpy.run_path('main.py')\"";
+  const store = (files: Record<string, string>) => ({
+    readFile: async (f: string) => (f in files ? Buffer.from(files[f]!) : null),
+  });
+
+  it("finds a traceback's file relative to the folder the entrypoint moved into", () => {
+    expect(resolveRepoFile("main.py", ["code/main.py", "README.md"], entrypoint)).toBe("code/main.py");
+    expect(resolveRepoFile("./main.py", ["main.py"], "python main.py")).toBe("main.py");
+    expect(resolveRepoFile("util.py", ["a/util.py", "b/util.py"], "python x.py")).toBeNull();
+  });
+
+  it("shows a small file whole, as it stands now", async () => {
+    const out = await sourceForRepair({ errorLog: 'File "main.py", line 2, in <module>', sandbox: store({ "code/main.py": "import numpy\nx = np.float(1)\n" }), files: ["code/main.py"], entrypoint });
+    expect(out).toContain("The whole of code/main.py");
+    expect(out).toContain("x = np.float(1)");
+  });
+
+  it("shows a large file only around the error", async () => {
+    const big = Array.from({ length: 4000 }, (_, i) => `value_${i} = ${i}`).join("\n");
+    const out = await sourceForRepair({ errorLog: 'File "/work/repo/big.py", line 2000, in f', sandbox: store({ "big.py": big }), files: ["big.py"], entrypoint: "python big.py" });
+    expect(out).toContain("around line 2000");
+    expect(out).toContain("value_1999");
+    expect(out).not.toContain("value_100 ");
+  });
+
+  it("shows a file an earlier edit missed, even when this error doesn't name it", async () => {
+    const out = await sourceForRepair({ errorLog: "ImportError: nope", sandbox: store({ "code/analysis.py": "a = 1\n" }), files: ["code/analysis.py"], entrypoint, missed: ["code/analysis.py"] });
+    expect(out).toContain("The whole of code/analysis.py");
+  });
+});
+
+describe("repairing with the exact code in view", () => {
+  const run = async (file: string, body: string, edits: Partial<RepairEdit>[]) => {
+    const files = new Map([[file, body]]);
+    let prompt = "";
+    const sandbox = {
+      readFile: async (f: string) => (files.has(f) ? Buffer.from(files.get(f)!) : null),
+      writeFile: async (f: string, b: Buffer) => void files.set(f, b.toString("utf8")),
+      listFiles: async () => [...files.keys()],
+    };
+    const model = {
+      ask: async (_: string, messages: { content: string }[]) => {
+        prompt = messages.at(-1)!.content;
+        return JSON.stringify({ give_up: false, reason: "test", edits: edits.map((e) => ({ file, kind: "ENV", justification: "environment only", ...e })) });
+      },
+    };
+    const result = await proposeAndApplyRepair({
+      model: model as never,
+      sandbox: sandbox as never,
+      phase: "run",
+      errorLog: `File "${file}", line 1, in <module>`,
+      entrypoint: `python ${file}`,
+      setup: [],
+      guard: { dataPaths: [], outputPath: "results.json", privatePath: null } as never,
+      previous: [],
+    });
+    return { result, prompt, text: files.get(file)! };
+  };
+
+  it("still blocks an edit that changes a number, though the AI can see the whole file", async () => {
+    const body = "import numpy as np\nthreshold = 0.5\n";
+    const { result, prompt, text } = await run("glue.py", body, [{ search: "threshold = 0.5", replace: "threshold = 0.9" }]);
+    expect(prompt).toContain("threshold = 0.5");
+    expect(result.applied).toHaveLength(0);
+    expect(result.rejected).toHaveLength(1);
+    expect(text).toBe(body);
+  });
+
+  it("still blocks a hardcoded result", async () => {
+    const body = "import numpy as np\nprint(compute())\n";
+    const { result, text } = await run("glue.py", body, [{ search: "print(compute())", replace: "print(42)" }]);
+    expect(result.applied).toHaveLength(0);
+    expect(text).toBe(body);
+  });
+
+  it("matches an edit spanning two lines in a file with Windows line breaks, and keeps them", async () => {
+    const { result, text } = await run("glue.py", "from foo import a\r\nfrom bar import b\r\nrun()\r\n", [{ search: "from foo import a\nfrom bar import b", replace: "from foo2 import a\nfrom bar import b" }]);
+    expect(result.rejected).toEqual([]);
+    expect(text).toBe("from foo2 import a\r\nfrom bar import b\r\nrun()\r\n");
   });
 });

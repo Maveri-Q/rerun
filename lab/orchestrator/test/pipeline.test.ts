@@ -226,15 +226,14 @@ describe("reproduce: repair loop", () => {
     expect(order.lastIndexOf("pip install -r requirements.txt")).toBeLessThan(order.lastIndexOf("python run.py"));
   });
 
-  it("shows the AI the code around the error, so it can write an exact edit", async () => {
+  it("shows the AI the exact code the error names, so it can write an exact edit", async () => {
     sandbox.files.set("run.py", Buffer.from(Array.from({ length: 30 }, (_, i) => `line_${i + 1}`).join("\n")));
     sandbox.runs = [{ exitCode: 1, log: 'Traceback:\n  File "/work/repo/run.py", line 15, in <module>\nAttributeError: gone' }];
     model.replies.repair = ['{"give_up":true,"reason":"no","edits":[]}'];
     await run();
     const prompt = model.calls.find((c) => c.purpose === "repair")!.text;
-    expect(prompt).toContain("15: line_15");
-    expect(prompt).toContain("7: line_7");
-    expect(prompt).not.toContain("line_30");
+    expect(prompt).toContain("The whole of run.py");
+    expect(prompt).toContain("line_15\nline_16");
   });
 
   it("posts no verdict when the internet keeps failing during setup", async () => {

@@ -126,6 +126,7 @@ export default function LabPage() {
             ? `On our benchmark of real papers, broken on purpose with today's software, the AI fixed ${benchmark.repaired} of ${benchmark.papers_counted}.`
             : `Not proven yet. We only claim this once a benchmark of ${benchmark.target_papers} real papers says so, and ${benchmark.papers_counted} ${benchmark.papers_counted === 1 ? "has" : "have"} been tested so far (${benchmark.repaired} fixed).`}
         </p>
+        <p className="hint">{benchmark.changed_after_results}</p>
         <p className="hint">Before any AI, the Lab installs the software as it was on the date of the code. If it still can&apos;t get the code running, the claim is inconclusive: nobody wins, and everyone gets half back.</p>
       </section>
 

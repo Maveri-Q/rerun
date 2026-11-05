@@ -23,27 +23,54 @@ export const PARSE_RETRIES = 2;
 
 const SOURCE_FILES_SHOWN = 3;
 const SOURCE_LINES_AROUND = 8;
+/** Up to this size the model sees the whole file, so it never has to guess the text of an edit. */
+const WHOLE_FILE_BYTES = 16 * 1024;
+const WHOLE_FILES_TOTAL_BYTES = 32 * 1024;
+
+/** A traceback's path can be relative to the folder the entrypoint moved into. Finds it in the repository. */
+export function resolveRepoFile(name: string, files: string[], entrypoint: string): string | null {
+  const clean = name.replace(/^\.\//, "");
+  if (files.includes(clean)) return clean;
+  const dir = /^\s*cd\s+([^\s&;]+)\s*&&/.exec(entrypoint)?.[1]?.replace(/^\.\//, "").replace(/\/$/, "");
+  if (dir && files.includes(`${dir}/${clean}`)) return `${dir}/${clean}`;
+  const matches = files.filter((f) => f.endsWith(`/${clean}`));
+  return matches.length === 1 ? matches[0]! : null;
+}
 
 /**
- * The code around each line an error names. Without it the model must guess the exact text of an
- * edit in a file it can't see, and spends its whole budget trying. Only runs on the repair path,
- * which private-data claims never take.
+ * The code the model needs to write an edit: the files the error names, closest to the error first,
+ * and any file an earlier edit couldn't be matched in, as they stand now. Small files come whole and
+ * large ones as the lines around the error. Without this the model guesses at text it can't see and
+ * spends its whole budget trying. Only runs on the repair path, which private-data claims never take.
  */
-export async function sourceAroundError(errorLog: string, sandbox: Pick<Sandbox, "readFile">): Promise<string> {
-  const seen = new Set<string>();
-  const parts: string[] = [];
+export async function sourceForRepair(args: { errorLog: string; sandbox: Pick<Sandbox, "readFile">; files: string[]; entrypoint: string; missed?: string[] }): Promise<string> {
+  const { errorLog, sandbox, files, entrypoint, missed = [] } = args;
+  const frames: { file: string; line: number }[] = [];
   for (const m of errorLog.matchAll(/File "(?:\/work\/repo\/|\.\/)?([^"\s]+)", line (\d+)/g)) {
-    const file = m[1]!;
-    const line = Number(m[2]);
-    const key = `${file}:${line}`;
-    if (file.startsWith("/") || seen.has(key) || seen.size >= SOURCE_FILES_SHOWN) continue;
-    seen.add(key);
+    if (m[1]!.startsWith("/")) continue;
+    const file = resolveRepoFile(m[1]!, files, entrypoint);
+    if (file) frames.push({ file, line: Number(m[2]) });
+  }
+  frames.reverse();
+
+  const named = [...new Set([...missed, ...frames.map((f) => f.file)])].slice(0, SOURCE_FILES_SHOWN);
+  const parts: string[] = [];
+  let wholeBytes = 0;
+  for (const file of named) {
     const body = await sandbox.readFile(file, 1024 * 1024).catch(() => null);
     if (!body) continue;
-    const lines = body.toString("utf8").split("\n");
-    const from = Math.max(line - SOURCE_LINES_AROUND - 1, 0);
-    const shown = lines.slice(from, line + SOURCE_LINES_AROUND).map((text, i) => `${from + i + 1}: ${text}`);
-    parts.push(`${file}, around line ${line}:\n${shown.join("\n")}`);
+    const text = body.toString("utf8");
+    if (body.length <= WHOLE_FILE_BYTES && wholeBytes + body.length <= WHOLE_FILES_TOTAL_BYTES) {
+      wholeBytes += body.length;
+      parts.push(`The whole of ${file} as it is now:\n${text}`);
+      continue;
+    }
+    const lines = text.split("\n");
+    for (const { line } of frames.filter((f) => f.file === file).slice(0, SOURCE_FILES_SHOWN)) {
+      const from = Math.max(line - SOURCE_LINES_AROUND - 1, 0);
+      const shown = lines.slice(from, line + SOURCE_LINES_AROUND).map((l, i) => `${from + i + 1}: ${l}`);
+      parts.push(`${file}, around line ${line} (line numbers added, not part of the file):\n${shown.join("\n")}`);
+    }
   }
   return parts.join("\n\n");
 }
@@ -59,6 +86,8 @@ export interface AppliedPatch {
   diff: string;
   justification: string;
 }
+
+export const SEARCH_MISSED = "search text must occur exactly once";
 
 export interface RepairOutcome {
   /** The AI's reply couldn't be used at all, as opposed to a real attempt or a decision to give up. */
@@ -82,11 +111,13 @@ export async function proposeAndApplyRepair(args: {
   kept?: AppliedPatch[];
   /** The command that installs packages now, if an earlier step changed it. */
   installCommand?: string;
+  /** Files where an earlier edit's text wasn't found, so the model sees them whole this time. */
+  missed?: string[];
 }): Promise<RepairOutcome> {
-  const { model, sandbox, phase, errorLog, entrypoint, setup, guard, previous, kept = [], installCommand } = args;
+  const { model, sandbox, phase, errorLog, entrypoint, setup, guard, previous, kept = [], installCommand, missed } = args;
   const dependencyFile = (await sandbox.readFile("requirements.txt", 64 * 1024).catch(() => null))?.toString("utf8") ?? null;
   const files = await sandbox.listFiles(200);
-  const source = await sourceAroundError(errorLog, sandbox);
+  const source = await sourceForRepair({ errorLog, sandbox, files, entrypoint, missed });
   const user = [
     `The ${phase} phase failed.`,
     `Setup commands: ${JSON.stringify(setup)}`,
@@ -97,7 +128,7 @@ export async function proposeAndApplyRepair(args: {
     installCommand ? `Packages are installed with: ${installCommand}` : "",
     dependencyFile !== null ? `requirements.txt exists now, so edit it with a non-empty "search". It contains:\n${dependencyFile}` : "requirements.txt doesn't exist yet.",
     `Error output (last part):\n${errorLog.slice(-6000)}`,
-    source ? `Source code around the error. Copy "search" text exactly from here, without the line numbers:\n${source}` : "",
+    source ? `The code as it stands now, including any fixes already made. Copy "search" character for character from here, and use just enough text, usually one line, to occur only once:\n${source}` : "",
   ]
     .filter(Boolean)
     .join("\n\n");
@@ -148,9 +179,13 @@ async function applyEdit(edit: RepairEdit, sandbox: Sandbox, guard: Omit<GuardCo
   if (edit.search === "") {
     updated = edit.replace;
   } else {
-    const occurrences = current === null ? 0 : current.split(edit.search).length - 1;
-    if (occurrences !== 1) return `search text must occur exactly once in ${file} (found ${occurrences})`;
-    updated = current!.replace(edit.search, () => edit.replace);
+    // The model writes plain line breaks, so a file with Windows ones would never match. The guards have already passed this edit.
+    const windows = current?.includes("\r\n") ?? false;
+    const matchBreaks = (t: string) => (windows ? t.replace(/\r?\n/g, "\r\n") : t);
+    const search = matchBreaks(edit.search);
+    const occurrences = current === null ? 0 : current.split(search).length - 1;
+    if (occurrences !== 1) return `${SEARCH_MISSED} in ${file} (found ${occurrences})`;
+    updated = current!.replace(search, () => matchBreaks(edit.replace));
   }
   await sandbox.writeFile(file, Buffer.from(updated));
 
