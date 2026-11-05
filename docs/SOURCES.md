@@ -29,6 +29,10 @@ Nothing in any author's code is edited. Two claims needed a change to how the co
 
 The posted `parkinsons-spread` claim keeps its launch fix. A later test with no such fix, installing packages as of the commit date instead, gave the same 0.69605.
 
+## The authors' own Parkinson's code
+
+`parkinsons-authors` runs Henderson et al.'s published R code ([ejcorn/connectome_diffusion](https://github.com/ejcorn/connectome_diffusion), MIT). In a local test, with R packages from a dated copy of CRAN (2020-02-28, the commit date) and no AI, it gave 0.69605221. The Python rebuild gives 0.6960522. It isn't posted. Before posting, its `setup` needs replacing, because it's currently `false` to force the date-pinned step.
+
 ## Margins
 
 Each margin was set before any run: 0.0005 for `wildfire-water` and 0.005 for `parkinsons-spread`,

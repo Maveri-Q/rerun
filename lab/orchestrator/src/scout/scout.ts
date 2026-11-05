@@ -25,6 +25,36 @@ export interface Lead {
   repoUrl: string | null;
   /** A journal of replications comes with its data. A preprint might not, so check. */
   needsDataCheck?: boolean;
+  doi?: string;
+  /** A source's own measure of interest, such as Hugging Face upvotes. */
+  upvotes?: number;
+  abstract?: string;
+}
+
+/** How much attention a paper has had, where a free source can say. */
+export interface Attention {
+  source: string;
+  /** Plain words for the review page, such as "302 citations". */
+  label: string;
+  /** Comparable across papers, 0 and up. */
+  value: number;
+}
+
+/** Below this, the scout doesn't suggest a paper at all. */
+export const MIN_RELATABILITY = 4;
+const PREFERRED_TOPICS = new Set(["health", "food", "economics", "ai", "climate", "everyday life"]);
+
+/** The order of the review queue: mostly how much people would care, then topic, then attention. */
+export function interestScore(relatability: number, topic: string, attention?: Attention): number {
+  const fromAttention = attention ? Math.min(Math.log10(1 + attention.value) * 5, 20) : 0;
+  return Math.round(relatability * 10 + (PREFERRED_TOPICS.has(topic) ? 5 : 0) + fromAttention);
+}
+
+const TOPIC_WORDS = /\b(health|disease|cancer|diabet|parkinson|alzheimer|heart|covid|vaccin|drug|patient|sleep|diet|food|nutrition|obes|wage|price|inflation|income|employ|econom|market|tax|poverty|climate|wildfire|weather|emission|pollution|chatbot|language model|gpt|llm|school|student|phone|social media|gender|housing|traffic)/i;
+
+/** A cheap first look at the title, so the small AI budget goes to the likeliest papers first. */
+export function titleInterest(lead: Pick<Lead, "title" | "upvotes">): number {
+  return (TOPIC_WORDS.test(lead.title) ? 100 : 0) + Math.min(lead.upvotes ?? 0, 50);
 }
 
 export type CandidateStatus = "pending" | "rejected" | "retry" | "approved";
@@ -37,6 +67,9 @@ export interface Candidate extends Lead {
   runtime?: string | null;
   draft?: ClaimDraft;
   marketId?: number;
+  attention?: Attention;
+  /** Sorts the review queue, highest first. */
+  interest?: number;
 }
 
 export interface ScoutState {
@@ -51,6 +84,8 @@ export interface ScoutDeps {
   leads: () => Promise<Lead[]>;
   repoFacts: (repoUrl: string) => Promise<RepoFacts>;
   draft: (lead: Lead) => Promise<ClaimDraft>;
+  /** Optional, and never required: a paper with no attention data can still rank highly. */
+  attention?: (lead: Lead) => Promise<Attention | undefined>;
   log?: (message: string) => void;
   now?: () => Date;
 }
@@ -72,6 +107,9 @@ export async function runScout(state: ScoutState, deps: ScoutDeps): Promise<Scou
     if (l.repoUrl) reposSeen.add(l.repoUrl);
     return true;
   });
+  // Papers already through the checks go first, so they aren't checked again and again.
+  const waiting = (l: Lead) => (next.candidates[l.id]?.reasons.some((r) => r.startsWith("Passed the checks")) ? 1000 : 0);
+  fresh.sort((a, b) => waiting(b) + titleInterest(b) - waiting(a) - titleInterest(a));
   log(`scout: ${leads.length} leads, ${fresh.length} not checked yet`);
 
   let draftsThisScan = 0;
@@ -119,7 +157,12 @@ export async function runScout(state: ScoutState, deps: ScoutDeps): Promise<Scou
       record("rejected", [...checked.reasons, "The AI couldn't find one clear number to check, and how to produce it."], { license: facts.license, runtime: checked.runtime });
       continue;
     }
-    record("pending", checked.reasons, { license: facts.license, runtime: checked.runtime, draft: withScoutNote(draft) });
+    if (draft.relatability < MIN_RELATABILITY) {
+      record("rejected", [`Relatability ${draft.relatability} of 10, below our limit of ${MIN_RELATABILITY}: ${draft.relatability_why}`], { license: facts.license, runtime: checked.runtime });
+      continue;
+    }
+    const attention = await deps.attention?.(lead).catch(() => undefined);
+    record("pending", checked.reasons, { license: facts.license, runtime: checked.runtime, draft: withScoutNote(draft), attention, interest: interestScore(draft.relatability, draft.topic, attention) });
   }
   return next;
 }
@@ -174,7 +217,7 @@ export async function reScienceLeads(limit: number): Promise<Lead[]> {
   for (const name of newest) {
     const yaml = await raw(`https://raw.githubusercontent.com/ReScience/articles/master/${name}/article.yaml`);
     const { title, repoUrl } = parseArticleYaml(yaml);
-    if (title) leads.push({ id: `rescience:${name}`, source: "ReScience C", title, paperUrl: `https://doi.org/${name.replace("_", "/")}`, repoUrl });
+    if (title) leads.push({ id: `rescience:${name}`, source: "ReScience C", title, paperUrl: `https://doi.org/${name.replace("_", "/")}`, doi: name.replace("_", "/"), repoUrl });
   }
   return leads;
 }
@@ -186,12 +229,37 @@ export async function reScienceLeads(limit: number): Promise<Lead[]> {
 export async function huggingFaceLeads(limit: number): Promise<Lead[]> {
   const res = await withNetworkRetry(() => fetch(`https://huggingface.co/api/daily_papers?limit=${limit}`, { headers: { "user-agent": "rerun-scout" } }));
   if (!res.ok) throw new Error(`Hugging Face answered ${res.status}`);
-  const items = (await res.json()) as { title?: string; paper?: { id?: string; title?: string; githubRepo?: string | null } }[];
+  const items = (await res.json()) as { title?: string; paper?: { id?: string; title?: string; githubRepo?: string | null; upvotes?: number; summary?: string }; summary?: string }[];
   return items.flatMap((item) => {
     const repoUrl = item.paper?.githubRepo ? repoRoot(item.paper.githubRepo) : null;
     if (!repoUrl || !item.paper?.id) return [];
-    return [{ id: `arxiv:${item.paper.id}`, source: "Hugging Face Papers", title: item.paper.title ?? item.title ?? item.paper.id, paperUrl: `https://arxiv.org/abs/${item.paper.id}`, repoUrl, needsDataCheck: true }];
+    return [{ id: `arxiv:${item.paper.id}`, source: "Hugging Face Papers", title: item.paper.title ?? item.title ?? item.paper.id, paperUrl: `https://arxiv.org/abs/${item.paper.id}`, doi: `10.48550/arXiv.${item.paper.id}`, upvotes: item.paper.upvotes, abstract: item.paper.summary ?? item.summary, repoUrl, needsDataCheck: true }];
   });
+}
+
+/**
+ * Attention, best source first. Altmetric counts news and social mentions, but has needed a key since
+ * November 2025, so it's only used if ALTMETRIC_KEY is set. OpenAlex is free, but counts citations,
+ * which show interest among researchers rather than the public.
+ */
+export async function paperAttention(lead: Lead): Promise<Attention | undefined> {
+  const key = process.env.ALTMETRIC_KEY;
+  if (key && lead.doi) {
+    const res = await fetch(`https://api.altmetric.com/v1/doi/${lead.doi}?key=${encodeURIComponent(key)}`).catch(() => null);
+    if (res?.ok) {
+      const d = (await res.json()) as { score?: number; cited_by_msm_count?: number };
+      return { source: "Altmetric", label: `${d.cited_by_msm_count ?? 0} news stories, attention score ${Math.round(d.score ?? 0)}`, value: d.score ?? 0 };
+    }
+  }
+  if (lead.doi) {
+    const res = await fetch(`https://api.openalex.org/works/https://doi.org/${lead.doi}`, { headers: { "user-agent": "rerun-scout" } }).catch(() => null);
+    if (res?.ok) {
+      const d = (await res.json()) as { cited_by_count?: number };
+      if (d.cited_by_count) return { source: "OpenAlex", label: `${d.cited_by_count} citations`, value: d.cited_by_count };
+    }
+  }
+  if (lead.upvotes) return { source: "Hugging Face", label: `${lead.upvotes} upvotes`, value: lead.upvotes };
+  return undefined;
 }
 
 export const allLeads = async (): Promise<Lead[]> => {
@@ -214,7 +282,7 @@ export async function githubRepoFacts(repoUrl: string): Promise<RepoFacts> {
 }
 
 export function draftWithModel(model: PrivateModel) {
-  return (lead: Lead) => draftClaim(lead.repoUrl!, lead.paperUrl, model);
+  return (lead: Lead) => draftClaim(lead.repoUrl!, lead.paperUrl, model, lead.abstract);
 }
 
 /* Saved state */

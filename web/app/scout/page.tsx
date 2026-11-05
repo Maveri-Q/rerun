@@ -18,7 +18,7 @@ function buildSpec(c: ScoutCandidate, margin: string) {
   const d = c.draft!;
   return ClaimSpec.safeParse({
     version: 1,
-    title: d.title,
+    title: (d.question || d.title).slice(0, 120),
     statement: d.statement,
     source: { type: "paper", url: c.paperUrl, license: c.license ?? d.license, authors: d.authors || "See the paper" },
     artifact: {
@@ -80,7 +80,11 @@ function Suggestion({ c, isOwner, onDone }: { c: ScoutCandidate; isOwner: boolea
         <b>{c.source}</b>
         <span>{c.runtime === "r4.4" ? "R" : "Python"}</span>
       </div>
-      <h3>{d.title}</h3>
+      <h3>{d.question || d.title}</h3>
+      <p className="suggestion-score">
+        <b>{d.relatability} of 10</b> for relatability, {d.topic}. {d.relatability_why}
+        {c.attention && ` ${c.attention.label} (${c.attention.source}).`}
+      </p>
       <p>{d.statement}</p>
       <dl className="receipt-lines">
         <div>
@@ -137,7 +141,7 @@ export default function ScoutPage() {
   const scout = usePoll(() => lab.scout(), [], 30_000);
   const config = usePoll(() => chain.config(), []);
   const all = scout.data ? Object.values(scout.data.candidates) : [];
-  const pending = all.filter((c) => c.status === "pending" && c.draft);
+  const pending = all.filter((c) => c.status === "pending" && c.draft).sort((a, b) => (b.interest ?? 0) - (a.interest ?? 0));
   const turnedDown = all.filter((c) => c.status === "rejected");
   const approved = all.filter((c) => c.status === "approved");
   const isOwner = Boolean(wallet.accountId && wallet.accountId === config.data?.owner);

@@ -7,7 +7,7 @@ import path from "node:path";
 import { loadEnv } from "../src/env.ts";
 import { LlmClient, llmConfigFromEnv } from "../src/nearai/client.ts";
 import { NearAiModel } from "../src/pipeline/model.ts";
-import { allLeads, draftWithModel, githubRepoFacts, loadScoutState, runScout, saveScoutState } from "../src/scout/scout.ts";
+import { allLeads, draftWithModel, githubRepoFacts, loadScoutState, paperAttention, runScout, saveScoutState } from "../src/scout/scout.ts";
 
 loadEnv();
 
@@ -22,6 +22,7 @@ const state = await runScout(loadScoutState(DATA_DIR), {
   leads: allLeads,
   repoFacts: githubRepoFacts,
   draft: draftWithModel(model),
+  attention: paperAttention,
   log: (m) => console.log(m),
 });
 saveScoutState(DATA_DIR, state);

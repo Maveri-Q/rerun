@@ -85,7 +85,13 @@ export interface ScoutCandidate {
   license?: string | null;
   runtime?: string | null;
   marketId?: number;
+  attention?: { source: string; label: string; value: number };
+  interest?: number;
   draft?: {
+    question: string;
+    topic: string;
+    relatability: number;
+    relatability_why: string;
     repo_url: string;
     commit: string;
     title: string;

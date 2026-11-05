@@ -9,7 +9,7 @@ import { demoForSpec } from "../src/demo/fixtures.ts";
 import { labPublicUrl, need, testnetChain, testnetWorker } from "../src/lab/setup.ts";
 import { startLabServer } from "../src/lab/server.ts";
 import { createQueue, EventHub, LabResolver, saveAttestation } from "../src/lab/store.ts";
-import { allLeads, draftWithModel, githubRepoFacts, loadScoutState, runScout, saveScoutState } from "../src/scout/scout.ts";
+import { allLeads, draftWithModel, githubRepoFacts, loadScoutState, paperAttention, runScout, saveScoutState } from "../src/scout/scout.ts";
 
 const POLL_MS = 5_000;
 const ATTEST_EVERY_MS = 6 * 3600_000;
@@ -73,7 +73,7 @@ setInterval(() => attestNow().catch((e: Error) => console.error(`attestation fai
 async function scoutNow() {
   const llm = new LlmClient(llmConfigFromEnv());
   llm.newRun();
-  const state = await runScout(loadScoutState(DATA_DIR), { leads: allLeads, repoFacts: githubRepoFacts, draft: draftWithModel(new NearAiModel(llm, modelId)), log: (m) => console.log(m) });
+  const state = await runScout(loadScoutState(DATA_DIR), { leads: allLeads, repoFacts: githubRepoFacts, draft: draftWithModel(new NearAiModel(llm, modelId)), attention: paperAttention, log: (m) => console.log(m) });
   saveScoutState(DATA_DIR, state);
 }
 scoutNow().catch((e: Error) => console.error(`scout failed: ${e.message}`));

@@ -2986,3 +2986,11 @@ a {
   padding: 6px 0;
   overflow-wrap: anywhere;
 }
+
+.suggestion .suggestion-score {
+  font-size: 14px;
+}
+
+.suggestion-score b {
+  color: var(--paper-ink);
+}

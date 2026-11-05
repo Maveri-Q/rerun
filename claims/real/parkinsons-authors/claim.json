@@ -1,5 +1,12 @@
 {
   "expected": "REPRODUCED",
+  "human_patches": [
+    {
+      "file": "entrypoint",
+      "kind": "ENV",
+      "why": "Sets the script's folder settings and runs only the steps behind this number. The other steps, including the MATLAB side analysis, aren't part of it."
+    }
+  ],
   "spec": {
     "version": 1,
     "title": "A brain-wiring model predicts how Parkinson's-linked protein spreads in mice, r = 0.696",
@@ -16,20 +23,32 @@
       "commit": "b967d0851f66073a0bfe25d39374466639b9685f",
       "data": [],
       "runtime": "r4.4",
-      "setup": ["false"],
+      "setup": [
+        "false"
+      ],
       "entrypoint": "Rscript --vanilla -e \"params<-list(basedir='./',opdir='out/',grps='NTG');source('code/packages.R');source('code/process/process_pathconn.R');source('code/process/getLout.R');grp<-'NTG';source('code/diffmodel/analyzespread.R');cat('r3',format(r.SC[2],digits=8),'\\n')\" > rerun_output.txt",
       "output": {
         "path": "rerun_output.txt",
-        "extractor": { "type": "regex", "expr": "r3 ([0-9.]+)" }
+        "extractor": {
+          "type": "regex",
+          "expr": "r3 ([0-9.]+)"
+        }
       }
     },
     "metric": {
       "name": "correlation between predicted and measured pathology at 3 months",
       "reported_value": "0.696",
-      "tolerance": { "type": "abs", "value": "0.005" },
+      "tolerance": {
+        "type": "abs",
+        "value": "0.005"
+      },
       "comparison": "within_tolerance"
     },
-    "resources": { "cpu": 2, "mem_gb": 4, "max_minutes": 15 },
+    "resources": {
+      "cpu": 2,
+      "mem_gb": 4,
+      "max_minutes": 15
+    },
     "private_data": null
   }
 }

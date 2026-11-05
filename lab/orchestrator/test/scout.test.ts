@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
-import type { ClaimDraft } from "../src/lab/draft.ts";
+import { articleFile, type ClaimDraft } from "../src/lab/draft.ts";
 import { checkRepo, hasDataInRepo, isClearNumber, type RepoFacts } from "../src/scout/filters.ts";
-import { emptyState, LIMITS, parseArticleYaml, repoRoot, runScout, SUGGESTED_BY, type Lead } from "../src/scout/scout.ts";
+import { emptyState, interestScore, LIMITS, parseArticleYaml, repoRoot, runScout, SUGGESTED_BY, type Lead } from "../src/scout/scout.ts";
 
 const facts = (over: Partial<RepoFacts> = {}): RepoFacts => ({ license: "MIT", languages: { Python: 9000, Shell: 100 }, sizeKb: 2000, archived: false, files: ["run.py"], dependencyText: "numpy\npandas", ...over });
 
-const draft = (over: Partial<ClaimDraft> = {}): ClaimDraft => ({ repo_url: "https://github.com/a/b", commit: "c".repeat(40), title: "T", statement: "S", authors: "A", license: "MIT", runtime: "python3.11", setup: [], entrypoint: "python run.py", output_path: "out.json", extractor_type: "jsonpath", extractor_expr: "$.x", metric_name: "m", reported_value: "0.9", notes: "", ...over });
+const draft = (over: Partial<ClaimDraft> = {}): ClaimDraft => ({ question: "Does it hold up?", topic: "health", relatability: 7, relatability_why: "It affects people's health.",  repo_url: "https://github.com/a/b", commit: "c".repeat(40), title: "T", statement: "S", authors: "A", license: "MIT", runtime: "python3.11", setup: [], entrypoint: "python run.py", output_path: "out.json", extractor_type: "jsonpath", extractor_expr: "$.x", metric_name: "m", reported_value: "0.9", notes: "", ...over });
 
 const lead = (n: number, repoUrl: string | null = `https://github.com/a/r${n}`): Lead => ({ id: `x:${n}`, source: "test", title: `Paper ${n}`, paperUrl: "https://doi.org/1", repoUrl });
 
@@ -52,6 +52,12 @@ describe("scout filters", () => {
   it("finds data in a repository, but not in config files", () => {
     expect(hasDataInRepo(["run.py", "data/trials.csv"])).toBe(true);
     expect(hasDataInRepo(["run.py", "package.json", "codemeta.json"])).toBe(false);
+  });
+
+  it("finds the paper's own text in a repository", () => {
+    expect(articleFile(["README.md", "article/content.tex", "article/article.tex"])).toBe("article/content.tex");
+    expect(articleFile(["paper.md"])).toBe("paper.md");
+    expect(articleFile(["run.py"])).toBeUndefined();
   });
 
   it("doesn't confuse a word containing torch with the package", () => {
@@ -148,6 +154,44 @@ describe("a scan", () => {
     expect(s.candidates["x:1"]!.reasons.join(" ")).toMatch(/dataset/);
     const ok = await runScout(emptyState(), deps([preprint], { repoFacts: async () => facts({ files: ["run.py", "data/x.csv"] }) }));
     expect(ok.candidates["x:1"]!.status).toBe("pending");
+  });
+
+  it("skips anything below 4 for relatability, and says why", async () => {
+    const s = await runScout(emptyState(), deps([lead(1)], { draft: async () => draft({ relatability: 3, relatability_why: "Only for specialists." }) }));
+    expect(s.candidates["x:1"]!.status).toBe("rejected");
+    expect(s.candidates["x:1"]!.reasons.join(" ")).toMatch(/Relatability 3 of 10.*Only for specialists/);
+  });
+
+  it("keeps a paper scoring exactly 4", async () => {
+    const s = await runScout(emptyState(), deps([lead(1)], { draft: async () => draft({ relatability: 4 }) }));
+    expect(s.candidates["x:1"]!.status).toBe("pending");
+  });
+
+  it("the safety filters still apply, however relatable a paper is", async () => {
+    const s = await runScout(emptyState(), deps([lead(1)], { repoFacts: async () => facts({ license: null }), draft: async () => draft({ relatability: 10 }) }));
+    expect(s.candidates["x:1"]!.status).toBe("rejected");
+  });
+
+  it("ranks by how much people would care, then topic, then attention", () => {
+    expect(interestScore(8, "other")).toBeGreaterThan(interestScore(7, "health"));
+    expect(interestScore(7, "health")).toBeGreaterThan(interestScore(7, "other"));
+    const cited = { source: "OpenAlex", label: "1000 citations", value: 1000 };
+    expect(interestScore(5, "other", cited)).toBeGreaterThan(interestScore(5, "other"));
+    // Fame alone can't lift a paper past one people care more about.
+    expect(interestScore(5, "other", { ...cited, value: 1e9 })).toBeLessThan(interestScore(8, "health"));
+  });
+
+  it("carries on when attention data isn't available", async () => {
+    const s = await runScout(emptyState(), deps([lead(1)], { attention: async () => { throw new Error("down"); } }));
+    expect(s.candidates["x:1"]!.status).toBe("pending");
+    expect(s.candidates["x:1"]!.interest).toBeGreaterThan(0);
+  });
+
+  it("spends the AI budget on the likeliest topics first", async () => {
+    const titled = [{ ...lead(1), title: "Graph ordering in C" }, { ...lead(2), title: "Sleep and heart disease" }, { ...lead(3), title: "Inflation and wages" }];
+    const drafted: string[] = [];
+    await runScout(emptyState(), deps(titled, { draft: async (l: Lead) => (drafted.push(l.title), draft()) }));
+    expect(drafted).toEqual(["Sleep and heart disease", "Inflation and wages"]);
   });
 
   it("doesn't check a paper twice", async () => {
