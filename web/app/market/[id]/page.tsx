@@ -63,7 +63,7 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
   };
 
   if (market.error && !market.data) return <p className="notice notice--error">The chain did not answer: {market.error}. This page retries by itself.</p>;
-  if (market.loading && market.data === undefined) return <p className="empty dim">Loading this claim…</p>;
+  if (market.loading && market.data === undefined) return <p className="empty dim">Reading this claim from the blockchain…</p>;
   if (!market.data) {
     return (
       <p className="empty">
@@ -176,7 +176,7 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
         </section>
 
         <section className="section">
-          {history.data ? <OddsChart points={history.data} /> : <p className="empty dim">Loading the price history…</p>}
+          {history.data ? <OddsChart points={history.data} /> : <p className="empty dim">Reading how the odds moved…</p>}
         </section>
 
         <section className="section">
@@ -273,7 +273,7 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
               <dd className="mono">{s.spec_hash}</dd>
             </dl>
           ) : (
-            <p className="dim">Loading the claim…</p>
+            <p className="dim">Reading the claim as it was stored…</p>
           )}
           <details style={{ marginTop: 12 }}>
             <summary>Show the claim exactly as stored on the blockchain</summary>

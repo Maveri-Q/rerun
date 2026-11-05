@@ -148,7 +148,7 @@ export default function Home() {
           </div>
         </div>
         {markets.error && !markets.data && <p className="notice notice--error">Unable to load claims from the blockchain. This page keeps trying.</p>}
-        {markets.loading && !markets.data && <p className="empty">Loading claims…</p>}
+        {markets.loading && !markets.data && <p className="empty">Reading the open claims from the blockchain…</p>}
         {markets.data && shown.length === 0 && (
           <p className="empty">
             No claims match this filter. <Link href="/create">Open the first one</Link>.

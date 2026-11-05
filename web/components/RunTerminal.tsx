@@ -8,7 +8,7 @@ const STAGE_LABEL: Record<string, string> = {
   fetching: "downloading",
   verifying_hashes: "checking data",
   installing: "setting up",
-  decrypting: "unlocking",
+  decrypting: "opening the sealed data",
   running: "running",
   repairing: "fixing setup",
   extracting: "reading result",

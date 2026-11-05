@@ -80,12 +80,13 @@ export function EvidenceLadder({ receipt, reportHash }: { receipt: Receipt; repo
           <p>{outcomeMeaning(receipt.outcome)}</p>
         </Rung>
         <Rung step={2} title="Stress test: does the number depend on luck?" level={robust === "stable" ? "strong" : robust === "sensitive" ? "warning" : "none"}>
-          {loading && !data ? <p>Loading…</p> : <Stress evidence={evidence} />}
+          {loading && !data ? <p>Fetching the extra runs…</p> : <Stress evidence={evidence} />}
         </Rung>
         <Rung step={3} title="Rebuilt from the description (experimental)" level={rebuilt === "agrees" ? "strong" : rebuilt === "differs" ? "warning" : "none"}>
-          {loading && !data ? <p>Loading…</p> : <Rebuild evidence={evidence} />}
+          {loading && !data ? <p>Fetching the AI&apos;s rebuild…</p> : <Rebuild evidence={evidence} />}
         </Rung>
       </ol>
+      <p className="hint">Coming next: a data-leakage check, for the same rows in training and test data, and a maths check on the statistics a paper reports. Neither has run on this claim.</p>
       <p className="hint">Even all three steps can&apos;t prove the science is true. They show how well this result stands up to checking.</p>
     </section>
   );

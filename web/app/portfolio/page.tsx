@@ -103,7 +103,7 @@ export default function PortfolioPage() {
           <h2>Your forecasts</h2>
         </div>
         {data.error && !d && <p className="notice notice--error">Unable to load your forecasts. This page keeps trying.</p>}
-        {data.loading && !d && <p className="dim">Loading your forecasts…</p>}
+        {data.loading && !d && <p className="dim">Finding your forecasts on the blockchain…</p>}
         {d && d.rows.length === 0 && (
           <p className="empty">
             You have no forecasts yet. <Link href="/">Pick a claim</Link> and make your first one.

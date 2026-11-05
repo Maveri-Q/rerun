@@ -28,7 +28,7 @@ export default function LeaderboardPage() {
       <p className="lede">Everyone starts with 1,000 free points. Points can&apos;t be bought or transferred, so the only way up this list is forecasting well.</p>
 
       {board.error && !board.data && <p className="notice notice--error">Unable to load the leaderboard. This page keeps trying.</p>}
-      {board.loading && !board.data && <p className="empty">Loading the leaderboard…</p>}
+      {board.loading && !board.data && <p className="empty">Adding up everyone&apos;s points…</p>}
       {board.data && rows.length === 0 && <p className="empty">Nobody has claimed points yet. Open any claim that uses points to be first.</p>}
 
       {top.length > 0 && (

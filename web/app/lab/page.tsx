@@ -160,7 +160,7 @@ export default function LabPage() {
             </div>
           </>
         ) : (
-          <p className="empty">Loading…</p>
+          <p className="empty">Asking the Lab what it&apos;s working on…</p>
         )}
         <p className="hint" style={{ marginTop: 20 }}>The Lab&apos;s accuracy on papers with known answers hasn&apos;t been measured yet. So far these are demo claims.</p>
       </section>
@@ -182,7 +182,7 @@ export default function LabPage() {
             ))}
           </div>
         ) : (
-          !attestation.data?.mock && <p className="dim">{attestation.loading ? "Loading…" : "The Lab's proof isn't available right now. The check-it-yourself steps below still work."}</p>
+          !attestation.data?.mock && <p className="dim">{attestation.loading ? "Fetching the Lab's proof…" : "The Lab's proof isn't available right now. The check-it-yourself steps below still work."}</p>
         )}
       </section>
 
