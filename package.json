@@ -20,6 +20,7 @@
     "seed": "pnpm --filter @rerun/scripts seed",
     "post-real": "pnpm --filter @rerun/scripts post-real",
     "scout": "pnpm --filter @rerun/orchestrator scout",
+    "repair-benchmark": "pnpm --filter @rerun/orchestrator repair-benchmark",
     "challenge-demo": "pnpm --filter @rerun/scripts challenge-demo",
     "attack-demo": "pnpm --filter @rerun/scripts attack-demo",
     "judge-demo": "pnpm --filter @rerun/scripts judge-demo",

@@ -6,6 +6,7 @@ import { usePoll } from "@/components/usePoll";
 import { chain } from "@/lib/chain";
 import { accountLink } from "@/lib/config";
 import { lab, type QuoteVerification } from "@/lib/lab";
+import benchmark from "@/lib/repair-benchmark.json";
 import { relativeTime } from "@/lib/market";
 
 const CODE = ["model = LogisticRegression()", "X, y = load_trials(path)", "train, test = split(X, y)", "model.fit(train)", "score = model.score(test)", "print(score)", "# no changes to the method", "# reading the final number"];
@@ -114,6 +115,18 @@ export default function LabPage() {
             ))}
           </ul>
         </div>
+      </section>
+
+      <section className="section">
+        <div className="section-head">
+          <h2 className="big-head">Can the AI repair old code?</h2>
+        </div>
+        <p className="lede">
+          {benchmark.complete
+            ? `On our benchmark of real papers, broken on purpose with today's software, the AI fixed ${benchmark.repaired} of ${benchmark.papers_counted}.`
+            : `Not proven yet. We only claim this once a benchmark of ${benchmark.target_papers} real papers says so, and ${benchmark.papers_counted} ${benchmark.papers_counted === 1 ? "has" : "have"} been tested so far (${benchmark.repaired} fixed).`}
+        </p>
+        <p className="hint">Before any AI, the Lab installs the software as it was on the date of the code. If it still can&apos;t get the code running, the claim is inconclusive: nobody wins, and everyone gets half back.</p>
       </section>
 
       <section className="section">

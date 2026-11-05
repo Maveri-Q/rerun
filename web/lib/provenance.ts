@@ -35,7 +35,7 @@ export const PROVENANCE: Record<string, Provenance> = {
     origin: "rebuild",
     why: {
       heading: "Why not the authors' own code?",
-      text: "It wasn't missing. Henderson and colleagues published their code openly, in R and MATLAB, under an MIT licence. This claim runs a separate Python rebuild, written by other researchers and published in a peer-reviewed journal, because we chose it before checking the original closely. We have since read the original: MATLAB is only used for a side analysis, not this number, so the authors' R code looks runnable. We haven't run it yet.",
+      text: "It wasn't missing. Henderson and colleagues published their code openly, in R and MATLAB, under an MIT licence. This claim runs a separate Python rebuild, written by other researchers and published in a peer-reviewed journal, because we chose it before checking the original closely. We have since read the original: MATLAB is only used for a side analysis, not this number, so the authors' R code looks runnable. We haven't run it yet. The rebuild itself runs with no AI and no code changes once its packages are installed as they were on the date of its code.",
       link: { label: "See the authors' code", href: "https://github.com/ejcorn/connectome_diffusion" },
     },
   },

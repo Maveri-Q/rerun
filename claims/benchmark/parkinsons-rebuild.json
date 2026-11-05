@@ -1,0 +1,12 @@
+{
+  "title": "Parkinson's protein spread rebuild (Bourdenx and Paul, ReScience C)",
+  "paper": "https://doi.org/10.5281/zenodo.5379631",
+  "repo_url": "https://github.com/MathieuBo/PathoSpreading",
+  "commit": "3031496c581800ebec3fb892f6dd05936e341dcb",
+  "license": "MIT",
+  "runtime": "python3.11",
+  "packages": ["numpy", "pandas", "scipy", "statsmodels", "matplotlib", "seaborn", "tqdm"],
+  "entrypoint": "python -c \"import runpy, Robustness_Stability as R; R.random_robustness = lambda *a, **k: None; runpy.run_path('Pipeline.py', run_name='__main__')\" > rerun_output.txt",
+  "output_path": "rerun_output.txt",
+  "extractor": "Month Post Injection 3\\s[\\s\\S]*?Pearson correlation coefficient ([0-9.]+)"
+}

@@ -10,6 +10,7 @@
     "lab:run": "tsx scripts/run-claim.ts",
     "lab:watch": "tsx scripts/watch.ts",
     "scout": "tsx scripts/scout.ts",
+    "repair-benchmark": "tsx scripts/repair-benchmark.ts",
     "export:vectors": "tsx scripts/export-vectors.ts"
   },
   "dependencies": {

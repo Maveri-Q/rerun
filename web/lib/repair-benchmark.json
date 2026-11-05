@@ -1,0 +1,23 @@
+{
+  "generated_at": "2026-11-05T07:15:23.312Z",
+  "model": "z-ai/glm-5.3-flash",
+  "max_attempts": 6,
+  "target_papers": 8,
+  "papers_counted": 1,
+  "repaired": 0,
+  "complete": false,
+  "rows": [
+    {
+      "name": "parkinsons-rebuild",
+      "title": "Parkinson's protein spread rebuild (Bourdenx and Paul, ReScience C)",
+      "paper": "https://doi.org/10.5281/zenodo.5379631",
+      "result": "failed",
+      "baseline": "0.6960522094835953",
+      "measured": null,
+      "ai_patches": 2,
+      "blocked_edits": 0,
+      "cost_usd": 0.02440192,
+      "detail": "INVALID (ENV_SETUP_FAILED), measured nothing."
+    }
+  ]
+}
