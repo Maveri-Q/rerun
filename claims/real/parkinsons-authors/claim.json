@@ -1,0 +1,35 @@
+{
+  "expected": "REPRODUCED",
+  "spec": {
+    "version": 1,
+    "title": "A brain-wiring model predicts how Parkinson's-linked protein spreads in mice, r = 0.696",
+    "statement": "Henderson et al. (Nature Neuroscience, 2019) modelled how alpha-synuclein, the protein linked to Parkinson's disease, spreads along the mouse brain's wiring. They report that the model's predictions match lab measurements with a correlation of 0.696 at 3 months. This re-runs the authors' own R code on their published data. The paper's MATLAB side analysis isn't part of this number and isn't run.",
+    "source": {
+      "type": "paper",
+      "url": "https://doi.org/10.1038/s41593-019-0457-5",
+      "doi": "10.1038/s41593-019-0457-5",
+      "license": "MIT",
+      "authors": "M. X. Henderson, E. J. Cornblath, et al."
+    },
+    "artifact": {
+      "repo_url": "https://github.com/ejcorn/connectome_diffusion",
+      "commit": "b967d0851f66073a0bfe25d39374466639b9685f",
+      "data": [],
+      "runtime": "r4.4",
+      "setup": [],
+      "entrypoint": "Rscript --vanilla -e \"params<-list(basedir='./',opdir='out/',grps='NTG');source('code/packages.R');source('code/process/process_pathconn.R');source('code/process/getLout.R');grp<-'NTG';source('code/diffmodel/analyzespread.R');cat('r3',format(r.SC[2],digits=8),'\\n')\" > rerun_output.txt",
+      "output": {
+        "path": "rerun_output.txt",
+        "extractor": { "type": "regex", "expr": "r3 ([0-9.]+)" }
+      }
+    },
+    "metric": {
+      "name": "correlation between predicted and measured pathology at 3 months",
+      "reported_value": "0.696",
+      "tolerance": { "type": "abs", "value": "0.005" },
+      "comparison": "within_tolerance"
+    },
+    "resources": { "cpu": 2, "mem_gb": 4, "max_minutes": 15 },
+    "private_data": null
+  }
+}

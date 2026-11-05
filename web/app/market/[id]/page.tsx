@@ -16,6 +16,7 @@ import { VerifiedPanel } from "@/components/VerifiedPanel";
 import { chain } from "@/lib/chain";
 import { accountLink, CONTRACT } from "@/lib/config";
 import { useRunStream } from "@/lib/lab";
+import { ORIGIN_LABEL, provenanceOf } from "@/lib/provenance";
 import { fmtUnits, modeUnit, outcomeMeaning, rangeText, relativeTime, stateLabel, toleranceText, type State } from "@/lib/market";
 import { useWallet } from "@/lib/wallet";
 
@@ -63,6 +64,7 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
 
   const m = market.data;
   const s = m.spec;
+  const origin = provenanceOf(s.spec_hash);
   const unit = modeUnit(m.mode);
   const trading = m.state === "Open" && Date.now() / 1000 < m.lock_time;
   const latestReceipt = receipts.data?.at(-1);
@@ -74,7 +76,21 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
       <div>
         <span className="page-no">Claim {m.id}</span>
         <h1 className="market-title">{s.title.replace(/^\[DEMO\]\s*/, "")}</h1>
+        {origin && (
+          <p className="origin-chips">
+            {origin.flagship && <span className="chip chip--REPRODUCED">Flagship claim</span>}
+            <span className={`chip origin-chip--${origin.origin}`}>{ORIGIN_LABEL[origin.origin]}</span>
+          </p>
+        )}
         <p className="statement">{spec?.statement.replace(/^DEMO FIXTURE,\s*/i, "A demo, ")}</p>
+        {origin && (
+          <div className="origin">
+            <h2>{origin.why.heading}</h2>
+            <p>{origin.why.text}</p>
+            {origin.why.link && <a href={origin.why.link.href}>{origin.why.link.label}</a>}
+          </div>
+        )}
+        <p className="hint scope-note">RERUN checks whether the published numbers can be reproduced from the code and data. It does not judge whether the science is correct.</p>
 
         <div className="claim-figure">
           <span className="claim-value">{s.reported_value}</span>

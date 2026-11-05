@@ -2,8 +2,8 @@
   "expected": "REPRODUCED",
   "spec": {
     "version": 1,
-    "title": "A brain-wiring model predicts how Parkinson's-linked protein spreads in mice, r = 0.696",
-    "statement": "Henderson et al. (Nature Neuroscience, 2019) modelled how alpha-synuclein, the protein linked to Parkinson's disease, spreads along the mouse brain's wiring. They report that the model's predictions match lab measurements with a correlation of 0.696 at 3 months. This re-runs an independent Python replication by Bourdenx and Paul, published in ReScience C, on the study's data.",
+    "title": "Independent rebuild: brain-wiring model predicts spread of Parkinson's-linked protein in mice, r = 0.696",
+    "statement": "Henderson et al. (Nature Neuroscience, 2019) modelled how alpha-synuclein, the protein linked to Parkinson's disease, spreads along the mouse brain's wiring. They report that the model's predictions match lab measurements with a correlation of 0.696 at 3 months. This re-runs an independent Python rebuild by Bourdenx and Paul (ReScience C) on the study's data. It is not the authors' own R and MATLAB code, which is also public.",
     "source": {
       "type": "paper",
       "url": "https://doi.org/10.5281/zenodo.5379631",

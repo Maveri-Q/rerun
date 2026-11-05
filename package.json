@@ -18,6 +18,7 @@
     "deploy:testnet": "pnpm --filter @rerun/scripts deploy:testnet",
     "demo": "pnpm --filter @rerun/scripts demo",
     "seed": "pnpm --filter @rerun/scripts seed",
+    "post-real": "pnpm --filter @rerun/scripts post-real",
     "challenge-demo": "pnpm --filter @rerun/scripts challenge-demo",
     "attack-demo": "pnpm --filter @rerun/scripts attack-demo",
     "judge-demo": "pnpm --filter @rerun/scripts judge-demo",

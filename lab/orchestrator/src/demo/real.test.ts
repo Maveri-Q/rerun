@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { specHash } from "@rerun/shared";
 import { extractMetric } from "../pipeline/extract.ts";
+import { PROVENANCE } from "../../../../web/lib/provenance.ts";
 import { loadReal, REAL_NAMES } from "./real.ts";
 
 describe("real claims", () => {
@@ -15,6 +16,17 @@ describe("real claims", () => {
     expect(spec.source.doi).toBeTruthy();
     expect(spec.title).not.toContain("[DEMO]");
     expect(specHash(spec)).toMatch(/^[0-9a-f]{64}$/);
+  });
+
+  it("the site's labels match the claims being posted, and the flagship runs the authors' own code", () => {
+    const entries = Object.entries(PROVENANCE);
+    for (const [hash, p] of entries) expect(specHash(loadReal(p.name).spec)).toBe(hash);
+    const flagship = entries.filter(([, p]) => p.flagship);
+    expect(flagship).toHaveLength(1);
+    expect(flagship[0]![1].origin).toBe("authors");
+    expect(flagship[0]![1].name).toBe("wildfire-water");
+    expect(PROVENANCE[specHash(loadReal("parkinsons-spread").spec)]!.origin).toBe("rebuild");
+    expect(loadReal("parkinsons-spread").spec.title).toMatch(/^Independent rebuild/);
   });
 
   it("reads the wildfire number from R's printed output", () => {

@@ -10,6 +10,7 @@ import { usePoll } from "@/components/usePoll";
 import { chain } from "@/lib/chain";
 import { lab } from "@/lib/lab";
 import { fmtUnits, rangeText, type Market, type Mode } from "@/lib/market";
+import { provenanceOf } from "@/lib/provenance";
 
 type Filter = "all" | Mode | "settled";
 
@@ -21,6 +22,12 @@ const FILTERS: { key: Filter; label: string }[] = [
 ];
 
 const FIRST_ROWS = 8;
+
+/** The flagship, then other published papers, then demos. */
+const rank = (m: Market) => {
+  const p = provenanceOf(m.spec.spec_hash);
+  return p?.flagship ? 0 : p ? 1 : 2;
+};
 
 const live = (m: Market) => m.state !== "Final";
 
@@ -35,10 +42,10 @@ export default function Home() {
   const listed = useMemo(() => (markets.data ?? []).filter((m) => m.state !== "Draft" && !m.spec.title.startsWith("[TEST]")), [markets.data]);
   const shown = useMemo(() => {
     const rows = listed.filter((m) => (filter === "all" ? true : filter === "settled" ? m.state === "Final" : m.mode === filter));
-    return [...rows].sort((a, b) => Number(live(b)) - Number(live(a)) || b.id - a.id);
+    return [...rows].sort((a, b) => rank(a) - rank(b) || Number(live(b)) - Number(live(a)) || b.id - a.id);
   }, [listed, filter]);
 
-  const latest = useMemo(() => [...listed].filter((m) => m.outcome === "REPRODUCED").sort((a, b) => (b.finalized_at ?? 0) - (a.finalized_at ?? 0))[0], [listed]);
+  const latest = useMemo(() => [...listed].filter((m) => m.outcome === "REPRODUCED").sort((a, b) => rank(a) - rank(b) || (b.finalized_at ?? 0) - (a.finalized_at ?? 0))[0], [listed]);
   const receipts = usePoll(() => (latest ? chain.receipts(latest.id) : Promise.resolve([])), [latest?.id], 0, latest ? `receipts.${latest.id}` : undefined);
   const measured = receipts.data?.at(-1)?.measured_value ?? null;
 

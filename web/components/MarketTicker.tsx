@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { chain } from "@/lib/chain";
 import { modeUnit, rangeText, relativeTime, stateLabel, type Market } from "@/lib/market";
+import { ORIGIN_LABEL, provenanceOf } from "@/lib/provenance";
 import { RollingNumber } from "./RollingNumber";
 import { ScrubChart, type PricePoint } from "./ScrubChart";
 import { Stamp } from "./Stamp";
@@ -29,6 +30,7 @@ export function MarketTicker({ market }: { market: Market }) {
   const change = (shown - start) / 10_000;
   const up = change >= 0;
   const isDemo = s.title.startsWith("[DEMO]");
+  const origin = provenanceOf(s.spec_hash);
   const when = held
     ? new Date(held.t * 1000).toLocaleString(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })
     : market.state === "Open"
@@ -41,7 +43,7 @@ export function MarketTicker({ market }: { market: Market }) {
         <span className="ticker-title">
           <span className="ticker-name">{shortTitle(s.title)}</span>
           <span className="ticker-meta">
-            {isDemo ? "Demo claim. " : ""}
+            {isDemo ? "Demo claim. " : origin ? `${origin.flagship ? "Flagship. " : ""}${ORIGIN_LABEL[origin.origin]}. ` : ""}
             Holds up at {rangeText(s.reported_value, s.tolerance_kind, s.tolerance_value)}
           </span>
         </span>
