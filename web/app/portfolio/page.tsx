@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { AnyChainPanel } from "@/components/AnyChainPanel";
 import { PrintedReceipt } from "@/components/PrintedReceipt";
 import { RollingNumber } from "@/components/RollingNumber";
 import { Stamp } from "@/components/Stamp";
@@ -57,6 +58,7 @@ export default function PortfolioPage() {
           </div>
           <PrintedReceipt title="Waiting for your first forecast" outcome={null} reported="?" range="your call" measured={null} hash="" print />
         </div>
+        <AnyChainPanel />
       </>
     );
   }
@@ -154,6 +156,7 @@ export default function PortfolioPage() {
         )}
         <p className="hint">Profit or loss counts what you put in, what you took out, and today&apos;s value of your shares. Money you added to a prize pool isn&apos;t counted until you take it out.</p>
       </section>
+      <AnyChainPanel />
     </>
   );
 }

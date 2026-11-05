@@ -40,7 +40,7 @@ const SCAN_SCRIPT = `import ast, os, sys
 names = dict(${JSON.stringify(IMPORT_NAMES)})
 found, local = set(), set()
 for root, dirs, files in os.walk("."):
-    dirs[:] = [d for d in dirs if not d.startswith(".")]
+    dirs[:] = [d for d in dirs if not d.startswith(".") and d not in ("article", "manuscript", "paper", "docs")]
     local.update(dirs)
     for f in files:
         if f.endswith(".py"):
