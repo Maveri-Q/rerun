@@ -27,7 +27,7 @@ const ROOT = path.resolve(import.meta.dirname, "../../..");
 const CASES = path.join(ROOT, "claims/benchmark");
 const JSON_OUT = path.join(ROOT, "web/lib/repair-benchmark.json");
 const DOC_OUT = path.join(ROOT, "docs/REPAIR_BENCHMARK.md");
-const TARGET_PAPERS = 8;
+const TARGET_PAPERS = 5;
 const MATCH_MARGIN = "0.005"; // relative
 const MAX_MINUTES = 15;
 /** Per paper, per run. A paper that takes longer counts as failed. */

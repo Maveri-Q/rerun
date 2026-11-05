@@ -1,0 +1,12 @@
+{
+  "title": "Contextual modulation of information (Mahmoudian, ReScience C)",
+  "paper": "https://doi.org/10.5281/zenodo.3885793",
+  "repo_url": "https://github.com/sepahead/mahmoudian-2020-rescience",
+  "commit": "e85a5b4fcc741a653666b9d56884d4603976e8b9",
+  "license": "MIT",
+  "runtime": "python3.11",
+  "packages": ["numpy", "scipy", "matplotlib"],
+  "entrypoint": "cd code && python -c \"import runpy; g = runpy.run_path('main.py', run_name='__main__'); r = g['analytical_results']; print('Total information', r['value'].sum())\" > ../rerun_output.txt",
+  "output_path": "rerun_output.txt",
+  "extractor": "Total information (-?[0-9.]+)"
+}

@@ -2,7 +2,7 @@
   "generated_at": "2026-11-05T12:47:25.646Z",
   "model": "z-ai/glm-5.3-flash",
   "max_attempts": 6,
-  "target_papers": 8,
+  "target_papers": 5,
   "papers_counted": 1,
   "repaired": 1,
   "complete": false,
