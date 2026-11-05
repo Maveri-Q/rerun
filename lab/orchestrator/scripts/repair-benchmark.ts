@@ -103,6 +103,8 @@ async function benchmark(name: string, c: Case): Promise<Row> {
   const base = await withTimeout(runOnce(specFor(c, ["false"], "0", { type: "abs", value: "1000000" }), true, llm, log)).catch((e: Error) => e);
   if (base instanceof Error || base.receipt.measured_value === null) {
     row.detail = base instanceof Error ? base.message : `No number under the old packages (${base.receipt.outcome}).`;
+    // A network or attestation failure says nothing about the paper, unlike running out of time.
+    if (base instanceof Error && !/timed out after/.test(base.message)) row.result = "no_verdict";
     return row;
   }
   row.baseline = base.receipt.measured_value;
@@ -201,8 +203,12 @@ async function main() {
   mkdirSync(path.dirname(DOC_OUT), { recursive: true });
   for (const name of names) {
     const row = await benchmark(name, JSON.parse(readFileSync(path.join(CASES, `${name}.json`), "utf8")) as Case);
-    rows.set(name, row);
     console.log(`--> ${name}: ${row.result}. ${row.detail}`);
+    if (row.result === "no_verdict" && rows.has(name)) {
+      console.log(`    keeping the earlier result for ${name}, because this run couldn't finish`);
+      continue;
+    }
+    rows.set(name, row);
     write([...rows.values()]);
   }
 }

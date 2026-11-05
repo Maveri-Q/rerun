@@ -50,9 +50,10 @@ export class RollingDemos {
     return Math.floor((this.deps.now?.() ?? Date.now()) / 1000);
   }
 
-  /** The demo claim still open for forecasts, with time left to use it. */
+  /** A short demo still open with time left. Older demos with days to run can't show the whole cycle. */
   private openOne(markets: RollingMarket[]) {
-    return markets.find((m) => isDemo(m) && m.state === "Open" && m.lock_time > this.now() + 30);
+    const now = this.now();
+    return markets.find((m) => isDemo(m) && m.state === "Open" && m.lock_time > now + 30 && m.lock_time <= now + this.opts.windowSecs);
   }
 
   private async post(): Promise<number> {

@@ -37,6 +37,12 @@ describe("RollingDemos", () => {
     expect(posted).toEqual(["reproduces"]);
   });
 
+  it("ignores an older demo that stays open for days", async () => {
+    const { demos, posted } = setup([demo({ id: 10, lock_time: NOW + 5 * 86_400 })]);
+    expect(await demos.tryNow()).toBe(101);
+    expect(posted).toHaveLength(1);
+  });
+
   it("never treats a published paper's open claim as a demo", async () => {
     const { demos, posted } = setup([demo({ id: 20, spec: { title: "Temperature explains water loss" } })]);
     expect(await demos.tryNow()).toBe(101);
