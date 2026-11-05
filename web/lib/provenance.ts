@@ -73,8 +73,8 @@ export const PROVENANCE: Record<string, Provenance> = {
     notChecked: ["Whether results in mice carry over to people."],
     why: {
       heading: "Why not the authors' own code?",
-      text: "It wasn't missing. Henderson and colleagues published their code openly, in R and MATLAB, under an MIT licence. This claim runs a separate Python rebuild, written by other researchers and published in a peer-reviewed journal, because we chose it before checking the original closely. MATLAB turns out to be used only for a side analysis. We have since run the authors' R code too, in a local test with no AI: it gave 0.69605, the same as this rebuild. That test isn't on the blockchain.",
-      link: { label: "See the authors' code", href: "https://github.com/ejcorn/connectome_diffusion" },
+      text: "It wasn't missing. Henderson and colleagues published their code openly, in R and MATLAB, under an MIT licence. This claim runs a separate Python rebuild, written by other researchers and published in a peer-reviewed journal, because we chose it before checking the original closely. MATLAB turns out to be used only for a side analysis. We have since run the authors' R code too, with no AI: it gave 0.69605, the same as this rebuild. That's claim 24.",
+      link: { label: "See the authors' code result", href: "/market/24" },
     },
   },
   "c4a9b60c770317e5f7ec3aacbac1513bd2f133958bb226d29762fa2a39ae86d1": {

@@ -31,7 +31,7 @@ The posted `parkinsons-spread` claim keeps its launch fix. A later test with no 
 
 ## The authors' own Parkinson's code
 
-`parkinsons-authors` runs Henderson et al.'s published R code ([ejcorn/connectome_diffusion](https://github.com/ejcorn/connectome_diffusion), MIT). In a local test, with R packages from a dated copy of CRAN (2020-02-28, the commit date) and no AI, it gave 0.69605221. The Python rebuild gives 0.6960522. It isn't posted. Before posting, its `setup` needs replacing, because it's currently `false` to force the date-pinned step.
+`parkinsons-authors` runs Henderson et al.'s published R code ([ejcorn/connectome_diffusion](https://github.com/ejcorn/connectome_diffusion), MIT), with R packages from a dated copy of CRAN (2020-02-28, the commit date) and no AI repair. It's posted on testnet as claim 24, a settled showcase with no forecasting, and gave 0.69605221. The Python rebuild gives 0.6960522.
 
 ## Margins
 

@@ -14,19 +14,32 @@ const WASM = path.resolve(import.meta.dirname, "../contracts/target/near/rerun/r
 
 /** Everything that must read back the same afterwards. */
 async function snapshot() {
-  const markets = await chain.view<{ id: number }[]>("list_markets", { limit: 200 });
-  const details = await Promise.all(
-    markets.map(async (m) => ({
-      market: await chain.view("get_market", { market_id: m.id }),
-      spec: await chain.view("get_spec", { market_id: m.id }),
-      receipts: await chain.view("get_receipts", { market_id: m.id }),
-      history: await chain.view("get_price_history", { market_id: m.id }),
-    })),
-  );
+  // One at a time, because the RPC rate-limits bursts and a failed read looks like a failed upgrade.
+  const view = async <T>(method: string, args: Record<string, unknown> = {}): Promise<T> => {
+    for (let i = 0; ; i++) {
+      try {
+        await new Promise((r) => setTimeout(r, 300));
+        return await chain.view<T>(method, args);
+      } catch (e) {
+        if (i >= 6) throw e;
+        await new Promise((r) => setTimeout(r, 4000));
+      }
+    }
+  };
+  const markets = await view<{ id: number }[]>("list_markets", { limit: 200 });
+  const details: { market: unknown; spec: unknown; receipts: unknown[]; history: unknown }[] = [];
+  for (const m of markets) {
+    details.push({
+      market: await view("get_market", { market_id: m.id }),
+      spec: await view("get_spec", { market_id: m.id }),
+      receipts: await view<unknown[]>("get_receipts", { market_id: m.id }),
+      history: await view("get_price_history", { market_id: m.id }),
+    });
+  }
   return {
-    json: JSON.stringify({ details, config: await chain.view("get_config"), stats: await chain.view("get_stats"), labs: await chain.view("list_labs"), board: await chain.view("get_points_leaderboard", { limit: 50 }) }),
+    json: JSON.stringify({ details, config: await view("get_config"), stats: await view("get_stats"), labs: await view("list_labs"), board: await view("get_points_leaderboard", { limit: 50 }) }),
     count: markets.length,
-    receipts: details.reduce((n, d) => n + (d.receipts as unknown[]).length, 0),
+    receipts: details.reduce((n, d) => n + (d.receipts).length, 0),
   };
 }
 
