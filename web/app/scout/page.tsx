@@ -146,7 +146,7 @@ export default function ScoutPage() {
     <>
       <h1 className="page-title">The scout finds. A person decides.</h1>
       <p className="lede">An AI agent scans newly published replications that share their code, and drafts a claim for each one that passes its checks. Nothing goes live until a person approves it.</p>
-      <p className="hint">{scout.data?.lastScanAt ? `Last scan: ${new Date(scout.data.lastScanAt).toLocaleString()}. It reads ReScience C for now, and never runs anyone's code.` : "It reads ReScience C for now, and never runs anyone's code."}</p>
+      <p className="hint">{scout.data?.lastScanAt ? `Last scan: ${new Date(scout.data.lastScanAt).toLocaleString()}. It reads ReScience C and Hugging Face Papers, and never runs anyone's code.` : "It reads ReScience C and Hugging Face Papers, and never runs anyone's code."}</p>
 
       <section className="section">
         <div className="section-head">
@@ -182,7 +182,7 @@ export default function ScoutPage() {
 
       {turnedDown.length > 0 && (
         <section className="section">
-          <details>
+          <details open>
             <summary>What the scout turned down, and why ({turnedDown.length})</summary>
             <ul className="scout-rejected">
               {turnedDown.map((c) => (

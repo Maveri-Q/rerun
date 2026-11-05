@@ -75,9 +75,14 @@ export async function draftClaim(repoUrl: string, paperUrl: string | undefined, 
           .join("\n\n"),
       },
     ],
-    2000,
+    6000, // 2000 cut replies off part way through on real repositories
   );
-  const d = parseJsonReply(reply) as Record<string, unknown>;
+  let d: Record<string, unknown>;
+  try {
+    d = parseJsonReply(reply) as Record<string, unknown>;
+  } catch (e) {
+    throw new Error(`${(e as Error).message}. The reply began: ${reply.slice(0, 160)}`);
+  }
   const str = (k: string, fallback = "") => (typeof d[k] === "string" ? (d[k] as string) : fallback);
   return {
     repo_url: `https://github.com/${owner}/${repo}`,

@@ -139,6 +139,7 @@ export function startLabServer(port: number, opts: ServerOptions) {
           sandbox: new DockerSandbox({ image: sandboxImage(spec.artifact.runtime), cpus: spec.resources.cpu, memGb: spec.resources.mem_gb }),
           model: new NearAiModel(llm, opts.modelId),
           resolver: opts.resolverFor(spec),
+          dateInstall: true,
           newSandbox: () => new DockerSandbox({ image: sandboxImage(spec.artifact.runtime), cpus: spec.resources.cpu, memGb: spec.resources.mem_gb }),
           emit: (e) => opts.hub.publish(run, e),
         },

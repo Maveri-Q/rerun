@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { ClaimDraft } from "../src/lab/draft.ts";
-import { checkRepo, isClearNumber, type RepoFacts } from "../src/scout/filters.ts";
+import { checkRepo, hasDataInRepo, isClearNumber, type RepoFacts } from "../src/scout/filters.ts";
 import { emptyState, LIMITS, parseArticleYaml, repoRoot, runScout, SUGGESTED_BY, type Lead } from "../src/scout/scout.ts";
 
 const facts = (over: Partial<RepoFacts> = {}): RepoFacts => ({ license: "MIT", languages: { Python: 9000, Shell: 100 }, sizeKb: 2000, archived: false, files: ["run.py"], dependencyText: "numpy\npandas", ...over });
@@ -28,6 +28,30 @@ describe("scout filters", () => {
     const r = checkRepo(facts(over));
     expect(r.accepted).toBe(false);
     expect(r.reasons.join(" ")).toMatch(why);
+  });
+
+  it("ignores documents and styling when deciding what a project runs on", () => {
+    const r = checkRepo(facts({ languages: { TeX: 90000, Python: 4000, HTML: 8000 } }));
+    expect(r.accepted).toBe(true);
+    expect(r.runtime).toBe("python3.11");
+  });
+
+  it("accepts R", () => {
+    const r = checkRepo(facts({ languages: { R: 4000 } }));
+    expect(r.accepted).toBe(true);
+    expect(r.runtime).toBe("r4.4");
+  });
+
+  it("reads a licence file GitHub can't name, and asks a person to check it", () => {
+    const r = checkRepo(facts({ license: "NOASSERTION", licenseText: "Permission is hereby granted, free of charge, to any person" }));
+    expect(r.accepted).toBe(true);
+    expect(r.reasons.join(" ")).toMatch(/Check this one yourself/);
+    expect(checkRepo(facts({ license: null, licenseText: "All rights reserved." })).accepted).toBe(false);
+  });
+
+  it("finds data in a repository, but not in config files", () => {
+    expect(hasDataInRepo(["run.py", "data/trials.csv"])).toBe(true);
+    expect(hasDataInRepo(["run.py", "package.json", "codemeta.json"])).toBe(false);
   });
 
   it("doesn't confuse a word containing torch with the package", () => {
@@ -109,6 +133,21 @@ describe("a scan", () => {
     expect(bad.candidates["x:1"]!.status).toBe("retry");
     const good = await runScout(bad, deps([lead(1)]));
     expect(good.candidates["x:1"]!.status).toBe("pending");
+  });
+
+  it("checks one project only once, even when it's published as many articles", async () => {
+    let reads = 0;
+    const same = [lead(1, "https://github.com/a/same"), lead(2, "https://github.com/a/same"), lead(3, "https://github.com/a/other")];
+    await runScout(emptyState(), deps(same, { repoFacts: async () => (reads++, facts()) }));
+    expect(reads).toBe(2);
+  });
+
+  it("asks a preprint to show a dataset", async () => {
+    const preprint = { ...lead(1), needsDataCheck: true };
+    const s = await runScout(emptyState(), deps([preprint], { repoFacts: async () => facts({ files: ["run.py"] }) }));
+    expect(s.candidates["x:1"]!.reasons.join(" ")).toMatch(/dataset/);
+    const ok = await runScout(emptyState(), deps([preprint], { repoFacts: async () => facts({ files: ["run.py", "data/x.csv"] }) }));
+    expect(ok.candidates["x:1"]!.status).toBe("pending");
   });
 
   it("doesn't check a paper twice", async () => {

@@ -18,6 +18,28 @@ export interface RepoFacts {
   files: string[];
   /** The text of requirements.txt, environment.yml and similar, if there are any. */
   dependencyText: string;
+  /** The repository's own licence file. GitHub can't always name the licence inside one. */
+  licenseText?: string;
+}
+
+/** Recognises common licences by their wording when GitHub can't name them. */
+function licenseFromText(text: string): string | null {
+  if (/permission is hereby granted, free of charge/i.test(text)) return "MIT";
+  if (/GNU GENERAL PUBLIC LICENSE/i.test(text)) return "GPL";
+  if (/Apache License/i.test(text)) return "Apache-2.0";
+  if (/redistribution and use in source and binary forms/i.test(text)) return "BSD";
+  if (/creative commons attribution/i.test(text)) return "CC-BY";
+  return null;
+}
+
+/** Documents, styling and glue don't say what a project runs on, so they don't count. */
+const NOT_ANALYSIS = new Set(["TeX", "HTML", "CSS", "Makefile", "Shell", "Batchfile", "Dockerfile", "PostScript", "SCSS", "JavaScript", "Roff", "Rich Text Format"]);
+
+/** A paper needs data the Lab can reach. This looks for it in the repository. */
+const DATA_FILE = /\.(csv|tsv|json|jsonl|parquet|npz|npy|h5|hdf5|rds|rdata|xlsx|xls|mat|pkl|txt\.gz|csv\.gz)$/i;
+
+export function hasDataInRepo(files: string[]): boolean {
+  return files.some((f) => DATA_FILE.test(f) && !/(^|\/)(package|tsconfig|package-lock|codemeta|\.zenodo)[^/]*$/i.test(f));
 }
 
 export interface FilterResult {
@@ -31,11 +53,14 @@ export function checkRepo(facts: RepoFacts): FilterResult {
   const failures: string[] = [];
   const passes: string[] = [];
 
+  const fromFile = facts.licenseText ? licenseFromText(facts.licenseText) : null;
   if (facts.license && OPEN_LICENSES.has(facts.license)) passes.push(`Open licence: ${facts.license}.`);
+  else if (fromFile) passes.push(`Open licence: ${fromFile}, read from the licence file. Check this one yourself.`);
   else failures.push(facts.license && facts.license !== "NOASSERTION" ? `Licence ${facts.license} isn't on our list of open licences.` : "GitHub can't identify an open licence.");
 
-  const total = Object.values(facts.languages).reduce((a, b) => a + b, 0);
-  const [top, topBytes] = Object.entries(facts.languages).sort((a, b) => b[1] - a[1])[0] ?? ["none", 0];
+  const analysis = Object.entries(facts.languages).filter(([name]) => !NOT_ANALYSIS.has(name));
+  const total = analysis.reduce((a, [, b]) => a + b, 0);
+  const [top, topBytes] = analysis.sort((a, b) => b[1] - a[1])[0] ?? ["none", 0];
   const runtime = top === "Python" || top === "Jupyter Notebook" ? "python3.11" : top === "R" ? "r4.4" : null;
   if (runtime && total > 0) passes.push(`Mostly ${top} (${Math.round((topBytes / total) * 100)}% of the code).`);
   else failures.push(`Mostly ${top}. The Lab only runs Python and R.`);

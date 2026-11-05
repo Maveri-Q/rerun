@@ -31,6 +31,12 @@ RUN pip download --no-cache-dir --retries 10 --timeout 120 -d /opt/wheels \
 
 ENV PIP_FIND_LINKS=/opt/wheels
 
+# For installing a repository's packages as of its commit date, which needs a Python from that era.
+RUN pip install --no-cache-dir uv==0.9.5 \
+    && UV_PYTHON_INSTALL_DIR=/opt/uv-python uv python install 3.8 3.9 3.10
+
+ENV UV_PYTHON_INSTALL_DIR=/opt/uv-python
+
 RUN useradd --create-home --uid 1000 runner \
     && mkdir /work \
     && chown runner:runner /work

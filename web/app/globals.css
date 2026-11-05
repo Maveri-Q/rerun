@@ -2974,3 +2974,15 @@ a {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+.patch-list {
+  list-style: none;
+  margin: 0 0 12px;
+  padding: 0;
+  font-size: 14.5px;
+}
+
+.patch-list li {
+  padding: 6px 0;
+  overflow-wrap: anywhere;
+}

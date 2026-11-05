@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import type { Outcome } from "@/lib/market";
+import { INCONCLUSIVE_REASON, type Outcome } from "@/lib/market";
 
 const VERDICT: Record<Outcome, string> = {
   REPRODUCED: "HELD UP",
@@ -38,6 +38,7 @@ export function PrintedReceipt({
   marketId,
   title,
   outcome,
+  invalidReason,
   reported,
   range,
   measured,
@@ -49,6 +50,7 @@ export function PrintedReceipt({
   marketId?: number;
   title: string;
   outcome: Outcome | null;
+  invalidReason?: string | null;
   reported: string;
   range: string;
   measured: string | null;
@@ -80,7 +82,7 @@ export function PrintedReceipt({
       </dl>
       <div className="receipt-verdict">
         <span>Verdict</span>
-        <strong>{outcome ? VERDICT[outcome] : "NOT CHECKED YET"}</strong>
+        <strong>{invalidReason === INCONCLUSIVE_REASON ? "INCONCLUSIVE" : outcome ? VERDICT[outcome] : "NOT CHECKED YET"}</strong>
       </div>
       {hash && <Barcode hash={hash} />}
       <div className="receipt-foot">

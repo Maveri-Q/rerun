@@ -17,6 +17,8 @@ export interface PrivateModel {
   /** Digest of the attestation report(s) verified during this run. */
   attestationDigest(): string;
   signatureRefs(): string[];
+  /** What this run has spent so far, where the model can say. */
+  spentThisRun?(): number;
 }
 
 export class ModelVerificationError extends Error {}
@@ -62,6 +64,10 @@ export class NearAiModel implements PrivateModel {
     this.verified.set(key, verification);
     this.digests.push(verification.digest);
     return verification;
+  }
+
+  spentThisRun(): number {
+    return this.llm.spentThisRun;
   }
 
   async ask(purpose: string, messages: ChatMessage[], maxTokens?: number): Promise<string> {

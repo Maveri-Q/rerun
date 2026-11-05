@@ -64,6 +64,7 @@ async function main() {
         sandbox: new DockerSandbox({ image: sandboxImage(spec.artifact.runtime), cpus: spec.resources.cpu, memGb: spec.resources.mem_gb }),
         model: new NearAiModel(llm, modelId),
         resolver: demo.resolver,
+        dateInstall: !(DEMO_NAMES as readonly string[]).includes(name),
         newSandbox: () => new DockerSandbox({ image: sandboxImage(spec.artifact.runtime), cpus: spec.resources.cpu, memGb: spec.resources.mem_gb }),
         store,
         emit: (e) => {

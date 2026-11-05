@@ -44,6 +44,9 @@ pub enum InvalidReason {
     ExtractionFailed,
     RunsDisagree,
     Stale,
+    /// The Lab couldn't get the software running within its limits. That says nothing about the
+    /// research, so nobody wins: shares redeem at half, and the creator keeps the bond.
+    EnvSetupFailed,
 }
 
 impl InvalidReason {

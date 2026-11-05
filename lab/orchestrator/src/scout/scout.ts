@@ -3,7 +3,7 @@ import path from "node:path";
 import { draftClaim, parseGithubUrl, type ClaimDraft } from "../lab/draft.ts";
 import { withNetworkRetry } from "../nearai/attestation.ts";
 import type { PrivateModel } from "../pipeline/model.ts";
-import { checkRepo, isClearNumber, type RepoFacts } from "./filters.ts";
+import { checkRepo, hasDataInRepo, isClearNumber, type RepoFacts } from "./filters.ts";
 
 /**
  * The scout agent (build plan §5.4). It looks for published research that ships code, checks it in
@@ -23,6 +23,8 @@ export interface Lead {
   title: string;
   paperUrl: string;
   repoUrl: string | null;
+  /** A journal of replications comes with its data. A preprint might not, so check. */
+  needsDataCheck?: boolean;
 }
 
 export type CandidateStatus = "pending" | "rejected" | "retry" | "approved";
@@ -61,9 +63,14 @@ export async function runScout(state: ScoutState, deps: ScoutDeps): Promise<Scou
   const next: ScoutState = { ...state, lastScanAt: now.toISOString(), candidates: { ...state.candidates }, draftsByDay: { [today]: state.draftsByDay[today] ?? 0 } };
 
   const leads = await deps.leads();
+  // ReScience publishes one project as many articles, so a repository only counts once.
+  const reposSeen = new Set(Object.values(next.candidates).filter((c) => c.status !== "retry").map((c) => c.repoUrl));
   const fresh = leads.filter((l) => {
     const seen = next.candidates[l.id];
-    return !seen || seen.status === "retry";
+    if (seen && seen.status !== "retry") return false;
+    if (l.repoUrl && reposSeen.has(l.repoUrl)) return false;
+    if (l.repoUrl) reposSeen.add(l.repoUrl);
+    return true;
   });
   log(`scout: ${leads.length} leads, ${fresh.length} not checked yet`);
 
@@ -87,6 +94,10 @@ export async function runScout(state: ScoutState, deps: ScoutDeps): Promise<Scou
       continue;
     }
     const checked = checkRepo(facts);
+    if (checked.accepted && lead.needsDataCheck && !hasDataInRepo(facts.files)) {
+      record("rejected", ["No small public dataset in the repository, so the Lab would have nothing to run on."], { license: facts.license, runtime: checked.runtime });
+      continue;
+    }
     if (!checked.accepted) {
       record("rejected", checked.reasons, { license: facts.license, runtime: checked.runtime });
       continue;
@@ -131,8 +142,14 @@ export function repoRoot(url: string): string | null {
   return m ? `https://github.com/${m[1]}/${m[2]}` : null;
 }
 
+/** A read-only GitHub token lifts the limit of 60 requests an hour. It stays on the server. */
+function githubHeaders(): Record<string, string> {
+  const token = process.env.GITHUB_TOKEN;
+  return { accept: "application/vnd.github+json", "user-agent": "rerun-scout", ...(token ? { authorization: `Bearer ${token}` } : {}) };
+}
+
 async function github<T>(apiPath: string): Promise<T> {
-  const res = await withNetworkRetry(() => fetch(`https://api.github.com${apiPath}`, { headers: { accept: "application/vnd.github+json", "user-agent": "rerun-scout" } }));
+  const res = await withNetworkRetry(() => fetch(`https://api.github.com${apiPath}`, { headers: githubHeaders() }));
   if (!res.ok) throw new Error(`GitHub answered ${res.status}`);
   return (await res.json()) as T;
 }
@@ -162,6 +179,27 @@ export async function reScienceLeads(limit: number): Promise<Lead[]> {
   return leads;
 }
 
+/**
+ * Hugging Face Papers: daily arXiv papers, some with a linked GitHub repository. Only those with a
+ * link become leads, and they must also show a small dataset, since a preprint may not ship one.
+ */
+export async function huggingFaceLeads(limit: number): Promise<Lead[]> {
+  const res = await withNetworkRetry(() => fetch(`https://huggingface.co/api/daily_papers?limit=${limit}`, { headers: { "user-agent": "rerun-scout" } }));
+  if (!res.ok) throw new Error(`Hugging Face answered ${res.status}`);
+  const items = (await res.json()) as { title?: string; paper?: { id?: string; title?: string; githubRepo?: string | null } }[];
+  return items.flatMap((item) => {
+    const repoUrl = item.paper?.githubRepo ? repoRoot(item.paper.githubRepo) : null;
+    if (!repoUrl || !item.paper?.id) return [];
+    return [{ id: `arxiv:${item.paper.id}`, source: "Hugging Face Papers", title: item.paper.title ?? item.title ?? item.paper.id, paperUrl: `https://arxiv.org/abs/${item.paper.id}`, repoUrl, needsDataCheck: true }];
+  });
+}
+
+export const allLeads = async (): Promise<Lead[]> => {
+  const [rescience, huggingFace] = await Promise.allSettled([reScienceLeads(70), huggingFaceLeads(100)]);
+  if (rescience.status === "rejected" && huggingFace.status === "rejected") throw new Error(`no source answered: ${String(rescience.reason)}`);
+  return [...(rescience.status === "fulfilled" ? rescience.value : []), ...(huggingFace.status === "fulfilled" ? huggingFace.value : [])];
+};
+
 export async function githubRepoFacts(repoUrl: string): Promise<RepoFacts> {
   const { owner, repo } = parseGithubUrl(repoUrl)!;
   const meta = await github<{ default_branch: string; size: number; archived: boolean; license: { spdx_id?: string } | null }>(`/repos/${owner}/${repo}`);
@@ -170,7 +208,9 @@ export async function githubRepoFacts(repoUrl: string): Promise<RepoFacts> {
   const files = tree.tree.filter((t) => t.type === "blob").map((t) => t.path);
   const dependencyFiles = files.filter((f) => /(^|\/)(requirements[^/]*\.txt|environment[^/]*\.ya?ml|Pipfile|pyproject\.toml|DESCRIPTION)$/i.test(f)).slice(0, 4);
   const texts = await Promise.all(dependencyFiles.map((f) => raw(`https://raw.githubusercontent.com/${owner}/${repo}/${meta.default_branch}/${f}`)));
-  return { license: meta.license?.spdx_id ?? null, languages, sizeKb: meta.size, archived: meta.archived, files, dependencyText: texts.join("\n") };
+  const licenseFile = files.find((f) => /^(licen[cs]e|copying)(\.\w+)?$/i.test(f));
+  const licenseText = licenseFile ? await raw(`https://raw.githubusercontent.com/${owner}/${repo}/${meta.default_branch}/${licenseFile}`) : undefined;
+  return { license: meta.license?.spdx_id ?? null, licenseText, languages, sizeKb: meta.size, archived: meta.archived, files, dependencyText: texts.join("\n") };
 }
 
 export function draftWithModel(model: PrivateModel) {

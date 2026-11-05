@@ -47,9 +47,13 @@ export async function sourceAroundError(errorLog: string, sandbox: Pick<Sandbox,
   return parts.join("\n\n");
 }
 
+/** Who made a change. The contract's patch record has no such field, so it travels in the diff header, which is on-chain. */
+export type PatchAuthor = "ai" | "system" | "human";
+
 export interface AppliedPatch {
   file: string;
   kind: PatchKind;
+  by: PatchAuthor;
   diffHash: string;
   diff: string;
   justification: string;
@@ -73,8 +77,13 @@ export async function proposeAndApplyRepair(args: {
   setup: string[];
   guard: Omit<GuardContext, "fileExists">;
   previous: string[];
+  /** Fixes from earlier attempts. They stay in place, so the model builds on them. */
+  kept?: AppliedPatch[];
+  /** The command that installs packages now, if an earlier step changed it. */
+  installCommand?: string;
 }): Promise<RepairOutcome> {
-  const { model, sandbox, phase, errorLog, entrypoint, setup, guard, previous } = args;
+  const { model, sandbox, phase, errorLog, entrypoint, setup, guard, previous, kept = [], installCommand } = args;
+  const dependencyFile = (await sandbox.readFile("requirements.txt", 64 * 1024).catch(() => null))?.toString("utf8") ?? null;
   const files = await sandbox.listFiles(200);
   const source = await sourceAroundError(errorLog, sandbox);
   const user = [
@@ -83,6 +92,9 @@ export async function proposeAndApplyRepair(args: {
     `Entrypoint: ${entrypoint}`,
     `Files in the repository (working directory ${REPO_DIR}):\n${files.join("\n")}`,
     `Earlier attempts in this run:\n${previous.length ? previous.join("\n") : "none"}`,
+    kept.length ? `Fixes already in place, which stay. Build on them and don't repeat them:\n${kept.map((p) => `${p.file} (${p.by}): ${p.justification}`).join("\n")}` : "",
+    installCommand ? `Packages are installed with: ${installCommand}` : "",
+    dependencyFile !== null ? `requirements.txt exists now, so edit it with a non-empty "search". It contains:\n${dependencyFile}` : "requirements.txt doesn't exist yet.",
     `Error output (last part):\n${errorLog.slice(-6000)}`,
     source ? `Source code around the error. Copy "search" text exactly from here, without the line numbers:\n${source}` : "",
   ]
@@ -134,10 +146,11 @@ async function applyEdit(edit: RepairEdit, sandbox: Sandbox, guard: Omit<GuardCo
   }
   await sandbox.writeFile(file, Buffer.from(updated));
 
-  const diff = `--- ${file} [${edit.kind}] ${edit.justification}\n${prefixLines("-", edit.search)}\n${prefixLines("+", edit.replace)}\n`;
+  const diff = `--- ${file} [${edit.kind} by ai] ${edit.justification}\n${prefixLines("-", edit.search)}\n${prefixLines("+", edit.replace)}\n`;
   return {
     file,
     kind: edit.kind,
+    by: "ai",
     diff,
     diffHash: createHash("sha256").update(diff).digest("hex"),
     justification: edit.justification,

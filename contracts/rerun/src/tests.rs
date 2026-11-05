@@ -366,6 +366,20 @@ fn swapped_data_resolves_invalid_and_forfeits_the_creation_bond() {
 }
 
 #[test]
+fn failed_software_setup_is_invalid_and_keeps_the_creation_bond() {
+    let mut w = world();
+    let mut r = receipt(&w, Outcome::Invalid, None, 0, "m1");
+    r.invalid_reason = Some(InvalidReason::EnvSetupFailed);
+    let treasury_before = points(&w.c, "treasury.testnet");
+    let t = propose(&mut w, |_| r);
+    as_("anyone.testnet", t + WINDOW);
+    w.c.finalize(w.id);
+    let m = w.c.get_market(w.id).unwrap().market;
+    assert_eq!((m.outcome, m.invalid_reason), (Some(Outcome::Invalid), Some(InvalidReason::EnvSetupFailed)));
+    assert_eq!(points(&w.c, "treasury.testnet"), treasury_before, "not the creator's fault: no bond is forfeited");
+}
+
+#[test]
 #[should_panic(expected = "set by the contract")]
 fn lab_cannot_claim_runs_disagree() {
     let mut w = world();

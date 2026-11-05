@@ -9,9 +9,11 @@ import { VerifiedPanel } from "@/components/VerifiedPanel";
 import { chain } from "@/lib/chain";
 import { accountLink, CONTRACT, LAB_URL } from "@/lib/config";
 import { lab } from "@/lib/lab";
-import { outcomeMeaning, rangeText } from "@/lib/market";
+import { INCONCLUSIVE_MEANING, INCONCLUSIVE_REASON, outcomeMeaning, patchAuthors, rangeText } from "@/lib/market";
 
 const when = (t: number) => new Date(t * 1000).toLocaleString();
+
+const BY: Record<string, string> = { ai: "AI", system: "System", human: "Human" };
 
 export default function ReceiptPage({ params }: { params: Promise<{ market: string; run: string }> }) {
   const p = use(params);
@@ -49,6 +51,7 @@ export default function ReceiptPage({ params }: { params: Promise<{ market: stri
           marketId={m.id}
           title={m.spec.title}
           outcome={r.outcome}
+          invalidReason={r.invalid_reason}
           reported={r.reported_value}
           range={rangeText(m.spec.reported_value, m.spec.tolerance_kind, m.spec.tolerance_value)}
           measured={r.measured_value}
@@ -57,7 +60,7 @@ export default function ReceiptPage({ params }: { params: Promise<{ market: stri
           print
         />
         <div style={{ paddingTop: 20 }}>
-          <p className="statement" style={{ margin: 0 }}>{outcomeMeaning(r.outcome)}</p>
+          <p className="statement" style={{ margin: 0 }}>{r.invalid_reason === INCONCLUSIVE_REASON ? INCONCLUSIVE_MEANING : outcomeMeaning(r.outcome)}</p>
           {r.invalid_reason && <p className="hint">Why: {r.invalid_reason.replaceAll("_", " ").toLowerCase()}</p>}
         </div>
       </div>
@@ -72,6 +75,13 @@ export default function ReceiptPage({ params }: { params: Promise<{ market: stri
           {r.patches.length > 0 && (
             <>
               <h3 style={{ marginTop: 24 }}>Setup fixes the AI made</h3>
+              <ul className="patch-list">
+                {patchAuthors(r.patches_diff_excerpt).map((p, i) => (
+                  <li key={i}>
+                    <span className="chip">{BY[p.by] ?? p.by}</span> {p.file}: {p.why}
+                  </li>
+                ))}
+              </ul>
               <pre className="diff">{r.patches_diff_excerpt}</pre>
             </>
           )}

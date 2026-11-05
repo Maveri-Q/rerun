@@ -1,3 +1,5 @@
+import { pythonForDate } from "../src/pipeline/dateinstall.ts";
+import { MAX_REPAIR_ATTEMPTS, REPAIR_COST_CAP_USD } from "../src/pipeline/pipeline.ts";
 import { createHash } from "node:crypto";
 import { beforeEach, describe, expect, it } from "vitest";
 import { generateLabKeyPair, sealToLab, type ClaimSpec } from "@rerun/shared";
@@ -203,7 +205,8 @@ describe("reproduce: repair loop", () => {
     expect(rejectedEdits.length).toBeGreaterThan(0);
     expect(rejectedEdits[0]!.reason).toMatch(/numbers changed|analysis/);
     expect(receipt.patches).toHaveLength(0);
-    expect(receipt.outcome).toBe("BROKEN");
+    // It never gave up, it just kept being blocked, so this is out of tries and not a finding about the code.
+    expect(receipt.invalid_reason).toBe("ENV_SETUP_FAILED");
   });
 
   it("installs packages again after the AI fixes the package list during the run", async () => {
@@ -248,15 +251,95 @@ describe("reproduce: repair loop", () => {
     sandbox.runs = [{ exitCode: 1, log: "still failing" }];
     model.replies.repair = ["this is not JSON"];
     await expect(run()).rejects.toThrow(/no verdict is posted/);
-    expect(model.calls.filter((c) => c.purpose === "repair")).toHaveLength(3);
+    expect(model.calls.filter((c) => c.purpose === "repair")).toHaveLength(MAX_REPAIR_ATTEMPTS);
   });
 
-  it("stops after three attempts and says BROKEN once the AI really tried", async () => {
+  it("says BROKEN only when the AI concludes it can't be fixed", async () => {
     sandbox.runs = [{ exitCode: 1, log: "still failing" }];
     model.replies.repair = ["this is not JSON", "this is not JSON", '{"give_up":true,"reason":"nothing to fix","edits":[]}'];
     const { receipt } = await run();
     expect(receipt.outcome).toBe("BROKEN");
     expect(model.calls.filter((c) => c.purpose === "repair")).toHaveLength(3);
+  });
+
+  it("is inconclusive, never BROKEN, when repair runs out of tries", async () => {
+    sandbox.runs = [{ exitCode: 1, log: "still failing" }];
+    let n = 0;
+    model.ask = async function (purpose: string, messages: { content: string }[]) {
+      this.calls.push({ purpose, text: messages.map((m) => m.content).join("\n") });
+      if (purpose !== "repair") return "a short report";
+      n++;
+      return `{"give_up":false,"reason":"try ${n}","edits":[{"file":"requirements.txt","kind":"DEPENDENCY","justification":"adding a missing package, number ${n}","search":"","replace":"p${n}\\n"}]}`;
+    };
+    const { receipt } = await run();
+    expect(receipt.outcome).toBe("INVALID");
+    expect(receipt.invalid_reason).toBe("ENV_SETUP_FAILED");
+    expect(model.calls.filter((c) => c.purpose === "repair")).toHaveLength(MAX_REPAIR_ATTEMPTS);
+  });
+
+  it("stops repairing when the cost cap is reached, and is inconclusive", async () => {
+    sandbox.runs = [{ exitCode: 1, log: "still failing" }];
+    model.replies.repair = ['{"give_up":false,"reason":"x","edits":[{"file":"requirements.txt","kind":"DEPENDENCY","justification":"x","search":"","replace":"p\\n"}]}'];
+    (model as unknown as { spentThisRun: () => number }).spentThisRun = () => REPAIR_COST_CAP_USD;
+    const { receipt } = await run();
+    expect(receipt.invalid_reason).toBe("ENV_SETUP_FAILED");
+    expect(model.calls.filter((c) => c.purpose === "repair")).toHaveLength(0);
+  });
+
+  it("tells the AI what's already fixed, so it builds on it", async () => {
+    sandbox.runs = [{ exitCode: 1, log: "e1" }, { exitCode: 1, log: "e2" }, { effect: (s) => s.files.set("out.json", Buffer.from('{"acc":0.9}')), log: "ok" }];
+    model.replies.repair = [
+      '{"give_up":false,"reason":"a","edits":[{"file":"requirements.txt","kind":"DEPENDENCY","justification":"added numpy","search":"","replace":"numpy\\n"}]}',
+      '{"give_up":true,"reason":"b","edits":[]}',
+    ];
+    await run();
+    const second = model.calls.filter((c) => c.purpose === "repair")[1]!.text;
+    expect(second).toContain("added numpy");
+    expect(second).toContain("requirements.txt exists now");
+  });
+
+  it("labels every patch with who made it", async () => {
+    sandbox.runs = [{ exitCode: 1, log: "e1" }, { effect: (s) => s.files.set("out.json", Buffer.from('{"acc":0.9}')), log: "ok" }];
+    model.replies.repair = ['{"give_up":false,"reason":"a","edits":[{"file":"requirements.txt","kind":"DEPENDENCY","justification":"added numpy","search":"","replace":"numpy\\n"}]}'];
+    const { receipt } = await run();
+    expect(receipt.patches_diff_excerpt).toContain("[DEPENDENCY by ai]");
+  });
+
+  it("tries the date-pinned install before any AI, and labels it as the system's", async () => {
+    sandbox.head = COMMIT;
+    const baseExec = sandbox.exec.bind(sandbox);
+    sandbox.exec = async (script, opts) => (script.startsWith("git log") ? { exitCode: 0, timedOut: false, tail: "", log: "2021-05-01T10:00:00+00:00\n", logHash: "x", durationMs: 1 } : baseExec(script, opts));
+    sandbox.files.set("requirements.txt", Buffer.from("pandas\n"));
+    sandbox.runs = [{ exitCode: 1, log: "AttributeError: gone" }, { effect: (s) => s.files.set("out.json", Buffer.from('{"acc":0.9}')), log: "ok" }];
+    const { receipt } = await run(spec(), { dateInstall: true });
+    expect(receipt.outcome).toBe("REPRODUCED");
+    expect(model.calls.filter((c) => c.purpose === "repair")).toHaveLength(0);
+    expect(receipt.patches_diff_excerpt).toContain("[DEPENDENCY by system]");
+    expect(receipt.patches_diff_excerpt).toContain("--exclude-newer 2021-05-01T10:00:00Z");
+    expect(sandbox.execs.some((e) => e.script.includes("uv venv --seed --python 3.8") && e.opts.network)).toBe(true);
+  });
+
+  it("falls back to the AI when the date-pinned install fails", async () => {
+    const baseExec = sandbox.exec.bind(sandbox);
+    sandbox.exec = async (script, opts) => {
+      if (script.startsWith("git log")) return { exitCode: 0, timedOut: false, tail: "", log: "2021-05-01T10:00:00+00:00\n", logHash: "x", durationMs: 1 };
+      if (script.includes("uv venv")) return { exitCode: 1, timedOut: false, tail: "no matching", log: "no matching", logHash: "x", durationMs: 1 };
+      return baseExec(script, opts);
+    };
+    sandbox.files.set("requirements.txt", Buffer.from("pandas\n"));
+    sandbox.runs = [{ exitCode: 1, log: "AttributeError: gone" }];
+    model.replies.repair = ['{"give_up":true,"reason":"no","edits":[]}'];
+    const { receipt } = await run(spec(), { dateInstall: true });
+    expect(receipt.outcome).toBe("BROKEN");
+    expect(model.calls.filter((c) => c.purpose === "repair")).toHaveLength(1);
+    expect(sandbox.execs.some((e) => e.script.includes("mv /work/.pydeps.bak"))).toBe(true);
+  });
+
+  it("picks a Python from the code's era", () => {
+    expect(pythonForDate("2020-01-01T00:00:00Z")).toBe("3.8");
+    expect(pythonForDate("2022-03-01T00:00:00Z")).toBe("3.9");
+    expect(pythonForDate("2023-03-01T00:00:00Z")).toBe("3.10");
+    expect(pythonForDate("2025-03-01T00:00:00Z")).toBe("3.11");
   });
 
   it("rejects a patch whose search text is ambiguous", async () => {

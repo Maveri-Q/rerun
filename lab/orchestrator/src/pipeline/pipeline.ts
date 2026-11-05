@@ -14,6 +14,7 @@ import { runReimplementation, runRobustness, summarizeEvidence, type Evidence, t
 import { extractMetric, MAX_OUTPUT_BYTES, type ExtractorType } from "./extract.ts";
 import { parseJsonReply } from "./guards.ts";
 import { ModelUnavailableError, ModelVerificationError, NetworkUnavailableError, type PrivateModel } from "./model.ts";
+import { dateInstall } from "./dateinstall.ts";
 import { proposeAndApplyRepair, type AppliedPatch } from "./repair.ts";
 
 /**
@@ -24,7 +25,9 @@ import { proposeAndApplyRepair, type AppliedPatch } from "./repair.ts";
  * network, and from that moment no log or output goes to the LLM, the stream, or the receipt.
  */
 
-export const MAX_REPAIR_ATTEMPTS = 3;
+export const MAX_REPAIR_ATTEMPTS = 6;
+/** Repairs stop here even with tries left. A normal attempt costs well under a cent. */
+export const REPAIR_COST_CAP_USD = 0.05;
 const SETUP_TIMEOUT_MS = 15 * 60_000;
 const TAIL_LIMIT_BYTES = 4096;
 
@@ -80,6 +83,8 @@ export interface RunDeps {
   emit?: (e: StageEvent) => void;
   /** A fresh workspace with none of the authors' code. Without it, re-implementation is skipped. */
   newSandbox?: () => Sandbox;
+  /** Before any AI repair, try installing the packages as of the commit's date. */
+  dateInstall?: boolean;
   /** Stores a log, report or evidence file and returns its URI. Not called with private-run logs. */
   store?: (kind: "log" | "report" | "evidence", hash: string, content: string) => Promise<string>;
   now?: () => number;
@@ -147,12 +152,32 @@ export async function reproduce(input: RunInput, deps: RunDeps): Promise<RunResu
   };
 
   let unusableReplies = 0;
+  let installCommand = artifact.setup.join(" && ");
+  let dateInstallTried = false;
+
+  /** The plain-code fix, tried once before any AI. Returns true if the packages are now in place. */
+  const tryDateInstall = async (): Promise<boolean> => {
+    if (!deps.dateInstall || dateInstallTried || spec.private_data) return false;
+    dateInstallTried = true;
+    emit({ stage: "installing", message: "trying the packages as they were on the date of this code" });
+    const installed = await dateInstall(spec, sandbox);
+    if (!installed.ok || !installed.patch || !installed.installCommand) {
+      emit({ stage: "installing", message: "the packages from that date wouldn't install, so the AI will look at it" });
+      return false;
+    }
+    patches.push(installed.patch);
+    installCommand = installed.installCommand;
+    emit({ stage: "installing", message: installed.patch.justification, diff: installed.patch.diff });
+    return true;
+  };
 
   /** One repair round. Returns false once no further attempt is possible. */
   const repair = async (phase: "setup" | "run", errorLog: string): Promise<boolean> => {
-    if (attempts.length >= MAX_REPAIR_ATTEMPTS) {
-      if (unusableReplies === attempts.length) throw new ModelUnavailableError(`the AI gave no usable answer in ${attempts.length} tries, so no repair was attempted and no verdict is posted`);
-      return false;
+    const overBudget = (model.spentThisRun?.() ?? 0) >= REPAIR_COST_CAP_USD;
+    if (attempts.length >= MAX_REPAIR_ATTEMPTS || overBudget) {
+      if (attempts.length > 0 && unusableReplies === attempts.length) throw new ModelUnavailableError(`the AI gave no usable answer in ${attempts.length} tries, so no repair was attempted and no verdict is posted`);
+      // Running out of tries says nothing about the research, so nobody wins.
+      throw new Stop("INVALID", "ENV_SETUP_FAILED", overBudget ? "the repair budget ran out before the software was running" : `the software still wasn't running after ${attempts.length} repair attempts`);
     }
     emit({ stage: "repairing", message: `the code failed, so the AI is looking for a setup problem it can fix (try ${attempts.length + 1} of ${MAX_REPAIR_ATTEMPTS})` });
     const result = await proposeAndApplyRepair({
@@ -164,6 +189,8 @@ export async function reproduce(input: RunInput, deps: RunDeps): Promise<RunResu
       setup: artifact.setup,
       guard,
       previous: attempts,
+      kept: patches,
+      installCommand,
     });
     if (result.unusable) unusableReplies++;
     for (const r of result.rejected) {
@@ -220,14 +247,15 @@ export async function reproduce(input: RunInput, deps: RunDeps): Promise<RunResu
     while (true) {
       emit({ stage: "installing", message: artifact.setup.length ? "installing what the code needs" : "nothing to install" });
       if (artifact.setup.length === 0) break;
-      lastExec = await sandbox.exec(artifact.setup.join(" && "), { network: true, timeoutMs: SETUP_TIMEOUT_MS });
+      lastExec = await sandbox.exec(installCommand, { network: true, timeoutMs: SETUP_TIMEOUT_MS });
       for (let retry = 0; lastExec.exitCode !== 0 && !lastExec.timedOut && isNetworkFailure(lastExec.tail) && retry < SETUP_NETWORK_RETRIES; retry++) {
         emit({ stage: "installing", message: `the internet dropped while installing, so the Lab is trying again (${retry + 1} of ${SETUP_NETWORK_RETRIES})` });
-        lastExec = await sandbox.exec(artifact.setup.join(" && "), { network: true, timeoutMs: SETUP_TIMEOUT_MS });
+        lastExec = await sandbox.exec(installCommand, { network: true, timeoutMs: SETUP_TIMEOUT_MS });
       }
       if (lastExec.exitCode === 0) break;
       if (lastExec.timedOut || isNetworkFailure(lastExec.tail)) throw new NetworkUnavailableError("installing packages kept stalling or failing to connect, so no verdict is posted");
       exitCode = lastExec.exitCode;
+      if (await tryDateInstall()) break;
       if (!(await repair("setup", lastExec.tail))) {
         throw new Stop("BROKEN", null, "setup failed and could not be repaired");
       }
@@ -264,12 +292,17 @@ export async function reproduce(input: RunInput, deps: RunDeps): Promise<RunResu
       if (lastExec.timedOut) throw new Stop("BROKEN", null, `the run exceeded its ${spec.resources.max_minutes}-minute limit`);
       if (lastExec.exitCode === 0) break;
       if (isPrivate) throw new Stop("BROKEN", null, "the run failed; logs are not shared because this claim uses private data");
+      if (await tryDateInstall()) {
+        const relock = await sandbox.exec(lockCommand(artifact.runtime), { network: false, timeoutMs: 120_000 });
+        envLockHash = sha256(relock.log);
+        continue;
+      }
       const before = patches.length;
       if (!(await repair("run", lastExec.tail))) throw new Stop("BROKEN", null, "the run failed and could not be repaired");
       // A fix to the package list does nothing until the packages are installed again.
       if (patches.slice(before).some((p) => p.kind === "DEPENDENCY") && artifact.setup.length > 0) {
         emit({ stage: "installing", message: "installing the corrected list of packages" });
-        const reinstall = await sandbox.exec(artifact.setup.join(" && "), { network: true, timeoutMs: SETUP_TIMEOUT_MS });
+        const reinstall = await sandbox.exec(installCommand, { network: true, timeoutMs: SETUP_TIMEOUT_MS });
         if (reinstall.timedOut || (reinstall.exitCode !== 0 && isNetworkFailure(reinstall.tail))) {
           throw new NetworkUnavailableError("installing packages kept stalling or failing to connect, so no verdict is posted");
         }
@@ -449,7 +482,7 @@ async function writeReport(a: {
     `Finding: ${a.summary}`,
     `Metric ${a.spec.metric.name}: reported ${a.spec.metric.reported_value}, measured ${a.measured ?? "none"}, tolerance ${toleranceString(a.spec)}`,
     `Runtime: ${a.runtimeSecs}s`,
-    `Environment patches: ${a.patches.map((p) => `${p.kind} ${p.file}: ${p.justification}`).join("; ") || "none"}`,
+    `Environment patches: ${a.patches.map((p) => `${p.kind} ${p.file}, made by ${p.by}: ${p.justification}`).join("; ") || "none"}`,
     `Repair attempts: ${a.attempts.join(" | ") || "none"}`,
     a.evidenceSummary,
     a.isPrivate ? "This claim used private data that was never revealed; do not speculate about its contents." : "",

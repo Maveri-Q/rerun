@@ -74,6 +74,7 @@ interface Pricing {
 
 export class LlmClient {
   private callsThisRun = 0;
+  spentThisRun = 0;
   private pricing = new Map<string, Pricing>();
 
   /** `mockResponder` scripts MOCK_LLM replies, e.g. a demo claim's expected repair. */
@@ -85,6 +86,7 @@ export class LlmClient {
   /** Start a new reproduction run; resets the per-run call counter. */
   newRun(): void {
     this.callsThisRun = 0;
+    this.spentThisRun = 0;
   }
 
   async chat(req: ChatRequest): Promise<ChatResult> {
@@ -198,6 +200,7 @@ export class LlmClient {
   }
 
   private async logSpend(req: ChatRequest, r: ChatResult): Promise<void> {
+    this.spentThisRun += r.costUsd;
     await mkdir(this.config.spendDir, { recursive: true });
     const entry = {
       at: new Date().toISOString(),

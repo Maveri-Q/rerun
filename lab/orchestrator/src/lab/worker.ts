@@ -94,6 +94,7 @@ export class LabWorker {
         model,
         newSandbox: () => new DockerSandbox({ image: sandboxImage(spec.artifact.runtime), cpus: spec.resources.cpu, memGb: spec.resources.mem_gb }),
         resolver: this.cfg.resolverFor(spec),
+        dateInstall: true,
         store: this.cfg.store,
         emit: (e) => this.cfg.onEvent?.(m.id, e),
       },

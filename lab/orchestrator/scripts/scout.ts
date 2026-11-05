@@ -7,7 +7,7 @@ import path from "node:path";
 import { loadEnv } from "../src/env.ts";
 import { LlmClient, llmConfigFromEnv } from "../src/nearai/client.ts";
 import { NearAiModel } from "../src/pipeline/model.ts";
-import { draftWithModel, githubRepoFacts, loadScoutState, reScienceLeads, runScout, saveScoutState } from "../src/scout/scout.ts";
+import { allLeads, draftWithModel, githubRepoFacts, loadScoutState, runScout, saveScoutState } from "../src/scout/scout.ts";
 
 loadEnv();
 
@@ -19,7 +19,7 @@ llm.newRun();
 const model = new NearAiModel(llm, modelId);
 
 const state = await runScout(loadScoutState(DATA_DIR), {
-  leads: () => reScienceLeads(30),
+  leads: allLeads,
   repoFacts: githubRepoFacts,
   draft: draftWithModel(model),
   log: (m) => console.log(m),

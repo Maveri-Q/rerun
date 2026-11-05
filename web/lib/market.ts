@@ -5,6 +5,15 @@ import { parseDecimal } from "@rerun/shared/browser";
 export type Mode = "money" | "points";
 export type State = "Draft" | "Open" | "Locked" | "Running" | "Proposed" | "Challenged" | "Final";
 export type Outcome = "REPRODUCED" | "NOT_REPRODUCED" | "BROKEN" | "INVALID";
+
+/** Running out of repair tries reaches the contract as INVALID with this reason. */
+export const INCONCLUSIVE_REASON = "ENV_SETUP_FAILED";
+export const INCONCLUSIVE_MEANING = "The Lab couldn't get the software running within its limits, so this says nothing about the research. Nobody wins, and everyone gets half their shares' value back.";
+
+/** Who made each change, read from the receipt's on-chain diff headers. */
+export function patchAuthors(excerpt: string): { file: string; kind: string; by: string; why: string }[] {
+  return [...excerpt.matchAll(/^--- (\S+) \[(\w+)(?: by (\w+))?\] (.*)$/gm)].map((m) => ({ file: m[1]!, kind: m[2]!, by: m[3] ?? "ai", why: m[4]! }));
+}
 export type Side = "YES" | "NO";
 
 export interface Market {

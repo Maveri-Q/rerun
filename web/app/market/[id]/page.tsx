@@ -17,7 +17,7 @@ import { chain } from "@/lib/chain";
 import { accountLink, CONTRACT } from "@/lib/config";
 import { useRunStream } from "@/lib/lab";
 import { ORIGIN_LABEL, provenanceOf } from "@/lib/provenance";
-import { fmtUnits, modeUnit, outcomeMeaning, rangeText, relativeTime, stateLabel, toleranceText, type State } from "@/lib/market";
+import { INCONCLUSIVE_MEANING, INCONCLUSIVE_REASON, fmtUnits, modeUnit, outcomeMeaning, rangeText, relativeTime, stateLabel, toleranceText, type State } from "@/lib/market";
 import { useWallet } from "@/lib/wallet";
 
 const SEQUENCE: { state: State; label: string }[] = [
@@ -111,6 +111,7 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
               marketId={m.id}
               title={s.title}
               outcome={shownOutcome}
+              invalidReason={m.invalid_reason ?? latestReceipt?.invalid_reason}
               reported={s.reported_value}
               range={rangeText(s.reported_value, s.tolerance_kind, s.tolerance_value)}
               measured={latestReceipt?.measured_value ?? null}
@@ -121,7 +122,7 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
             {latestReceipt && (
               <div style={{ paddingTop: 20 }}>
                 <h3>{m.outcome ? "This result is final" : "This can still be challenged"}</h3>
-                <p className="hint" style={{ maxWidth: "38ch", fontSize: 15 }}>{outcomeMeaning(latestReceipt.outcome)}</p>
+                <p className="hint" style={{ maxWidth: "38ch", fontSize: 15 }}>{latestReceipt.invalid_reason === INCONCLUSIVE_REASON ? INCONCLUSIVE_MEANING : outcomeMeaning(latestReceipt.outcome)}</p>
                 <p style={{ marginTop: 14 }}>
                   <Link className="btn quiet btn--small" href={`/receipt/${m.id}/${latestReceipt.run_index}`}>See the full receipt</Link>
                 </p>
