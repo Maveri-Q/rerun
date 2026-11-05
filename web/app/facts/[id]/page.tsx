@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { use } from "react";
+import { ClaimNotes } from "@/components/ClaimNotes";
 import { usePoll } from "@/components/usePoll";
 import { chain } from "@/lib/chain";
 import { citedByText, factsFor } from "@/lib/facts";
@@ -73,6 +74,8 @@ export default function FactPage({ params }: { params: Promise<{ id: string }> }
           ))}
         </ul>
       </section>
+
+      <ClaimNotes market={m} />
     </article>
   );
 }

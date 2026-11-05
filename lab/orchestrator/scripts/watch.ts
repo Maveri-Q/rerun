@@ -7,6 +7,8 @@ import { LlmClient, llmConfigFromEnv } from "../src/nearai/client.ts";
 import { NearAiModel } from "../src/pipeline/model.ts";
 import { demoForSpec } from "../src/demo/fixtures.ts";
 import { labPublicUrl, need, testnetChain, testnetWorker } from "../src/lab/setup.ts";
+import { verifyMessage } from "near-api-js/nep413";
+import { NOTES_RECIPIENT, NotesStore } from "../src/lab/notes.ts";
 import { startLabServer } from "../src/lab/server.ts";
 import { RollingDemos, type RollingMarket } from "../src/lab/rolling.ts";
 import { loadDemo } from "../src/demo/fixtures.ts";
@@ -57,6 +59,10 @@ startLabServer(port, {
   hub,
   tryDemo: rolling && (() => rolling.tryNow()),
   scoutDir: DATA_DIR,
+  notes: new NotesStore(DATA_DIR, {
+    verify: (accountId, publicKey, message, nonce, signature) => verifyMessage({ signerAccountId: accountId, signerPublicKey: publicKey, payload: { message, recipient: NOTES_RECIPIENT, nonce }, signature, provider: chain.provider }),
+    creatorOf: async (market) => (await chain.view<{ creator: string } | null>("get_market", { market_id: market }))?.creator ?? null,
+  }),
   verifyScoutApproval: async (marketId, candidate) => {
     const [market, raw, config] = await Promise.all([
       chain.view<{ creator: string } | null>("get_market", { market_id: marketId }),

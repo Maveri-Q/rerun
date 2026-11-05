@@ -3174,3 +3174,16 @@ a {
 .any-chain-form label { display: grid; gap: 6px; }
 .any-chain-form label span { font-size: 14px; color: var(--ink-2); }
 .any-chain-form select, .any-chain-form input { width: 100%; min-height: 44px; }
+
+/* Community notes and declared connections */
+.note-list, .coi-list { list-style: none; padding: 0; margin: 16px 0; display: grid; gap: 12px; max-width: 720px; }
+.note { border-top: 1px solid var(--line); padding-top: 12px; overflow-wrap: anywhere; }
+.note p { margin: 0 0 8px; }
+.note--reply { margin: 8px 0 8px 16px; border-top: 0; border-left: 2px solid var(--line-strong); padding: 0 0 0 12px; }
+.note-who { color: var(--ink-2); font-size: 14px; }
+.coi-badge { display: inline-block; border: 1px solid var(--line-strong); border-radius: 8px; padding: 2px 8px; font-size: 13px; color: var(--ink); }
+.note-form { display: grid; gap: 8px; margin-top: 16px; max-width: 720px; justify-items: start; }
+.note-form textarea { width: 100%; }
+.note-declare { margin-top: 16px; max-width: 720px; }
+.note-declare summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; color: var(--ink-2); }
+.note-declare select { margin: 8px 8px 8px 0; min-height: 44px; }

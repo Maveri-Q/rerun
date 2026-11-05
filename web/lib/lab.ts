@@ -110,7 +110,36 @@ export interface ScoutCandidate {
   };
 }
 
+export interface ClaimNote {
+  id: string;
+  market: number;
+  account: string;
+  kind: "note" | "reply" | "declare";
+  text: string;
+  role: "author" | "creator" | null;
+  parent: string | null;
+  at: number;
+}
+
+export const NOTES_RECIPIENT = "rerun-notes";
+
+const toBase64 = (bytes: Uint8Array) => btoa(String.fromCharCode(...bytes));
+
 export const lab = {
+  notes: async (market: number) => {
+    const res = await fetch(`${LAB_URL}/notes/${market}`);
+    if (!res.ok) throw new Error(`notes ${res.status}`);
+    return (await res.json()) as ClaimNote[];
+  },
+  /** The wallet signs the note's exact text, so it can't be changed or posted in someone else's name. */
+  async addNote(wallet: { accountId: string; signMessage: (message: string, recipient: string, nonce: Uint8Array) => Promise<{ publicKey: string; signature: string }> }, note: Pick<ClaimNote, "market" | "kind" | "text" | "role" | "parent">): Promise<void> {
+    const message = JSON.stringify({ app: NOTES_RECIPIENT, ...note, time: Date.now() });
+    const nonce = crypto.getRandomValues(new Uint8Array(32));
+    const signed = await wallet.signMessage(message, NOTES_RECIPIENT, nonce);
+    const res = await fetch(`${LAB_URL}/notes`, { method: "POST", body: JSON.stringify({ account_id: wallet.accountId, public_key: signed.publicKey, signature: signed.signature, nonce: toBase64(nonce), message }) }).catch(() => null);
+    if (!res) throw new Error("The Lab isn't answering, so your note wasn't posted. Try again later.");
+    if (!res.ok) throw new Error(((await res.json()) as { error?: string }).error ?? "The Lab didn't take that note.");
+  },
   /** From the Lab if it's on, otherwise the log the scheduled scan publishes with the site. */
   scout: async () => {
     const res = await fetch(`${LAB_URL}/scout`).catch(() => null);

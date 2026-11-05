@@ -12,6 +12,7 @@ import { RunTerminal } from "@/components/RunTerminal";
 import { PrintedReceipt } from "@/components/PrintedReceipt";
 import { TradePanel } from "@/components/TradePanel";
 import { usePoll } from "@/components/usePoll";
+import { ClaimNotes } from "@/components/ClaimNotes";
 import { VerifiedPanel } from "@/components/VerifiedPanel";
 import { chain } from "@/lib/chain";
 import { citedByText, factsFor } from "@/lib/facts";
@@ -279,6 +280,8 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
             <pre className="log">{specRaw.data}</pre>
           </details>
         </section>
+
+        <ClaimNotes market={m} />
       </div>
 
       <aside className="sticky" id="forecast">
