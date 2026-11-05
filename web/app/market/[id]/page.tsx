@@ -82,6 +82,11 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
             <span className={`chip origin-chip--${origin.origin}`}>{ORIGIN_LABEL[origin.origin]}</span>
           </p>
         )}
+        {spec?.statement.endsWith("Suggested by the scout agent.") && (
+          <p className="origin-chips">
+            <Link className="chip" href="/scout">Suggested by the scout agent</Link>
+          </p>
+        )}
         <p className="statement">{spec?.statement.replace(/^DEMO FIXTURE,\s*/i, "A demo, ")}</p>
         {origin && (
           <div className="origin">

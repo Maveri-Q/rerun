@@ -73,7 +73,47 @@ async function get<T>(path: string): Promise<T | null> {
   }
 }
 
+export interface ScoutCandidate {
+  id: string;
+  source: string;
+  title: string;
+  paperUrl: string;
+  repoUrl: string | null;
+  status: "pending" | "rejected" | "retry" | "approved";
+  reasons: string[];
+  checkedAt: string;
+  license?: string | null;
+  runtime?: string | null;
+  marketId?: number;
+  draft?: {
+    repo_url: string;
+    commit: string;
+    title: string;
+    statement: string;
+    authors: string;
+    license: string;
+    runtime: string;
+    setup: string[];
+    entrypoint: string;
+    output_path: string;
+    extractor_type: string;
+    extractor_expr: string;
+    metric_name: string;
+    reported_value: string;
+    notes: string;
+  };
+}
+
 export const lab = {
+  scout: async () => {
+    const res = await fetch(`${LAB_URL}/scout`);
+    if (!res.ok) throw new Error(`Lab answered ${res.status}`);
+    return (await res.json()) as { lastScanAt: string | null; candidates: Record<string, ScoutCandidate> };
+  },
+  async scoutApproved(id: string, marketId: number): Promise<void> {
+    const res = await fetch(`${LAB_URL}/scout/${encodeURIComponent(id)}/approved`, { method: "POST", body: JSON.stringify({ market_id: marketId }) });
+    if (!res.ok) throw new Error(`The claim is open, but the Lab couldn't mark the suggestion as approved (${res.status}).`);
+  },
   health: () => get<LabHealth>("/health"),
   attestation: (digest: string) => get<AttestationRecord>(`/attestations/${digest}`),
   latestAttestation: () => get<AttestationRecord>("/attestations/latest"),

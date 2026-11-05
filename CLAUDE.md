@@ -11,7 +11,7 @@ RERUN: NEAR Hackathon 2026 entry. The full spec is the human's build plan (`RERU
 - `DOCKER_TESTS=1 pnpm --filter @rerun/orchestrator test` adds real-container isolation tests
 - After changing specs, receipts or demo claims: `MOCK_LLM=1 pnpm lab:run all && pnpm --filter @rerun/orchestrator export:vectors`, then `pnpm test:contracts`
 - `pnpm deploy:testnet` (idempotent; `pnpm deploy` is pnpm's own command), `pnpm demo [names] [--resume]` (end to end on testnet), `pnpm lab:watch` (Lab loop)
-- `pnpm web` (site on :3000), `pnpm seed` (open markets with odds). `pnpm lab:watch` also serves the Lab's API on :8787
+- `pnpm scout` (one scan by the scout agent: reads metadata, drafts with the AI, never runs code or posts; review at `/scout`), `pnpm post-real` (posts `claims/real` to testnet, idempotent), `pnpm web` (site on :3000), `pnpm seed` (open markets with odds). `pnpm lab:watch` also serves the Lab's API on :8787
 - `pnpm judge-demo [--skip-live]` (Node only), `pnpm challenge-demo`, `pnpm attack-demo` (both refuse to run while a Lab is up, because it would race them for markets)
 - `pnpm test:contracts` (cargo unit + property tests), `pnpm build:contracts` (testnet wasm into `contracts/target/near/`)
 - Mainnet contract build: `cd contracts/rerun && cargo near build non-reproducible-wasm --no-abi --no-default-features` (drops `register_lab_local`)

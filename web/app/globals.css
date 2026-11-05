@@ -2867,3 +2867,110 @@ a {
   max-width: 62ch;
   margin-top: 16px;
 }
+
+/* The scout's review queue */
+.suggestions {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  align-items: start;
+}
+
+.suggestion {
+  padding: 20px 20px 30px;
+  background: var(--paper);
+  color: var(--paper-ink);
+  font-size: 15px;
+  mask:
+    conic-gradient(from -45deg at 50% 100%, #000 90deg, #0000 0) 0 100% / 10px 10px repeat-x,
+    linear-gradient(#000 0 0) 0 0 / 100% calc(100% - 10px) no-repeat;
+}
+
+.suggestion .receipt-top {
+  font: 12.5px/1.45 var(--font-geist-mono), monospace;
+}
+
+.suggestion h3 {
+  margin: 14px 0 8px;
+  font: 500 21px/1.2 var(--font-funnel-display), sans-serif;
+}
+
+.suggestion p {
+  margin: 0 0 12px;
+  color: var(--paper-ink-2);
+}
+
+.suggestion a {
+  color: var(--paper-ink);
+}
+
+.suggestion .receipt-lines {
+  font: 12.5px/1.6 var(--font-geist-mono), monospace;
+}
+
+.suggestion-links {
+  display: flex;
+  gap: 16px;
+  margin-top: 12px !important;
+}
+
+.suggestion summary {
+  color: var(--paper-ink-2);
+}
+
+.suggestion-note {
+  font-size: 14px;
+}
+
+.suggestion-approve {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--paper-ink);
+}
+
+.suggestion-approve input.mono {
+  color: var(--ink);
+  margin-top: 4px;
+  max-width: 160px;
+}
+
+.suggestion-check {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+
+.suggestion-check input {
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+}
+
+.scout-rejected {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+}
+
+.scout-rejected li {
+  padding: 12px 0;
+  border-top: 1px solid var(--line);
+  font-size: 15px;
+}
+
+.scout-rejected p {
+  margin: 4px 0 0;
+  color: var(--ink-2);
+  font-size: 14px;
+}
+
+@media (max-width: 720px) {
+  .suggestions {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

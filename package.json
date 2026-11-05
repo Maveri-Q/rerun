@@ -19,6 +19,7 @@
     "demo": "pnpm --filter @rerun/scripts demo",
     "seed": "pnpm --filter @rerun/scripts seed",
     "post-real": "pnpm --filter @rerun/scripts post-real",
+    "scout": "pnpm --filter @rerun/orchestrator scout",
     "challenge-demo": "pnpm --filter @rerun/scripts challenge-demo",
     "attack-demo": "pnpm --filter @rerun/scripts attack-demo",
     "judge-demo": "pnpm --filter @rerun/scripts judge-demo",

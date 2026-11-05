@@ -1,3 +1,4 @@
+import { loadScoutState, saveScoutState, type Candidate } from "../scout/scout.ts";
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import { ClaimSpec, specHash } from "@rerun/shared";
 import { LlmClient, llmConfigFromEnv } from "../nearai/client.ts";
@@ -26,6 +27,10 @@ export interface ServerOptions {
   labAccount: string;
   modelId: string;
   dryRunEnabled: boolean;
+  /** Where the scout keeps its queue. Without it, the scout's endpoints answer 404. */
+  scoutDir?: string;
+  /** Confirms on-chain that a market came from this candidate and the contract's owner opened it. */
+  verifyScoutApproval?: (marketId: number, candidate: Candidate) => Promise<boolean>;
 }
 
 export function startLabServer(port: number, opts: ServerOptions) {
@@ -42,6 +47,7 @@ export function startLabServer(port: number, opts: ServerOptions) {
     const parts = url.pathname.split("/").filter(Boolean);
 
     if (req.method === "GET") {
+      if (url.pathname === "/scout" && opts.scoutDir) return json(res, 200, loadScoutState(opts.scoutDir));
       if (url.pathname === "/health") return json(res, 200, { ok: true, dry_run: opts.dryRunEnabled, ...opts.info });
       if (url.pathname === "/runs") return json(res, 200, opts.hub.recent(Math.min(Number(url.searchParams.get("limit") ?? 20), 50)));
       if (parts[0] === "runs" && parts[2] === "stream" && parts[1]) return stream(req, res, parts[1]);
@@ -74,6 +80,17 @@ export function startLabServer(port: number, opts: ServerOptions) {
         } catch (e) {
           return json(res, 422, { error: (e as Error).message.slice(0, 300) });
         }
+      }
+      if (parts[0] === "scout" && parts[2] === "approved" && parts[1] && opts.scoutDir && opts.verifyScoutApproval) {
+        const body = JSON.parse((await readBody(req, MAX_JSON_BYTES)).toString("utf8")) as { market_id?: number };
+        const state = loadScoutState(opts.scoutDir);
+        const candidate = state.candidates[decodeURIComponent(parts[1])];
+        if (!candidate || typeof body.market_id !== "number") return json(res, 404, { error: "Unknown suggestion." });
+        // Anyone can call this, so it believes the blockchain and not the caller.
+        if (!(await opts.verifyScoutApproval(body.market_id, candidate))) return json(res, 403, { error: "That claim doesn't match this suggestion, or wasn't opened by the owner." });
+        state.candidates[candidate.id] = { ...candidate, status: "approved", marketId: body.market_id };
+        saveScoutState(opts.scoutDir, state);
+        return json(res, 200, { ok: true });
       }
       if (url.pathname === "/methods") {
         const body = JSON.parse((await readBody(req, MAX_JSON_BYTES)).toString("utf8")) as { spec_hash?: string; methods?: string };

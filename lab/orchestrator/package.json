@@ -9,6 +9,7 @@
     "nearai:hello": "tsx scripts/nearai-hello.ts",
     "lab:run": "tsx scripts/run-claim.ts",
     "lab:watch": "tsx scripts/watch.ts",
+    "scout": "tsx scripts/scout.ts",
     "export:vectors": "tsx scripts/export-vectors.ts"
   },
   "dependencies": {
