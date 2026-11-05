@@ -13,7 +13,7 @@ import type { ExecResult, Sandbox } from "../sandbox/types.ts";
 import { runReimplementation, runRobustness, summarizeEvidence, type Evidence, type ReimplementationResult, type RobustnessResult } from "./evidence.ts";
 import { extractMetric, MAX_OUTPUT_BYTES, type ExtractorType } from "./extract.ts";
 import { parseJsonReply } from "./guards.ts";
-import { ModelVerificationError, type PrivateModel } from "./model.ts";
+import { ModelUnavailableError, ModelVerificationError, NetworkUnavailableError, type PrivateModel } from "./model.ts";
 import { proposeAndApplyRepair, type AppliedPatch } from "./repair.ts";
 
 /**
@@ -92,6 +92,17 @@ export interface RunResult {
   evidence: Evidence;
 }
 
+const SETUP_NETWORK_RETRIES = 3;
+const NETWORK_FAILURE = /read timed out|readtimeouterror|connection (reset|refused|timed out|aborted)|connectionerror|temporary failure in name resolution|could not resolve host|name or service not known|network is unreachable|cannot open url|failed to connect/i;
+
+/** A dropped connection during setup is the Lab's problem, not a finding about the research. */
+export function isNetworkFailure(log: string): boolean {
+  return NETWORK_FAILURE.test(log);
+}
+
+// The model's hidden reasoning counts against this, so it needs far more room than the 120-word report.
+const REPORT_MAX_TOKENS = 5000;
+
 class Stop extends Error {
   constructor(
     readonly outcome: Outcome,
@@ -135,9 +146,14 @@ export async function reproduce(input: RunInput, deps: RunDeps): Promise<RunResu
     privatePath: spec.private_data?.path,
   };
 
+  let unusableReplies = 0;
+
   /** One repair round. Returns false once no further attempt is possible. */
   const repair = async (phase: "setup" | "run", errorLog: string): Promise<boolean> => {
-    if (attempts.length >= MAX_REPAIR_ATTEMPTS) return false;
+    if (attempts.length >= MAX_REPAIR_ATTEMPTS) {
+      if (unusableReplies === attempts.length) throw new ModelUnavailableError(`the AI gave no usable answer in ${attempts.length} tries, so no repair was attempted and no verdict is posted`);
+      return false;
+    }
     emit({ stage: "repairing", message: `the code failed, so the AI is looking for a setup problem it can fix (try ${attempts.length + 1} of ${MAX_REPAIR_ATTEMPTS})` });
     const result = await proposeAndApplyRepair({
       model,
@@ -149,6 +165,7 @@ export async function reproduce(input: RunInput, deps: RunDeps): Promise<RunResu
       guard,
       previous: attempts,
     });
+    if (result.unusable) unusableReplies++;
     for (const r of result.rejected) {
       rejectedEdits.push(r);
       emit({ stage: "repairing", message: `blocked an AI edit to ${r.file}: ${r.reason}` });
@@ -204,9 +221,14 @@ export async function reproduce(input: RunInput, deps: RunDeps): Promise<RunResu
       emit({ stage: "installing", message: artifact.setup.length ? "installing what the code needs" : "nothing to install" });
       if (artifact.setup.length === 0) break;
       lastExec = await sandbox.exec(artifact.setup.join(" && "), { network: true, timeoutMs: SETUP_TIMEOUT_MS });
+      for (let retry = 0; lastExec.exitCode !== 0 && !lastExec.timedOut && isNetworkFailure(lastExec.tail) && retry < SETUP_NETWORK_RETRIES; retry++) {
+        emit({ stage: "installing", message: `the internet dropped while installing, so the Lab is trying again (${retry + 1} of ${SETUP_NETWORK_RETRIES})` });
+        lastExec = await sandbox.exec(artifact.setup.join(" && "), { network: true, timeoutMs: SETUP_TIMEOUT_MS });
+      }
       if (lastExec.exitCode === 0) break;
+      if (lastExec.timedOut || isNetworkFailure(lastExec.tail)) throw new NetworkUnavailableError("installing packages kept stalling or failing to connect, so no verdict is posted");
       exitCode = lastExec.exitCode;
-      if (lastExec.timedOut || !(await repair("setup", lastExec.tail))) {
+      if (!(await repair("setup", lastExec.tail))) {
         throw new Stop("BROKEN", null, "setup failed and could not be repaired");
       }
     }
@@ -430,7 +452,7 @@ async function writeReport(a: {
         },
         { role: "user", content: facts },
       ],
-      2000, // reasoning tokens count against this
+      REPORT_MAX_TOKENS, // reasoning tokens count against this
     );
   } catch (e) {
     if (e instanceof ModelVerificationError) throw e;

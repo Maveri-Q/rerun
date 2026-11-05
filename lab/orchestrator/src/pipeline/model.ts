@@ -21,6 +21,15 @@ export interface PrivateModel {
 
 export class ModelVerificationError extends Error {}
 
+/**
+ * The AI never gave a usable answer, so no repair was really tried. That says nothing about the
+ * research, so it must not become a BROKEN verdict: the run stops and posts nothing.
+ */
+export class ModelUnavailableError extends Error {}
+
+/** The internet failed while installing packages. Like above, this says nothing about the research. */
+export class NetworkUnavailableError extends Error {}
+
 const MAX_SIGNATURE_REFS = 16;
 
 export class NearAiModel implements PrivateModel {
@@ -56,7 +65,7 @@ export class NearAiModel implements PrivateModel {
   }
 
   async ask(purpose: string, messages: ChatMessage[], maxTokens?: number): Promise<string> {
-    const chat = await this.llm.chat({ model: this.modelId, purpose, messages, maxTokens, long: purpose === "reimplement" });
+    const chat = await this.llm.chat({ model: this.modelId, purpose, messages, maxTokens, long: true });
     if (chat.mock) {
       this.addRef(chat.chatId);
       return chat.text;

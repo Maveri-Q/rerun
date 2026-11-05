@@ -20,6 +20,13 @@ replication's code against the number the original paper published.
 - `budworm-timing`: slope -0.0457, the "Original" logit row of Table 2 of the ReScience article.
 - `budworm-spread`: 1.559, transcribed from Kemp et al. 1986 Table 1 in the replication's `code/03_fit_dennis_et_al_model.R`. The replication's author reports a difference of about 9% for this value and good overall agreement.
 
+## Setup changes
+
+Nothing in any author's code is edited. Two claims needed a change to how the code is launched, and both are in the claim's public spec:
+
+- `parkinsons-spread`: the code is from 2021 and uses `Index._index_data`, a private pandas feature that newer versions removed. The article's pandas 1.1.5 has no build for Python 3.11, so the command restores that one attribute (it returns the index's values) before running `Pipeline.py` unchanged.
+- `budworm-spread`: the command runs the script's own lines up to the model fit and skips the table formatting after it, because that needs `kableExtra`, which wouldn't install in the sandbox. It doesn't affect the fit.
+
 ## Margins
 
 Each margin was set before any run: 0.0005 for `wildfire-water` and 0.005 for `parkinsons-spread`,

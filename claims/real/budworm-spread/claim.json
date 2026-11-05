@@ -18,9 +18,9 @@
       "runtime": "r4.4",
       "setup": [
         "mkdir -p /work/.rlib",
-        "Rscript --vanilla -e \"install.packages(c('gtools','kableExtra'), lib='/work/.rlib', repos='https://cloud.r-project.org')\""
+        "Rscript --vanilla -e \"install.packages('gtools', lib='/work/.rlib', repos='https://cloud.r-project.org')\""
       ],
-      "entrypoint": "Rscript --vanilla -e \"source('code/03_fit_dennis_et_al_model.R'); cat(sprintf('spread %.6f\\n', logit_cm_dennis_nll\\$par[7]))\" > rerun_output.txt",
+      "entrypoint": "Rscript --vanilla -e \"library(dplyr); e <- parse('code/03_fit_dennis_et_al_model.R'); for (x in e[3:5]) eval(x); cat(sprintf('spread %.6f\\n', logit_cm_dennis_nll\\$par[7]))\" > rerun_output.txt",
       "output": {
         "path": "rerun_output.txt",
         "extractor": { "type": "regex", "expr": "spread (-?[0-9.]+)" }

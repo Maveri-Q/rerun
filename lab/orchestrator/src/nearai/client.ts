@@ -27,7 +27,7 @@ export function llmConfigFromEnv(env: NodeJS.ProcessEnv = process.env): LlmConfi
     baseUrl: env.NEARAI_CLOUD_BASE_URL || "https://cloud-api.near.ai",
     apiKey: env.NEARAI_CLOUD_API_KEY || undefined,
     maxTokensPerCall: Number(env.LLM_MAX_TOKENS_PER_CALL || 2000),
-    maxTokensLongCall: Number(env.LLM_MAX_TOKENS_LONG_CALL || 5000),
+    maxTokensLongCall: Number(env.LLM_MAX_TOKENS_LONG_CALL || 8000),
     maxCallsPerRun: Number(env.LLM_MAX_CALLS_PER_RUN || 12),
     dailyUsdCap: Number(env.LLM_DAILY_USD_CAP || 1),
     mock: env.MOCK_LLM === "1",

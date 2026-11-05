@@ -206,9 +206,39 @@ describe("reproduce: repair loop", () => {
     expect(receipt.outcome).toBe("BROKEN");
   });
 
-  it("stops after three attempts", async () => {
+  it("shows the AI the code around the error, so it can write an exact edit", async () => {
+    sandbox.files.set("run.py", Buffer.from(Array.from({ length: 30 }, (_, i) => `line_${i + 1}`).join("\n")));
+    sandbox.runs = [{ exitCode: 1, log: 'Traceback:\n  File "/work/repo/run.py", line 15, in <module>\nAttributeError: gone' }];
+    model.replies.repair = ['{"give_up":true,"reason":"no","edits":[]}'];
+    await run();
+    const prompt = model.calls.find((c) => c.purpose === "repair")!.text;
+    expect(prompt).toContain("15: line_15");
+    expect(prompt).toContain("7: line_7");
+    expect(prompt).not.toContain("line_30");
+  });
+
+  it("posts no verdict when the internet keeps failing during setup", async () => {
+    sandbox.setups = [{ exitCode: 1, log: "ReadTimeoutError: Read timed out." }];
+    await expect(run()).rejects.toThrow(/no verdict is posted/);
+    expect(model.calls.filter((c) => c.purpose === "repair")).toHaveLength(0);
+  });
+
+  it("carries on when the internet comes back during setup", async () => {
+    sandbox.setups = [{ exitCode: 1, log: "Could not resolve host: pypi.org" }, {}];
+    expect((await run()).receipt.outcome).toBe("REPRODUCED");
+    expect(model.calls.filter((c) => c.purpose === "repair")).toHaveLength(0);
+  });
+
+  it("posts no verdict when the AI never gives a usable answer, because no repair was really tried", async () => {
     sandbox.runs = [{ exitCode: 1, log: "still failing" }];
     model.replies.repair = ["this is not JSON"];
+    await expect(run()).rejects.toThrow(/no verdict is posted/);
+    expect(model.calls.filter((c) => c.purpose === "repair")).toHaveLength(3);
+  });
+
+  it("stops after three attempts and says BROKEN once the AI really tried", async () => {
+    sandbox.runs = [{ exitCode: 1, log: "still failing" }];
+    model.replies.repair = ["this is not JSON", "this is not JSON", '{"give_up":true,"reason":"nothing to fix","edits":[]}'];
     const { receipt } = await run();
     expect(receipt.outcome).toBe("BROKEN");
     expect(model.calls.filter((c) => c.purpose === "repair")).toHaveLength(3);
