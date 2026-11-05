@@ -264,7 +264,23 @@ export async function reproduce(input: RunInput, deps: RunDeps): Promise<RunResu
       if (lastExec.timedOut) throw new Stop("BROKEN", null, `the run exceeded its ${spec.resources.max_minutes}-minute limit`);
       if (lastExec.exitCode === 0) break;
       if (isPrivate) throw new Stop("BROKEN", null, "the run failed; logs are not shared because this claim uses private data");
+      const before = patches.length;
       if (!(await repair("run", lastExec.tail))) throw new Stop("BROKEN", null, "the run failed and could not be repaired");
+      // A fix to the package list does nothing until the packages are installed again.
+      if (patches.slice(before).some((p) => p.kind === "DEPENDENCY") && artifact.setup.length > 0) {
+        emit({ stage: "installing", message: "installing the corrected list of packages" });
+        const reinstall = await sandbox.exec(artifact.setup.join(" && "), { network: true, timeoutMs: SETUP_TIMEOUT_MS });
+        if (reinstall.timedOut || (reinstall.exitCode !== 0 && isNetworkFailure(reinstall.tail))) {
+          throw new NetworkUnavailableError("installing packages kept stalling or failing to connect, so no verdict is posted");
+        }
+        if (reinstall.exitCode !== 0) {
+          lastExec = reinstall;
+          exitCode = reinstall.exitCode;
+          if (!(await repair("setup", reinstall.tail))) throw new Stop("BROKEN", null, "setup failed and could not be repaired");
+        }
+        const relock = await sandbox.exec(lockCommand(artifact.runtime), { network: false, timeoutMs: 120_000 });
+        envLockHash = sha256(relock.log);
+      }
     }
 
     emit({ stage: "extracting", message: `reading the ${spec.metric.name} from the output` });

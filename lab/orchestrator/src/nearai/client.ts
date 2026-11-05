@@ -104,6 +104,9 @@ export class LlmClient {
       messages: req.messages,
       max_tokens: maxTokens,
       stream: false,
+      // Hidden thinking counts against max_tokens, and on real repositories it used the whole budget
+      // and returned nothing. Only writing a whole program from a paper's methods needs it.
+      chat_template_kwargs: { enable_thinking: req.purpose === "reimplement" },
     });
 
     const result = this.config.mock

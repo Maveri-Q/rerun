@@ -206,6 +206,21 @@ describe("reproduce: repair loop", () => {
     expect(receipt.outcome).toBe("BROKEN");
   });
 
+  it("installs packages again after the AI fixes the package list during the run", async () => {
+    sandbox.runs = [
+      { exitCode: 1, log: "ModuleNotFoundError: No module named 'tqdm'" },
+      { effect: (s) => s.files.set("out.json", Buffer.from('{"acc":0.9}')), log: "ok" },
+    ];
+    model.replies.repair = ['{"give_up":false,"reason":"missing package","edits":[{"file":"requirements.txt","kind":"DEPENDENCY","justification":"add a missing package","search":"","replace":"tqdm\\n"}]}'];
+    const { receipt } = await run();
+    expect(receipt.outcome).toBe("REPRODUCED");
+    const installs = sandbox.execs.filter((e) => e.script.startsWith("pip install"));
+    expect(installs).toHaveLength(2);
+    expect(installs[1]!.opts.network).toBe(true);
+    const order = sandbox.execs.map((e) => e.script);
+    expect(order.lastIndexOf("pip install -r requirements.txt")).toBeLessThan(order.lastIndexOf("python run.py"));
+  });
+
   it("shows the AI the code around the error, so it can write an exact edit", async () => {
     sandbox.files.set("run.py", Buffer.from(Array.from({ length: 30 }, (_, i) => `line_${i + 1}`).join("\n")));
     sandbox.runs = [{ exitCode: 1, log: 'Traceback:\n  File "/work/repo/run.py", line 15, in <module>\nAttributeError: gone' }];

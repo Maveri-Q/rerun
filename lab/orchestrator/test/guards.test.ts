@@ -61,3 +61,17 @@ describe("parseJsonReply", () => {
     expect(() => parseJsonReply("no json here")).toThrow();
   });
 });
+
+describe("parseJsonReply on real model replies", () => {
+  it("takes the first complete object and ignores what follows", () => {
+    expect(parseJsonReply('Here:\n{"a":{"b":"}"}}\n\n{"second":true} and more')).toEqual({ a: { b: "}" } });
+  });
+
+  it("handles escaped quotes inside strings", () => {
+    expect(parseJsonReply('{"a":"say \\"hi}\\" now"} trailing')).toEqual({ a: 'say "hi}" now' });
+  });
+
+  it("rejects a reply cut off part way through", () => {
+    expect(() => parseJsonReply('{"a":1')).toThrow(/no complete JSON/);
+  });
+});

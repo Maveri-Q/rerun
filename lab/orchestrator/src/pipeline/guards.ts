@@ -131,7 +131,18 @@ function isPathLike(s: string): boolean {
 /** Pulls the JSON object out of a model reply, tolerating code fences and surrounding prose. */
 export function parseJsonReply(text: string): unknown {
   const start = text.indexOf("{");
-  const end = text.lastIndexOf("}");
-  if (start < 0 || end < start) throw new Error("reply contains no JSON object");
-  return JSON.parse(text.slice(start, end + 1));
+  if (start < 0) throw new Error("reply contains no JSON object");
+  // The first complete object wins: real replies sometimes carry on after it with more text or a second object.
+  let depth = 0;
+  let quoted = false;
+  for (let i = start; i < text.length; i++) {
+    const c = text[i];
+    if (quoted) {
+      if (c === "\\") i++;
+      else if (c === '"') quoted = false;
+    } else if (c === '"') quoted = true;
+    else if (c === "{") depth++;
+    else if (c === "}" && --depth === 0) return JSON.parse(text.slice(start, i + 1));
+  }
+  throw new Error("reply contains no complete JSON object");
 }

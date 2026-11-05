@@ -13,7 +13,9 @@ Every edit is checked by code and rejected if it touches analysis logic, numbers
 
 Reply with a single JSON object and nothing else:
 {"give_up": boolean, "reason": "short explanation", "edits": [{"file": "relative/path", "kind": "ENV|PATH|DEPENDENCY", "justification": "why this is environment-only", "search": "exact text occurring once in the file", "replace": "new text"}]}
-Use kind DEPENDENCY only for dependency files. "search" may be empty only to create a new dependency file. Keep edits minimal.`;
+Use kind DEPENDENCY only for dependency files. "search" may be empty only to create a new dependency file. Keep edits minimal.
+
+You have few attempts, so fix the whole problem at once. If the same removed feature appears on several lines in the code you can see, send one edit for each. When you write a dependency file, list everything the error and file names suggest is needed.`;
 
 // The model's hidden reasoning counts against this. 2000 proved too few on a real repository: the answer came back empty.
 const REPAIR_MAX_TOKENS = 8000;
