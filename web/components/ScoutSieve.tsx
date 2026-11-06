@@ -8,7 +8,7 @@ import { BINS, binOf } from "@/lib/scout-bins";
 export function ScoutSieve({ candidates }: { candidates: ScoutCandidate[] }) {
   const reduce = useReducedMotion();
   const turnedDown = candidates.filter((c) => c.status === "rejected");
-  const passed = candidates.filter((c) => c.status === "pending" || c.status === "approved");
+  const passed = candidates.filter((c) => c.status === "pending" || c.status === "approved" || c.status === "waiting");
   const waiting = candidates.filter((c) => c.status === "retry");
   const bins = [...BINS, { label: "Something else", why: "See the list below.", test: /$^/ }]
     .map((b, i) => ({ ...b, papers: turnedDown.filter((c) => binOf(c.reasons) === i) }))

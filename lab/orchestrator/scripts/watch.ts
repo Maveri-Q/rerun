@@ -7,12 +7,14 @@ import { LlmClient, llmConfigFromEnv } from "../src/nearai/client.ts";
 import { NearAiModel } from "../src/pipeline/model.ts";
 import { demoForSpec } from "../src/demo/fixtures.ts";
 import { labPublicUrl, need, testnetChain, testnetWorker } from "../src/lab/setup.ts";
+import { canonicalJson } from "@rerun/shared";
+import { AUTO_LIMITS, marginWithModel, runApprover, specFromDraft } from "../src/scout/approver.ts";
 import { startLabServer } from "../src/lab/server.ts";
 import { RollingDemos, type RollingMarket } from "../src/lab/rolling.ts";
 import { loadDemo } from "../src/demo/fixtures.ts";
 import { specJson } from "@rerun/shared";
 import { createQueue, EventHub, LabResolver, saveAttestation } from "../src/lab/store.ts";
-import { allLeads, draftWithModel, githubRepoFacts, loadScoutState, paperAttention, readLeadPaper, runScout, saveScoutState, secondPickWithModel } from "../src/scout/scout.ts";
+import { type ScoutState, allLeads, draftWithModel, githubRepoFacts, loadScoutState, paperAttention, readLeadPaper, runScout, saveScoutState, secondPickWithModel } from "../src/scout/scout.ts";
 
 const POLL_MS = 5_000;
 const ATTEST_EVERY_MS = 6 * 3600_000;
@@ -98,12 +100,40 @@ async function attestNow() {
 attestNow().catch((e: Error) => console.error(`attestation failed: ${e.message}`));
 setInterval(() => attestNow().catch((e: Error) => console.error(`attestation failed: ${e.message}`)), ATTEST_EVERY_MS);
 
+/**
+ * The safe approver. Off unless AUTO_APPROVE=1 and it has its own account: never the owner's. That account
+ * can only do what any visitor can, and it signs at most 3 drafts a day. Each waits 6 hours before opening.
+ */
+const approve =
+  process.env.AUTO_APPROVE === "1"
+    ? (() => {
+        const scout = chain.account(need("SCOUT_ACCOUNT"), need("SCOUT_PRIVATE_KEY"));
+        if (need("SCOUT_ACCOUNT") === need("TESTNET_OWNER_ACCOUNT")) throw new Error("The safe approver must not use the owner's account.");
+        return (state: ScoutState, llm: LlmClient) =>
+          runApprover(state, {
+            firstMargin: marginWithModel(new NearAiModel(llm, modelId)),
+            secondMargin: marginWithModel(new NearAiModel(llm, process.env.NEARAI_RERUN_MODEL || "Qwen/Qwen3.8-27B")),
+            createDraft: async (c, margin, lockTime) => {
+              const specJson = canonicalJson(specFromDraft(c, margin));
+              const deposit = (0.1 + specJson.length / 50_000).toFixed(4);
+              const created = await chain.call(scout, "create_market", { spec_json: specJson, lock_time: lockTime, challenge_window: AUTO_LIMITS.challengeSecs, mode: "points" }, { deposit });
+              return Number(created.value);
+            },
+            open: async (marketId) => {
+              await chain.call(scout, "fund_market", { market_id: marketId, initial_liquidity: AUTO_LIMITS.liquidity.toString() }, { deposit: "0.02" });
+            },
+            stillDraft: async (marketId) => (await chain.view<{ state: string } | null>("get_market", { market_id: marketId }))?.state === "Draft",
+            log: (m) => console.log(m),
+          });
+      })()
+    : null;
+
 /** Looks for new research to suggest. A failed scan just waits for the next one. */
 async function scoutNow() {
   const llm = new LlmClient(llmConfigFromEnv());
   llm.newRun();
   const state = await runScout(loadScoutState(DATA_DIR), { leads: allLeads, repoFacts: githubRepoFacts, draft: draftWithModel(new NearAiModel(llm, modelId)), attention: paperAttention, paperText: readLeadPaper, secondPick: secondPickWithModel(new NearAiModel(llm, process.env.NEARAI_RERUN_MODEL || "Qwen/Qwen3.8-27B")), log: (m) => console.log(m) });
-  saveScoutState(DATA_DIR, state);
+  saveScoutState(DATA_DIR, approve ? await approve(state, llm) : state);
 }
 scoutNow().catch((e: Error) => console.error(`scout failed: ${e.message}`));
 setInterval(() => scoutNow().catch((e: Error) => console.error(`scout failed: ${e.message}`)), SCOUT_EVERY_MS);

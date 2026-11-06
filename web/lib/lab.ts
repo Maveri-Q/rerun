@@ -100,7 +100,8 @@ export interface ScoutCandidate {
   title: string;
   paperUrl: string;
   repoUrl: string | null;
-  status: "pending" | "rejected" | "retry" | "approved";
+  status: "pending" | "rejected" | "retry" | "approved" | "waiting";
+  opensAt?: number;
   reasons: string[];
   checkedAt: string;
   license?: string | null;
@@ -136,7 +137,7 @@ export const lab = {
   scout: async () => {
     const found = (await live("/scout")) ?? (await fetch("/scout.json"));
     if (!found.ok) throw new Error(`no scout log (${found.status})`);
-    return (await found.json()) as { lastScanAt: string | null; candidates: Record<string, ScoutCandidate> };
+    return (await found.json()) as { lastScanAt: string | null; decisions?: { at: string; id: string; title: string; result: "approved" | "sent_to_you" | "rejected"; why: string }[]; candidates: Record<string, ScoutCandidate> };
   },
   async suggest(repoUrl: string, paperUrl: string): Promise<string> {
     if (!LAB_URL) throw new Error("The Lab is offline right now, so suggestions can't be taken. Try again later.");

@@ -8,9 +8,10 @@ import { ScoutSieve } from "@/components/ScoutSieve";
 import { usePoll } from "@/components/usePoll";
 import { chain } from "@/lib/chain";
 import { lab, type ScoutCandidate } from "@/lib/lab";
-import { rangeText } from "@/lib/market";
+import { rangeText, relativeTime } from "@/lib/market";
 import { explainError, useWallet } from "@/lib/wallet";
 
+const DECISION_WORDS = { approved: "Approved", sent_to_you: "Sent to a person", rejected: "Rejected" } as const;
 const LIQUIDITY_UNITS = 40_000_000n;
 const CHALLENGE_SECS = 24 * 3600;
 const FORECAST_DAYS = 7;
@@ -145,6 +146,8 @@ export default function ScoutPage() {
   const pending = all.filter((c) => c.status === "pending" && c.draft).sort((a, b) => (b.interest ?? 0) - (a.interest ?? 0));
   const turnedDown = all.filter((c) => c.status === "rejected");
   const approved = all.filter((c) => c.status === "approved");
+  const waiting = all.filter((c) => c.status === "waiting");
+  const decisions = [...(scout.data?.decisions ?? [])].reverse().slice(0, 30);
   const isOwner = Boolean(wallet.accountId && wallet.accountId === config.data?.owner);
 
   return (
@@ -177,6 +180,24 @@ export default function ScoutPage() {
         </ul>
       </section>
 
+      {waiting.length > 0 && (
+        <section className="section">
+          <div className="section-head">
+            <h2>Opening soon</h2>
+          </div>
+          <p className="hint">The approver passed these. Each stays closed for 6 hours, so a person can cancel it first.</p>
+          <ul className="feed">
+            {waiting.map((c) => (
+              <li key={c.id}>
+                <span className="mono">Claim {c.marketId}</span>
+                <span>{c.draft?.question ?? c.title}</span>
+                <span>Opens {c.opensAt ? relativeTime(c.opensAt) : "soon"}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
       {approved.length > 0 && (
         <section className="section">
           <div className="section-head">
@@ -190,6 +211,23 @@ export default function ScoutPage() {
                 </Link>
                 <span>{c.draft?.title ?? c.title}</span>
                 <span />
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {decisions.length > 0 && (
+        <section className="section">
+          <div className="section-head">
+            <h2>What the approver decided</h2>
+          </div>
+          <ul className="decision-log">
+            {decisions.map((d) => (
+              <li key={`${d.at}-${d.id}-${d.result}`}>
+                <b>{DECISION_WORDS[d.result]}</b>
+                <span>{d.title}</span>
+                <p className="hint">{d.why}</p>
               </li>
             ))}
           </ul>

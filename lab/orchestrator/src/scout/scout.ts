@@ -3,13 +3,14 @@ import path from "node:path";
 import { draftClaim, parseGithubUrl, pickNumber, wordingWithoutNumber, type ClaimDraft } from "../lab/draft.ts";
 import { withNetworkRetry } from "../nearai/attestation.ts";
 import type { PrivateModel } from "../pipeline/model.ts";
+import type { Decision } from "./approver.ts";
 import { checkRepo, hasDataInRepo, isClearNumber, type RepoFacts } from "./filters.ts";
 import { fetchPaperText, numberNearWording, sameNumber, type PaperText } from "./paper.ts";
 
 /**
  * The scout agent (build plan §5.4). It looks for published research that ships code, checks it in
  * plain code, drafts a claim with the private AI, and queues it for a person. Nothing it finds ever
- * goes live by itself. It only reads metadata: it never downloads or runs anyone's code.
+ * goes live by itself unless the safe approver (`approver.ts`) is turned on. It only reads metadata: it never downloads or runs anyone's code.
  */
 
 export const SUGGESTED_BY = "Suggested by the scout agent.";
@@ -58,7 +59,8 @@ export function titleInterest(lead: Pick<Lead, "title" | "upvotes">): number {
   return (TOPIC_WORDS.test(lead.title) ? 100 : 0) + Math.min(lead.upvotes ?? 0, 50);
 }
 
-export type CandidateStatus = "pending" | "rejected" | "retry" | "approved";
+/** "waiting" is a claim the safe approver has drafted, inside the 6 hours a person has to cancel it. */
+export type CandidateStatus = "pending" | "rejected" | "retry" | "approved" | "waiting";
 
 export interface Candidate extends Lead {
   status: CandidateStatus;
@@ -71,12 +73,20 @@ export interface Candidate extends Lead {
   attention?: Attention;
   /** Sorts the review queue, highest first. */
   interest?: number;
+  /** The safe approver has looked at this one, so it stays with the person from here. */
+  autoReviewed?: boolean;
+  /** When a waiting claim opens for forecasts, in seconds. */
+  opensAt?: number;
+  autoMargin?: string;
 }
 
 export interface ScoutState {
   lastScanAt: string | null;
   draftsByDay: Record<string, number>;
   candidates: Record<string, Candidate>;
+  /** Every decision the safe approver made, and why. Shown on the scout page. */
+  decisions?: Decision[];
+  autoByDay?: Record<string, number>;
 }
 
 export const emptyState = (): ScoutState => ({ lastScanAt: null, draftsByDay: {}, candidates: {} });
