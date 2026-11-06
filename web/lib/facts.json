@@ -6,6 +6,20 @@
       "result": "The check re-ran the authors' own R code, with software packages pinned to the date the code was written, on their published data. The measured correlation was 0.69605221 against a reported 0.696, so the number checks out. This only confirms that the same code and data reproduce the same figure; it does not verify that the model is correct, that the data were suitable, or that mouse results apply to humans.",
       "model": "z-ai/glm-5.3-flash",
       "writtenAt": "2026-11-05T12:02:10.837Z"
+    },
+    "6450bf0ac8d633cb663e2c8ebeb33fde42b6dd75dcfeee3d3ecc3333a8d6eb1b": {
+      "summary": "This was a small rebuild of the famous Card and Krueger finding on the minimum wage: their reported gain of 2.76 full-time-equivalent jobs per store in New Jersey, relative to Pennsylvania, checks out against their public survey data.",
+      "background": "Card and Krueger wanted to know whether raising the minimum wage destroys jobs. They surveyed fast-food restaurants in New Jersey, which raised its minimum wage in 1992, and in neighboring eastern Pennsylvania, which did not, and compared how employment changed in each state.",
+      "result": "Recomputing from the authors' public survey data gave a difference of 2.7536 full-time-equivalent workers per store between the two states, matching the paper's reported 2.76. This only confirms that the same data and arithmetic give the same number; it doesn't show the sample was fair, that payroll records agree, or that the result generalizes.",
+      "model": "z-ai/glm-5.3-flash",
+      "writtenAt": "2026-11-06T05:05:44.971Z"
+    },
+    "fa35d7e5ffd002b0b8496bed8020579611c19cef349d5ec4658021a5b04bf3d7": {
+      "summary": "A well-known claim that rich countries with public debt above 90 percent of GDP saw growth fall to -0.1 percent a year was re-run with corrected code and data, and the growth figure came out at 2.168 percent instead.",
+      "background": "Reinhart and Rogoff reported in a 2010 economics paper that rich countries with public debt above 90 percent of GDP grew by -0.1 percent a year on average, a figure widely cited in arguments for austerity. Herndon, Ash and Pollin later identified problems in the calculation, including a coding error, excluded years and unusual weighting. This re-run uses the critics' published code on the authors' own working spreadsheet to see what the corrected numbers show.",
+      "result": "Running the critics' corrected code on the authors' data produced average growth of 2.168 percent a year for the high-debt group, instead of the -0.1 percent reported in the paper. The check means the original figure does not reproduce when the identified problems are fixed, using the critics' code rather than the authors'. It does not show whether the sample was fair or complete, whether high debt slows growth or slow growth raises debt, or whether the critics' choices about years and weights were the only fair ones.",
+      "model": "z-ai/glm-5.3-flash",
+      "writtenAt": "2026-11-06T05:05:57.214Z"
     }
   },
   "citedBy": {
@@ -13,6 +27,7 @@
     "a942a4e8eee4390f46ae932c48d15ccd0c83ebc0a39eab408c50e054088f6986": 0,
     "f63ef50e89f8221d51bde13cebd576b5b89b56f82842ae5fb33321418db60774": 302,
     "c4a9b60c770317e5f7ec3aacbac1513bd2f133958bb226d29762fa2a39ae86d1": 1,
-    "19ef61085d1bfae1011de7c8c5006c243a97c56f2066c7bbea8d1179e60c8a0f": 1
+    "19ef61085d1bfae1011de7c8c5006c243a97c56f2066c7bbea8d1179e60c8a0f": 1,
+    "fa35d7e5ffd002b0b8496bed8020579611c19cef349d5ec4658021a5b04bf3d7": 3177
   }
 }
