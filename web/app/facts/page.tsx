@@ -29,8 +29,8 @@ function FactCard({ market: m }: { market: Market }) {
           {words?.mark} {words?.words}
         </motion.span>
       </div>
-      {entry && <p className="fact-card-summary">{entry.summary}</p>}
-      {receipts.data && <NumberLine reported={m.spec.reported_value} kind={m.spec.tolerance_kind} margin={m.spec.tolerance_value} measured={measured} tone={words?.tone} noNumber="No number came out of this run" />}
+      {(p.plain || entry) && <p className="fact-card-summary">{p.plain?.claim ?? entry!.summary}</p>}
+      {receipts.data && <NumberLine reported={m.spec.reported_value} kind={m.spec.tolerance_kind} margin={m.spec.tolerance_value} measured={measured} tone={words?.tone} noNumber="No number came out of this run" unit={p.plain?.unit} />}
       <p className="fact-card-foot">
         <span>{ORIGIN_LABEL[p.origin]}</span>
         {cited && <span>{cited}</span>}
@@ -44,7 +44,7 @@ export default function FactsPage() {
   const markets = usePoll(() => chain.markets(), [], 30_000, "markets");
   const real = (markets.data ?? []).filter((m) => provenanceOf(m.spec.spec_hash));
   const checked = real.filter((m) => m.state === "Final").sort((a, b) => b.id - a.id);
-  const open = real.filter((m) => m.state !== "Final");
+  const open = real.filter((m) => m.state !== "Final" && !provenanceOf(m.spec.spec_hash)?.technical);
   const held = checked.filter((m) => m.outcome === "REPRODUCED").length;
   const fell = checked.filter((m) => m.outcome === "NOT_REPRODUCED" || m.outcome === "BROKEN").length;
   const unsure = checked.length - held - fell;

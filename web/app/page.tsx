@@ -6,29 +6,28 @@ import { MarketTicker } from "@/components/MarketTicker";
 import { PaperTape } from "@/components/PaperTape";
 import { PrintedReceipt } from "@/components/PrintedReceipt";
 import { RollingNumber } from "@/components/RollingNumber";
-import { TryItNow } from "@/components/TryItNow";
 import { usePoll } from "@/components/usePoll";
 import { chain } from "@/lib/chain";
 import { lab } from "@/lib/lab";
-import { fmtUnits, rangeText, type Market, type Mode } from "@/lib/market";
-import { provenanceOf } from "@/lib/provenance";
+import { isPractice, rangeText, type Market } from "@/lib/market";
+import { claimName, provenanceOf } from "@/lib/provenance";
 
-type Filter = "all" | Mode | "settled";
+type Filter = "all" | "open" | "settled";
 
 const FILTERS: { key: Filter; label: string }[] = [
   { key: "all", label: "All" },
-  { key: "points", label: "Points" },
-  { key: "money", label: "tUSDC" },
+  { key: "open", label: "Open" },
   { key: "settled", label: "Finished" },
 ];
 
 const FIRST_ROWS = 8;
 
-/** The flagship, then other published papers, then demos. */
+/** Findings people have heard of first, and the ones that need background last. */
 const rank = (m: Market) => {
   const p = provenanceOf(m.spec.spec_hash);
-  return p?.flagship ? 0 : p ? 1 : 2;
+  return p?.famous ? 0 : p?.technical ? 2 : 1;
 };
+const technical = (m: Market) => Boolean(provenanceOf(m.spec.spec_hash)?.technical);
 
 const live = (m: Market) => m.state !== "Final";
 
@@ -36,13 +35,12 @@ export default function Home() {
   const [filter, setFilter] = useState<Filter>("all");
   const [showAll, setShowAll] = useState(false);
   const markets = usePoll(() => chain.markets(), [], 15_000, "markets");
-  const stats = usePoll(() => chain.stats(), [], 30_000, "stats");
   const feed = usePoll(() => lab.recentRuns(), [], 10_000);
 
-  // Pipeline checks are labelled [TEST]; they stay on-chain and reachable by link, but off the front page.
-  const listed = useMemo(() => (markets.data ?? []).filter((m) => m.state !== "Draft" && !m.spec.title.startsWith("[TEST]")), [markets.data]);
+  // Only real research is listed. Demos and pipeline checks stay on-chain, reachable by direct link.
+  const listed = useMemo(() => (markets.data ?? []).filter((m) => m.state !== "Draft" && !isPractice(m)), [markets.data]);
   const shown = useMemo(() => {
-    const rows = listed.filter((m) => (filter === "all" ? true : filter === "settled" ? m.state === "Final" : m.mode === filter));
+    const rows = listed.filter((m) => (filter === "all" ? true : filter === "settled" ? m.state === "Final" : m.state !== "Final"));
     return [...rows].sort((a, b) => rank(a) - rank(b) || Number(live(b)) - Number(live(a)) || b.id - a.id);
   }, [listed, filter]);
 
@@ -50,9 +48,8 @@ export default function Home() {
   const receipts = usePoll(() => (latest ? chain.receipts(latest.id) : Promise.resolve([])), [latest?.id], 0, latest ? `receipts.${latest.id}` : undefined);
   const measured = receipts.data?.at(-1)?.measured_value ?? null;
 
-  const s = stats.data;
-  // Only published papers count here. The demo and test claims would make this figure meaningless.
-  const papers = listed.filter((m) => provenanceOf(m.spec.spec_hash));
+  const papers = listed;
+  const stillOpen = papers.filter((m) => m.state === "Open").length;
   const checked = papers.filter((m) => m.state === "Final" && (m.outcome === "REPRODUCED" || m.outcome === "NOT_REPRODUCED"));
   const held = checked.filter((m) => m.outcome === "REPRODUCED");
   return (
@@ -64,8 +61,7 @@ export default function Home() {
             Many published results don&apos;t. Here you predict which ones will, then an AI lab re-runs the code and data behind them and prints public proof.
           </p>
           <div className="hero-actions">
-            <TryItNow />
-            <a className="btn quiet" href="#claims">
+            <a className="btn" href="#claims">
               See the claims
             </a>
             <Link className="btn quiet" href="/check">
@@ -87,16 +83,17 @@ export default function Home() {
             </div>
             <div className="figure">
               <b>
-                <RollingNumber value={s ? fmtUnits(s.volume_points, 0) : "\u2013"} />
+                <RollingNumber value={markets.data ? String(stillOpen) : "\u2013"} />
               </b>
-              <span>points predicted</span>
+              <span>open for forecasts</span>
             </div>
           </div>
         </div>
         {latest?.outcome && (
           <PrintedReceipt
             marketId={latest.id}
-            title={latest.spec.title}
+            title={claimName(latest)}
+            unit={provenanceOf(latest.spec.spec_hash)?.plain?.unit}
             outcome={latest.outcome}
             reported={latest.spec.reported_value}
             range={rangeText(latest.spec.reported_value, latest.spec.tolerance_kind, latest.spec.tolerance_value)}
@@ -120,7 +117,7 @@ export default function Home() {
           <ol className="how-short">
             <li>
               <h3>Pick a claim</h3>
-              <p>A published result, such as &quot;this model is 93% accurate&quot;.</p>
+              <p>A published finding, such as &quot;raising the minimum wage didn&apos;t cost jobs&quot;.</p>
             </li>
             <li>
               <h3>Make a forecast</h3>
@@ -157,13 +154,13 @@ export default function Home() {
           </p>
         )}
         <div className="ticker-list">
-          {(showAll ? shown : shown.slice(0, FIRST_ROWS)).map((m) => (
+          {(showAll ? shown : shown.filter((m) => !technical(m)).slice(0, FIRST_ROWS)).map((m) => (
             <MarketTicker key={m.id} market={m} />
           ))}
         </div>
-        {!showAll && shown.length > FIRST_ROWS && (
+        {!showAll && shown.some(technical) && (
           <button className="quiet show-all" onClick={() => setShowAll(true)}>
-            Show all {shown.length} claims
+            Show the more technical papers too
           </button>
         )}
       </section>

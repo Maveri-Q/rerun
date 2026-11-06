@@ -3524,3 +3524,5 @@ a {
 @media (prefers-reduced-motion: reduce) {
   .pod-paper { animation: none; }
 }
+
+.exact-claim { margin: -6px 0 18px; font-size: 14px; color: var(--ink-3); }

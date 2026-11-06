@@ -21,8 +21,8 @@ import { Hint } from "@/components/Hint";
 import { citedByText, factsFor } from "@/lib/facts";
 import { accountLink, CONTRACT } from "@/lib/config";
 import { lab, useRunStream } from "@/lib/lab";
-import { NEVER_CHECKED, ORIGIN_LABEL, PRICE_RULE, provenanceOf } from "@/lib/provenance";
-import { CHECK_OUT_NOTE, fmtUnits, modeUnit, verdictWords, outcomeMeaning, rangeText, relativeTime, stateLabel, toleranceText, type State } from "@/lib/market";
+import { claimName, NEVER_CHECKED, ORIGIN_LABEL, PRICE_RULE, provenanceOf } from "@/lib/provenance";
+import { CHECK_OUT_NOTE, fmtUnits, isPractice, modeUnit, verdictWords, outcomeMeaning, rangeText, relativeTime, stateLabel, toleranceText, type State } from "@/lib/market";
 import { useWallet } from "@/lib/wallet";
 
 const SEQUENCE: { state: State; label: string }[] = [
@@ -87,11 +87,11 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
     <div className="market-grid">
       <div>
         <span className="page-no">Claim {m.id}</span>
-        <h1 className="market-title">{s.title.replace(/^\[DEMO\]\s*/, "")}</h1>
+        {isPractice(m) && <p className="notice">This is a practice claim from our testing, not real research, so it isn&apos;t listed on the site.</p>}
+        <h1 className="market-title">{claimName(m)}</h1>
         {origin && (
           <p className="origin-chips">
-            {origin.flagship && <span className="chip chip--REPRODUCED">Start here</span>}
-            <span className={`chip origin-chip--${origin.origin}`}>{ORIGIN_LABEL[origin.origin]}</span>
+                        <span className={`chip origin-chip--${origin.origin}`}>{ORIGIN_LABEL[origin.origin]}</span>
           </p>
         )}
         {spec?.statement.endsWith("Suggested by the scout agent.") && (
@@ -99,7 +99,18 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
             <Link className="chip" href="/scout">Suggested by the scout agent</Link>
           </p>
         )}
-        <p className="statement">{readableStatement(spec?.statement)}</p>
+        {origin?.plain ? (
+          <>
+            <p className="statement">{origin.plain.claim}</p>
+            <details className="exact-claim">
+              <summary>The exact claim as posted</summary>
+              <p className="hint">{s.title}</p>
+              <p className="hint">{readableStatement(spec?.statement)}</p>
+            </details>
+          </>
+        ) : (
+          <p className="statement">{readableStatement(spec?.statement)}</p>
+        )}
         {origin && (
           <div className="origin">
             <h2>{origin.why.heading}</h2>
@@ -148,16 +159,17 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
           <span className="claim-value">{s.reported_value}</span>
           <span className="claim-tol"><Hint term="margin">{toleranceText(s.tolerance_kind, s.tolerance_value)}</Hint></span>
           <span className="dim">
-            The paper reports this as {origin?.metricWords ?? `its ${spec?.metric.name}`}. The claim holds up if the Lab gets {rangeText(s.reported_value, s.tolerance_kind, s.tolerance_value)}.
+            {origin?.plain ? `${origin.plain.unit}, the paper says.` : `The paper reports this as its ${spec?.metric.name}.`} It holds up if the Lab gets {rangeText(s.reported_value, s.tolerance_kind, s.tolerance_value)}.
           </span>
         </div>
-        <NumberLine reported={s.reported_value} kind={s.tolerance_kind} margin={s.tolerance_value} measured={latestReceipt?.measured_value ?? null} tone={shownOutcome ? verdictWords(shownOutcome)?.tone : undefined} noNumber={shownOutcome ? "No number came out of this run" : undefined} />
+        <NumberLine reported={s.reported_value} kind={s.tolerance_kind} margin={s.tolerance_value} measured={latestReceipt?.measured_value ?? null} tone={shownOutcome ? verdictWords(shownOutcome)?.tone : undefined} noNumber={shownOutcome ? "No number came out of this run" : undefined} unit={origin?.plain?.unit} />
 
         {shownOutcome && (
           <div className="verdict-line">
             <PrintedReceipt
               marketId={m.id}
-              title={s.title}
+              title={claimName(m)}
+              unit={origin?.plain?.unit}
               outcome={shownOutcome}
               invalidReason={m.invalid_reason ?? latestReceipt?.invalid_reason}
               reported={s.reported_value}

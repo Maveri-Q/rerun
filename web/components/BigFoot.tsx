@@ -10,7 +10,7 @@ export function BigFoot() {
   return (
     <footer className="bigfoot">
       <div className="bigfoot-links">
-        <span>Testnet demo. Points and tUSDC have no real value.</span>
+        <span>Running on a test network. Points have no real value.</span>
         <Link href="/how">How it works</Link>
         <Link href="/check">Check a paper</Link>
         <Link href="/lab">The Lab</Link>

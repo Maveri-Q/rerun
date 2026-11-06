@@ -4,6 +4,7 @@ import Link from "next/link";
 import { use } from "react";
 import { EvidenceLadder } from "@/components/EvidenceLadder";
 import { PrintedReceipt } from "@/components/PrintedReceipt";
+import { claimName } from "@/lib/provenance";
 import { usePoll } from "@/components/usePoll";
 import { APP_NAME } from "@rerun/shared/browser";
 import { VerifiedPanel } from "@/components/VerifiedPanel";
@@ -45,7 +46,7 @@ export default function ReceiptPage({ params }: { params: Promise<{ market: stri
       </p>
       <h1 className="market-title">
         <Link href={`/market/${m.id}`} className="plain-link">
-          {m.spec.title.replace(/^\[DEMO\]\s*/, "")}
+          {claimName(m)}
         </Link>
       </h1>
       <div className="verdict-line">

@@ -47,6 +47,9 @@ export function verdictWords(outcome: Outcome | null | undefined, reason?: strin
 
 export const CHECK_OUT_NOTE = "The code and data produced the same result. That doesn't prove the study's method is right.";
 
+/** Our own demos and pipeline checks. They stay on the blockchain and open by direct link, but aren't listed. */
+export const isPractice = (m: Pick<Market, "spec">) => /^\[(DEMO|TEST)\]/.test(m.spec.title);
+
 /** "24 hours", "1 minute". */
 export function durationWords(secs: number): string {
   const [n, unit] = secs < 3600 ? [Math.round(secs / 60), "minute"] : secs < 172_800 ? [Math.round(secs / 3600), "hour"] : [Math.round(secs / 86_400), "day"];

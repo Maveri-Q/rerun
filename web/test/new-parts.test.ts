@@ -2,7 +2,8 @@ import { describe, expect, it } from "vitest";
 import { answerText } from "../components/usePoll";
 import { linePositions } from "../lib/line";
 import { binOf } from "../lib/scout-bins";
-import { challengeBond, durationWords, type Config, type Market } from "../lib/market";
+import { challengeBond, durationWords, isPractice, type Config, type Market } from "../lib/market";
+import { claimName } from "../lib/provenance";
 
 describe("linePositions", () => {
   it("puts a run inside the range inside the band", () => {
@@ -53,5 +54,17 @@ describe("answerText", () => {
   it("copes with a balance held as a bigint", () => {
     expect(answerText({ internal: 5n })).toBe('{"internal":"5"}');
     expect(answerText(undefined)).toBe("null");
+  });
+});
+
+describe("what gets listed", () => {
+  it("treats our demos and pipeline checks as practice, and nothing else", () => {
+    expect(isPractice({ spec: { title: "[DEMO] A sample model" } } as Market)).toBe(true);
+    expect(isPractice({ spec: { title: "[TEST] Pipeline check" } } as Market)).toBe(true);
+    expect(isPractice({ spec: { title: "Does raising the minimum wage cost jobs?" } } as Market)).toBe(false);
+  });
+
+  it("names a claim without its label", () => {
+    expect(claimName({ spec: { spec_hash: "unknown", title: "[DEMO] A sample model" } })).toBe("A sample model");
   });
 });

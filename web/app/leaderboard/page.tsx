@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { RollingNumber } from "@/components/RollingNumber";
 import { usePoll } from "@/components/usePoll";
 import { chain } from "@/lib/chain";
@@ -8,6 +9,9 @@ import { fmtUnits } from "@/lib/market";
 import { useWallet } from "@/lib/wallet";
 
 const START = 1_000_000_000n;
+
+/** The project's own accounts and the automated demo's throwaway ones. */
+const OURS = /^rerun-judge-|rerun-43f5f2\.testnet$|rerun-lab-43f5f2\.testnet$|\.rerun-43f5f2\.testnet$/;
 
 const short = (id: string) => (id.length > 20 ? `${id.slice(0, 17)}…` : id);
 const signed = (points: string) => {
@@ -18,7 +22,7 @@ const signed = (points: string) => {
 export default function LeaderboardPage() {
   const board = usePoll(() => chain.leaderboard(), [], 30_000, "leaderboard");
   const wallet = useWallet();
-  const rows = board.data ?? [];
+  const rows = (board.data ?? []).filter((e) => !OURS.test(e.account_id));
   const top = rows.slice(0, 3);
   const rest = rows.slice(3);
   const highest = rows.length ? Number(fmtUnits(rows[0]!.points).replaceAll(",", "")) || 1 : 1;
@@ -29,7 +33,7 @@ export default function LeaderboardPage() {
 
       {board.error && !board.data && <p className="notice notice--error">Unable to load the leaderboard. This page keeps trying.</p>}
       {board.loading && !board.data && <p className="empty">Adding up everyone&apos;s points…</p>}
-      {board.data && rows.length === 0 && <p className="empty">Nobody has claimed points yet. Open any claim that uses points to be first.</p>}
+      {board.data && rows.length === 0 && <p className="empty">Nobody&apos;s on the board yet. <Link href="/#claims">Make a forecast</Link> to be first.</p>}
 
       {top.length > 0 && (
         <div className="podium">

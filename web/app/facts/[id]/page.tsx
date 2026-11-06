@@ -34,7 +34,7 @@ export default function FactPage({ params }: { params: Promise<{ id: string }> }
       <p className="hint"><Link href="/facts">All results</Link></p>
       <h1 className="page-title">{p.question ?? m.spec.title}</h1>
       <p className={`fact-verdict fact-verdict--${words?.tone}`}>{words?.mark} {words?.words}</p>
-      {receipts.data && <NumberLine reported={m.spec.reported_value} kind={m.spec.tolerance_kind} margin={m.spec.tolerance_value} measured={measured} tone={words?.tone} noNumber="No number came out of this run" />}
+      {receipts.data && <NumberLine reported={m.spec.reported_value} kind={m.spec.tolerance_kind} margin={m.spec.tolerance_value} measured={measured} tone={words?.tone} noNumber="No number came out of this run" unit={p.plain?.unit} />}
       {m.outcome === "INVALID" && words?.reason && <p className="fact-numbers">{words.reason}</p>}
       {m.outcome === "REPRODUCED" && <p className="hint">{CHECK_OUT_NOTE}</p>}
 

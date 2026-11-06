@@ -40,6 +40,7 @@ export function PrintedReceipt({
   when,
   print,
   href,
+  unit,
 }: {
   marketId?: number;
   title: string;
@@ -52,6 +53,8 @@ export function PrintedReceipt({
   when?: number | null;
   print?: boolean;
   href?: string;
+  /** What the numbers count. */
+  unit?: string;
 }) {
   const words = verdictWords(outcome, invalidReason);
   const paper = (
@@ -62,6 +65,12 @@ export function PrintedReceipt({
       </div>
       <p className="receipt-title">{title.replace(/^\[DEMO\]\s*/, "")}</p>
       <dl className="receipt-lines">
+        {unit && (
+          <div>
+            <dt>Measured in</dt>
+            <dd>{unit}</dd>
+          </div>
+        )}
         <div>
           <dt>Paper says</dt>
           <dd>{reported}</dd>

@@ -7,7 +7,7 @@ import { chain } from "@/lib/chain";
 import { accountLink } from "@/lib/config";
 import { lab, type QuoteVerification } from "@/lib/lab";
 import benchmark from "@/lib/repair-benchmark.json";
-import { relativeTime } from "@/lib/market";
+import { isPractice, relativeTime } from "@/lib/market";
 
 const CODE = ["model = LogisticRegression()", "X, y = load_trials(path)", "train, test = split(X, y)", "model.fit(train)", "score = model.score(test)", "print(score)", "# no changes to the method", "# reading the final number"];
 
@@ -49,7 +49,7 @@ function VerdictStrip({ held, not, broken, invalid }: { held: number; not: numbe
 export default function LabPage() {
   const reduce = useReducedMotion();
   const labs = usePoll(() => chain.labs(), [], 0, "labs");
-  const stats = usePoll(() => chain.stats(), [], 0, "stats");
+  const markets = usePoll(() => chain.markets(), [], 0, "markets");
   const health = usePoll(() => lab.health(), [], 20_000);
   const attestation = usePoll(() => lab.latestAttestation(), [], 60_000);
 
@@ -57,7 +57,9 @@ export default function LabPage() {
   const entry = labs.data?.[0];
   const local = entry?.[1].local ?? true;
   const online = Boolean(health.data);
-  const s = stats.data;
+  const real = markets.data?.filter((m) => m.state !== "Draft" && !isPractice(m));
+  const count = (outcome: string) => real!.filter((m) => m.state === "Final" && m.outcome === outcome).length;
+  const s = real && { markets: real.length, reproduced: count("REPRODUCED"), not_reproduced: count("NOT_REPRODUCED"), broken: count("BROKEN"), invalid: count("INVALID") };
 
   return (
     <>
@@ -140,7 +142,7 @@ export default function LabPage() {
             <div className="figures lab-figures">
               <div className="figure">
                 <b><RollingNumber value={String(s.markets)} /></b>
-                <span>Claims opened</span>
+                <span>Real papers posted</span>
               </div>
               <div className="figure figure--held">
                 <b><RollingNumber value={String(s.reproduced)} /></b>
@@ -163,7 +165,7 @@ export default function LabPage() {
         ) : (
           <p className="empty">Asking the Lab what it&apos;s working on…</p>
         )}
-        <p className="hint" style={{ marginTop: 20 }}>These counts include our demo and test claims. We haven&apos;t yet measured how often the Lab gets papers with known answers right.</p>
+        <p className="hint" style={{ marginTop: 20 }}>We haven&apos;t yet measured how often the Lab gets papers with known answers right.</p>
       </section>
 
       <section className="section">

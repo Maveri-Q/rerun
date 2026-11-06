@@ -12,13 +12,15 @@ export interface NumberLineProps {
   tone?: "good" | "bad" | "unsure";
   /** Shown in place of the Lab's marker when it has no number. */
   noNumber?: string;
+  /** What the number counts, such as "jobs per store". */
+  unit?: string;
 }
 
 /**
  * The whole idea of a claim on one line: the paper's number, the range that counts, and where the
  * Lab's number landed. The Lab's marker travels along the line and stops at its real value.
  */
-export function NumberLine({ reported, kind, margin, measured, tone, noNumber = "The Lab hasn't run this yet" }: NumberLineProps) {
+export function NumberLine({ reported, kind, margin, measured, tone, noNumber = "The Lab hasn't run this yet", unit }: NumberLineProps) {
   const reduce = useReducedMotion();
   const r = Number(reported);
   const t = Number(margin);
@@ -33,7 +35,7 @@ export function NumberLine({ reported, kind, margin, measured, tone, noNumber = 
     <div className={`line line--${tone ?? "waiting"}`} role="img" aria-label={summary}>
       <div className="line-marks line-marks--top">
         <motion.span className={`line-mark line-mark--paper ${align(p.paper)}`} style={{ left: `${p.paper}%` }} initial={reduce ? false : { opacity: 0, y: -18 }} whileInView={{ opacity: 1, y: 0 }} viewport={seen} transition={{ type: "spring", stiffness: 300, damping: 18, delay: 0.1 }}>
-          <b>{reported}</b> the paper
+          <b>{reported}</b> {unit ? `${unit}, the paper` : "the paper"}
         </motion.span>
       </div>
       <div className="line-track">
@@ -44,7 +46,7 @@ export function NumberLine({ reported, kind, margin, measured, tone, noNumber = 
       <div className="line-marks line-marks--bottom">
         {p.lab !== null ? (
           <motion.span className={`line-mark line-mark--lab ${align(p.lab)}`} style={{ left: `${p.lab}%` }} initial={reduce ? false : { opacity: 0 }} whileInView={{ opacity: 1 }} viewport={seen} transition={{ duration: 0.3, delay: 1.5 }}>
-            <b>{measured}</b> the Lab
+            <b>{measured}</b> {unit ? `${unit}, the Lab` : "the Lab"}
           </motion.span>
         ) : (
           <span className="line-waiting">{noNumber}</span>

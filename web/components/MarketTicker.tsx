@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { chain } from "@/lib/chain";
 import { modeUnit, rangeText, relativeTime, stateLabel, type Market } from "@/lib/market";
-import { ORIGIN_LABEL, provenanceOf } from "@/lib/provenance";
+import { claimName, provenanceOf } from "@/lib/provenance";
 import { RollingNumber } from "./RollingNumber";
 import { ScrubChart, type PricePoint } from "./ScrubChart";
 import { Stamp } from "./Stamp";
@@ -14,7 +14,6 @@ import { usePoll } from "./usePoll";
 const SPRING = { type: "spring", stiffness: 420, damping: 38, mass: 0.9 } as const;
 
 const pct = (ppm: number) => `${(ppm / 10_000).toFixed(1)}%`;
-const shortTitle = (t: string) => t.replace(/^\[DEMO\]\s*/, "");
 
 /** A claim as a slim pill that springs open into a chart you can scrub. */
 export function MarketTicker({ market }: { market: Market }) {
@@ -41,10 +40,9 @@ export function MarketTicker({ market }: { market: Market }) {
     <article className={`ticker ${open ? "ticker--open" : ""}`}>
       <button className="ticker-head" aria-expanded={open} onClick={() => setOpen(!open)}>
         <span className="ticker-title">
-          <span className="ticker-name">{shortTitle(s.title)}</span>
+          <span className="ticker-name">{claimName(market)}</span>
           <span className="ticker-meta">
-            {isDemo ? "Demo claim. " : origin ? `${origin.flagship ? "Start here. " : ""}${ORIGIN_LABEL[origin.origin]}. ` : ""}
-            Holds up at {rangeText(s.reported_value, s.tolerance_kind, s.tolerance_value)}
+            {origin?.plain?.claim ?? <>{isDemo ? "Demo claim. " : ""}Holds up at {rangeText(s.reported_value, s.tolerance_kind, s.tolerance_value)}</>}
           </span>
         </span>
         {!open && (

@@ -16,8 +16,12 @@ export interface Provenance {
   testRunEarly?: boolean;
   /** What the paper says, word for word, and where. */
   paperSays?: { quote: string; where: string; href: string };
-  /** What the number measures, in everyday words. Replaces the name stored on the blockchain. */
-  metricWords?: string;
+  /** The claim as a sentence anyone can follow, and what its number counts. */
+  plain?: { claim: string; unit: string };
+  /** A well-known finding, listed first. */
+  famous?: boolean;
+  /** Needs background to follow, so it's listed behind "more technical papers". */
+  technical?: boolean;
   /** One line on why anyone should care. */
   whyItMatters?: string;
   /** The finding as a question in everyday words. */
@@ -54,6 +58,7 @@ export const ORIGIN_LABEL: Record<CodeOrigin, string> = {
 export const PROVENANCE: Record<string, Provenance> = {
   "53d87974c67eef8008149ef40f0448812042bff87db91a0683551e921a3b2e75": {
     name: "parkinsons-authors",
+    plain: { claim: "A model of the brain's wiring predicted where Parkinson's-like damage spreads in mice, with a match score of 0.696, where 1 would be perfect.", unit: "match score" },
     origin: "authors",
     question: "Does the brain's wiring predict where Parkinson's spreads?",
     citeDoi: "10.1038/s41593-019-0457-5",
@@ -69,6 +74,8 @@ export const PROVENANCE: Record<string, Provenance> = {
   },
   "6450bf0ac8d633cb663e2c8ebeb33fde42b6dd75dcfeee3d3ecc3333a8d6eb1b": {
     name: "card-krueger",
+    famous: true,
+    plain: { claim: "After New Jersey raised its minimum wage, its fast-food stores gained about 2.76 jobs each, compared with stores next door in Pennsylvania.", unit: "jobs per store" },
     origin: "rebuild",
     question: "Does raising the minimum wage cost jobs?",
     settledShowcase: true,
@@ -83,6 +90,8 @@ export const PROVENANCE: Record<string, Provenance> = {
   },
   "fa35d7e5ffd002b0b8496bed8020579611c19cef349d5ec4658021a5b04bf3d7": {
     name: "reinhart-rogoff",
+    famous: true,
+    plain: { claim: "Rich countries with government debt above 90% of their economy grew by -0.1% a year on average, the paper said.", unit: "% growth a year" },
     origin: "critics",
     question: "Does high government debt kill growth?",
     citeDoi: "10.1257/aer.100.2.573",
@@ -106,11 +115,11 @@ export const PROVENANCE: Record<string, Provenance> = {
   },
   "a942a4e8eee4390f46ae932c48d15ccd0c83ebc0a39eab408c50e054088f6986": {
     name: "wildfire-water",
+    plain: { claim: "After wildfires, temperature explains about 15% of the year-to-year change in how much water northern forests lose. That's 0.1495 as a share.", unit: "share explained" },
     origin: "authors",
     question: "Does temperature explain how much water forests lose after a wildfire?",
     citeDoi: "10.5281/zenodo.4617894",
     flagship: true,
-    metricWords: "the share of the change in forest water loss that temperature explains (R-squared)",
     testRunEarly: true,
     paperSays: { quote: "Multiple R-Squared: 0.1495", where: "The author's 2008 output file, line 251, for ET ~ Tavg", href: "https://github.com/bpbond/ten-years-paper33/blob/c28b8a2e3149f7d90f2dc0179f9c976785e762b1/original/R%20output.txt#L251" },
     whyItMatters: "Wildfires are reshaping northern forests, and how much water those forests lose matters for climate models.",
@@ -122,6 +131,7 @@ export const PROVENANCE: Record<string, Provenance> = {
   },
   "f63ef50e89f8221d51bde13cebd576b5b89b56f82842ae5fb33321418db60774": {
     name: "parkinsons-spread",
+    plain: { claim: "A model of the brain's wiring predicted where Parkinson's-like damage spreads in mice, with a match score of 0.696, where 1 would be perfect.", unit: "match score" },
     question: "Does the brain's wiring predict where Parkinson's spreads? A separate rebuild",
     citeDoi: "10.1038/s41593-019-0457-5",
     origin: "rebuild",
@@ -137,6 +147,8 @@ export const PROVENANCE: Record<string, Provenance> = {
   },
   "c4a9b60c770317e5f7ec3aacbac1513bd2f133958bb226d29762fa2a39ae86d1": {
     name: "budworm-timing",
+    technical: true,
+    plain: { claim: "A 1991 model of when a forest pest develops gives this value for one of its settings.", unit: "model setting" },
     question: "Does a 1991 model get the timing of a forest pest right?",
     citeDoi: "10.5281/zenodo.5006005",
     origin: "rebuild",
@@ -151,11 +163,12 @@ export const PROVENANCE: Record<string, Provenance> = {
   },
   "19ef61085d1bfae1011de7c8c5006c243a97c56f2066c7bbea8d1179e60c8a0f": {
     name: "budworm-spread",
+    technical: true,
+    plain: { claim: "A table from 1986 gives this value for how spread out a forest pest's development is over the season.", unit: "model setting" },
     question: "Does a 1986 figure for a forest pest's timing hold up?",
     citeDoi: "10.5281/zenodo.5006005",
     origin: "rebuild",
     testRunEarly: true,
-    metricWords: "how spread out the pest's development is over the season (b squared in the model)",
     paperSays: { quote: "dennis_par = c(\u2026, 599.57, 1.559)", where: "The last value on this line is from Kemp et al. 1986, Table 1, copied into the replication's code", href: "https://github.com/pboesu/replication_candy_1991/blob/98329d447ef025c260879f28316015fc0b24fb08/code/03_fit_dennis_et_al_model.R" },
     whyItMatters: "Spruce budworm strips forests across North America. Can a rebuild land on a number printed in a table 40 years ago?",
     why: {
@@ -167,3 +180,8 @@ export const PROVENANCE: Record<string, Provenance> = {
 };
 
 export const provenanceOf = (specHash: string): Provenance | undefined => PROVENANCE[specHash];
+
+/** A claim's name for readers: the question if it has one, otherwise its title without the label. */
+export function claimName(m: { spec: { spec_hash: string; title: string } }): string {
+  return provenanceOf(m.spec.spec_hash)?.question ?? m.spec.title.replace(/^\[(DEMO|TEST)\]\s*/, "");
+}
