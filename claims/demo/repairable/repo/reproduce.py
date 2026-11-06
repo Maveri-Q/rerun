@@ -1,15 +1,17 @@
+import csv
 import json
-import pandas as pd
-from sklearn.linear_model import LogisticRegression
-from sklearn.model_selection import train_test_split
 
-# Runs fine on the author's laptop; that path does not exist anywhere else.
-df = pd.read_csv("/home/drsmith/project/data/trials.csv")
-X = df[["age", "dose", "biomarker"]]
-y = df["response"]
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=42)
-model = LogisticRegression(max_iter=1000).fit(X_train, y_train)
-accuracy = model.score(X_test, y_test)
-print(f"accuracy={accuracy}")
+# This folder only exists on the writer's laptop.
+DATA = "/home/sam/laptop/dog_walks.csv"
+
+steps = {"yes": [], "no": []}
+with open(DATA, newline="") as f:
+    for row in csv.DictReader(f):
+        steps[row["has_dog"]].append(int(row["steps"]))
+
+with_dog = sum(steps["yes"]) / len(steps["yes"])
+without = sum(steps["no"]) / len(steps["no"])
+more = 100 * (with_dog / without - 1)
+print(f"Dog owners walked {more:.2f}% more")
 with open("results.json", "w") as f:
-    json.dump({"accuracy": accuracy}, f)
+    json.dump({"percent_more": more}, f)

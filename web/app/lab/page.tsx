@@ -7,7 +7,8 @@ import { chain } from "@/lib/chain";
 import { accountLink } from "@/lib/config";
 import { lab, type QuoteVerification } from "@/lib/lab";
 import benchmark from "@/lib/repair-benchmark.json";
-import { isPractice, relativeTime } from "@/lib/market";
+import { relativeTime } from "@/lib/market";
+import { isListed } from "@/lib/provenance";
 
 const CODE = ["model = LogisticRegression()", "X, y = load_trials(path)", "train, test = split(X, y)", "model.fit(train)", "score = model.score(test)", "print(score)", "# no changes to the method", "# reading the final number"];
 
@@ -57,7 +58,7 @@ export default function LabPage() {
   const entry = labs.data?.[0];
   const local = entry?.[1].local ?? true;
   const online = Boolean(health.data);
-  const real = markets.data?.filter((m) => m.state !== "Draft" && !isPractice(m));
+  const real = markets.data?.filter(isListed);
   const count = (outcome: string) => real!.filter((m) => m.state === "Final" && m.outcome === outcome).length;
   const s = real && { markets: real.length, reproduced: count("REPRODUCED"), not_reproduced: count("NOT_REPRODUCED"), broken: count("BROKEN"), invalid: count("INVALID") };
 

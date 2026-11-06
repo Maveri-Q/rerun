@@ -9,12 +9,16 @@ import type { ArtifactResolver, LabKeys } from "../pipeline/pipeline.ts";
 import type { Sandbox } from "../sandbox/types.ts";
 
 /**
- * Demo claims, clearly labelled as fixtures. Each repo is committed with a fixed author and
- * date, so its commit SHA is stable. Demo URLs use the reserved `.invalid` domain and resolve
- * to local files; they are not real artifacts.
+ * Demo claims on made-up practice data, labelled as such. Each repo is committed with a fixed
+ * author and date, so its commit SHA is stable. Demo URLs use the reserved `.invalid` domain and
+ * resolve to local files; they are not real artifacts.
+ *
+ * `_old` holds the previous demos unchanged, because claims already on testnet pin their hashes
+ * and the Lab must still recognise them when they lock.
  */
 
 const DEMO_ROOT = path.resolve(import.meta.dirname, "../../../../claims/demo");
+const OLD_ROOT = path.join(DEMO_ROOT, "_old");
 export const DEMO_NAMES = ["reproduces", "misreported", "repairable", "broken", "private", "swapped-data"] as const;
 export type DemoName = (typeof DEMO_NAMES)[number];
 
@@ -24,6 +28,8 @@ interface ClaimFile {
   /** Serve different bytes than the spec pins: the attack the hash check exists for. */
   swap_data?: boolean;
   methods?: string;
+  /** The scripted re-implementation used with MOCK_LLM=1. */
+  mock_reimplementation?: string;
   title: string;
   statement: string;
   metric: ClaimSpec["metric"];
@@ -77,15 +83,30 @@ function buildRepo(dir: string): { commit: string; bundle: Buffer } {
   }
 }
 
-/** Deterministic synthetic hospital records. Only generated in memory; never written to the repo. */
-export function syntheticReadmissions(): Buffer {
-  let seed = 7_301_991;
-  const r = () => {
+function seeded(start: number) {
+  let seed = start;
+  return () => {
     seed = (seed + 0x6d2b79f5) | 0;
     let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
     t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
+}
+
+/** A made-up gym's member records. Only generated in memory; never written to the repo. */
+export function syntheticGym(): Buffer {
+  const r = seeded(7_301_991);
+  const rows = ["member_id,weekly_visitor,months_stayed"];
+  for (let i = 0; i < 1000; i++) {
+    const weekly = r() < 0.5;
+    rows.push(`M${100000 + i},${weekly ? "yes" : "no"},${Math.round((weekly ? 14 : 10) + (r() - 0.5) * 8)}`);
+  }
+  return Buffer.from(`${rows.join("\n")}\n`);
+}
+
+/** The previous demo's records, kept so its pinned hash still matches. */
+function syntheticReadmissions(): Buffer {
+  const r = seeded(7_301_991);
   const rows = ["patient_id,age,prior_admissions,length_of_stay,comorbidities,readmitted_30d"];
   for (let i = 0; i < 1000; i++) {
     const age = 40 + Math.floor(r() * 50);
@@ -98,14 +119,14 @@ export function syntheticReadmissions(): Buffer {
   return Buffer.from(`${rows.join("\n")}\n`);
 }
 
-export function loadDemo(name: DemoName, labKeys: LabKeys): DemoClaim {
-  const dir = path.join(DEMO_ROOT, name);
+export function loadDemo(name: DemoName, labKeys: LabKeys, root = DEMO_ROOT): DemoClaim {
+  const dir = path.join(root, name);
   const claim = JSON.parse(readFileSync(path.join(dir, "claim.json"), "utf8")) as ClaimFile;
   const { commit, bundle } = buildRepo(path.join(dir, "repo"));
 
   const files = new Map<string, Uint8Array>();
   const data = claim.data.map((d) => {
-    const bytes = lf(readFileSync(path.join(DEMO_ROOT, "_data", d.file)));
+    const bytes = lf(readFileSync(path.join(root, "_data", d.file)));
     const url = `https://rerun.invalid/demo/data/${d.file}`;
     files.set(url, claim.swap_data ? Buffer.concat([bytes, Buffer.from("99,99,9.999,1")]) : bytes);
     return { url, sha256: sha256(bytes), path: d.path };
@@ -113,17 +134,18 @@ export function loadDemo(name: DemoName, labKeys: LabKeys): DemoClaim {
 
   let privateData: ClaimSpec["private_data"] = null;
   if (claim.private) {
-    const plain = syntheticReadmissions();
+    const old = root === OLD_ROOT;
+    const plain = old ? syntheticReadmissions() : syntheticGym();
     const ref = `https://rerun.invalid/demo/sealed/${name}.bin`;
     files.set(ref, sealToLab(plain, labKeys.publicKey));
-    privateData = { ciphertext_ref: ref, sha256_plain: sha256(plain), owner: "demo-hospital.testnet", path: claim.private.path };
+    privateData = { ciphertext_ref: ref, sha256_plain: sha256(plain), owner: old ? "demo-hospital.testnet" : "demo-gym.testnet", path: claim.private.path };
   }
 
   const spec = ClaimSpec.parse({
     version: 1,
     title: claim.title,
     statement: claim.statement,
-    source: { type: "report", url: `https://rerun.invalid/demo/${name}`, license: "MIT", authors: "RERUN demo fixture" },
+    source: { type: "report", url: `https://rerun.invalid/demo/${name}`, license: "MIT", authors: root === OLD_ROOT ? "RERUN demo fixture" : "RERUN practice data" },
     artifact: {
       repo_url: `https://rerun.invalid/demo/${name}.git`,
       commit,
@@ -163,10 +185,10 @@ export function loadDemo(name: DemoName, labKeys: LabKeys): DemoClaim {
     expected: claim.expected,
     expectedPatches: claim.expected_patches ?? 0,
     resolver,
-    methods: claim.methods ? readFileSync(path.join(DEMO_ROOT, "_data", claim.methods), "utf8") : undefined,
+    methods: claim.methods ? readFileSync(path.join(root, "_data", claim.methods), "utf8") : undefined,
     mockResponder: (req) => {
       if (req.purpose === "repair") return claim.mock_llm?.repair;
-      if (req.purpose === "reimplement") return readFileSync(path.join(DEMO_ROOT, "_data", "mock-reimplementation.md"), "utf8");
+      if (req.purpose === "reimplement") return readFileSync(path.join(root, "_data", claim.mock_reimplementation ?? "mock-reimplementation.md"), "utf8");
       if (req.purpose === "report") return `MOCK report: the claim "${claim.title}" was re-run. See the receipt for the outcome.`;
       return undefined;
     },
@@ -176,9 +198,11 @@ export function loadDemo(name: DemoName, labKeys: LabKeys): DemoClaim {
 /** The demo fixture behind an on-chain spec, if it is one. Real claims return undefined. */
 export function demoForSpec(spec: ClaimSpec, labKeys: LabKeys): DemoClaim | undefined {
   if (!spec.artifact.repo_url.startsWith("https://rerun.invalid/demo/")) return undefined;
-  for (const name of DEMO_NAMES) {
-    const demo = loadDemo(name, labKeys);
-    if (specHash(demo.spec) === specHash(spec)) return demo;
+  for (const root of [DEMO_ROOT, OLD_ROOT]) {
+    for (const name of DEMO_NAMES) {
+      const demo = loadDemo(name, labKeys, root);
+      if (specHash(demo.spec) === specHash(spec)) return demo;
+    }
   }
   return undefined;
 }

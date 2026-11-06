@@ -1,14 +1,35 @@
 {
-  "methods": "methods-trials.md",
+  "methods": "methods-pizza.md",
   "expected": "INVALID",
-  "title": "[DEMO] Analysis that depends on an unpublished private package",
-  "statement": "DEMO FIXTURE, not real research. The code imports a package the authors never released, so no environment repair can make it run. That is a real finding: the result did not reproduce because the code is broken.",
-  "metric": { "name": "accuracy", "reported_value": "0.9", "tolerance": { "type": "abs", "value": "0.01" }, "comparison": "within_tolerance" },
+  "title": "Demo: our practice dataset says pizza arrives 10 minutes faster at night. Will the re-run agree?",
+  "statement": "Made-up practice data, not real research. A short script compares the delivery times of a pretend pizza shop by day and by night.",
+  "metric": {
+    "name": "minutes faster at night",
+    "reported_value": "10",
+    "tolerance": {
+      "type": "abs",
+      "value": "2"
+    },
+    "comparison": "within_tolerance"
+  },
   "entrypoint": "python reproduce.py",
-  "setup": ["pip install -r requirements.txt"],
-  "output": { "path": "results.json", "extractor": { "type": "jsonpath", "expr": "$.accuracy" } },
-  "data": [{ "file": "trials.csv", "path": "data/trials.csv" }],
+  "setup": [
+    "pip install -r requirements.txt"
+  ],
+  "output": {
+    "path": "results.json",
+    "extractor": {
+      "type": "jsonpath",
+      "expr": "$.minutes_faster"
+    }
+  },
+  "data": [
+    {
+      "file": "pizza.csv",
+      "path": "data/pizza.csv"
+    }
+  ],
   "mock_llm": {
-    "repair": "{\"give_up\":true,\"reason\":\"labtools_internal is an unpublished package that holds the analysis itself; replacing it would change the science.\",\"edits\":[]}"
+    "repair": "{\"give_up\": true, \"reason\": \"pizza_sums is a package that was never published, and it holds the calculation itself. Replacing it would change the result being tested.\", \"edits\": []}"
   }
 }

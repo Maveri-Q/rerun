@@ -4,7 +4,7 @@ import Link from "next/link";
 import { use } from "react";
 import { EvidenceLadder } from "@/components/EvidenceLadder";
 import { PrintedReceipt } from "@/components/PrintedReceipt";
-import { claimName } from "@/lib/provenance";
+import { claimName, provenanceOf } from "@/lib/provenance";
 import { usePoll } from "@/components/usePoll";
 import { APP_NAME } from "@rerun/shared/browser";
 import { VerifiedPanel } from "@/components/VerifiedPanel";
@@ -12,7 +12,7 @@ import { chain } from "@/lib/chain";
 import { accountLink, CONTRACT } from "@/lib/config";
 import { lab, labFileHref } from "@/lib/lab";
 import { Hint } from "@/components/Hint";
-import { CHECK_OUT_NOTE, outcomeMeaning, patchAuthors, rangeText, verdictWords, readableReport } from "@/lib/market";
+import { CHECK_OUT_NOTE, outcomeMeaning, patchAuthors, rangeText, verdictWords, readableReport, isTest } from "@/lib/market";
 
 const when = (t: number) => new Date(t * 1000).toLocaleString();
 
@@ -38,6 +38,13 @@ export default function ReceiptPage({ params }: { params: Promise<{ market: stri
   }
   const r = receipt;
   const m = market.data;
+  if (isTest(m)) {
+    return (
+      <p className="empty">
+        This was a test of our own system, so it isn&apos;t shown here. <Link href="/">See all claims</Link>.
+      </p>
+    );
+  }
   return (
     <>
       <span className="page-no" style={{ marginTop: 36 }}>Claim {m.id}</span>
@@ -52,7 +59,8 @@ export default function ReceiptPage({ params }: { params: Promise<{ market: stri
       <div className="verdict-line">
         <PrintedReceipt
           marketId={m.id}
-          title={m.spec.title}
+          title={claimName(m)}
+          unit={provenanceOf(m.spec.spec_hash)?.plain?.unit}
           outcome={r.outcome}
           invalidReason={r.invalid_reason}
           reported={r.reported_value}

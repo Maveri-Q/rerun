@@ -1,0 +1,11 @@
+{
+  "methods": "methods-trials.md",
+  "expected": "REPRODUCED",
+  "title": "[DEMO] A logistic model predicts trial response with 93% accuracy",
+  "statement": "DEMO FIXTURE, not real research. The released code trains a logistic regression on the synthetic trials dataset and reaches the reported test accuracy.",
+  "metric": { "name": "accuracy", "reported_value": "0.93", "tolerance": { "type": "abs", "value": "0.02" }, "comparison": "within_tolerance" },
+  "entrypoint": "python reproduce.py",
+  "setup": ["pip install -r requirements.txt"],
+  "output": { "path": "results.json", "extractor": { "type": "jsonpath", "expr": "$.accuracy" } },
+  "data": [{ "file": "trials.csv", "path": "data/trials.csv" }]
+}

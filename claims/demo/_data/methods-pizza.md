@@ -1,0 +1,1 @@
+Made-up practice data. The file lists a pretend pizza shop's delivery times in minutes, by day or by night. We report how many minutes faster the average night delivery is than the average day delivery.

@@ -1,0 +1,11 @@
+{
+  "expected": "INVALID",
+  "swap_data": true,
+  "title": "[DEMO] A claim whose data file was swapped after the market opened",
+  "statement": "DEMO FIXTURE, not real research. The dataset at the claim's URL no longer matches the hash pinned in the spec, so the Lab refuses to run it. Both sides redeem at 0.5 and the creator's bond is forfeited.",
+  "metric": { "name": "accuracy", "reported_value": "0.93", "tolerance": { "type": "abs", "value": "0.02" }, "comparison": "within_tolerance" },
+  "entrypoint": "python reproduce.py",
+  "setup": ["pip install -r requirements.txt"],
+  "output": { "path": "results.json", "extractor": { "type": "jsonpath", "expr": "$.accuracy" } },
+  "data": [{ "file": "trials.csv", "path": "data/trials.csv" }]
+}

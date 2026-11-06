@@ -4,8 +4,8 @@ import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import Link from "next/link";
 import { useState } from "react";
 import { chain } from "@/lib/chain";
-import { modeUnit, rangeText, relativeTime, stateLabel, type Market } from "@/lib/market";
-import { claimName, provenanceOf } from "@/lib/provenance";
+import { countsIf, DEMO_LABEL, isPractice, modeUnit, relativeTime, stateLabel, type Market } from "@/lib/market";
+import { claimName, provenanceOf, resultSentence } from "@/lib/provenance";
 import { RollingNumber } from "./RollingNumber";
 import { ScrubChart, type PricePoint } from "./ScrubChart";
 import { Stamp } from "./Stamp";
@@ -28,8 +28,6 @@ export function MarketTicker({ market }: { market: Market }) {
   const start = points[0]?.yes_ppm ?? 500_000;
   const change = (shown - start) / 10_000;
   const up = change >= 0;
-  const isDemo = s.title.startsWith("[DEMO]");
-  const origin = provenanceOf(s.spec_hash);
   const when = held
     ? new Date(held.t * 1000).toLocaleString(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })
     : market.state === "Open"
@@ -40,9 +38,12 @@ export function MarketTicker({ market }: { market: Market }) {
     <article className={`ticker ${open ? "ticker--open" : ""}`}>
       <button className="ticker-head" aria-expanded={open} onClick={() => setOpen(!open)}>
         <span className="ticker-title">
-          <span className="ticker-name">{claimName(market)}</span>
+          <span className="ticker-name">
+            {provenanceOf(s.spec_hash)?.flagship && <em className="start-here">Start here</em>}
+            {claimName(market)}
+          </span>
           <span className="ticker-meta">
-            {origin?.plain?.claim ?? <>{isDemo ? "Demo claim. " : ""}Holds up at {rangeText(s.reported_value, s.tolerance_kind, s.tolerance_value)}</>}
+            {isPractice(market) ? DEMO_LABEL : resultSentence(market) ?? countsIf(s.reported_value, s.tolerance_kind, s.tolerance_value)}
           </span>
         </span>
         {!open && (

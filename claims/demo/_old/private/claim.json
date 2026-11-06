@@ -1,0 +1,11 @@
+{
+  "expected": "REPRODUCED",
+  "title": "[DEMO] Readmission model reaches the reported AUC on private hospital data",
+  "statement": "DEMO FIXTURE, not real research: the hospital records are synthetic. The data is encrypted to the attested Lab and never revealed; only hashes and the result leave.",
+  "metric": { "name": "auc", "reported_value": "0.94", "tolerance": { "type": "abs", "value": "0.03" }, "comparison": "within_tolerance" },
+  "entrypoint": "python analyze.py",
+  "setup": ["pip install -r requirements.txt"],
+  "output": { "path": "results.csv", "extractor": { "type": "csv_cell", "expr": "0:value" } },
+  "data": [],
+  "private": { "path": "private/readmissions.csv" }
+}

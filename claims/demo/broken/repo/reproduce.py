@@ -1,9 +1,7 @@
 import json
-import pandas as pd
-import labtools_internal as lt  # the lab's private package; never published
+import pizza_sums  # the writer's own package, never published
 
-df = pd.read_csv("data/trials.csv")
-accuracy = lt.fit_and_score(df, target="response", seed=42)
-print(f"accuracy={accuracy}")
+faster = pizza_sums.minutes_faster_at_night("data/pizza.csv")
+print(f"{faster:.2f} minutes faster at night")
 with open("results.json", "w") as f:
-    json.dump({"accuracy": accuracy}, f)
+    json.dump({"minutes_faster": faster}, f)

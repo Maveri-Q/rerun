@@ -7,7 +7,7 @@ import { usePoll } from "@/components/usePoll";
 import { chain } from "@/lib/chain";
 import { citedByText, factsFor } from "@/lib/facts";
 import { verdictWords, yesPercent, type Market } from "@/lib/market";
-import { ORIGIN_LABEL, provenanceOf } from "@/lib/provenance";
+import { ORIGIN_LABEL, provenanceOf, isListed, resultSentence } from "@/lib/provenance";
 
 /** One finished paper: the question, the verdict stamped on it, and where the number landed. */
 function FactCard({ market: m }: { market: Market }) {
@@ -29,8 +29,8 @@ function FactCard({ market: m }: { market: Market }) {
           {words?.mark} {words?.words}
         </motion.span>
       </div>
-      {(p.plain || entry) && <p className="fact-card-summary">{p.plain?.claim ?? entry!.summary}</p>}
-      {receipts.data && <NumberLine reported={m.spec.reported_value} kind={m.spec.tolerance_kind} margin={m.spec.tolerance_value} measured={measured} tone={words?.tone} noNumber="No number came out of this run" unit={p.plain?.unit} />}
+      {(p.plain || entry) && <p className="fact-card-summary">{resultSentence(m) ?? entry!.summary}</p>}
+      {receipts.data && <NumberLine reported={m.spec.reported_value} kind={m.spec.tolerance_kind} margin={m.spec.tolerance_value} measured={measured} tone={words?.tone} noNumber="No number came out of this run" bare />}
       <p className="fact-card-foot">
         <span>{ORIGIN_LABEL[p.origin]}</span>
         {cited && <span>{cited}</span>}
@@ -42,9 +42,9 @@ function FactCard({ market: m }: { market: Market }) {
 
 export default function FactsPage() {
   const markets = usePoll(() => chain.markets(), [], 30_000, "markets");
-  const real = (markets.data ?? []).filter((m) => provenanceOf(m.spec.spec_hash));
+  const real = (markets.data ?? []).filter((m) => provenanceOf(m.spec.spec_hash) && isListed(m));
   const checked = real.filter((m) => m.state === "Final").sort((a, b) => b.id - a.id);
-  const open = real.filter((m) => m.state !== "Final" && !provenanceOf(m.spec.spec_hash)?.technical);
+  const open = real.filter((m) => m.state !== "Final");
   const held = checked.filter((m) => m.outcome === "REPRODUCED").length;
   const fell = checked.filter((m) => m.outcome === "NOT_REPRODUCED" || m.outcome === "BROKEN").length;
   const unsure = checked.length - held - fell;
@@ -52,7 +52,7 @@ export default function FactsPage() {
   return (
     <div className="facts-page">
       <h1 className="page-title">We re-ran the research. Here&apos;s what happened.</h1>
-      <p className="lede">The paper&apos;s number, the range that counts, and where our re-run landed. Every result links to proof you can check yourself.</p>
+      <p className="lede">What each study said, and whether our re-run agreed. Every result links to proof you can check yourself.</p>
       {markets.data && checked.length > 0 && (
         <p className="tally">
           <span><b>{checked.length}</b> re-run</span>

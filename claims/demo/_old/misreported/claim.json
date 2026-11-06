@@ -1,0 +1,11 @@
+{
+  "methods": "methods-trials.md",
+  "expected": "NOT_REPRODUCED",
+  "title": "[DEMO] A logistic model predicts trial response with 97% accuracy",
+  "statement": "DEMO FIXTURE, not real research. Same code and data as the true claim, but the number in the claim was deliberately misreported as 97%.",
+  "metric": { "name": "accuracy", "reported_value": "0.97", "tolerance": { "type": "abs", "value": "0.01" }, "comparison": "within_tolerance" },
+  "entrypoint": "python reproduce.py",
+  "setup": ["pip install -r requirements.txt"],
+  "output": { "path": "results.txt", "extractor": { "type": "regex", "expr": "final test accuracy: ([0-9.]+)" } },
+  "data": [{ "file": "trials.csv", "path": "data/trials.csv" }]
+}

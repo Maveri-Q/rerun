@@ -8,6 +8,7 @@ import { RollingNumber } from "@/components/RollingNumber";
 import { Stamp } from "@/components/Stamp";
 import { usePoll } from "@/components/usePoll";
 import { chain } from "@/lib/chain";
+import { claimName } from "@/lib/provenance";
 import { fmtUnits, modeUnit, stateLabel, type Market, type Position } from "@/lib/market";
 import { explainError, useWallet } from "@/lib/wallet";
 
@@ -118,7 +119,7 @@ export default function PortfolioPage() {
               return (
                 <li key={m.id} className="position">
                   <div className="position-head">
-                    <Link href={`/market/${m.id}`}>{m.spec.title.replace(/^\[DEMO\]\s*/, "")}</Link>
+                    <Link href={`/market/${m.id}`}>{claimName(m)}</Link>
                     {m.outcome ? <Stamp outcome={m.outcome} /> : <span className="chip">{stateLabel(m.state)}</span>}
                   </div>
                   <dl className="position-numbers">

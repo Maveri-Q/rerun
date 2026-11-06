@@ -1,29 +1,29 @@
 [
   {
     "name": "reproduces",
-    "spec_json": "{\"artifact\":{\"commit\":\"563c58831162400e57dc0129eb2d2744fb3a1368\",\"data\":[{\"path\":\"data/trials.csv\",\"sha256\":\"be35dcd48bdcc0222a5c4d5ef769adb4a58e77c1914af80d8aa457ad742f9b7d\",\"url\":\"https://rerun.invalid/demo/data/trials.csv\"}],\"entrypoint\":\"python reproduce.py\",\"output\":{\"extractor\":{\"expr\":\"$.accuracy\",\"type\":\"jsonpath\"},\"path\":\"results.json\"},\"repo_url\":\"https://rerun.invalid/demo/reproduces.git\",\"runtime\":\"python3.11\",\"setup\":[\"pip install -r requirements.txt\"]},\"metric\":{\"comparison\":\"within_tolerance\",\"name\":\"accuracy\",\"reported_value\":\"0.93\",\"tolerance\":{\"type\":\"abs\",\"value\":\"0.02\"}},\"private_data\":null,\"resources\":{\"cpu\":2,\"max_minutes\":3,\"mem_gb\":2},\"source\":{\"authors\":\"RERUN demo fixture\",\"license\":\"MIT\",\"type\":\"report\",\"url\":\"https://rerun.invalid/demo/reproduces\"},\"statement\":\"DEMO FIXTURE, not real research. The released code trains a logistic regression on the synthetic trials dataset and reaches the reported test accuracy.\",\"title\":\"[DEMO] A logistic model predicts trial response with 93% accuracy\",\"version\":1}",
-    "spec_hash": "5082cac3ebc8904e3559bca9af1c2d8f4c68df3c4565be2c5547e61f4ae3bbd8",
+    "spec_json": "{\"artifact\":{\"commit\":\"b52f01136e179950512f283875f9c2bf43e7ddb7\",\"data\":[{\"path\":\"data/ice_cream.csv\",\"sha256\":\"800249b3736cd722aad09b94fa088d74a14536d7a08270e7ccc96240b585a2c7\",\"url\":\"https://rerun.invalid/demo/data/ice_cream.csv\"}],\"entrypoint\":\"python reproduce.py\",\"output\":{\"extractor\":{\"expr\":\"$.percent_more\",\"type\":\"jsonpath\"},\"path\":\"results.json\"},\"repo_url\":\"https://rerun.invalid/demo/reproduces.git\",\"runtime\":\"python3.11\",\"setup\":[\"pip install -r requirements.txt\"]},\"metric\":{\"comparison\":\"within_tolerance\",\"name\":\"% more ice cream sold on sunny days\",\"reported_value\":\"20\",\"tolerance\":{\"type\":\"abs\",\"value\":\"2\"}},\"private_data\":null,\"resources\":{\"cpu\":2,\"max_minutes\":3,\"mem_gb\":2},\"source\":{\"authors\":\"RERUN practice data\",\"license\":\"MIT\",\"type\":\"report\",\"url\":\"https://rerun.invalid/demo/reproduces\"},\"statement\":\"Made-up practice data, not real research. A short script compares the ice cream a pretend shop sold on sunny and cloudy days.\",\"title\":\"Demo: our practice dataset says sunny days sell 20% more ice cream. Will the re-run agree?\",\"version\":1}",
+    "spec_hash": "cdcc0543ecdf7cfe48d709675b9dfcbb5a1f0c137d8d18c20bdc94959d083295",
     "receipt": {
       "market_id": 0,
-      "spec_hash": "5082cac3ebc8904e3559bca9af1c2d8f4c68df3c4565be2c5547e61f4ae3bbd8",
+      "spec_hash": "cdcc0543ecdf7cfe48d709675b9dfcbb5a1f0c137d8d18c20bdc94959d083295",
       "outcome": "REPRODUCED",
       "invalid_reason": null,
-      "measured_value": "0.93",
-      "reported_value": "0.93",
-      "tolerance": "abs:0.02",
-      "commit": "563c58831162400e57dc0129eb2d2744fb3a1368",
+      "measured_value": "21.05564712504313",
+      "reported_value": "20",
+      "tolerance": "abs:2",
+      "commit": "b52f01136e179950512f283875f9c2bf43e7ddb7",
       "data_hashes": [
-        "be35dcd48bdcc0222a5c4d5ef769adb4a58e77c1914af80d8aa457ad742f9b7d"
+        "800249b3736cd722aad09b94fa088d74a14536d7a08270e7ccc96240b585a2c7"
       ],
       "env_lock_hash": "8dab88328537f15c219ff04f4c55b0150f9867347067f4b5868ed8b0769249af",
       "patches": [],
       "patches_diff_excerpt": "",
-      "log_hash": "d703a3caeb7c8920890384d9dd62da26793a4f1eaee9ffc5e6ec84fe3aa12357",
-      "log_tail": "accuracy=0.93\n",
-      "full_log_uri": "rerun-lab://local/logs/d703a3caeb7c8920890384d9dd62da26793a4f1eaee9ffc5e6ec84fe3aa12357",
-      "report_hash": "2df18ef758fc7e42e59dab7ebd4b0a833ba45c30ddcc8e9e8c2202fbd7fe4520",
-      "report_uri": "rerun-lab://local/reports/2df18ef758fc7e42e59dab7ebd4b0a833ba45c30ddcc8e9e8c2202fbd7fe4520",
-      "runtime_secs": 2,
+      "log_hash": "8162fda7d598ef0f3742d20d495fa6298110c52eeb7ab5e0d99d2ed98e0929d0",
+      "log_tail": "Sunny days sold 21.06% more ice cream\n",
+      "full_log_uri": "rerun-lab://local/logs/8162fda7d598ef0f3742d20d495fa6298110c52eeb7ab5e0d99d2ed98e0929d0",
+      "report_hash": "0ea6d68d557c882c08d114a60b91e108f11711dcd01988f8d8eeee0398be83e2",
+      "report_uri": "rerun-lab://local/reports/0ea6d68d557c882c08d114a60b91e108f11711dcd01988f8d8eeee0398be83e2",
+      "runtime_secs": 1,
       "exit_code": 0,
       "lab_codehash": "0000000000000000000000000000000000000000000000000000000000000000",
       "lab_account": "local-lab.testnet",
@@ -31,40 +31,40 @@
         "model_id": "z-ai/glm-5.3-flash",
         "attestation_digest": "bb8a7976104d871a735c0da6d0f0b244382f42c97202b1b1efc9cfd40c1de8d6",
         "response_signature_refs": [
-          "mock-17599eb416be9bb7",
-          "mock-883a99ae9cd32ef8"
+          "mock-87d0b75438c2af07",
+          "mock-7969e323f7c7f345"
         ]
       },
       "run_index": 0,
-      "started_at": 1793791012,
-      "finished_at": 1793791039
+      "started_at": 1793953401,
+      "finished_at": 1793953437
     }
   },
   {
     "name": "misreported",
-    "spec_json": "{\"artifact\":{\"commit\":\"8977800218ee404231d5dd457efed7546023334d\",\"data\":[{\"path\":\"data/trials.csv\",\"sha256\":\"be35dcd48bdcc0222a5c4d5ef769adb4a58e77c1914af80d8aa457ad742f9b7d\",\"url\":\"https://rerun.invalid/demo/data/trials.csv\"}],\"entrypoint\":\"python reproduce.py\",\"output\":{\"extractor\":{\"expr\":\"final test accuracy: ([0-9.]+)\",\"type\":\"regex\"},\"path\":\"results.txt\"},\"repo_url\":\"https://rerun.invalid/demo/misreported.git\",\"runtime\":\"python3.11\",\"setup\":[\"pip install -r requirements.txt\"]},\"metric\":{\"comparison\":\"within_tolerance\",\"name\":\"accuracy\",\"reported_value\":\"0.97\",\"tolerance\":{\"type\":\"abs\",\"value\":\"0.01\"}},\"private_data\":null,\"resources\":{\"cpu\":2,\"max_minutes\":3,\"mem_gb\":2},\"source\":{\"authors\":\"RERUN demo fixture\",\"license\":\"MIT\",\"type\":\"report\",\"url\":\"https://rerun.invalid/demo/misreported\"},\"statement\":\"DEMO FIXTURE, not real research. Same code and data as the true claim, but the number in the claim was deliberately misreported as 97%.\",\"title\":\"[DEMO] A logistic model predicts trial response with 97% accuracy\",\"version\":1}",
-    "spec_hash": "913616f92919657ffae80932f9e0f250d322c71acf60c17a3ae1a810795a39d7",
+    "spec_json": "{\"artifact\":{\"commit\":\"bb61018d5b8aafe665aff1d53a67c5b86eb1db38\",\"data\":[{\"path\":\"data/ice_cream.csv\",\"sha256\":\"800249b3736cd722aad09b94fa088d74a14536d7a08270e7ccc96240b585a2c7\",\"url\":\"https://rerun.invalid/demo/data/ice_cream.csv\"}],\"entrypoint\":\"python reproduce.py\",\"output\":{\"extractor\":{\"expr\":\"percent more: ([0-9.]+)\",\"type\":\"regex\"},\"path\":\"results.txt\"},\"repo_url\":\"https://rerun.invalid/demo/misreported.git\",\"runtime\":\"python3.11\",\"setup\":[\"pip install -r requirements.txt\"]},\"metric\":{\"comparison\":\"within_tolerance\",\"name\":\"% more ice cream sold on sunny days\",\"reported_value\":\"50\",\"tolerance\":{\"type\":\"abs\",\"value\":\"2\"}},\"private_data\":null,\"resources\":{\"cpu\":2,\"max_minutes\":3,\"mem_gb\":2},\"source\":{\"authors\":\"RERUN practice data\",\"license\":\"MIT\",\"type\":\"report\",\"url\":\"https://rerun.invalid/demo/misreported\"},\"statement\":\"Made-up practice data, not real research. A short script compares the ice cream a pretend shop sold on sunny and cloudy days.\",\"title\":\"Demo: our practice dataset says sunny days sell 50% more ice cream. Will the re-run agree?\",\"version\":1}",
+    "spec_hash": "925b702b104e07b9619102ce54c759ef85831d2d00ed9934b01a6fb698089e81",
     "receipt": {
       "market_id": 1,
-      "spec_hash": "913616f92919657ffae80932f9e0f250d322c71acf60c17a3ae1a810795a39d7",
+      "spec_hash": "925b702b104e07b9619102ce54c759ef85831d2d00ed9934b01a6fb698089e81",
       "outcome": "NOT_REPRODUCED",
       "invalid_reason": null,
-      "measured_value": "0.93",
-      "reported_value": "0.97",
-      "tolerance": "abs:0.01",
-      "commit": "8977800218ee404231d5dd457efed7546023334d",
+      "measured_value": "21.05564712504313",
+      "reported_value": "50",
+      "tolerance": "abs:2",
+      "commit": "bb61018d5b8aafe665aff1d53a67c5b86eb1db38",
       "data_hashes": [
-        "be35dcd48bdcc0222a5c4d5ef769adb4a58e77c1914af80d8aa457ad742f9b7d"
+        "800249b3736cd722aad09b94fa088d74a14536d7a08270e7ccc96240b585a2c7"
       ],
       "env_lock_hash": "8dab88328537f15c219ff04f4c55b0150f9867347067f4b5868ed8b0769249af",
       "patches": [],
       "patches_diff_excerpt": "",
-      "log_hash": "d703a3caeb7c8920890384d9dd62da26793a4f1eaee9ffc5e6ec84fe3aa12357",
-      "log_tail": "accuracy=0.93\n",
-      "full_log_uri": "rerun-lab://local/logs/d703a3caeb7c8920890384d9dd62da26793a4f1eaee9ffc5e6ec84fe3aa12357",
-      "report_hash": "b6f294cd47558a6f0bf51b412515224bd3f760786b7611b85dfda1eb4b84962e",
-      "report_uri": "rerun-lab://local/reports/b6f294cd47558a6f0bf51b412515224bd3f760786b7611b85dfda1eb4b84962e",
-      "runtime_secs": 2,
+      "log_hash": "8162fda7d598ef0f3742d20d495fa6298110c52eeb7ab5e0d99d2ed98e0929d0",
+      "log_tail": "Sunny days sold 21.06% more ice cream\n",
+      "full_log_uri": "rerun-lab://local/logs/8162fda7d598ef0f3742d20d495fa6298110c52eeb7ab5e0d99d2ed98e0929d0",
+      "report_hash": "5d27bfdbaef693b296d17572826f7b02a30ddbb7dad80b29a3c805f916e42bc3",
+      "report_uri": "rerun-lab://local/reports/5d27bfdbaef693b296d17572826f7b02a30ddbb7dad80b29a3c805f916e42bc3",
+      "runtime_secs": 1,
       "exit_code": 0,
       "lab_codehash": "0000000000000000000000000000000000000000000000000000000000000000",
       "lab_account": "local-lab.testnet",
@@ -72,46 +72,46 @@
         "model_id": "z-ai/glm-5.3-flash",
         "attestation_digest": "bb8a7976104d871a735c0da6d0f0b244382f42c97202b1b1efc9cfd40c1de8d6",
         "response_signature_refs": [
-          "mock-17599eb416be9bb7",
-          "mock-009d5266ce4491c5"
+          "mock-87d0b75438c2af07",
+          "mock-b3d7d8c87d3f8c9f"
         ]
       },
       "run_index": 0,
-      "started_at": 1793791039,
-      "finished_at": 1793791066
+      "started_at": 1793953439,
+      "finished_at": 1793953462
     }
   },
   {
     "name": "repairable",
-    "spec_json": "{\"artifact\":{\"commit\":\"d1f86938a1b89aab8b29421e8c6bf0c9ea54c6e4\",\"data\":[{\"path\":\"data/trials.csv\",\"sha256\":\"be35dcd48bdcc0222a5c4d5ef769adb4a58e77c1914af80d8aa457ad742f9b7d\",\"url\":\"https://rerun.invalid/demo/data/trials.csv\"}],\"entrypoint\":\"python reproduce.py\",\"output\":{\"extractor\":{\"expr\":\"$.accuracy\",\"type\":\"jsonpath\"},\"path\":\"results.json\"},\"repo_url\":\"https://rerun.invalid/demo/repairable.git\",\"runtime\":\"python3.11\",\"setup\":[\"pip install -r requirements.txt\"]},\"metric\":{\"comparison\":\"within_tolerance\",\"name\":\"accuracy\",\"reported_value\":\"0.93\",\"tolerance\":{\"type\":\"abs\",\"value\":\"0.02\"}},\"private_data\":null,\"resources\":{\"cpu\":2,\"max_minutes\":3,\"mem_gb\":2},\"source\":{\"authors\":\"RERUN demo fixture\",\"license\":\"MIT\",\"type\":\"report\",\"url\":\"https://rerun.invalid/demo/repairable\"},\"statement\":\"DEMO FIXTURE, not real research. The script reads data from a path on the author's laptop. The Lab fixes only that path, shows the diff, and the unchanged analysis reproduces the result.\",\"title\":\"[DEMO] A paper's code with a hardcoded laptop path still reproduces\",\"version\":1}",
-    "spec_hash": "7307d651f5e782ddb931062bca81ec13b420e9015fd094c8f637f1147b164cf9",
+    "spec_json": "{\"artifact\":{\"commit\":\"5f5ee11238e4bebb7126900e2dbcae3b60cf8412\",\"data\":[{\"path\":\"data/dog_walks.csv\",\"sha256\":\"8bb148be35abf585808df8dbb62e8bcba1d1e60abcce08baefb81f013abeaa40\",\"url\":\"https://rerun.invalid/demo/data/dog_walks.csv\"}],\"entrypoint\":\"python reproduce.py\",\"output\":{\"extractor\":{\"expr\":\"$.percent_more\",\"type\":\"jsonpath\"},\"path\":\"results.json\"},\"repo_url\":\"https://rerun.invalid/demo/repairable.git\",\"runtime\":\"python3.11\",\"setup\":[\"pip install -r requirements.txt\"]},\"metric\":{\"comparison\":\"within_tolerance\",\"name\":\"% more steps for dog owners\",\"reported_value\":\"30\",\"tolerance\":{\"type\":\"abs\",\"value\":\"2\"}},\"private_data\":null,\"resources\":{\"cpu\":2,\"max_minutes\":3,\"mem_gb\":2},\"source\":{\"authors\":\"RERUN practice data\",\"license\":\"MIT\",\"type\":\"report\",\"url\":\"https://rerun.invalid/demo/repairable\"},\"statement\":\"Made-up practice data, not real research. A short script compares the daily steps of pretend people with and without a dog.\",\"title\":\"Demo: our practice dataset says dog owners walk 30% more each day. Will the re-run agree?\",\"version\":1}",
+    "spec_hash": "23e969137d3e65e4e512822e75fba9cb493e88668b42f7c4919970a8d07709c8",
     "receipt": {
       "market_id": 2,
-      "spec_hash": "7307d651f5e782ddb931062bca81ec13b420e9015fd094c8f637f1147b164cf9",
+      "spec_hash": "23e969137d3e65e4e512822e75fba9cb493e88668b42f7c4919970a8d07709c8",
       "outcome": "REPRODUCED",
       "invalid_reason": null,
-      "measured_value": "0.93",
-      "reported_value": "0.93",
-      "tolerance": "abs:0.02",
-      "commit": "d1f86938a1b89aab8b29421e8c6bf0c9ea54c6e4",
+      "measured_value": "30.427257118633257",
+      "reported_value": "30",
+      "tolerance": "abs:2",
+      "commit": "5f5ee11238e4bebb7126900e2dbcae3b60cf8412",
       "data_hashes": [
-        "be35dcd48bdcc0222a5c4d5ef769adb4a58e77c1914af80d8aa457ad742f9b7d"
+        "8bb148be35abf585808df8dbb62e8bcba1d1e60abcce08baefb81f013abeaa40"
       ],
       "env_lock_hash": "8dab88328537f15c219ff04f4c55b0150f9867347067f4b5868ed8b0769249af",
       "patches": [
         {
           "file": "reproduce.py",
           "kind": "PATH",
-          "diff_hash": "8821df483523adcd8f4faf2f591c498fc49b48d14427a213152ca04d65b862bd"
+          "diff_hash": "25f69f2516018e4f8b56758b88e3517b4cbf4e6ada6e4fd878c0a5171712e22c"
         }
       ],
-      "patches_diff_excerpt": "--- reproduce.py [PATH] Point the hardcoded laptop path at the repository's data file; the analysis is unchanged.\n- pd.read_csv(\"/home/drsmith/project/data/trials.csv\")\n+ pd.read_csv(\"data/trials.csv\")\n",
-      "log_hash": "d703a3caeb7c8920890384d9dd62da26793a4f1eaee9ffc5e6ec84fe3aa12357",
-      "log_tail": "accuracy=0.93\n",
-      "full_log_uri": "rerun-lab://local/logs/d703a3caeb7c8920890384d9dd62da26793a4f1eaee9ffc5e6ec84fe3aa12357",
-      "report_hash": "8476bfbe303e60c764be8d4587c0b1683bd3be792061c6f2fdf1833227c981b8",
-      "report_uri": "rerun-lab://local/reports/8476bfbe303e60c764be8d4587c0b1683bd3be792061c6f2fdf1833227c981b8",
-      "runtime_secs": 5,
+      "patches_diff_excerpt": "--- reproduce.py [PATH by ai] Point the laptop path at the repository's data file. The sums are unchanged.\n- DATA = \"/home/sam/laptop/dog_walks.csv\"\n+ DATA = \"data/dog_walks.csv\"\n",
+      "log_hash": "250fd6273ce2df41780781e38fc794a8055c8b3596259b28a99a904760afdfb2",
+      "log_tail": "Dog owners walked 30.43% more\n",
+      "full_log_uri": "rerun-lab://local/logs/250fd6273ce2df41780781e38fc794a8055c8b3596259b28a99a904760afdfb2",
+      "report_hash": "84f764755fda41f25e72e3a0060a68b4db882a764d3c3ff11b2283e8d11fe71b",
+      "report_uri": "rerun-lab://local/reports/84f764755fda41f25e72e3a0060a68b4db882a764d3c3ff11b2283e8d11fe71b",
+      "runtime_secs": 2,
       "exit_code": 0,
       "lab_codehash": "0000000000000000000000000000000000000000000000000000000000000000",
       "lab_account": "local-lab.testnet",
@@ -119,41 +119,41 @@
         "model_id": "z-ai/glm-5.3-flash",
         "attestation_digest": "bb8a7976104d871a735c0da6d0f0b244382f42c97202b1b1efc9cfd40c1de8d6",
         "response_signature_refs": [
-          "mock-cc7353e3e00db26d",
-          "mock-17599eb416be9bb7",
-          "mock-36c6b3b7bb404226"
+          "mock-aeb8899159179391",
+          "mock-05e62f64778f2c9f",
+          "mock-ffbbbdfc299172d1"
         ]
       },
       "run_index": 0,
-      "started_at": 1793791067,
-      "finished_at": 1793791096
+      "started_at": 1793953464,
+      "finished_at": 1793953492
     }
   },
   {
     "name": "broken",
-    "spec_json": "{\"artifact\":{\"commit\":\"4657282b6cdd46e0645cf2c6f9febea99f66fed3\",\"data\":[{\"path\":\"data/trials.csv\",\"sha256\":\"be35dcd48bdcc0222a5c4d5ef769adb4a58e77c1914af80d8aa457ad742f9b7d\",\"url\":\"https://rerun.invalid/demo/data/trials.csv\"}],\"entrypoint\":\"python reproduce.py\",\"output\":{\"extractor\":{\"expr\":\"$.accuracy\",\"type\":\"jsonpath\"},\"path\":\"results.json\"},\"repo_url\":\"https://rerun.invalid/demo/broken.git\",\"runtime\":\"python3.11\",\"setup\":[\"pip install -r requirements.txt\"]},\"metric\":{\"comparison\":\"within_tolerance\",\"name\":\"accuracy\",\"reported_value\":\"0.9\",\"tolerance\":{\"type\":\"abs\",\"value\":\"0.01\"}},\"private_data\":null,\"resources\":{\"cpu\":2,\"max_minutes\":3,\"mem_gb\":2},\"source\":{\"authors\":\"RERUN demo fixture\",\"license\":\"MIT\",\"type\":\"report\",\"url\":\"https://rerun.invalid/demo/broken\"},\"statement\":\"DEMO FIXTURE, not real research. The code imports a package the authors never released, so no environment repair can make it run. That is a real finding: the result did not reproduce because the code is broken.\",\"title\":\"[DEMO] Analysis that depends on an unpublished private package\",\"version\":1}",
-    "spec_hash": "095cd48cf1aac81d27e9ac8df19b66e4fbfc698a7c58c110e4f6d8a33edef6a8",
+    "spec_json": "{\"artifact\":{\"commit\":\"2bc7d647243d5b041a549b43fc9274c4ac6a1633\",\"data\":[{\"path\":\"data/pizza.csv\",\"sha256\":\"671d73a5b1765c562ec7a3164da8b9cc17273f232e48b38e2acf0557c1724686\",\"url\":\"https://rerun.invalid/demo/data/pizza.csv\"}],\"entrypoint\":\"python reproduce.py\",\"output\":{\"extractor\":{\"expr\":\"$.minutes_faster\",\"type\":\"jsonpath\"},\"path\":\"results.json\"},\"repo_url\":\"https://rerun.invalid/demo/broken.git\",\"runtime\":\"python3.11\",\"setup\":[\"pip install -r requirements.txt\"]},\"metric\":{\"comparison\":\"within_tolerance\",\"name\":\"minutes faster at night\",\"reported_value\":\"10\",\"tolerance\":{\"type\":\"abs\",\"value\":\"2\"}},\"private_data\":null,\"resources\":{\"cpu\":2,\"max_minutes\":3,\"mem_gb\":2},\"source\":{\"authors\":\"RERUN practice data\",\"license\":\"MIT\",\"type\":\"report\",\"url\":\"https://rerun.invalid/demo/broken\"},\"statement\":\"Made-up practice data, not real research. A short script compares the delivery times of a pretend pizza shop by day and by night.\",\"title\":\"Demo: our practice dataset says pizza arrives 10 minutes faster at night. Will the re-run agree?\",\"version\":1}",
+    "spec_hash": "e45822434afdee64bb78e0df3a009c9176d98552b0ccfd980c6841d3b45d8158",
     "receipt": {
       "market_id": 3,
-      "spec_hash": "095cd48cf1aac81d27e9ac8df19b66e4fbfc698a7c58c110e4f6d8a33edef6a8",
-      "outcome": "BROKEN",
-      "invalid_reason": null,
+      "spec_hash": "e45822434afdee64bb78e0df3a009c9176d98552b0ccfd980c6841d3b45d8158",
+      "outcome": "INVALID",
+      "invalid_reason": "ENV_SETUP_FAILED",
       "measured_value": null,
-      "reported_value": "0.9",
-      "tolerance": "abs:0.01",
-      "commit": "4657282b6cdd46e0645cf2c6f9febea99f66fed3",
+      "reported_value": "10",
+      "tolerance": "abs:2",
+      "commit": "2bc7d647243d5b041a549b43fc9274c4ac6a1633",
       "data_hashes": [
-        "be35dcd48bdcc0222a5c4d5ef769adb4a58e77c1914af80d8aa457ad742f9b7d"
+        "671d73a5b1765c562ec7a3164da8b9cc17273f232e48b38e2acf0557c1724686"
       ],
       "env_lock_hash": "8dab88328537f15c219ff04f4c55b0150f9867347067f4b5868ed8b0769249af",
       "patches": [],
       "patches_diff_excerpt": "",
-      "log_hash": "db84011ef2fa752bbd43273ab1d60812dfb31830fb346e4c44d6e9704f5dc973",
-      "log_tail": "Traceback (most recent call last):\n  File \"/work/repo/reproduce.py\", line 3, in <module>\n    import labtools_internal as lt  # the lab's private package; never published\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nModuleNotFoundError: No module named 'labtools_internal'\n",
-      "full_log_uri": "rerun-lab://local/logs/db84011ef2fa752bbd43273ab1d60812dfb31830fb346e4c44d6e9704f5dc973",
-      "report_hash": "81df97c0a172c57eec908f370883cf39de4551105e3112876162bad402d66f18",
-      "report_uri": "rerun-lab://local/reports/81df97c0a172c57eec908f370883cf39de4551105e3112876162bad402d66f18",
-      "runtime_secs": 2,
+      "log_hash": "29508f739a1f119c00af1d3d9f466f3da854d18cca9193383f8dbc8d0d97cd4e",
+      "log_tail": "Traceback (most recent call last):\n  File \"/work/repo/reproduce.py\", line 2, in <module>\n    import pizza_sums  # the writer's own package, never published\n    ^^^^^^^^^^^^^^^^^\nModuleNotFoundError: No module named 'pizza_sums'\n",
+      "full_log_uri": "rerun-lab://local/logs/29508f739a1f119c00af1d3d9f466f3da854d18cca9193383f8dbc8d0d97cd4e",
+      "report_hash": "8a9446db4c74961511f541f8cef6ac44375d71bcff8cdcea761b2f79fda44bf7",
+      "report_uri": "rerun-lab://local/reports/8a9446db4c74961511f541f8cef6ac44375d71bcff8cdcea761b2f79fda44bf7",
+      "runtime_secs": 1,
       "exit_code": 1,
       "lab_codehash": "0000000000000000000000000000000000000000000000000000000000000000",
       "lab_account": "local-lab.testnet",
@@ -161,29 +161,28 @@
         "model_id": "z-ai/glm-5.3-flash",
         "attestation_digest": "bb8a7976104d871a735c0da6d0f0b244382f42c97202b1b1efc9cfd40c1de8d6",
         "response_signature_refs": [
-          "mock-9b7da63f1f475a58",
-          "mock-17599eb416be9bb7",
-          "mock-e7cdf5da9a767b4e"
+          "mock-4290ea4c9f7e2495",
+          "mock-db729112a489173a"
         ]
       },
       "run_index": 0,
-      "started_at": 1793791097,
-      "finished_at": 1793791109
+      "started_at": 1793953494,
+      "finished_at": 1793953505
     }
   },
   {
     "name": "private",
-    "spec_json": "{\"artifact\":{\"commit\":\"9001edcd704673bca341d56a56d72f1e6383d7a9\",\"data\":[],\"entrypoint\":\"python analyze.py\",\"output\":{\"extractor\":{\"expr\":\"0:value\",\"type\":\"csv_cell\"},\"path\":\"results.csv\"},\"repo_url\":\"https://rerun.invalid/demo/private.git\",\"runtime\":\"python3.11\",\"setup\":[\"pip install -r requirements.txt\"]},\"metric\":{\"comparison\":\"within_tolerance\",\"name\":\"auc\",\"reported_value\":\"0.94\",\"tolerance\":{\"type\":\"abs\",\"value\":\"0.03\"}},\"private_data\":{\"ciphertext_ref\":\"https://rerun.invalid/demo/sealed/private.bin\",\"owner\":\"demo-hospital.testnet\",\"path\":\"private/readmissions.csv\",\"sha256_plain\":\"45d60ab42de9d9a09a9fa970e08034e01674a76c9f2eeef040b3d53c6c7f4473\"},\"resources\":{\"cpu\":2,\"max_minutes\":3,\"mem_gb\":2},\"source\":{\"authors\":\"RERUN demo fixture\",\"license\":\"MIT\",\"type\":\"report\",\"url\":\"https://rerun.invalid/demo/private\"},\"statement\":\"DEMO FIXTURE, not real research: the hospital records are synthetic. The data is encrypted to the attested Lab and never revealed; only hashes and the result leave.\",\"title\":\"[DEMO] Readmission model reaches the reported AUC on private hospital data\",\"version\":1}",
-    "spec_hash": "931a3cb90d3fe9d60d89c7e048dffc6b25ae2b81bfb69e9c69b7e191ec1c01de",
+    "spec_json": "{\"artifact\":{\"commit\":\"758d52e5ccfa9b92226c3b745d17e36d05c8fe4f\",\"data\":[],\"entrypoint\":\"python analyze.py\",\"output\":{\"extractor\":{\"expr\":\"0:value\",\"type\":\"csv_cell\"},\"path\":\"results.csv\"},\"repo_url\":\"https://rerun.invalid/demo/private.git\",\"runtime\":\"python3.11\",\"setup\":[\"pip install -r requirements.txt\"]},\"metric\":{\"comparison\":\"within_tolerance\",\"name\":\"% longer membership for weekly visitors\",\"reported_value\":\"40\",\"tolerance\":{\"type\":\"abs\",\"value\":\"2\"}},\"private_data\":{\"ciphertext_ref\":\"https://rerun.invalid/demo/sealed/private.bin\",\"owner\":\"demo-gym.testnet\",\"path\":\"private/gym.csv\",\"sha256_plain\":\"5f53eae112e1361c4a90c8e629f4d5b80271c75767690e57ace5adcaccef9166\"},\"resources\":{\"cpu\":2,\"max_minutes\":3,\"mem_gb\":2},\"source\":{\"authors\":\"RERUN practice data\",\"license\":\"MIT\",\"type\":\"report\",\"url\":\"https://rerun.invalid/demo/private\"},\"statement\":\"Made-up practice data, not real research. The pretend gym's records are invented, and they're sealed so only the Lab can read them. Only the result and fingerprints come out.\",\"title\":\"Demo: a made-up gym's private records say weekly visitors stay 40% longer. Will the re-run agree?\",\"version\":1}",
+    "spec_hash": "0dd955fcea61a5d91fc249cfc486093c1332c17488b24fa903762f6a5dbe0e5e",
     "receipt": {
       "market_id": 4,
-      "spec_hash": "931a3cb90d3fe9d60d89c7e048dffc6b25ae2b81bfb69e9c69b7e191ec1c01de",
+      "spec_hash": "0dd955fcea61a5d91fc249cfc486093c1332c17488b24fa903762f6a5dbe0e5e",
       "outcome": "REPRODUCED",
       "invalid_reason": null,
-      "measured_value": "0.937216",
-      "reported_value": "0.94",
-      "tolerance": "abs:0.03",
-      "commit": "9001edcd704673bca341d56a56d72f1e6383d7a9",
+      "measured_value": "41.5510093006131",
+      "reported_value": "40",
+      "tolerance": "abs:2",
+      "commit": "758d52e5ccfa9b92226c3b745d17e36d05c8fe4f",
       "data_hashes": [],
       "env_lock_hash": "8dab88328537f15c219ff04f4c55b0150f9867347067f4b5868ed8b0769249af",
       "patches": [],
@@ -191,9 +190,9 @@
       "log_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "log_tail": "",
       "full_log_uri": "",
-      "report_hash": "52377737ac7dd11a154602818cfdf46ac04ee61a74ad642c49bd73fb8a298ae0",
-      "report_uri": "rerun-lab://local/reports/52377737ac7dd11a154602818cfdf46ac04ee61a74ad642c49bd73fb8a298ae0",
-      "runtime_secs": 3,
+      "report_hash": "c34de23fd93c1012758f858083aaf862f6dfa78c79ae3233af5d2a00e74a50ee",
+      "report_uri": "rerun-lab://local/reports/c34de23fd93c1012758f858083aaf862f6dfa78c79ae3233af5d2a00e74a50ee",
+      "runtime_secs": 1,
       "exit_code": 0,
       "lab_codehash": "0000000000000000000000000000000000000000000000000000000000000000",
       "lab_account": "local-lab.testnet",
@@ -201,38 +200,38 @@
         "model_id": "z-ai/glm-5.3-flash",
         "attestation_digest": "bb8a7976104d871a735c0da6d0f0b244382f42c97202b1b1efc9cfd40c1de8d6",
         "response_signature_refs": [
-          "mock-46a7e63ffc215345"
+          "mock-d7f078b856cd8cbd"
         ]
       },
       "run_index": 0,
-      "started_at": 1793791109,
-      "finished_at": 1793791118
+      "started_at": 1793953507,
+      "finished_at": 1793953516
     }
   },
   {
     "name": "swapped-data",
-    "spec_json": "{\"artifact\":{\"commit\":\"563c58831162400e57dc0129eb2d2744fb3a1368\",\"data\":[{\"path\":\"data/trials.csv\",\"sha256\":\"be35dcd48bdcc0222a5c4d5ef769adb4a58e77c1914af80d8aa457ad742f9b7d\",\"url\":\"https://rerun.invalid/demo/data/trials.csv\"}],\"entrypoint\":\"python reproduce.py\",\"output\":{\"extractor\":{\"expr\":\"$.accuracy\",\"type\":\"jsonpath\"},\"path\":\"results.json\"},\"repo_url\":\"https://rerun.invalid/demo/swapped-data.git\",\"runtime\":\"python3.11\",\"setup\":[\"pip install -r requirements.txt\"]},\"metric\":{\"comparison\":\"within_tolerance\",\"name\":\"accuracy\",\"reported_value\":\"0.93\",\"tolerance\":{\"type\":\"abs\",\"value\":\"0.02\"}},\"private_data\":null,\"resources\":{\"cpu\":2,\"max_minutes\":3,\"mem_gb\":2},\"source\":{\"authors\":\"RERUN demo fixture\",\"license\":\"MIT\",\"type\":\"report\",\"url\":\"https://rerun.invalid/demo/swapped-data\"},\"statement\":\"DEMO FIXTURE, not real research. The dataset at the claim's URL no longer matches the hash pinned in the spec, so the Lab refuses to run it. Both sides redeem at 0.5 and the creator's bond is forfeited.\",\"title\":\"[DEMO] A claim whose data file was swapped after the market opened\",\"version\":1}",
-    "spec_hash": "241c10238cc7508879569640c22b66789c0ab85246b8aada234abb043756fbc9",
+    "spec_json": "{\"artifact\":{\"commit\":\"0a9e4c197e6d3a87d913f5e8b962626f78aab440\",\"data\":[{\"path\":\"data/coffee.csv\",\"sha256\":\"a660e498b0c91ab0ab5e27f973975c420208655e238b530f82807ad7dfe9aca5\",\"url\":\"https://rerun.invalid/demo/data/coffee.csv\"}],\"entrypoint\":\"python reproduce.py\",\"output\":{\"extractor\":{\"expr\":\"$.percent_more\",\"type\":\"jsonpath\"},\"path\":\"results.json\"},\"repo_url\":\"https://rerun.invalid/demo/swapped-data.git\",\"runtime\":\"python3.11\",\"setup\":[\"pip install -r requirements.txt\"]},\"metric\":{\"comparison\":\"within_tolerance\",\"name\":\"% more coffee orders on Mondays\",\"reported_value\":\"15\",\"tolerance\":{\"type\":\"abs\",\"value\":\"2\"}},\"private_data\":null,\"resources\":{\"cpu\":2,\"max_minutes\":3,\"mem_gb\":2},\"source\":{\"authors\":\"RERUN practice data\",\"license\":\"MIT\",\"type\":\"report\",\"url\":\"https://rerun.invalid/demo/swapped-data\"},\"statement\":\"Made-up practice data, not real research. A short script compares a pretend cafe's coffee orders on Mondays and other days.\",\"title\":\"Demo: our practice dataset says Mondays get 15% more coffee orders. Will the re-run agree?\",\"version\":1}",
+    "spec_hash": "6dcf5a38c026c88a74c28e4d084a5fdf27510c3fb3f262baaff7c781c2394fcd",
     "receipt": {
       "market_id": 5,
-      "spec_hash": "241c10238cc7508879569640c22b66789c0ab85246b8aada234abb043756fbc9",
+      "spec_hash": "6dcf5a38c026c88a74c28e4d084a5fdf27510c3fb3f262baaff7c781c2394fcd",
       "outcome": "INVALID",
       "invalid_reason": "HASH_MISMATCH",
       "measured_value": null,
-      "reported_value": "0.93",
-      "tolerance": "abs:0.02",
-      "commit": "563c58831162400e57dc0129eb2d2744fb3a1368",
+      "reported_value": "15",
+      "tolerance": "abs:2",
+      "commit": "0a9e4c197e6d3a87d913f5e8b962626f78aab440",
       "data_hashes": [
-        "65cb2675a54874bae05839ad7314c1742157cf1291320d522b6268b5d468a46b"
+        "7093887d94b9623a4a3a02a9e7b846bc95b88801d0fe0f4620c3496e5b64cd58"
       ],
       "env_lock_hash": "",
       "patches": [],
       "patches_diff_excerpt": "",
-      "log_hash": "69cc0f4d9573047991afede09158c3332f7d6758c2073b58dcf5bd6d31460446",
-      "log_tail": "data/trials.csv has sha256 65cb2675a54874bae05839ad7314c1742157cf1291320d522b6268b5d468a46b, spec says be35dcd48bdcc0222a5c4d5ef769adb4a58e77c1914af80d8aa457ad742f9b7d",
-      "full_log_uri": "rerun-lab://local/logs/69cc0f4d9573047991afede09158c3332f7d6758c2073b58dcf5bd6d31460446",
-      "report_hash": "71a6bcae13c3d5dd04847723752e8de6d72994ad6985d69e959e279397df26d9",
-      "report_uri": "rerun-lab://local/reports/71a6bcae13c3d5dd04847723752e8de6d72994ad6985d69e959e279397df26d9",
+      "log_hash": "1b22c60ce010761165853ab9fe3c1ec6fd5b0ab4a86723fbbcbec53d75c5fff1",
+      "log_tail": "data/coffee.csv has sha256 7093887d94b9623a4a3a02a9e7b846bc95b88801d0fe0f4620c3496e5b64cd58, spec says a660e498b0c91ab0ab5e27f973975c420208655e238b530f82807ad7dfe9aca5",
+      "full_log_uri": "rerun-lab://local/logs/1b22c60ce010761165853ab9fe3c1ec6fd5b0ab4a86723fbbcbec53d75c5fff1",
+      "report_hash": "c5b9fff1804841d8d726df65b4939cf153eb23ccf8f37cf469800b97b32cf6f5",
+      "report_uri": "rerun-lab://local/reports/c5b9fff1804841d8d726df65b4939cf153eb23ccf8f37cf469800b97b32cf6f5",
       "runtime_secs": 0,
       "exit_code": 0,
       "lab_codehash": "0000000000000000000000000000000000000000000000000000000000000000",
@@ -241,12 +240,12 @@
         "model_id": "z-ai/glm-5.3-flash",
         "attestation_digest": "bb8a7976104d871a735c0da6d0f0b244382f42c97202b1b1efc9cfd40c1de8d6",
         "response_signature_refs": [
-          "mock-3c1f754c74acc87f"
+          "mock-fead98c52aa4753d"
         ]
       },
       "run_index": 0,
-      "started_at": 1793791118,
-      "finished_at": 1793791121
+      "started_at": 1793953518,
+      "finished_at": 1793953522
     }
   }
 ]

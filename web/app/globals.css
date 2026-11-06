@@ -429,7 +429,7 @@ h3 {
 
 .ticker-head {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 150px 112px;
+  grid-template-columns: minmax(0, 1fr) 150px minmax(112px, auto);
   gap: 20px;
   align-items: center;
   width: 100%;
@@ -3526,3 +3526,19 @@ a {
 }
 
 .exact-claim { margin: -6px 0 18px; font-size: 14px; color: var(--ink-3); }
+
+.proof { margin: 18px 0 24px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 12px 0; }
+.proof > summary { cursor: pointer; font-weight: 500; }
+.proof[open] > summary { margin-bottom: 16px; }
+.exact-claim { margin-top: 18px; }
+.exact-claim h3 { font-size: 15px; margin: 0 0 6px; }
+.more-science { margin: 34px 0 12px; font-size: 18px; font-weight: 500; }
+.try-band { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; }
+.try-band h2 { margin: 0 0 4px; }
+.try-band p { margin: 0; max-width: 56ch; }
+.try-list { list-style: none; margin: 24px 0 0; padding: 0; display: grid; gap: 8px; }
+.ticker-value .stamp, .ticker-value > * { max-width: none; }
+@media (max-width: 1160px) {
+  .nav a { padding: 6px 6px; font-size: 13.5px; }
+}
+.start-here { font-style: normal; font-size: 12px; color: var(--mint); border: 1px solid currentColor; border-radius: 999px; padding: 1px 8px; margin-right: 8px; vertical-align: 1px; }

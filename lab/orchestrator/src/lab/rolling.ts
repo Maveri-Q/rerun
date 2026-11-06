@@ -33,7 +33,7 @@ export interface RollingOptions {
   maxPerDay: number;
 }
 
-const isDemo = (m: RollingMarket) => m.spec.title.startsWith("[DEMO]");
+const isDemo = (m: RollingMarket) => /^(\[DEMO\]|Demo:)/.test(m.spec.title);
 const DAY_SECS = 86_400;
 
 export class RollingDemos {

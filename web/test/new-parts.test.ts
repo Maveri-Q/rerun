@@ -2,8 +2,8 @@ import { describe, expect, it } from "vitest";
 import { answerText } from "../components/usePoll";
 import { linePositions } from "../lib/line";
 import { binOf } from "../lib/scout-bins";
-import { challengeBond, durationWords, isPractice, type Config, type Market } from "../lib/market";
-import { claimName } from "../lib/provenance";
+import { challengeBond, countsIf, durationWords, isPractice, type Config, type Market } from "../lib/market";
+import { claimName, isListed, PROVENANCE, resultSentence } from "../lib/provenance";
 
 describe("linePositions", () => {
   it("puts a run inside the range inside the band", () => {
@@ -58,10 +58,32 @@ describe("answerText", () => {
 });
 
 describe("what gets listed", () => {
+  it("lists real claims only, and keeps back the one whose answer is already out", () => {
+    const hash = (name: string) => Object.entries(PROVENANCE).find(([, p]) => p.name === name)![0];
+    const claim = (state: string, title: string, spec_hash = "x") => ({ state, spec: { title, spec_hash } });
+    expect(isListed(claim("Open", "A paper's claim"))).toBe(true);
+    expect(isListed(claim("Open", "Demo: our practice dataset says something. Will the re-run agree?"))).toBe(false);
+    expect(isListed(claim("Final", "[TEST] Pipeline check"))).toBe(false);
+    expect(isListed(claim("Open", "Rebuild", hash("parkinsons-spread")))).toBe(false);
+    expect(isListed(claim("Final", "Rebuild", hash("parkinsons-spread")))).toBe(true);
+  });
+
+  it("says each result in one sentence", () => {
+    const debt = Object.entries(PROVENANCE).find(([, p]) => p.name === "reinhart-rogoff")![0];
+    expect(resultSentence({ state: "Final", outcome: "NOT_REPRODUCED", spec: { spec_hash: debt } })).toMatch(/^The study said .*We reran it: ✗ different result\.$/);
+    expect(resultSentence({ state: "Open", outcome: null, spec: { spec_hash: debt } })).toMatch(/We'll re-run it when forecasting closes\.$/);
+    expect(resultSentence({ state: "Open", spec: { spec_hash: "unknown" } })).toBeNull();
+  });
+
   it("treats our demos and pipeline checks as practice, and nothing else", () => {
     expect(isPractice({ spec: { title: "[DEMO] A sample model" } } as Market)).toBe(true);
     expect(isPractice({ spec: { title: "[TEST] Pipeline check" } } as Market)).toBe(true);
+    expect(isPractice({ spec: { title: "Demo: our practice dataset says something." } } as Market)).toBe(true);
     expect(isPractice({ spec: { title: "Does raising the minimum wage cost jobs?" } } as Market)).toBe(false);
+  });
+
+  it("words the range the way the site does", () => {
+    expect(countsIf("2.76", "abs", "0.05")).toBe("Counts if between 2.71 and 2.81");
   });
 
   it("names a claim without its label", () => {

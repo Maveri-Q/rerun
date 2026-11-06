@@ -21,8 +21,8 @@ import { Hint } from "@/components/Hint";
 import { citedByText, factsFor } from "@/lib/facts";
 import { accountLink, CONTRACT } from "@/lib/config";
 import { lab, useRunStream } from "@/lib/lab";
-import { claimName, NEVER_CHECKED, ORIGIN_LABEL, PRICE_RULE, provenanceOf } from "@/lib/provenance";
-import { CHECK_OUT_NOTE, fmtUnits, isPractice, modeUnit, verdictWords, outcomeMeaning, rangeText, relativeTime, stateLabel, toleranceText, type State } from "@/lib/market";
+import { claimName, resultSentence, NEVER_CHECKED, ORIGIN_LABEL, PRICE_RULE, provenanceOf } from "@/lib/provenance";
+import { CHECK_OUT_NOTE, countsIf, DEMO_LABEL, fmtUnits, isPractice, isTest, modeUnit, verdictWords, outcomeMeaning, rangeText, relativeTime, stateLabel, toleranceText, type State } from "@/lib/market";
 import { useWallet } from "@/lib/wallet";
 
 const SEQUENCE: { state: State; label: string }[] = [
@@ -75,6 +75,13 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
   }
 
   const m = market.data;
+  if (isTest(m)) {
+    return (
+      <p className="empty">
+        This was a test of our own system, so it isn&apos;t shown here. <Link href="/">See all claims</Link>.
+      </p>
+    );
+  }
   const s = m.spec;
   const origin = provenanceOf(s.spec_hash);
   const unit = modeUnit(m.mode);
@@ -87,11 +94,12 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
     <div className="market-grid">
       <div>
         <span className="page-no">Claim {m.id}</span>
-        {isPractice(m) && <p className="notice">This is a practice claim from our testing, not real research, so it isn&apos;t listed on the site.</p>}
+        {isPractice(m) && <p className="notice">{DEMO_LABEL}.</p>}
         <h1 className="market-title">{claimName(m)}</h1>
         {origin && (
           <p className="origin-chips">
-                        <span className={`chip origin-chip--${origin.origin}`}>{ORIGIN_LABEL[origin.origin]}</span>
+                        {origin.flagship && <span className="chip chip--REPRODUCED">Start here</span>}
+            <span className={`chip origin-chip--${origin.origin}`}>{ORIGIN_LABEL[origin.origin]}</span>
           </p>
         )}
         {spec?.statement.endsWith("Suggested by the scout agent.") && (
@@ -100,14 +108,7 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
           </p>
         )}
         {origin?.plain ? (
-          <>
-            <p className="statement">{origin.plain.claim}</p>
-            <details className="exact-claim">
-              <summary>The exact claim as posted</summary>
-              <p className="hint">{s.title}</p>
-              <p className="hint">{readableStatement(spec?.statement)}</p>
-            </details>
-          </>
+          <p className="statement">{resultSentence(m)}</p>
         ) : (
           <p className="statement">{readableStatement(spec?.statement)}</p>
         )}
@@ -118,6 +119,22 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
             {origin.why.link && <a href={origin.why.link.href}>{origin.why.link.label}</a>}
           </div>
         )}
+        {origin?.whyItMatters && <p className="why-matters">{origin.whyItMatters}</p>}
+        {citedByText(factsFor(s.spec_hash).citedBy) && <p className="test-run-note">{citedByText(factsFor(s.spec_hash).citedBy)}</p>}
+        {origin && m.state === "Final" && <p className="test-run-note"><Link href={`/facts/${m.id}`}>What this result means</Link></p>}
+        {origin?.testRunEarly && <p className="test-run-note">We test-ran this code once while building the Lab, so we&apos;ve already seen one result. Its official run comes after forecasting closes.</p>}
+        <p className="hint scope-note">We test one thing: does this code and data give this number? That&apos;s not the same as the science being right. {PRICE_RULE}</p>
+
+        <details className="proof">
+          <summary>See the proof</summary>
+        <div className="claim-figure">
+          <span className="claim-value">{s.reported_value}</span>
+          <span className="claim-tol"><Hint term="margin">{toleranceText(s.tolerance_kind, s.tolerance_value)}</Hint></span>
+          <span className="dim">
+            {origin?.plain ? `${origin.plain.unit}, the paper says.` : `The paper reports this as its ${spec?.metric.name}.`} {countsIf(s.reported_value, s.tolerance_kind, s.tolerance_value)}.
+          </span>
+        </div>
+        {(receipts.data || receipts.error) && <NumberLine reported={s.reported_value} kind={s.tolerance_kind} margin={s.tolerance_value} measured={latestReceipt?.measured_value ?? null} tone={shownOutcome ? verdictWords(shownOutcome)?.tone : undefined} noNumber={shownOutcome ? "No number came out of this run" : undefined} unit={origin?.plain?.unit} />}
         {origin?.numbers && (
           <dl className="both-numbers">
             {origin.numbers.map((n) => (
@@ -149,22 +166,16 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
             <a href={origin.paperSays.href}>{origin.paperSays.where}</a>
           </blockquote>
         )}
-        {origin?.whyItMatters && <p className="why-matters">{origin.whyItMatters}</p>}
-        {citedByText(factsFor(s.spec_hash).citedBy) && <p className="test-run-note">{citedByText(factsFor(s.spec_hash).citedBy)}</p>}
-        {origin && m.state === "Final" && <p className="test-run-note"><Link href={`/facts/${m.id}`}>What this result means</Link></p>}
-        {origin?.testRunEarly && <p className="test-run-note">We test-ran this code once while building the Lab, so we&apos;ve already seen one result. Its official run comes after forecasting closes.</p>}
-        <p className="hint scope-note">We test one thing: does this code and data give this number? That&apos;s not the same as the science being right. {PRICE_RULE}</p>
+          {origin?.plain && (
+            <div className="exact-claim">
+              <h3>The exact claim as posted</h3>
+              <p className="hint">{s.title}</p>
+              <p className="hint">{readableStatement(spec?.statement)}</p>
+            </div>
+          )}
+        </details>
 
-        <div className="claim-figure">
-          <span className="claim-value">{s.reported_value}</span>
-          <span className="claim-tol"><Hint term="margin">{toleranceText(s.tolerance_kind, s.tolerance_value)}</Hint></span>
-          <span className="dim">
-            {origin?.plain ? `${origin.plain.unit}, the paper says.` : `The paper reports this as its ${spec?.metric.name}.`} It holds up if the Lab gets {rangeText(s.reported_value, s.tolerance_kind, s.tolerance_value)}.
-          </span>
-        </div>
-        <NumberLine reported={s.reported_value} kind={s.tolerance_kind} margin={s.tolerance_value} measured={latestReceipt?.measured_value ?? null} tone={shownOutcome ? verdictWords(shownOutcome)?.tone : undefined} noNumber={shownOutcome ? "No number came out of this run" : undefined} unit={origin?.plain?.unit} />
-
-        {shownOutcome && (
+        {shownOutcome && (receipts.data || receipts.error) && (
           <div className="verdict-line">
             <PrintedReceipt
               marketId={m.id}

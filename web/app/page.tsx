@@ -9,8 +9,8 @@ import { RollingNumber } from "@/components/RollingNumber";
 import { usePoll } from "@/components/usePoll";
 import { chain } from "@/lib/chain";
 import { lab } from "@/lib/lab";
-import { isPractice, rangeText, type Market } from "@/lib/market";
-import { claimName, provenanceOf } from "@/lib/provenance";
+import { rangeText, type Market } from "@/lib/market";
+import { claimName, isListed, provenanceOf } from "@/lib/provenance";
 
 type Filter = "all" | "open" | "settled";
 
@@ -20,33 +20,31 @@ const FILTERS: { key: Filter; label: string }[] = [
   { key: "settled", label: "Finished" },
 ];
 
-const FIRST_ROWS = 8;
 
-/** Findings people have heard of first, and the ones that need background last. */
-const rank = (m: Market) => {
-  const p = provenanceOf(m.spec.spec_hash);
-  return p?.famous ? 0 : p?.technical ? 2 : 1;
-};
-const technical = (m: Market) => Boolean(provenanceOf(m.spec.spec_hash)?.technical);
+/** The order set for each paper. The start-here paper's place doesn't move it above the others. */
+const rank = (m: Market) => provenanceOf(m.spec.spec_hash)?.order ?? 50;
+const science = (m: Market) => Boolean(provenanceOf(m.spec.spec_hash)?.science);
 
 const live = (m: Market) => m.state !== "Final";
 
 export default function Home() {
   const [filter, setFilter] = useState<Filter>("all");
-  const [showAll, setShowAll] = useState(false);
   const markets = usePoll(() => chain.markets(), [], 15_000, "markets");
   const feed = usePoll(() => lab.recentRuns(), [], 10_000);
 
-  // Only real research is listed. Demos and pipeline checks stay on-chain, reachable by direct link.
-  const listed = useMemo(() => (markets.data ?? []).filter((m) => m.state !== "Draft" && !isPractice(m)), [markets.data]);
+  // Only real research is listed. Demos sit behind "Try it now".
+  const listed = useMemo(() => (markets.data ?? []).filter(isListed), [markets.data]);
   const shown = useMemo(() => {
     const rows = listed.filter((m) => (filter === "all" ? true : filter === "settled" ? m.state === "Final" : m.state !== "Final"));
     return [...rows].sort((a, b) => rank(a) - rank(b) || Number(live(b)) - Number(live(a)) || b.id - a.id);
   }, [listed, filter]);
 
-  const latest = useMemo(() => [...listed].filter((m) => m.outcome === "REPRODUCED").sort((a, b) => rank(a) - rank(b) || (b.finalized_at ?? 0) - (a.finalized_at ?? 0))[0], [listed]);
-  const receipts = usePoll(() => (latest ? chain.receipts(latest.id) : Promise.resolve([])), [latest?.id], 0, latest ? `receipts.${latest.id}` : undefined);
-  const measured = receipts.data?.at(-1)?.measured_value ?? null;
+  // The start-here paper fills the hero slip, whatever its verdict.
+  const latest = useMemo(() => listed.find((m) => m.outcome && provenanceOf(m.spec.spec_hash)?.flagship), [listed]);
+  // The answer carries its claim, so the slip never prints "no number" from an empty answer for no claim.
+  const receipts = usePoll(async () => ({ id: latest?.id, rows: latest ? await chain.receipts(latest.id) : [] }), [latest?.id], 0, latest ? `receipt-slip.${latest.id}` : undefined);
+  const ready = receipts.data?.id === latest?.id;
+  const measured = ready ? (receipts.data?.rows.at(-1)?.measured_value ?? null) : null;
 
   const papers = listed;
   const stillOpen = papers.filter((m) => m.state === "Open").length;
@@ -89,7 +87,7 @@ export default function Home() {
             </div>
           </div>
         </div>
-        {latest?.outcome && (
+        {latest?.outcome && ready && (
           <PrintedReceipt
             marketId={latest.id}
             title={claimName(latest)}
@@ -154,23 +152,36 @@ export default function Home() {
           </p>
         )}
         <div className="ticker-list">
-          {(showAll ? shown : shown.filter((m) => !technical(m)).slice(0, FIRST_ROWS)).map((m) => (
+          {shown.filter((m) => !science(m)).map((m) => (
             <MarketTicker key={m.id} market={m} />
           ))}
         </div>
-        {!showAll && shown.some(technical) && (
-          <button className="quiet show-all" onClick={() => setShowAll(true)}>
-            Show the more technical papers too
-          </button>
+        {shown.some(science) && (
+          <>
+            <h3 className="more-science">More science</h3>
+            <div className="ticker-list">
+              {shown.filter(science).map((m) => (
+                <MarketTicker key={m.id} market={m} />
+              ))}
+            </div>
+          </>
         )}
       </section>
 
+      <section className="section try-band">
+        <div>
+          <h2>Try it now</h2>
+          <p className="dim">Follow a whole claim from forecast to receipt in a few minutes, on made-up practice data.</p>
+        </div>
+        <Link className="btn quiet" href="/try">Try a demo claim</Link>
+      </section>
+
+      {feed.data && feed.data.length > 0 && (
       <section className="section">
         <div className="section-head">
           <h2>What the Lab is doing</h2>
           <Link href="/lab">How the Lab works</Link>
         </div>
-        {feed.data && feed.data.length > 0 ? (
           <ul className="feed">
             {feed.data.map(({ run, event }) => (
               <li key={run}>
@@ -182,10 +193,8 @@ export default function Home() {
               </li>
             ))}
           </ul>
-        ) : (
-          <p className="empty">{feed.loading ? "Checking on the Lab…" : "The Lab's live feed is offline. Verdicts still appear above."}</p>
-        )}
       </section>
+      )}
     </>
   );
 }

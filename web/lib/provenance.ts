@@ -16,12 +16,14 @@ export interface Provenance {
   testRunEarly?: boolean;
   /** What the paper says, word for word, and where. */
   paperSays?: { quote: string; where: string; href: string };
-  /** The claim as a sentence anyone can follow, and what its number counts. */
-  plain?: { claim: string; unit: string };
-  /** A well-known finding, listed first. */
-  famous?: boolean;
-  /** Needs background to follow, so it's listed behind "more technical papers". */
-  technical?: boolean;
+  /** What the study said, as a sentence anyone can follow, and what its number counts. */
+  plain?: { said: string; unit: string };
+  /** Its place in the main list on the home page. Lower comes first. */
+  order?: number;
+  /** Listed lower down, under "More science". */
+  science?: boolean;
+  /** Stays off the lists until it's settled, because another claim already gives its answer away. */
+  hideUntilFinal?: boolean;
   /** One line on why anyone should care. */
   whyItMatters?: string;
   /** The finding as a question in everyday words. */
@@ -58,7 +60,8 @@ export const ORIGIN_LABEL: Record<CodeOrigin, string> = {
 export const PROVENANCE: Record<string, Provenance> = {
   "53d87974c67eef8008149ef40f0448812042bff87db91a0683551e921a3b2e75": {
     name: "parkinsons-authors",
-    plain: { claim: "A model of the brain's wiring predicted where Parkinson's-like damage spreads in mice, with a match score of 0.696, where 1 would be perfect.", unit: "match score" },
+    science: true,
+    plain: { said: "The study said the brain's wiring predicts where Parkinson's-like damage spreads in mice.", unit: "match score, where 1 is perfect" },
     origin: "authors",
     question: "Does the brain's wiring predict where Parkinson's spreads?",
     citeDoi: "10.1038/s41593-019-0457-5",
@@ -74,8 +77,8 @@ export const PROVENANCE: Record<string, Provenance> = {
   },
   "6450bf0ac8d633cb663e2c8ebeb33fde42b6dd75dcfeee3d3ecc3333a8d6eb1b": {
     name: "card-krueger",
-    famous: true,
-    plain: { claim: "After New Jersey raised its minimum wage, its fast-food stores gained about 2.76 jobs each, compared with stores next door in Pennsylvania.", unit: "jobs per store" },
+    order: 4,
+    plain: { said: "The study said raising New Jersey's minimum wage didn't cost fast-food jobs.", unit: "jobs per store" },
     origin: "rebuild",
     question: "Does raising the minimum wage cost jobs?",
     settledShowcase: true,
@@ -90,8 +93,9 @@ export const PROVENANCE: Record<string, Provenance> = {
   },
   "fa35d7e5ffd002b0b8496bed8020579611c19cef349d5ec4658021a5b04bf3d7": {
     name: "reinhart-rogoff",
-    famous: true,
-    plain: { claim: "Rich countries with government debt above 90% of their economy grew by -0.1% a year on average, the paper said.", unit: "% growth a year" },
+    order: 3,
+    flagship: true,
+    plain: { said: "The study said rich countries with very high government debt stop growing.", unit: "% growth a year" },
     origin: "critics",
     question: "Does high government debt kill growth?",
     citeDoi: "10.1257/aer.100.2.573",
@@ -115,11 +119,11 @@ export const PROVENANCE: Record<string, Provenance> = {
   },
   "a942a4e8eee4390f46ae932c48d15ccd0c83ebc0a39eab408c50e054088f6986": {
     name: "wildfire-water",
-    plain: { claim: "After wildfires, temperature explains about 15% of the year-to-year change in how much water northern forests lose. That's 0.1495 as a share.", unit: "share explained" },
+    science: true,
+    plain: { said: "The study said temperature explains about 15% of how much water northern forests lose after a fire.", unit: "share explained" },
     origin: "authors",
     question: "Does temperature explain how much water forests lose after a wildfire?",
     citeDoi: "10.5281/zenodo.4617894",
-    flagship: true,
     testRunEarly: true,
     paperSays: { quote: "Multiple R-Squared: 0.1495", where: "The author's 2008 output file, line 251, for ET ~ Tavg", href: "https://github.com/bpbond/ten-years-paper33/blob/c28b8a2e3149f7d90f2dc0179f9c976785e762b1/original/R%20output.txt#L251" },
     whyItMatters: "Wildfires are reshaping northern forests, and how much water those forests lose matters for climate models.",
@@ -131,7 +135,9 @@ export const PROVENANCE: Record<string, Provenance> = {
   },
   "f63ef50e89f8221d51bde13cebd576b5b89b56f82842ae5fb33321418db60774": {
     name: "parkinsons-spread",
-    plain: { claim: "A model of the brain's wiring predicted where Parkinson's-like damage spreads in mice, with a match score of 0.696, where 1 would be perfect.", unit: "match score" },
+    science: true,
+    hideUntilFinal: true,
+    plain: { said: "The study said the brain's wiring predicts where Parkinson's-like damage spreads in mice.", unit: "match score, where 1 is perfect" },
     question: "Does the brain's wiring predict where Parkinson's spreads? A separate rebuild",
     citeDoi: "10.1038/s41593-019-0457-5",
     origin: "rebuild",
@@ -147,8 +153,8 @@ export const PROVENANCE: Record<string, Provenance> = {
   },
   "c4a9b60c770317e5f7ec3aacbac1513bd2f133958bb226d29762fa2a39ae86d1": {
     name: "budworm-timing",
-    technical: true,
-    plain: { claim: "A 1991 model of when a forest pest develops gives this value for one of its settings.", unit: "model setting" },
+    science: true,
+    plain: { said: "A 1991 study gave one number for how a forest pest develops as the season warms.", unit: "model setting" },
     question: "Does a 1991 model get the timing of a forest pest right?",
     citeDoi: "10.5281/zenodo.5006005",
     origin: "rebuild",
@@ -163,8 +169,8 @@ export const PROVENANCE: Record<string, Provenance> = {
   },
   "19ef61085d1bfae1011de7c8c5006c243a97c56f2066c7bbea8d1179e60c8a0f": {
     name: "budworm-spread",
-    technical: true,
-    plain: { claim: "A table from 1986 gives this value for how spread out a forest pest's development is over the season.", unit: "model setting" },
+    science: true,
+    plain: { said: "A 1986 study gave one number for how spread out a forest pest's development is.", unit: "model setting" },
     question: "Does a 1986 figure for a forest pest's timing hold up?",
     citeDoi: "10.5281/zenodo.5006005",
     origin: "rebuild",
@@ -180,6 +186,27 @@ export const PROVENANCE: Record<string, Provenance> = {
 };
 
 export const provenanceOf = (specHash: string): Provenance | undefined => PROVENANCE[specHash];
+
+/** Whether a claim belongs on the lists. Demos live behind "Try it now", and tests aren't shown at all. */
+export function isListed(m: { state: string; spec: { spec_hash: string; title: string } }): boolean {
+  if (m.state === "Draft" || /^(\[(DEMO|TEST)\]|Demo:)/.test(m.spec.title)) return false;
+  return !(provenanceOf(m.spec.spec_hash)?.hideUntilFinal && m.state !== "Final");
+}
+
+const RERUN_SAID: Record<string, string> = {
+  REPRODUCED: "We reran it: \u2713 same result.",
+  NOT_REPRODUCED: "We reran it: \u2717 different result.",
+  BROKEN: "We reran it: the code didn't finish.",
+  INVALID: "We couldn't get a fair re-run, so there's no verdict.",
+};
+
+/** "The study said X. We reran it: ✓ same result." Null when we have no plain wording for the claim. */
+export function resultSentence(m: { state: string; outcome?: string | null; spec: { spec_hash: string } }): string | null {
+  const said = provenanceOf(m.spec.spec_hash)?.plain?.said;
+  if (!said) return null;
+  const rerun = m.outcome ? RERUN_SAID[m.outcome] : null;
+  return `${said} ${rerun ?? "We'll re-run it when forecasting closes."}`;
+}
 
 /** A claim's name for readers: the question if it has one, otherwise its title without the label. */
 export function claimName(m: { spec: { spec_hash: string; title: string } }): string {

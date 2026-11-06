@@ -48,7 +48,17 @@ export function verdictWords(outcome: Outcome | null | undefined, reason?: strin
 export const CHECK_OUT_NOTE = "The code and data produced the same result. That doesn't prove the study's method is right.";
 
 /** Our own demos and pipeline checks. They stay on the blockchain and open by direct link, but aren't listed. */
-export const isPractice = (m: Pick<Market, "spec">) => /^\[(DEMO|TEST)\]/.test(m.spec.title);
+export const isPractice = (m: Pick<Market, "spec">) => /^(\[(DEMO|TEST)\]|Demo:)/.test(m.spec.title);
+/** A check of our own pipeline, never shown anywhere on the site. */
+export const isTest = (m: Pick<Market, "spec">) => m.spec.title.startsWith("[TEST]");
+/** One of the demos written as a plain question on made-up data. These are the ones "Try it now" lists. */
+export const isPlainDemo = (m: Pick<Market, "spec">) => m.spec.title.startsWith("Demo:");
+export const DEMO_LABEL = "Demo claim: practice run, not real research";
+
+/** "Counts if between 2.71 and 2.81". */
+export function countsIf(reported: string, kind: string, value: string): string {
+  return `Counts if between ${rangeText(reported, kind, value).replace(" to ", " and ")}`;
+}
 
 /** "24 hours", "1 minute". */
 export function durationWords(secs: number): string {

@@ -18,13 +18,14 @@ describe("real claims", () => {
     expect(specHash(spec)).toMatch(/^[0-9a-f]{64}$/);
   });
 
-  it("the site's labels match the claims being posted, and the flagship runs the authors' own code", () => {
+  it("the site's labels match the claims being posted, and the flagship is the debt paper", () => {
     const entries = Object.entries(PROVENANCE);
     for (const [hash, p] of entries) expect(specHash(loadReal(p.name).spec)).toBe(hash);
     const flagship = entries.filter(([, p]) => p.flagship);
     expect(flagship).toHaveLength(1);
-    expect(flagship[0]![1].origin).toBe("authors");
-    expect(flagship[0]![1].name).toBe("wildfire-water");
+    expect(flagship[0]![1].name).toBe("reinhart-rogoff");
+    // At least one claim running the authors' own code stays on the home page, under "More science".
+    expect(entries.some(([, p]) => p.origin === "authors" && p.science && !p.hideUntilFinal)).toBe(true);
     expect(PROVENANCE[specHash(loadReal("parkinsons-spread").spec)]!.origin).toBe("rebuild");
     expect(loadReal("parkinsons-spread").spec.title).toMatch(/^Independent rebuild/);
   });

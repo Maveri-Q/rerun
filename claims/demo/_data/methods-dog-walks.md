@@ -1,0 +1,1 @@
+Made-up practice data. The file lists pretend people's daily steps, and whether each has a dog. We took the average steps with a dog and without one. We report how many percent higher the average with a dog is.

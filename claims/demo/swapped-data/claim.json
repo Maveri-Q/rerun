@@ -1,11 +1,32 @@
 {
   "expected": "INVALID",
   "swap_data": true,
-  "title": "[DEMO] A claim whose data file was swapped after the market opened",
-  "statement": "DEMO FIXTURE, not real research. The dataset at the claim's URL no longer matches the hash pinned in the spec, so the Lab refuses to run it. Both sides redeem at 0.5 and the creator's bond is forfeited.",
-  "metric": { "name": "accuracy", "reported_value": "0.93", "tolerance": { "type": "abs", "value": "0.02" }, "comparison": "within_tolerance" },
+  "title": "Demo: our practice dataset says Mondays get 15% more coffee orders. Will the re-run agree?",
+  "statement": "Made-up practice data, not real research. A short script compares a pretend cafe's coffee orders on Mondays and other days.",
+  "metric": {
+    "name": "% more coffee orders on Mondays",
+    "reported_value": "15",
+    "tolerance": {
+      "type": "abs",
+      "value": "2"
+    },
+    "comparison": "within_tolerance"
+  },
   "entrypoint": "python reproduce.py",
-  "setup": ["pip install -r requirements.txt"],
-  "output": { "path": "results.json", "extractor": { "type": "jsonpath", "expr": "$.accuracy" } },
-  "data": [{ "file": "trials.csv", "path": "data/trials.csv" }]
+  "setup": [
+    "pip install -r requirements.txt"
+  ],
+  "output": {
+    "path": "results.json",
+    "extractor": {
+      "type": "jsonpath",
+      "expr": "$.percent_more"
+    }
+  },
+  "data": [
+    {
+      "file": "coffee.csv",
+      "path": "data/coffee.csv"
+    }
+  ]
 }

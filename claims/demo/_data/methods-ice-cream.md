@@ -1,0 +1,1 @@
+Made-up practice data. The file lists a pretend shop's cups of ice cream sold each day, and whether the day was sunny or cloudy. We took the average cups sold on sunny days and on cloudy days. We report how many percent higher the sunny average is than the cloudy average.

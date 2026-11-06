@@ -1,4 +1,4 @@
-// Writes trials.csv: a synthetic, seeded dataset for the demo claims. Not real patient data.
+// Writes the practice files for the demo claims. Every row is invented from a fixed seed. None of it is real.
 import { writeFileSync } from "node:fs";
 
 function mulberry32(seed) {
@@ -10,13 +10,24 @@ function mulberry32(seed) {
   };
 }
 
-const r = mulberry32(20261104);
-const rows = ["age,dose,biomarker,response"];
-for (let i = 0; i < 800; i++) {
-  const age = 30 + Math.floor(r() * 50);
-  const dose = 10 + Math.floor(r() * 90);
-  const biomarker = Number((r() * 4).toFixed(3));
-  const logit = -3.2 + 0.045 * dose + 0.9 * biomarker - 0.025 * (age - 50) + (r() - 0.5) * 2;
-  rows.push(`${age},${dose},${biomarker},${logit > 0 ? 1 : 0}`);
-}
-writeFileSync(new URL("./trials.csv", import.meta.url), `${rows.join("\n")}\n`);
+const r = mulberry32(20261106);
+const spread = (mid, by) => Math.round(mid + (r() - 0.5) * 2 * by);
+const save = (file, header, rows) => writeFileSync(new URL(`./${file}`, import.meta.url), `${[header, ...rows].join("\n")}\n`);
+const each = (n, row) => Array.from({ length: n }, (_, i) => row(i));
+
+save("ice_cream.csv", "day,weather,cups_sold", each(200, (i) => {
+  const sunny = r() < 0.5;
+  return `${i + 1},${sunny ? "sunny" : "cloudy"},${spread(sunny ? 120 : 100, 25)}`;
+}));
+save("dog_walks.csv", "person,has_dog,steps", each(200, (i) => {
+  const dog = r() < 0.5;
+  return `${i + 1},${dog ? "yes" : "no"},${spread(dog ? 7700 : 6000, 1500)}`;
+}));
+save("pizza.csv", "order,time_of_day,minutes", each(200, (i) => {
+  const night = r() < 0.5;
+  return `${i + 1},${night ? "night" : "day"},${spread(night ? 25 : 35, 8)}`;
+}));
+save("coffee.csv", "day,monday,orders", each(200, (i) => {
+  const monday = i % 7 === 0;
+  return `${i + 1},${monday ? "yes" : "no"},${spread(monday ? 230 : 200, 30)}`;
+}));

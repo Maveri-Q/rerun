@@ -83,15 +83,14 @@ export function ChallengeStory() {
         <div>
           <h3>Both runs agree</h3>
           <p>The verdict stands, and the challenger loses the deposit.</p>
-          <Link href="/market/16">See it happen on claim 16</Link>
+          <Link href="/market/16">See it happen on a demo claim</Link>
         </div>
         <div>
           <h3>The runs disagree</h3>
           <p>There&apos;s no verdict, every share pays back half, and the challenger gets the deposit back plus a reward.</p>
-          <Link href="/market/18">See it happen on claim 18</Link>
         </div>
       </div>
-      <p className="hint">If nobody challenges, anyone can make the verdict final once the time is up, and winners collect. Both examples are test claims, and their windows were only minutes long so we could run them through quickly.</p>
+      <p className="hint">If nobody challenges, anyone can make the verdict final once the time is up, and winners collect. The demo claim's window was only a minute long, so we could test it quickly. Real claims get 24 hours.</p>
     </div>
   );
 }
