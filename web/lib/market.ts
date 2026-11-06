@@ -323,7 +323,7 @@ export function quoteSell(m: Market, side: Side, shares: bigint, feeBps: number)
 export function readableReport(stored: string): { text: string; trimmed: boolean } {
   const parts = stored.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
   const body = parts.filter((p) => !p.startsWith("Evidence file sha256:"));
-  if (!body[1]?.startsWith("The user wants") || body.length < 3) return { text: stored, trimmed: false };
+  if ((!/^The (user wants|task)/.test(body[1] ?? "") && !stored.includes("</think>")) || body.length < 2) return { text: stored, trimmed: false };
   const last = body.at(-1)!.split("</think>").at(-1)!.trim();
   return { text: `${body[0]}\n\n${last.replace(/^"|"$/g, "")}`, trimmed: true };
 }
