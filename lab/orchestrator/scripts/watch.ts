@@ -12,7 +12,7 @@ import { RollingDemos, type RollingMarket } from "../src/lab/rolling.ts";
 import { loadDemo } from "../src/demo/fixtures.ts";
 import { specJson } from "@rerun/shared";
 import { createQueue, EventHub, LabResolver, saveAttestation } from "../src/lab/store.ts";
-import { allLeads, draftWithModel, githubRepoFacts, loadScoutState, paperAttention, readLeadPaper, runScout, saveScoutState } from "../src/scout/scout.ts";
+import { allLeads, draftWithModel, githubRepoFacts, loadScoutState, paperAttention, readLeadPaper, runScout, saveScoutState, secondPickWithModel } from "../src/scout/scout.ts";
 
 const POLL_MS = 5_000;
 const ATTEST_EVERY_MS = 6 * 3600_000;
@@ -102,7 +102,7 @@ setInterval(() => attestNow().catch((e: Error) => console.error(`attestation fai
 async function scoutNow() {
   const llm = new LlmClient(llmConfigFromEnv());
   llm.newRun();
-  const state = await runScout(loadScoutState(DATA_DIR), { leads: allLeads, repoFacts: githubRepoFacts, draft: draftWithModel(new NearAiModel(llm, modelId)), attention: paperAttention, paperText: readLeadPaper, log: (m) => console.log(m) });
+  const state = await runScout(loadScoutState(DATA_DIR), { leads: allLeads, repoFacts: githubRepoFacts, draft: draftWithModel(new NearAiModel(llm, modelId)), attention: paperAttention, paperText: readLeadPaper, secondPick: secondPickWithModel(new NearAiModel(llm, process.env.NEARAI_RERUN_MODEL || "Qwen/Qwen3.8-27B")), log: (m) => console.log(m) });
   saveScoutState(DATA_DIR, state);
 }
 scoutNow().catch((e: Error) => console.error(`scout failed: ${e.message}`));

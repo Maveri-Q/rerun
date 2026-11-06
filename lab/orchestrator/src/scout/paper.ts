@@ -141,8 +141,46 @@ export async function fetchPaperText(paperUrl: string, fetcher: Fetcher = fetch,
 
 /** Whether a number appears as written in the text, however the minus sign was typeset. */
 export function numberInText(value: string, text: string): boolean {
-  const unify = (s: string) => s.replace(/[−‐-―]/g, "-");
+  return numberPattern(value).test(unifyMinus(text));
+}
+
+const unifyMinus = (s: string) => s.replace(/[−‐-―]/g, "-");
+
+function numberPattern(value: string, flags = ""): RegExp {
   const digits = value.trim().replace(/^[-−]/, "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const sign = /^[-−]/.test(value.trim()) ? "-\\s?" : "";
-  return new RegExp(`(^|[^\\d.-])${sign}${digits}(?![\\d])`).test(unify(text));
+  return new RegExp(`(^|[^\\d.-])${sign}${digits}(?![\\d])`, flags);
+}
+
+const COMMON_WORDS = new Set("about above after also among and are before below between but can does for from had has have how into its more not number paper percent per rate rather result results same show shows slow study than that the their them they this those through was were what when where which while who why will with would you your".split(" "));
+/** How far from the number its wording may sit, in characters. Tables keep their headings at a distance. */
+const NEAR_CHARS = 500;
+
+/** The words that say what a number measures. Four letters are enough to match wage and wages. */
+function meaningWords(text: string): Set<string> {
+  const words = text.toLowerCase().match(/[a-z]{3,}/g) ?? [];
+  return new Set(words.filter((w) => !COMMON_WORDS.has(w)).map((w) => w.slice(0, 4)));
+}
+
+/**
+ * Whether the number appears close to what the claim says it measures, at least once. A short number
+ * like 2.2 can turn up anywhere in a paper, so being somewhere in the text proves little. At least
+ * half of the wording's words, and never fewer than two, must sit around the number.
+ */
+export function numberNearWording(value: string, wording: string, text: string): boolean {
+  const wanted = meaningWords(wording);
+  if (wanted.size === 0) return false;
+  const needed = Math.min(wanted.size, Math.max(2, Math.ceil(wanted.size / 2)));
+  const plain = unifyMinus(text);
+  for (const match of plain.matchAll(numberPattern(value, "g"))) {
+    const around = meaningWords(plain.slice(Math.max(0, match.index - NEAR_CHARS), match.index + NEAR_CHARS));
+    if ([...wanted].filter((w) => around.has(w)).length >= needed) return true;
+  }
+  return false;
+}
+
+/** Whether two numbers from a paper are the same value, however they were written. */
+export function sameNumber(a: string, b: string): boolean {
+  const read = (s: string) => Number(unifyMinus(s.trim()));
+  return a.trim() !== "" && b.trim() !== "" && read(a) === read(b);
 }

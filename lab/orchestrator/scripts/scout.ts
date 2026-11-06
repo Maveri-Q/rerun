@@ -7,7 +7,7 @@ import path from "node:path";
 import { loadEnv } from "../src/env.ts";
 import { LlmClient, llmConfigFromEnv } from "../src/nearai/client.ts";
 import { NearAiModel } from "../src/pipeline/model.ts";
-import { allLeads, draftWithModel, githubRepoFacts, loadScoutState, paperAttention, readLeadPaper, runScout, saveScoutState } from "../src/scout/scout.ts";
+import { allLeads, draftWithModel, githubRepoFacts, loadScoutState, paperAttention, readLeadPaper, runScout, saveScoutState, secondPickWithModel } from "../src/scout/scout.ts";
 
 loadEnv();
 
@@ -23,6 +23,7 @@ const state = await runScout(loadScoutState(DATA_DIR), {
   repoFacts: githubRepoFacts,
   draft: draftWithModel(model),
   attention: paperAttention, paperText: readLeadPaper,
+  secondPick: secondPickWithModel(new NearAiModel(llm, process.env.NEARAI_RERUN_MODEL || "Qwen/Qwen3.8-27B")),
   log: (m) => console.log(m),
 });
 saveScoutState(DATA_DIR, state);

@@ -1,10 +1,10 @@
 import { mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
 import path from "node:path";
-import { draftClaim, parseGithubUrl, type ClaimDraft } from "../lab/draft.ts";
+import { draftClaim, parseGithubUrl, pickNumber, wordingWithoutNumber, type ClaimDraft } from "../lab/draft.ts";
 import { withNetworkRetry } from "../nearai/attestation.ts";
 import type { PrivateModel } from "../pipeline/model.ts";
 import { checkRepo, hasDataInRepo, isClearNumber, type RepoFacts } from "./filters.ts";
-import { fetchPaperText, numberInText, type PaperText } from "./paper.ts";
+import { fetchPaperText, numberNearWording, sameNumber, type PaperText } from "./paper.ts";
 
 /**
  * The scout agent (build plan §5.4). It looks for published research that ships code, checks it in
@@ -85,8 +85,10 @@ export interface ScoutDeps {
   leads: () => Promise<Lead[]>;
   repoFacts: (repoUrl: string) => Promise<RepoFacts>;
   draft: (lead: Lead, paperText?: string) => Promise<ClaimDraft>;
-  /** Reads the paper itself. Without a readable copy the draft goes ahead, marked for the reviewer to check. */
-  paperText?: (lead: Lead) => Promise<PaperText | null>;
+  /** Reads the paper itself. Without a readable copy the number can't be checked, so nothing is drafted. */
+  paperText: (lead: Lead) => Promise<PaperText | null>;
+  /** A second AI, on a different model, finds the number on its own. It's never told the first answer. */
+  secondPick: (wording: string, paperText: string) => Promise<string>;
   /** Optional, and never required: a paper with no attention data can still rank highly. */
   attention?: (lead: Lead) => Promise<Attention | undefined>;
   log?: (message: string) => void;
@@ -149,12 +151,16 @@ export async function runScout(state: ScoutState, deps: ScoutDeps): Promise<Scou
       record("retry", ["Passed the checks, and waiting for the AI budget."], { license: facts.license, runtime: checked.runtime });
       continue;
     }
+    const paper = await deps.paperText(lead).catch(() => null);
+    if (!paper) {
+      record("rejected", [...checked.reasons, "Couldn't read a free copy of the paper, so its number can't be checked."], { license: facts.license, runtime: checked.runtime });
+      continue;
+    }
     draftsThisScan++;
     next.draftsByDay[today] = (next.draftsByDay[today] ?? 0) + 1;
-    const paper = await deps.paperText?.(lead).catch(() => null);
     let draft: ClaimDraft;
     try {
-      draft = await deps.draft(lead, paper?.text ?? lead.abstract);
+      draft = await deps.draft(lead, paper.text);
     } catch (e) {
       record("retry", [`The AI draft failed: ${(e as Error).message.slice(0, 120)}`], { license: facts.license, runtime: checked.runtime });
       continue;
@@ -163,16 +169,28 @@ export async function runScout(state: ScoutState, deps: ScoutDeps): Promise<Scou
       record("rejected", [...checked.reasons, "The AI couldn't find one clear number to check, and how to produce it."], { license: facts.license, runtime: checked.runtime });
       continue;
     }
-    if (paper && !numberInText(draft.reported_value, paper.text)) {
-      record("rejected", [...checked.reasons, `The AI picked ${draft.reported_value}, but that number isn't in the paper's text.`], { license: facts.license, runtime: checked.runtime });
+    const wording = wordingWithoutNumber(`${draft.metric_name}. ${draft.question}`, draft.reported_value);
+    if (!numberNearWording(draft.reported_value, wording, paper.text)) {
+      record("rejected", [...checked.reasons, `The AI picked ${draft.reported_value}, but the paper doesn't state that number near "${draft.metric_name}".`], { license: facts.license, runtime: checked.runtime });
       continue;
     }
     if (draft.relatability < MIN_RELATABILITY) {
       record("rejected", [`Relatability ${draft.relatability} of 10, below our limit of ${MIN_RELATABILITY}: ${draft.relatability_why}`], { license: facts.license, runtime: checked.runtime });
       continue;
     }
+    let second: string;
+    try {
+      second = await deps.secondPick(wording, paper.text);
+    } catch (e) {
+      record("retry", [`The second AI's check failed: ${(e as Error).message.slice(0, 120)}`], { license: facts.license, runtime: checked.runtime });
+      continue;
+    }
+    if (!sameNumber(second, draft.reported_value)) {
+      record("rejected", [...checked.reasons, `Two AIs disagreed: the first picked ${draft.reported_value}, the second ${second || "no number"}.`], { license: facts.license, runtime: checked.runtime });
+      continue;
+    }
     const attention = await deps.attention?.(lead).catch(() => undefined);
-    const paperCheck = paper ? `The number ${draft.reported_value} appears in the paper's text, read from ${paper.from}.` : "Couldn't read a free copy of the paper, so check the number against it yourself.";
+    const paperCheck = `The number ${draft.reported_value} appears near this wording in the paper, read from ${paper.from}, and a second AI on a different model picked it too.`;
     record("pending", [...checked.reasons, paperCheck], { license: facts.license, runtime: checked.runtime, draft: withScoutNote(draft), attention, interest: interestScore(draft.relatability, draft.topic, attention) });
   }
   return next;
@@ -316,6 +334,10 @@ export async function githubRepoFacts(repoUrl: string): Promise<RepoFacts> {
   const licenseFile = files.find((f) => /^(licen[cs]e|copying)(\.\w+)?$/i.test(f));
   const licenseText = licenseFile ? await raw(`https://raw.githubusercontent.com/${owner}/${repo}/${meta.default_branch}/${licenseFile}`) : undefined;
   return { license: meta.license?.spdx_id ?? null, licenseText, languages, sizeKb: meta.size, archived: meta.archived, files, dependencyText: texts.join("\n") };
+}
+
+export function secondPickWithModel(model: PrivateModel) {
+  return (wording: string, paperText: string) => pickNumber(model, wording, paperText);
 }
 
 export function draftWithModel(model: PrivateModel) {

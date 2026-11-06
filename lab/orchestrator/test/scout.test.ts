@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { doiIn, fetchPaperText, htmlToText, isPrivateAddress, numberInText, pdfLinkIn } from "../src/scout/paper.ts";
+import { doiIn, fetchPaperText, htmlToText, isPrivateAddress, numberInText, numberNearWording, pdfLinkIn, sameNumber } from "../src/scout/paper.ts";
 import { articleFile, type ClaimDraft } from "../src/lab/draft.ts";
 import { checkRepo, hasDataInRepo, isClearNumber, type RepoFacts } from "../src/scout/filters.ts";
 import { addSuggestion, emptyState, interestScore, LIMITS, parseArticleYaml, repoRoot, runScout, SUGGESTED_BY, type Lead, citationAttention } from "../src/scout/scout.ts";
@@ -91,7 +91,8 @@ describe("reading ReScience articles", () => {
 });
 
 describe("a scan", () => {
-  const deps = (leads: Lead[], over = {}) => ({ leads: async () => leads, repoFacts: async () => facts(), draft: async () => draft(), ...over });
+  const paperFor = (d: ClaimDraft) => ({ text: `We measured ${d.metric_name}. ${d.question} The answer was ${d.reported_value} in the main test.`, from: "https://doi.org/1" });
+  const deps = (leads: Lead[], over = {}) => ({ leads: async () => leads, repoFacts: async () => facts(), draft: async () => draft(), paperText: async () => paperFor(draft()), secondPick: async () => draft().reported_value, ...over });
 
   it("queues a good paper for a person, labelled, and never approves it itself", async () => {
     const s = await runScout(emptyState(), deps([lead(1)]));
@@ -99,6 +100,40 @@ describe("a scan", () => {
     expect(c.status).toBe("pending");
     expect(c.draft!.statement.endsWith(SUGGESTED_BY)).toBe(true);
     expect(Object.values(s.candidates).some((x) => x.status === "approved")).toBe(false);
+  });
+
+  it("won't draft a paper it can't read, so no AI is spent on it", async () => {
+    let drafts = 0;
+    const s = await runScout(emptyState(), deps([lead(1)], { paperText: async () => null, draft: async () => (drafts++, draft()) }));
+    expect(s.candidates["x:1"]!.status).toBe("rejected");
+    expect(s.candidates["x:1"]!.reasons.join(" ")).toMatch(/free copy/);
+    expect(drafts).toBe(0);
+  });
+
+  it("turns down a number that appears in the paper, but away from the claim's wording", async () => {
+    const elsewhere = `${"Unrelated background on the history of the field. ".repeat(40)}The sample had ${draft().reported_value} items. ${"Unrelated background on the history of the field. ".repeat(40)}We measured ${draft().metric_name} and report it in a table.`;
+    let asked = 0;
+    const s = await runScout(emptyState(), deps([lead(1)], { paperText: async () => ({ text: elsewhere, from: "x" }), secondPick: async () => (asked++, draft().reported_value) }));
+    expect(s.candidates["x:1"]!.status).toBe("rejected");
+    expect(s.candidates["x:1"]!.reasons.join(" ")).toMatch(/doesn't state that number near/);
+    expect(asked).toBe(0);
+  });
+
+  it("turns down a number when a second AI picks a different one, and never tells it the first", async () => {
+    const seen: string[] = [];
+    const picked = draft({ question: `Is it really ${draft().reported_value}?` });
+    const s = await runScout(emptyState(), deps([lead(1)], { draft: async () => picked, paperText: async () => paperFor(picked), secondPick: async (wording: string) => (seen.push(wording), "12345") }));
+    expect(s.candidates["x:1"]!.status).toBe("rejected");
+    expect(s.candidates["x:1"]!.reasons.join(" ")).toContain("Two AIs disagreed");
+    expect(seen[0]).not.toContain(picked.reported_value);
+    expect(seen[0]).toContain("[number]");
+  });
+
+  it("treats a second AI that finds no number as a disagreement, and a failed call as try again", async () => {
+    const none = await runScout(emptyState(), deps([lead(1)], { secondPick: async () => "" }));
+    expect(none.candidates["x:1"]!.status).toBe("rejected");
+    const failed = await runScout(emptyState(), deps([lead(1)], { secondPick: async () => { throw new Error("down"); } }));
+    expect(failed.candidates["x:1"]!.status).toBe("retry");
   });
 
   it("logs why a paper was turned down, without spending on an AI draft", async () => {
@@ -252,6 +287,21 @@ describe("reading the paper", () => {
     expect(numberInText("2.7", "a gain of 2.76 FTE")).toBe(false);
     expect(numberInText("0.1", "a value of 10.1 here")).toBe(false);
     expect(numberInText("-0.1", "a value of 0.1 here")).toBe(false);
+  });
+
+  it("needs the claim's words around the number, not just the number", () => {
+    const wording = "change in jobs per store, New Jersey relative to Pennsylvania";
+    expect(numberNearWording("2.76", wording, "The relative gain in employment per store between New Jersey and Pennsylvania jobs is 2.76 FTE.")).toBe(true);
+    expect(numberNearWording("2.76", wording, `A price of 2.76 dollars. ${"Filler about something else entirely. ".repeat(40)} Jobs per store in New Jersey and Pennsylvania rose.`)).toBe(false);
+    expect(numberNearWording("2.76", "", "2.76")).toBe(false);
+  });
+
+  it("compares numbers by value", () => {
+    expect(sameNumber("2.20", "2.2")).toBe(true);
+    expect(sameNumber("−0.1", "-0.1")).toBe(true);
+    expect(sameNumber("0.1", "-0.1")).toBe(false);
+    expect(sameNumber("", "0")).toBe(false);
+    expect(sameNumber("about 3", "3")).toBe(false);
   });
 
   it("refuses private addresses, including in a redirect", async () => {
