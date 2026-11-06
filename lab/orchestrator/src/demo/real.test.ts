@@ -10,10 +10,10 @@ describe("real claims", () => {
   });
 
   it.each(REAL_NAMES)("%s is a valid spec, pinned to real GitHub code", (name) => {
-    const { spec } = loadReal(name);
+    const { spec, noDoi } = loadReal(name);
     expect(spec.artifact.repo_url).toMatch(/^https:\/\/github\.com\//);
     expect(spec.artifact.commit).toMatch(/^[0-9a-f]{40}$/);
-    expect(spec.source.doi).toBeTruthy();
+    expect(spec.source.doi || noDoi).toBeTruthy();
     expect(spec.title).not.toContain("[DEMO]");
     expect(specHash(spec)).toMatch(/^[0-9a-f]{64}$/);
   });

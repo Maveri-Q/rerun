@@ -27,10 +27,12 @@ export interface RealClaim {
   methods?: string;
   humanPatches: HumanPatch[];
   origin: "authors" | "rebuild" | "critics";
+  /** Why a claim links a journal page instead of a DOI: only when Crossref and OpenAlex list none. */
+  noDoi?: string;
 }
 
 export function loadReal(name: string): RealClaim {
-  const file = JSON.parse(readFileSync(path.join(REAL_ROOT, name, "claim.json"), "utf8")) as { expected: Outcome; methods?: string; spec: unknown; human_patches?: HumanPatch[]; origin?: "authors" | "rebuild" };
+  const file = JSON.parse(readFileSync(path.join(REAL_ROOT, name, "claim.json"), "utf8")) as { expected: Outcome; methods?: string; no_doi?: string; spec: unknown; human_patches?: HumanPatch[]; origin?: "authors" | "rebuild" };
   const spec = ClaimSpec.parse(file.spec);
   return {
     name,
@@ -42,6 +44,7 @@ export function loadReal(name: string): RealClaim {
     methods: file.methods,
     humanPatches: file.human_patches ?? [],
     origin: file.origin ?? "authors",
+    noDoi: file.no_doi,
     mockResponder: (req) => (req.purpose === "report" ? `MOCK report: "${spec.title}" was re-run. See the receipt for the numbers.` : undefined),
   };
 }

@@ -1,7 +1,6 @@
 {
   "expected": "REPRODUCED",
   "origin": "rebuild",
-  "draft_status": "Our own rebuild. Run in a sealed container by hand (2.7536), not yet through the Lab. Waiting for a public repo: fill in repo_url and commit, then move to claims/real.",
   "paper_says": {
     "quote": "Change in mean FTE employment: PA -2.16, NJ 0.59, difference 2.76",
     "where": "Table 3, row 3, page 780 of the paper, read from the page image",
@@ -14,13 +13,13 @@
     "statement": "Card and Krueger (American Economic Review, 1994) compared fast-food restaurants in New Jersey, which raised its minimum wage in 1992, with those in eastern Pennsylvania, which didn't. They report that employment per store rose by 2.76 full-time equivalents in New Jersey relative to Pennsylvania. This runs our own small rebuild on the authors' public survey data. The rebuild isn't the authors' code, so a mismatch ends as inconclusive.",
     "source": {
       "type": "paper",
-      "url": "https://davidcard.berkeley.edu/papers/njmin-aer.pdf",
+      "url": "https://www.jstor.org/stable/2118030",
       "license": "Rebuild: MIT. Data: fetched from the authors' site, not redistributed.",
       "authors": "D. Card, A. B. Krueger; rebuild by the RERUN project"
     },
     "artifact": {
-      "repo_url": "https://github.com/Maveri-Q/REPLACE-WITH-PUBLIC-REPO",
-      "commit": "0000000000000000000000000000000000000000",
+      "repo_url": "https://github.com/Maveri-Q/rerun-rebuilds",
+      "commit": "7fb7854011967339316694187b906b7cab87f5d3",
       "data": [
         {
           "url": "https://davidcard.berkeley.edu/data_sets/njmin.zip",
@@ -54,5 +53,7 @@
       "max_minutes": 15
     },
     "private_data": null
-  }
+  },
+  "no_doi": "Crossref and OpenAlex list no DOI for the 1994 journal article, only for the 1993 working paper (10.3386/w4509), which is a different document. Checked 2026-11-06.",
+  "published_output_check": "Table 3, page 780: PA 23.33 to 21.17, NJ 20.44 to 21.03, changes -2.16 and 0.59, difference 2.76. The rebuild prints the same levels, -2.17, 0.59 and 2.7536."
 }

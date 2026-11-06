@@ -22,6 +22,8 @@ replication's code against the number the original paper published.
 
 - `reinhart-rogoff`: -0.1, the "90 percent and above" column of the average row for advanced economies, 1946-2009, in the summary table of NBER w15639. The acknowledgement of the spreadsheet error is cited from Reuters (via Daily FT, 22 April 2013) and The Harvard Crimson (April 2013). Their own statement refused automated reading, so it was not read directly.
 
+- `card-krueger`: 2.76, Table 3, row 3, column iii, page 780, read from the page image because the digits are not in the PDF's text; the text on page 778 states the same 2.76. Crossref and OpenAlex list no DOI for the 1994 article, only for the 1993 working paper (10.3386/w4509), so the claim links the JSTOR page and shows no citation count.
+
 ## Setup changes
 
 Nothing in any author's code is edited. Two claims needed a change to how the code is launched, and both are in the claim's public spec:

@@ -65,6 +65,20 @@ export const PROVENANCE: Record<string, Provenance> = {
       link: { label: "See the code", href: "https://github.com/ejcorn/connectome_diffusion" },
     },
   },
+  "6450bf0ac8d633cb663e2c8ebeb33fde42b6dd75dcfeee3d3ecc3333a8d6eb1b": {
+    name: "card-krueger",
+    origin: "rebuild",
+    question: "Does raising the minimum wage cost jobs?",
+    settledShowcase: true,
+    paperSays: { quote: "Change in mean FTE employment: PA -2.16, NJ 0.59, difference 2.76", where: "Table 3, row 3, page 780 of the paper", href: "https://davidcard.berkeley.edu/papers/njmin-aer.pdf" },
+    whyItMatters: "This study changed how economists and lawmakers argue about raising the minimum wage.",
+    notChecked: ["Whether these stores and months say anything about other places or times.", "Whether payroll records tell the same story, which later papers argued over."],
+    why: {
+      heading: "Whose code is this?",
+      text: "Our own small program, written from the paper and the authors' codebook and run on their public survey data. It isn't the authors' code. It got 2.7536 against the paper's 2.76, inside the allowed margin of 0.05, and the store averages for both states match Table 3. It's a settled showcase, so there was no forecasting.",
+      link: { label: "See the code", href: "https://github.com/Maveri-Q/rerun-rebuilds" },
+    },
+  },
   "fa35d7e5ffd002b0b8496bed8020579611c19cef349d5ec4658021a5b04bf3d7": {
     name: "reinhart-rogoff",
     origin: "critics",
