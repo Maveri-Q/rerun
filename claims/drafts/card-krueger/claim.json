@@ -1,0 +1,66 @@
+{
+  "expected": "REPRODUCED",
+  "origin": "rebuild",
+  "draft_status": "Waiting for the human's review. Not posted and not yet run.",
+  "paper_says": {
+    "quote": "Replication: 2.75 FTE. Published: 2.76 FTE",
+    "where": "Comment at the end of R/04_table3_did.R in the rebuild, about row 3 of Table 3 of the paper. Check against the paper itself before posting.",
+    "href": "https://www.jstor.org/stable/2118030"
+  },
+  "human_patches": [
+    {
+      "file": "entrypoint",
+      "kind": "ENV",
+      "why": "Runs the rebuild's data-cleaning and Table 3 scripts, makes the folder they save to, and prints the headline number on one line."
+    },
+    {
+      "file": "setup",
+      "kind": "DEPENDENCY",
+      "why": "Installs tidyverse as it was on 2026-10-11, the date of the code, from a dated copy of CRAN."
+    }
+  ],
+  "spec": {
+    "version": 1,
+    "title": "Does raising the minimum wage cost jobs? Card and Krueger found fast-food jobs rose 2.76 in New Jersey",
+    "statement": "Card and Krueger (American Economic Review, 1994) compared fast-food restaurants in New Jersey, which raised its minimum wage in 1992, with those in eastern Pennsylvania, which didn't. They report that employment per store rose by 2.76 full-time equivalents in New Jersey relative to Pennsylvania. This runs an independent rebuild on the authors' public survey data. The rebuild isn't the authors' code, so a mismatch ends as inconclusive.",
+    "source": {
+      "type": "paper",
+      "url": "https://www.jstor.org/stable/2118030",
+      "license": "MIT",
+      "authors": "D. Card, A. B. Krueger; rebuild by GitHub user laibabasraa-ux"
+    },
+    "artifact": {
+      "repo_url": "https://github.com/laibabasraa-ux/card-krueger-1994-replication",
+      "commit": "e6ceb00c8877af7984b99dc2b21f459df01324bb",
+      "data": [],
+      "runtime": "r4.4",
+      "setup": [
+        "mkdir -p /work/.rlib",
+        "Rscript --vanilla -e \"install.packages('tidyverse', lib='/work/.rlib', repos='https://packagemanager.posit.co/cran/2026-10-11', Ncpus=2)\""
+      ],
+      "entrypoint": "mkdir -p data/clean && Rscript --vanilla -e \"source('R/01_import_clean.R');source('R/04_table3_did.R');cat('did',format(did,digits=8),'\\n')\" > rerun_output.txt",
+      "output": {
+        "path": "rerun_output.txt",
+        "extractor": {
+          "type": "regex",
+          "expr": "did (-?[0-9.]+)"
+        }
+      }
+    },
+    "metric": {
+      "name": "change in jobs per store, New Jersey relative to Pennsylvania",
+      "reported_value": "2.76",
+      "tolerance": {
+        "type": "abs",
+        "value": "0.05"
+      },
+      "comparison": "within_tolerance"
+    },
+    "resources": {
+      "cpu": 2,
+      "mem_gb": 4,
+      "max_minutes": 15
+    },
+    "private_data": null
+  }
+}

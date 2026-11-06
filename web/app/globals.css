@@ -3222,3 +3222,80 @@ a {
   text-align: left;
   white-space: normal;
 }
+
+/*
+ * The verdict stamp: a rubber stamp hitting the paper as the receipt finishes printing. Each verdict
+ * has its own ink. The mask leaves the small gaps a real stamp leaves where the ink didn't take.
+ */
+.receipt-verdict strong.ink-stamp {
+  --ink-color: #1a6b43;
+  display: inline-block;
+  margin: 8px 0 2px 2px;
+  padding: 7px 10px 8px;
+  max-width: 100%;
+  border: 3px solid var(--ink-color);
+  border-radius: 5px;
+  color: var(--ink-color);
+  font-size: 27px;
+  line-height: 1.02;
+  letter-spacing: 0.01em;
+  transform: rotate(-3deg);
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='120'%3E%3Cfilter id='i'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -3.4 2.75'/%3E%3C/filter%3E%3Crect width='260' height='120' filter='url(%23i)'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='120'%3E%3Cfilter id='i'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -3.4 2.75'/%3E%3C/filter%3E%3Crect width='260' height='120' filter='url(%23i)'/%3E%3C/svg%3E");
+}
+.receipt-verdict strong.ink-stamp--bad {
+  --ink-color: #a8261d;
+  transform: rotate(2.5deg);
+}
+.receipt-verdict strong.ink-stamp--unsure {
+  --ink-color: #8a5a00;
+  transform: rotate(-1.5deg);
+}
+
+/* It lands just after the paper stops, and the paper takes the hit. */
+.receipt-paper--print .ink-stamp {
+  animation: stamp-land 240ms cubic-bezier(0.3, 0, 0.2, 1) 1600ms both;
+}
+.receipt-paper--print .receipt-verdict {
+  animation: stamp-thunk 200ms ease-out 1790ms;
+}
+
+@keyframes stamp-land {
+  0% {
+    opacity: 0;
+    scale: 2.1;
+  }
+  70% {
+    opacity: 1;
+    scale: 0.97;
+  }
+  100% {
+    opacity: 1;
+    scale: 1;
+  }
+}
+
+@keyframes stamp-thunk {
+  0% {
+    translate: 0 0;
+  }
+  35% {
+    translate: 0 2px;
+  }
+  100% {
+    translate: 0 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .receipt-paper--print .ink-stamp,
+  .receipt-paper--print .receipt-verdict {
+    animation: none;
+  }
+}
+
+@media (max-width: 420px) {
+  .receipt-verdict strong.ink-stamp {
+    font-size: 23px;
+  }
+}

@@ -77,7 +77,7 @@ export function PrintedReceipt({
       </dl>
       <div className="receipt-verdict">
         <span>Verdict</span>
-        <strong>{words ? `${words.mark} ${words.words.toUpperCase()}` : "NOT CHECKED YET"}</strong>
+        {words ? <strong className={`ink-stamp ink-stamp--${words.tone}`}>{`${words.mark} ${words.words.toUpperCase()}`}</strong> : <strong>NOT CHECKED YET</strong>}
         {words?.tone === "unsure" && <span className="receipt-reason">{words.reason}</span>}
       </div>
       {hash && <Barcode hash={hash} />}

@@ -1,0 +1,68 @@
+{
+  "expected": "NOT_REPRODUCED",
+  "origin": "critics",
+  "draft_status": "Waiting for the human's review. Not posted and not yet run.",
+  "paper_says": {
+    "quote": "actually 2.2 percent, not -0:1 percent as published in Reinhart and Rogoff",
+    "where": "The critics' summary, as copied on the Zenodo record. The -0:1 is a typo there for -0.1. Check against Table 1 of the 2010 paper before posting.",
+    "href": "https://zenodo.org/records/4017423"
+  },
+  "published_output_check": "RR.Rout in the critics' package (Zenodo 4017423), line 485, prints 2.168 for 'Above 90%'. R has changed since 2013, so the re-run may print something slightly different.",
+  "human_patches": [
+    {
+      "file": "entrypoint",
+      "kind": "ENV",
+      "why": "Runs only the first 236 lines of RR.R, the part behind this number, and leaves out the Excel export, which needs Java and isn't part of the calculation."
+    },
+    {
+      "file": "setup",
+      "kind": "DEPENDENCY",
+      "why": "Installs the R packages as they were on 2022-02-03, the date of the code, from a dated copy of CRAN."
+    }
+  ],
+  "spec": {
+    "version": 1,
+    "title": "Does high government debt kill growth? Reinhart and Rogoff said growth averages -0.1% above 90% debt",
+    "statement": "Reinhart and Rogoff (American Economic Review, 2010) reported that rich countries with public debt above 90 percent of GDP grew by -0.1 percent a year on average. The figure was widely cited in arguments for austerity. This re-runs the code Herndon, Ash and Pollin published, on the authors' own working spreadsheet, without the coding error, the excluded years or the unusual weighting they identified. It's the critics' code, not the authors'.",
+    "source": {
+      "type": "paper",
+      "url": "https://doi.org/10.1257/aer.100.2.573",
+      "doi": "10.1257/aer.100.2.573",
+      "license": "CC0-1.0",
+      "authors": "C. M. Reinhart, K. S. Rogoff; re-analysis by T. Herndon, M. Ash, R. Pollin"
+    },
+    "artifact": {
+      "repo_url": "https://github.com/michaelaoash/HAP-RR-git",
+      "commit": "b9c34472da97465050780dae5a4dab9ab7c69a63",
+      "data": [],
+      "runtime": "r4.4",
+      "setup": [
+        "mkdir -p /work/.rlib",
+        "Rscript --vanilla -e \"install.packages(c('plyr','gridExtra','car','reshape2'), lib='/work/.rlib', repos='https://packagemanager.posit.co/cran/2022-02-03', Ncpus=2)\""
+      ],
+      "entrypoint": "sed -n '1,236p' RR.R | sed '/library(xlsx)/d;/write.xlsx2/d' > /tmp/rr.R && echo 'cat(\"above90\", RR.correct.mean[[\"Above 90%\"]], \"\\n\")' >> /tmp/rr.R && Rscript --vanilla /tmp/rr.R > rerun_output.txt",
+      "output": {
+        "path": "rerun_output.txt",
+        "extractor": {
+          "type": "regex",
+          "expr": "above90 (-?[0-9.]+)"
+        }
+      }
+    },
+    "metric": {
+      "name": "average yearly growth above 90% debt, in percent",
+      "reported_value": "-0.1",
+      "tolerance": {
+        "type": "abs",
+        "value": "0.1"
+      },
+      "comparison": "within_tolerance"
+    },
+    "resources": {
+      "cpu": 2,
+      "mem_gb": 4,
+      "max_minutes": 15
+    },
+    "private_data": null
+  }
+}
