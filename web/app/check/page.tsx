@@ -66,6 +66,24 @@ function summarize(found: number, flagged: number): string {
   return `${found - flagged} of ${found} results add up. ${flagged} ${flagged === 1 ? "needs" : "need"} a closer look.`;
 }
 
+/** Splits the text around each number found, so it can be marked where it was printed. */
+function markUp(text: string, findings: Finding[]): { text: string; finding?: Finding; order: number }[] {
+  const spots = findings
+    .map((finding) => ({ finding, at: text.indexOf(finding.printed) }))
+    .filter((s) => s.at >= 0)
+    .sort((a, b) => a.at - b.at);
+  const pieces: { text: string; finding?: Finding; order: number }[] = [];
+  let from = 0;
+  spots.forEach(({ finding, at }) => {
+    if (at < from) return;
+    if (at > from) pieces.push({ text: text.slice(from, at), order: 0 });
+    pieces.push({ text: finding.printed, finding, order: findings.indexOf(finding) });
+    from = at + finding.printed.length;
+  });
+  if (from < text.length) pieces.push({ text: text.slice(from), order: 0 });
+  return pieces;
+}
+
 export default function CheckPage() {
   const [text, setText] = useState("");
   const [result, setResult] = useState<PaperCheck | null>(null);
@@ -80,70 +98,83 @@ export default function CheckPage() {
     window.setTimeout(() => {
       setResult(checkPaperText(value));
       setScanning(false);
-    }, 950);
+    }, 500);
   };
 
-  return (
-    <div className="check-grid">
-      <div>
-        <h1 className="check-title">Do a paper&apos;s numbers add up?</h1>
-        <p className="lede">
-          A research paper prints numbers that depend on each other, like the items and the total on a receipt. Paste some text from a paper and this checks that they agree. You don&apos;t need the code or the data, and what you paste stays in your browser.
-        </p>
-        <div style={{ margin: "24px 0 20px" }}>
-          <button onClick={() => { setText(SAMPLE); check(SAMPLE); }}>Try an example</button>
-        </div>
-        <label className="field">
-          <span>Or paste the results section of a paper</span>
-          <span className={`check-input ${scanning ? "is-scanning" : ""}`}>
-            <textarea rows={7} value={text} onChange={(e) => { setText(e.target.value); setResult(null); }} />
-          </span>
-        </label>
-        <button className="quiet" disabled={!text.trim() || scanning} onClick={() => check(text)}>
-          Check the numbers
-        </button>
-      </div>
+  const pieces = result ? markUp(text, findings) : [];
 
-      <div className="check-printer" aria-live="polite">
-        <div className="receipt-slot" aria-hidden="true" />
-        <div className="check-feed">
-          {!result && <p className="check-wait">{scanning ? "Reading the numbers…" : "Your results print here."}</p>}
+  return (
+    <div className="check-page">
+      <h1 className="check-title">Do a paper&apos;s numbers add up?</h1>
+      <p className="lede">
+        Science papers report their statistics in a set format, and some of those numbers can be worked out from the others. If they don&apos;t agree, there&apos;s a typo, or a conclusion that doesn&apos;t follow. You only need the paper&apos;s text, and it stays in your browser.
+      </p>
+
+      <section className="anatomy" aria-label="What to look for">
+        <h2>What to paste</h2>
+        <p className="hint">Sentences like this one, usually in the section called Results:</p>
+        <p className="anatomy-sample">
+          <span>t(<b>28</b>)</span> = <span><b>2.20</b></span>, <span>p = <b>.036</b></span>
+        </p>
+        <ul className="anatomy-key">
+          <li><b>28</b> comes from how much data the study had</li>
+          <li><b>2.20</b> is the size of the effect it found</li>
+          <li><b>.036</b> is the chance of seeing this by luck alone, which can be worked out from the other two</li>
+        </ul>
+        <p className="hint">It also reads F(2, 30) = 1.00, p &lt; .01, and averages such as M = 3.47, n = 20. It can&apos;t check plain percentages, tables or figures like &quot;93% accurate&quot;.</p>
+      </section>
+
+      <div className="check-work">
+        <div className="check-sheet">
+          <div className="check-sheet-head">
+            <label htmlFor="paper-text">The paper&apos;s text</label>
+            <button className="quiet btn--small" onClick={() => { setText(SAMPLE); check(SAMPLE); }}>Try an example</button>
+          </div>
+          {result || scanning ? (
+            <div className={`check-marked ${scanning ? "is-scanning" : ""}`}>
+              {scanning && text}
+              {!scanning && pieces.map((p, i) => (p.finding ? (
+                <motion.mark key={i} className={`pen pen--${p.finding.tone}`} initial={reduce ? false : { backgroundSize: "0% 100%" }} animate={{ backgroundSize: "100% 100%" }} transition={{ duration: 0.4, delay: p.order * 0.35, ease: "easeOut" }}>
+                  {p.text}
+                </motion.mark>
+              ) : (
+                <span key={i}>{p.text}</span>
+              )))}
+            </div>
+          ) : (
+            <textarea id="paper-text" rows={8} value={text} placeholder="Paste a paragraph from the paper's Results section" onChange={(e) => setText(e.target.value)} />
+          )}
+          {result ? (
+            <button className="quiet" onClick={() => { setResult(null); setText(""); }}>Check another paper</button>
+          ) : (
+            <button disabled={!text.trim() || scanning} onClick={() => check(text)}>Check the numbers</button>
+          )}
+        </div>
+
+        <div className="check-findings" aria-live="polite">
+          {!result && <p className="check-wait">{scanning ? "Reading the numbers…" : "Each number we can check gets marked in the text, and explained here."}</p>}
           {result && (
-            <motion.div className="check-paper" initial={reduce ? false : { y: "-100%" }} animate={{ y: 0 }} transition={{ type: "spring", stiffness: 70, damping: 18 }}>
-              <div className="receipt-top">
-                <b>NUMBER CHECK</b>
-                <span>{findings.length} found</span>
-              </div>
+            <>
               <h2>{summarize(findings.length, result.flagged)}</h2>
-              {findings.length === 0 && <p>This check reads results in the format most science papers use. Try pasting the paragraphs where the paper reports its results.</p>}
-              {findings.length > 0 && (
-                <ul className="paper-results">
-                  {findings.map((f, i) => (
-                    <li key={i}>
-                      <span className={`paper-mark ${TONE_CLASS[f.tone]}`} aria-hidden="true">
-                        {MARK[f.tone]}
-                      </span>
-                      <div>
-                        <h3>{f.headline}</h3>
-                        <p>{f.explanation}</p>
-                        <details>
-                          <summary>Show the numbers</summary>
-                          <p>
-                            <code className="mono">{f.printed}</code>
-                          </p>
-                          {f.detail && <p>{f.detail}</p>}
-                        </details>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              )}
-              {findings.length > 0 && (
-                <p className="check-note">
-                  A warning means someone should take a closer look. It&apos;s often just a typo, and it doesn&apos;t prove the research is wrong. A tick only means these numbers agree with each other, not that the research is right.
-                </p>
-              )}
-            </motion.div>
+              {findings.length === 0 && <p className="hint">Nothing here is in the format above. Try the paragraphs where the paper reports its tests.</p>}
+              <ul className="paper-results">
+                {findings.map((f, i) => (
+                  <motion.li key={i} initial={reduce ? false : { opacity: 0, x: 18 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3, delay: i * 0.35 }}>
+                    <span className={`paper-mark ${TONE_CLASS[f.tone]}`} aria-hidden="true">{MARK[f.tone]}</span>
+                    <div>
+                      <h3>{f.headline}</h3>
+                      <p>{f.explanation}</p>
+                      <details>
+                        <summary>Show the numbers</summary>
+                        <p><code className="mono">{f.printed}</code></p>
+                        {f.detail && <p>{f.detail}</p>}
+                      </details>
+                    </div>
+                  </motion.li>
+                ))}
+              </ul>
+              {findings.length > 0 && <p className="check-note">A warning means someone should take a closer look. It&apos;s often a typo, and doesn&apos;t prove the research is wrong. A tick only means these numbers agree with each other.</p>}
+            </>
           )}
         </div>
       </div>

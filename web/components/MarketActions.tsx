@@ -3,7 +3,7 @@
 import { nearToYocto } from "near-api-js";
 import { useEffect, useState } from "react";
 import { CONTRACT } from "@/lib/config";
-import { fmtUnits, modeUnit, relativeTime, type Config, type Market, type Position } from "@/lib/market";
+import { challengeBond, fmtUnits, modeUnit, relativeTime, type Config, type Market, type Position } from "@/lib/market";
 import { sha256Hex } from "@/lib/seal";
 import { explainError, useWallet } from "@/lib/wallet";
 import { ftTransferCall, prepareMoney } from "./TradePanel";
@@ -58,9 +58,7 @@ export function MarketActions({ market, config, position, onDone }: { market: Ma
     }
   };
 
-  const params = market.mode === "money" ? config.money : config.points;
-  const pct = (BigInt(market.collateral) * BigInt(params.challenge_bond_bps)) / 10_000n;
-  const bond = pct > BigInt(params.challenge_bond_min) ? pct : BigInt(params.challenge_bond_min);
+  const bond = challengeBond(market, config);
 
   const stale =
     (["Open", "Locked"].includes(market.state) && now > market.lock_time + config.run_timeout_secs) ||
@@ -98,6 +96,9 @@ export function MarketActions({ market, config, position, onDone }: { market: Ma
       {windowOpen && (
         <>
           <h2>Think this result is wrong?</h2>
+          <div className="window-clock" role="img" aria-label="Time left to challenge">
+            <i style={{ transform: `scaleX(${Math.max(0, (market.challenge_deadline! - now) / Math.max(market.challenge_window, 1))})` }} />
+          </div>
           <p className="hint">
             <span className="mono">{countdown(market.challenge_deadline! - now)}</span> left to challenge it. Put down {fmtUnits(bond)} {unit} and the Lab must run it again with a different AI. If both runs agree, you lose that deposit. If they disagree, the claim becomes invalid and you get it back plus a reward.
           </p>

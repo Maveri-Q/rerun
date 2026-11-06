@@ -163,7 +163,7 @@ export default function LabPage() {
         ) : (
           <p className="empty">Asking the Lab what it&apos;s working on…</p>
         )}
-        <p className="hint" style={{ marginTop: 20 }}>The Lab&apos;s accuracy on papers with known answers hasn&apos;t been measured yet. So far these are demo claims.</p>
+        <p className="hint" style={{ marginTop: 20 }}>These counts include our demo and test claims. We haven&apos;t yet measured how often the Lab gets papers with known answers right.</p>
       </section>
 
       <section className="section">

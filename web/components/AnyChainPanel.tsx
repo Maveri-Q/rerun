@@ -32,11 +32,10 @@ export function AnyChainPanel() {
   return (
     <section className="section any-chain">
       <div className="section-head">
-        <h2>Fund from any chain, collect to any chain</h2>
+        <h2>Holding USDC on another chain?</h2>
       </div>
-      <p className="any-chain-label">Live quote via NEAR Intents. Real transfers come with real-money mode.</p>
       <p className="hint" style={{ maxWidth: "62ch" }}>
-        USDC can move between other chains and NEAR with no bridge to set up. Forecasts here use test USDC, and real money is a future decision, pending legal review.
+        If real-money forecasts ever open, you could pay in from another chain and collect to it, with no bridge to set up. Here&apos;s today&apos;s live price from NEAR Intents. It&apos;s only a price, and nothing moves. Real money is still a decision for later, pending legal review.
       </p>
       <form
         className="any-chain-form"
@@ -48,7 +47,7 @@ export function AnyChainPanel() {
         <label>
           <span>Direction</span>
           <select value={direction} onChange={(e) => setDirection(e.target.value as IntentDirection)}>
-            <option value="fund">Fund from another chain</option>
+            <option value="fund">Pay in from another chain</option>
             <option value="payout">Collect to another chain</option>
           </select>
         </label>

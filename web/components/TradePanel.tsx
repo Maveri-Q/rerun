@@ -46,7 +46,7 @@ export function TradePanel({ market, config, position, contract, onDone }: { mar
   const [action, setAction] = useState<"buy" | "sell">("buy");
   const [side, setSide] = useState<Side>("YES");
   const [amount, setAmount] = useState("10");
-  const [slippage, setSlippage] = useState(1);
+  const [slippage, setSlippage] = useState(3);
   const [busy, setBusy] = useState<string | null>(null);
   const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
 
@@ -97,114 +97,139 @@ export function TradePanel({ market, config, position, contract, onDone }: { mar
     });
   };
 
+  const yesPct = (market.yes_price_ppm / 10_000).toFixed(0);
+  const noPct = (100 - market.yes_price_ppm / 10_000).toFixed(0);
+
   if (!wallet.accountId) {
     return (
       <div className="panel">
-        <h2>Make a forecast</h2>
-        <p className="hint">Connect a NEAR testnet wallet to forecast. {market.mode === "points" ? "Points are free." : "tUSDC is a free test token here."}</p>
+        <h2>Will it hold up?</h2>
+        <p className="hint">{market.trades > 0 ? `Forecasters put it at ${yesPct}% so far. ` : "Nobody has forecast this yet. "}{market.mode === "points" ? "Make your own call with free points, so there's nothing to lose." : "Make your own call with free test money."}</p>
         <button className="w-full" style={{ marginTop: 12 }} onClick={wallet.signIn}>
-          Connect wallet
+          Connect wallet to forecast
         </button>
+        <p className="hint">You&apos;ll need a wallet account on NEAR&apos;s test network. It&apos;s free, and your wallet opens in its own window.</p>
       </div>
     );
   }
 
+  const needsPoints = funds.data && internal === 0n && market.mode === "points";
+  const payout = quote ? fmtUnits(quote.out) : null;
+  const moved = quote ? (quote.yesPriceAfterPpm / 10_000).toFixed(0) : null;
+
   return (
-    <div className="panel">
-      <h2 style={{ marginBottom: 4 }}>Make a forecast</h2>
-      <p className="hint" style={{ margin: "0 0 12px" }}>YES means you expect this claim to hold up. NO means you don&apos;t.</p>
-      <div className="seg" role="group" aria-label="Buy or sell">
-        <button aria-pressed={action === "buy"} onClick={() => setAction("buy")}>
-          Buy
-        </button>
-        <button aria-pressed={action === "sell"} onClick={() => setAction("sell")}>
-          Sell
-        </button>
-      </div>
-      <div className="seg" role="group" aria-label="Outcome">
-        <button className="yes" aria-pressed={side === "YES"} onClick={() => setSide("YES")}>
-          YES {(market.yes_price_ppm / 10_000).toFixed(0)}%
-        </button>
-        <button className="no" aria-pressed={side === "NO"} onClick={() => setSide("NO")}>
-          NO {(100 - market.yes_price_ppm / 10_000).toFixed(0)}%
-        </button>
-      </div>
-      <label className="field">
-        <span>{action === "buy" ? `Amount to spend, in ${unit}` : `${side} shares to sell`}</span>
-        <input inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value)} aria-invalid={parsed === null} />
-      </label>
-      <label className="field">
-        <span>Stop if the price moves more than</span>
-        <select value={slippage} onChange={(e) => setSlippage(Number(e.target.value))}>
-          <option value={0.5}>0.5%</option>
-          <option value={1}>1%</option>
-          <option value={3}>3%</option>
-          <option value={10}>10%</option>
-        </select>
-      </label>
-      <div className="quote mono">
-        {quote ? (
-          <>
-            <div className="row">
-              <span>{action === "buy" ? "You get about" : "You receive about"}</span>
-              <b>
-                {fmtUnits(quote.out)} {action === "buy" ? `${side} shares` : unit}
-              </b>
-            </div>
-            <div className="row">
-              <span>Chance of YES after</span>
-              <span>{(quote.yesPriceAfterPpm / 10_000).toFixed(1)}%</span>
-            </div>
-            {action === "buy" && (
-              <div className="row">
-                <span>You win if {side} is right</span>
-                <span>{fmtUnits(quote.out)} {unit}</span>
-              </div>
-            )}
-          </>
-        ) : (
-          <span className="dim">Enter an amount with at most 6 decimals.</span>
-        )}
-      </div>
-      <button className="w-full" disabled={!quote || short || busy !== null} onClick={submit}>
-        {busy ?? (short ? (action === "buy" ? `Not enough ${unit}` : "Not enough shares") : `${action === "buy" ? "Buy" : "Sell"} ${side}`)}
-      </button>
-      <p className="hint">
-        You have {fmtUnits(market.mode === "money" ? available : internal)} {unit}
-        {position && (BigInt(position.yes) > 0n || BigInt(position.no) > 0n) ? `, ${fmtUnits(position.yes)} YES and ${fmtUnits(position.no)} NO shares` : ""}.
-      </p>
-      {funds.data && internal === 0n && market.mode === "points" && (
+    <div className="panel forecast">
+      <h2 style={{ marginBottom: 12 }}>Will it hold up?</h2>
+      {needsPoints && (
         <button
-          className="quiet w-full"
-          style={{ marginTop: 8 }}
+          className="w-full"
+          style={{ marginBottom: 14 }}
           disabled={busy !== null}
-          onClick={() => void run("Claiming…", "Claimed your free points.", () => wallet.call("claim_points", {}, { deposit: STORAGE_NEAR() }))}
+          onClick={() => void run("Claiming…", "1,000 points added. Now make your call.", () => wallet.call("claim_points", {}, { deposit: STORAGE_NEAR() }))}
         >
-          Claim 1,000 free points
+          First, claim your 1,000 free points
         </button>
       )}
-      {market.mode === "money" && <p className="hint">Test USDC on testnet only. Real money is a future decision, pending legal review.</p>}
+      {action === "sell" && <p className="hint" style={{ margin: "0 0 10px" }}>You&apos;re selling what you already hold.</p>}
+      <div className="call" role="group" aria-label="Your call">
+        <button className="call-yes" aria-pressed={side === "YES"} onClick={() => setSide("YES")}>
+          <b>YES</b>
+          <span>It holds up</span>
+          <small>{market.trades > 0 ? `${yesPct}% say so` : "Be the first"}</small>
+        </button>
+        <button className="call-no" aria-pressed={side === "NO"} onClick={() => setSide("NO")}>
+          <b>NO</b>
+          <span>It won&apos;t</span>
+          <small>{market.trades > 0 ? `${noPct}% say so` : "Be the first"}</small>
+        </button>
+      </div>
+      <label className="field">
+        <span>{action === "buy" ? (market.mode === "points" ? "How many points?" : "How much test USDC?") : `How many ${side} shares to sell?`}</span>
+        <input inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value)} aria-invalid={parsed === null} />
+      </label>
+      {action === "buy" && (
+        <div className="call-amounts" role="group" aria-label="Quick amounts">
+          {["10", "50", "100"].map((a) => (
+            <button key={a} className="quiet btn--small" aria-pressed={amount === a} onClick={() => setAmount(a)}>
+              {a}
+            </button>
+          ))}
+        </div>
+      )}
+      <div className="call-result" aria-live="polite">
+        {quote ? (
+          action === "buy" ? (
+            <>
+              <p>
+                <span>If you&apos;re right</span> <b>{payout} {unit}</b>
+              </p>
+              <p>
+                <span>If you&apos;re wrong</span> <b className="dim">you lose your {amount} {unit}</b>
+              </p>
+              <p className="hint">Your forecast moves the odds of YES to about {moved}%.</p>
+            </>
+          ) : (
+            <p>
+              <span>You&apos;d get back about</span> <b>{payout} {unit}</b>
+            </p>
+          )
+        ) : (
+          <p className="dim">Enter a number, with at most 6 decimals.</p>
+        )}
+      </div>
+      <button className="w-full" disabled={!funds.data || !quote || short || busy !== null} onClick={submit}>
+        {busy ?? (!funds.data ? "Checking your balance…" : short ? (action === "buy" ? `You don't have enough ${unit}` : "You don't hold that many") : action === "buy" ? `Forecast ${side} with ${amount} ${unit}` : `Sell ${amount} ${side} shares`)}
+      </button>
+      <p className="hint">
+        You have {funds.data ? fmtUnits(market.mode === "money" ? available : internal) : "…"} {unit}
+        {position && (BigInt(position.yes) > 0n || BigInt(position.no) > 0n) ? `, and you've already forecast: ${fmtUnits(position.yes)} YES, ${fmtUnits(position.no)} NO` : ""}.
+      </p>
+      {market.mode === "money" && <p className="hint">This is test USDC with no real value. Real money is a decision for later, pending legal review.</p>}
       {market.mode === "money" && (
         <button
           className="quiet w-full"
           style={{ marginTop: 8 }}
           disabled={busy !== null}
           onClick={() =>
-            void run("Minting…", "Added 100 test tUSDC to your wallet.", async () => {
+            void run("Adding…", "Added 100 test USDC to your wallet.", async () => {
               await prepareMoney(wallet);
               await wallet.call("mint", { amount: FAUCET_UNITS.toString() }, { contractId: FT });
             })
           }
         >
-          Get 100 test tUSDC
+          Get 100 test USDC
         </button>
       )}
       {message && <p className={`notice ${message.ok ? "notice--ok" : "notice--error"}`} role="status">{message.text}</p>}
 
       <details style={{ marginTop: 16 }}>
-        <summary>Add to the prize pool (advanced)</summary>
+        <summary>Changed your mind?</summary>
+        <p className="hint" style={{ marginBottom: 8 }}>Until forecasting closes, you can sell what you bought at today&apos;s odds.</p>
+        <div className="seg" role="group" aria-label="Buy or sell">
+          <button aria-pressed={action === "buy"} onClick={() => setAction("buy")}>
+            Forecast
+          </button>
+          <button aria-pressed={action === "sell"} onClick={() => setAction("sell")}>
+            Sell
+          </button>
+        </div>
+      </details>
+      <details style={{ marginTop: 8 }}>
+        <summary>If the odds move while you confirm</summary>
+        <label className="field" style={{ marginTop: 8 }}>
+          <span>Cancel my forecast if the odds move more than</span>
+          <select value={slippage} onChange={(e) => setSlippage(Number(e.target.value))}>
+            <option value={0.5}>0.5%</option>
+            <option value={1}>1%</option>
+            <option value={3}>3%</option>
+            <option value={10}>10%</option>
+          </select>
+        </label>
+      </details>
+      <details style={{ marginTop: 8 }}>
+        <summary>Add to the prize pool</summary>
         <p className="hint" style={{ marginBottom: 8 }}>
-          Adding money makes the odds harder to move. You earn {(config.fee_bps * (10_000 - config.treasury_fee_share_bps)) / 10_000 / 100}% of every trade, but you can lose money depending on the verdict.
+          For experienced forecasters. Adding to the pool makes the odds harder to move. You earn {(config.fee_bps * (10_000 - config.treasury_fee_share_bps)) / 10_000 / 100}% of every trade, but you can lose money depending on the verdict.
         </p>
         <button
           className="quiet w-full"

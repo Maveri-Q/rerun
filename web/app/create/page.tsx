@@ -606,7 +606,7 @@ function FullForm() {
       </div>
       <aside className="create-preview" aria-label="Preview of your claim">
         <p className="hint">Your claim, as it will print</p>
-        <PrintedReceipt title={title || "Your claim appears here"} outcome={null} reported={reported || "?"} range={previewRange} measured={null} hash={hash} print />
+        <PrintedReceipt title={title || "Your claim appears here"} outcome={null} reported={reported || "?"} range={previewRange} measured={null} hash={hash} />
       </aside>
     </div>
   );

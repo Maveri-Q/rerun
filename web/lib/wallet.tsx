@@ -41,10 +41,73 @@ async function testAccount(): Promise<Account | null> {
   return new Account(accountId, new JsonRpcProvider({ url: RPC }), privateKey as KeyPairString);
 }
 
+type WalletWait = null | "connect" | "sign";
+
+/**
+ * A browser wallet works in a separate window, and the connector's own dialog just waits for it, so a
+ * blocked or buried window looks like the site has frozen. This says what's going on and what to do.
+ */
+function WalletHelp({ wait, blocked, onClose }: { wait: WalletWait; blocked: boolean; onClose: () => void }) {
+  if (!wait) return null;
+  return (
+    <aside className="wallet-help" role="status">
+      {blocked ? (
+        <>
+          <b>Your browser blocked the wallet&apos;s window.</b>
+          <p>Allow pop-ups for this site, usually from the icon at the right of the address bar. Then close this dialog and try again.</p>
+        </>
+      ) : (
+        <>
+          <b>{wait === "connect" ? "Your wallet opens in its own window." : "Approve this in your wallet's window."}</b>
+          <p>
+            Can&apos;t see it? It may be behind this one, or your browser may have blocked it.
+            {wait === "connect" && " This site uses NEAR's test network, so your wallet needs a testnet account. They're free, but your everyday NEAR account won't show up."}
+          </p>
+        </>
+      )}
+      <button className="quiet btn--small" onClick={onClose}>
+        Hide this
+      </button>
+    </aside>
+  );
+}
+
 function Inner({ children }: { children: ReactNode }) {
   const near = useNearWallet();
   const [test, setTest] = useState<Account | null>(null);
+  const [wait, setWait] = useState<WalletWait>(null);
+  const [blocked, setBlocked] = useState(false);
   useEffect(() => void testAccount().then(setTest), []);
+
+  // The wallet code runs in a sandbox and asks this page to open its window, so this is where a block shows.
+  useEffect(() => {
+    const open = window.open;
+    window.open = function (...args: Parameters<typeof window.open>) {
+      const opened = open.apply(window, args);
+      setBlocked(!opened);
+      setWait((now) => now ?? "connect");
+      return opened;
+    };
+    return () => {
+      window.open = open;
+    };
+  }, []);
+
+  // The help goes away with the connector's dialog, or as soon as an account is connected.
+  useEffect(() => {
+    if (wait !== "connect") return;
+    if (near.signedAccountId) return setWait(null);
+    // The connector swaps one dialog for another when a wallet is picked, so a short gap doesn't mean it closed.
+    let seen = false;
+    let gone = 0;
+    const id = window.setInterval(() => {
+      const showing = document.querySelector(".hot-connector-popup") !== null;
+      gone = showing ? 0 : gone + 1;
+      if (showing) seen = true;
+      else if (seen && gone >= 12) setWait(null);
+    }, 400);
+    return () => window.clearInterval(id);
+  }, [wait, near.signedAccountId]);
 
   const call = useCallback<Wallet["call"]>(
     async (method, args, opts = {}) => {
@@ -54,7 +117,13 @@ function Inner({ children }: { children: ReactNode }) {
         await test.callFunction({ contractId, methodName: method, args, deposit: BigInt(opts.deposit ?? "0"), gas });
         return;
       }
-      await near.callFunction({ contractId, method, args, deposit: opts.deposit ?? "0", gas: gas.toString() });
+      setBlocked(false);
+      setWait("sign");
+      try {
+        await near.callFunction({ contractId, method, args, deposit: opts.deposit ?? "0", gas: gas.toString() });
+      } finally {
+        setWait(null);
+      }
     },
     [near, test],
   );
@@ -63,13 +132,22 @@ function Inner({ children }: { children: ReactNode }) {
     () => ({
       accountId: test?.accountId ?? near.signedAccountId,
       loading: near.loading,
-      signIn: () => void near.signIn(),
+      signIn: () => {
+        setBlocked(false);
+        setWait("connect");
+        void near.signIn();
+      },
       signOut: () => void near.signOut(),
       call,
     }),
     [near, test, call],
   );
-  return <WalletContext.Provider value={value}>{children}</WalletContext.Provider>;
+  return (
+    <WalletContext.Provider value={value}>
+      {children}
+      <WalletHelp wait={wait} blocked={blocked} onClose={() => setWait(null)} />
+    </WalletContext.Provider>
+  );
 }
 
 export function WalletProvider({ children }: { children: ReactNode }) {

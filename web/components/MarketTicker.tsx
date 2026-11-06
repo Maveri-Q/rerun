@@ -43,7 +43,7 @@ export function MarketTicker({ market }: { market: Market }) {
         <span className="ticker-title">
           <span className="ticker-name">{shortTitle(s.title)}</span>
           <span className="ticker-meta">
-            {isDemo ? "Demo claim. " : origin ? `${origin.flagship ? "Flagship. " : ""}${ORIGIN_LABEL[origin.origin]}. ` : ""}
+            {isDemo ? "Demo claim. " : origin ? `${origin.flagship ? "Start here. " : ""}${ORIGIN_LABEL[origin.origin]}. ` : ""}
             Holds up at {rangeText(s.reported_value, s.tolerance_kind, s.tolerance_value)}
           </span>
         </span>

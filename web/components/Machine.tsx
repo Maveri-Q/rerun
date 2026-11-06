@@ -6,11 +6,11 @@ import Link from "next/link";
 import { memo, useEffect, useRef, useState } from "react";
 
 const STEPS = [
-  { short: "Claim", title: "A claim goes in.", text: "Someone picks a published result, like “93% accurate”. They point to the authors’ exact code and data, and set how close a re-run must get." },
-  { short: "Forecast", title: "People weigh in.", text: "You buy YES if you think it will hold up, NO if you don’t. Each forecast tips the scale, and that sets the chance everyone can see." },
+  { short: "Claim", title: "A claim goes in.", text: "Someone picks a published result, like “93% accurate”. They point to the exact code and data, and set how close a re-run must get." },
+  { short: "Forecast", title: "People weigh in.", text: "You forecast YES if you think it will hold up, NO if you don’t. Each forecast tips the scale, and that sets the chance everyone can see. It has no effect on the verdict." },
   { short: "Re-run", title: "The Lab seals itself in.", text: "The internet is cut and the code runs again. An AI may fix setup problems, like a wrong file path. It can’t touch the science, and plain code reads the final number." },
-  { short: "Receipt", title: "A receipt comes out.", text: "The result goes on the blockchain, where nobody can change it. Anyone who disagrees has a limited time to challenge it." },
-  { short: "Collect", title: "Right forecasts get paid.", text: "When the time is up, winning shares pay out and losing shares pay nothing. Then the next claim goes in." },
+  { short: "Receipt", title: "A receipt comes out.", text: "The result goes on the blockchain, where nobody can change it. Anyone who disagrees then has 24 hours to challenge it, and a different AI runs it again." },
+  { short: "Collect", title: "Right forecasts get paid.", text: "When the time is up, right forecasts pay out and wrong ones pay nothing. If the test couldn’t be run fairly, everyone gets half back." },
 ];
 
 const N = STEPS.length;

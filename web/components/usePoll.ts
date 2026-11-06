@@ -21,6 +21,11 @@ function writeCache(key: string, text: string) {
   }
 }
 
+/** Text to compare answers by. Balances are bigints, which plain JSON refuses, and that would lose the answer. */
+export function answerText(value: unknown): string {
+  return JSON.stringify(value, (_, v: unknown) => (typeof v === "bigint" ? v.toString() : v)) ?? "null";
+}
+
 /**
  * Loads data and refreshes it on an interval. `refresh()` reloads straight after a transaction.
  * It doesn't re-render when the answer is unchanged, and pauses while the tab is hidden, so polling
@@ -37,7 +42,7 @@ export function usePoll<T>(load: () => Promise<T>, deps: unknown[], intervalMs =
   const refresh = useCallback(async () => {
     try {
       const value = await latest.current();
-      const text = JSON.stringify(value) ?? "null";
+      const text = answerText(value);
       if (text !== seen.current) {
         seen.current = text;
         setData(value);

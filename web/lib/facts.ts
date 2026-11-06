@@ -14,6 +14,7 @@ const data = saved as { entries: Record<string, FactEntry>; citedBy: Record<stri
 export const factsFor = (specHash: string) => ({ entry: data.entries[specHash], citedBy: data.citedBy[specHash] });
 
 export function citedByText(n: number | undefined): string | null {
-  if (!n) return null;
-  return n === 1 ? "Cited by 1 study" : `Cited by ${n.toLocaleString("en-US")} studies`;
+  // A handful of citations says nothing to a reader, so only a real following is worth a line.
+  if (!n || n < 10) return null;
+  return `Cited by ${n.toLocaleString("en-US")} studies`;
 }

@@ -76,7 +76,7 @@ export function EvidenceLadder({ receipt, reportHash }: { receipt: Receipt; repo
       <h2>How much evidence is behind this?</h2>
       <p>Each step is a tougher test. Only the first one decides who wins the market.</p>
       <ol>
-        <Rung step={1} title="Re-run with the authors' own code and data" level={reproduced ? "strong" : "warning"}>
+        <Rung step={1} title="Re-run of the code and data named in the claim" level={reproduced ? "strong" : "warning"}>
           <p>{outcomeMeaning(receipt.outcome)}</p>
         </Rung>
         <Rung step={2} title="Stress test: does the number depend on luck?" level={robust === "stable" ? "strong" : robust === "sensitive" ? "warning" : "none"}>

@@ -16,6 +16,8 @@ export interface Provenance {
   testRunEarly?: boolean;
   /** What the paper says, word for word, and where. */
   paperSays?: { quote: string; where: string; href: string };
+  /** What the number measures, in everyday words. Replaces the name stored on the blockchain. */
+  metricWords?: string;
   /** One line on why anyone should care. */
   whyItMatters?: string;
   /** The finding as a question in everyday words. */
@@ -108,6 +110,7 @@ export const PROVENANCE: Record<string, Provenance> = {
     question: "Does temperature explain how much water forests lose after a wildfire?",
     citeDoi: "10.5281/zenodo.4617894",
     flagship: true,
+    metricWords: "the share of the change in forest water loss that temperature explains (R-squared)",
     testRunEarly: true,
     paperSays: { quote: "Multiple R-Squared: 0.1495", where: "The author's 2008 output file, line 251, for ET ~ Tavg", href: "https://github.com/bpbond/ten-years-paper33/blob/c28b8a2e3149f7d90f2dc0179f9c976785e762b1/original/R%20output.txt#L251" },
     whyItMatters: "Wildfires are reshaping northern forests, and how much water those forests lose matters for climate models.",
@@ -152,8 +155,9 @@ export const PROVENANCE: Record<string, Provenance> = {
     citeDoi: "10.5281/zenodo.5006005",
     origin: "rebuild",
     testRunEarly: true,
-    paperSays: { quote: "dennis_par = c(121.08, 204.36, 264.41, 342.473, 465.620, 599.57, 1.559)", where: "Kemp et al. 1986 Table 1, as transcribed in the replication's code", href: "https://github.com/pboesu/replication_candy_1991/blob/98329d447ef025c260879f28316015fc0b24fb08/code/03_fit_dennis_et_al_model.R" },
-    whyItMatters: "The same pest model again, and a case where one value in a rebuild differs by about 9% while the overall fit still agrees.",
+    metricWords: "how spread out the pest's development is over the season (b squared in the model)",
+    paperSays: { quote: "dennis_par = c(\u2026, 599.57, 1.559)", where: "The last value on this line is from Kemp et al. 1986, Table 1, copied into the replication's code", href: "https://github.com/pboesu/replication_candy_1991/blob/98329d447ef025c260879f28316015fc0b24fb08/code/03_fit_dennis_et_al_model.R" },
+    whyItMatters: "Spruce budworm strips forests across North America. Can a rebuild land on a number printed in a table 40 years ago?",
     why: {
       heading: "Why not the authors' own code?",
       text: "The original analyses from 1986 and 1991 were written for SAS and GLIM, older statistics software the Lab can't run. SAS is also paid. This claim runs a rebuild in R by another researcher, published in a peer-reviewed journal.",

@@ -4,7 +4,9 @@ import Link from "next/link";
 import { use, useMemo } from "react";
 import { ClaimSpec } from "@rerun/shared/browser";
 import { JumpToForecast } from "@/components/JumpToForecast";
+import { ChallengeWindow } from "@/components/ChallengeWindow";
 import { MarketActions } from "@/components/MarketActions";
+import { NumberLine } from "@/components/NumberLine";
 import { EvidenceLadder } from "@/components/EvidenceLadder";
 import { MiniScale } from "@/components/MiniScale";
 import { OddsChart } from "@/components/OddsChart";
@@ -20,7 +22,6 @@ import { citedByText, factsFor } from "@/lib/facts";
 import { accountLink, CONTRACT } from "@/lib/config";
 import { lab, useRunStream } from "@/lib/lab";
 import { NEVER_CHECKED, ORIGIN_LABEL, PRICE_RULE, provenanceOf } from "@/lib/provenance";
-import { APP_NAME } from "@rerun/shared/browser";
 import { CHECK_OUT_NOTE, fmtUnits, modeUnit, verdictWords, outcomeMeaning, rangeText, relativeTime, stateLabel, toleranceText, type State } from "@/lib/market";
 import { useWallet } from "@/lib/wallet";
 
@@ -28,7 +29,7 @@ const SEQUENCE: { state: State; label: string }[] = [
   { state: "Open", label: "People forecast" },
   { state: "Locked", label: "Forecasting ends" },
   { state: "Running", label: "The Lab re-runs it" },
-  { state: "Proposed", label: "Verdict posted" },
+  { state: "Proposed", label: "Verdict posted, open to challenge" },
   { state: "Final", label: "Winners collect" },
 ];
 
@@ -89,7 +90,7 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
         <h1 className="market-title">{s.title.replace(/^\[DEMO\]\s*/, "")}</h1>
         {origin && (
           <p className="origin-chips">
-            {origin.flagship && <span className="chip chip--REPRODUCED">Flagship claim</span>}
+            {origin.flagship && <span className="chip chip--REPRODUCED">Start here</span>}
             <span className={`chip origin-chip--${origin.origin}`}>{ORIGIN_LABEL[origin.origin]}</span>
           </p>
         )}
@@ -132,24 +133,25 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
         )}
         {origin?.paperSays && (
           <blockquote className="paper-says">
-            <span>Paper says</span>
+            <span>Where the number comes from</span>
             <code>{origin.paperSays.quote}</code>
             <a href={origin.paperSays.href}>{origin.paperSays.where}</a>
           </blockquote>
         )}
         {origin?.whyItMatters && <p className="why-matters">{origin.whyItMatters}</p>}
         {citedByText(factsFor(s.spec_hash).citedBy) && <p className="test-run-note">{citedByText(factsFor(s.spec_hash).citedBy)}</p>}
-        {origin && m.state === "Final" && <p className="test-run-note"><Link href={`/facts/${m.id}`}>Read the plain-English entry</Link></p>}
-        {origin?.testRunEarly && <p className="test-run-note">Test-run during development.</p>}
-        <p className="hint scope-note">{APP_NAME} checks whether the published numbers can be reproduced from the code and data. It does not judge whether the science is correct. {PRICE_RULE}</p>
+        {origin && m.state === "Final" && <p className="test-run-note"><Link href={`/facts/${m.id}`}>What this result means</Link></p>}
+        {origin?.testRunEarly && <p className="test-run-note">We test-ran this code once while building the Lab, so we&apos;ve already seen one result. Its official run comes after forecasting closes.</p>}
+        <p className="hint scope-note">We test one thing: does this code and data give this number? That&apos;s not the same as the science being right. {PRICE_RULE}</p>
 
         <div className="claim-figure">
           <span className="claim-value">{s.reported_value}</span>
           <span className="claim-tol"><Hint term="margin">{toleranceText(s.tolerance_kind, s.tolerance_value)}</Hint></span>
           <span className="dim">
-            The paper reports this {spec?.metric.name}. The claim holds up if the Lab gets {rangeText(s.reported_value, s.tolerance_kind, s.tolerance_value)}.
+            The paper reports this as {origin?.metricWords ?? `its ${spec?.metric.name}`}. The claim holds up if the Lab gets {rangeText(s.reported_value, s.tolerance_kind, s.tolerance_value)}.
           </span>
         </div>
+        <NumberLine reported={s.reported_value} kind={s.tolerance_kind} margin={s.tolerance_value} measured={latestReceipt?.measured_value ?? null} tone={shownOutcome ? verdictWords(shownOutcome)?.tone : undefined} noNumber={shownOutcome ? "No number came out of this run" : undefined} />
 
         {shownOutcome && (
           <div className="verdict-line">
@@ -163,7 +165,6 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
               measured={latestReceipt?.measured_value ?? null}
               hash={s.spec_hash}
               when={m.finalized_at ?? latestReceipt?.finished_at}
-              print
             />
             {latestReceipt && (
               <div style={{ paddingTop: 20 }}>
@@ -314,6 +315,7 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
       <aside className="sticky" id="forecast">
         {trading && config.data && <TradePanel market={m} config={config.data} position={position.data} contract={CONTRACT} onDone={refreshAll} />}
         {config.data && <MarketActions market={m} config={config.data} position={position.data} onDone={refreshAll} />}
+        {config.data && m.state !== "Draft" && <ChallengeWindow market={m} config={config.data} />}
         <div className="panel">
           <MiniScale market={m} />
           <dl className="defs" style={{ gridTemplateColumns: "1fr auto", marginTop: 16, fontSize: 14 }}>
@@ -327,7 +329,7 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
             <dd>{relativeTime(m.lock_time)}</dd>
           </dl>
           <p className="hint" style={{ marginTop: 12 }}>
-            Opened by <a href={accountLink(m.creator)}>{m.creator}</a>. Creators can forecast on their own claims, so keep that in mind when reading the odds.
+            Opened by <a href={accountLink(m.creator)}>{m.creator}</a>. Whoever opens a claim can also forecast on it, so read the odds with that in mind.
           </p>
           {position.data && (
             <p className="hint">

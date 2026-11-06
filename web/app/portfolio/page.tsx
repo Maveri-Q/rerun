@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { AnyChainPanel } from "@/components/AnyChainPanel";
-import { PrintedReceipt } from "@/components/PrintedReceipt";
+import { PointsStack } from "@/components/PointsStack";
 import { RollingNumber } from "@/components/RollingNumber";
 import { Stamp } from "@/components/Stamp";
 import { usePoll } from "@/components/usePoll";
@@ -50,13 +50,13 @@ export default function PortfolioPage() {
       <>
         <div className="lab-hero">
           <div>
-            <h1 className="page-title">Your forecasts print here.</h1>
-            <p className="lede">Connect a wallet to see your forecasts, what you can collect, and your balance. New accounts can claim 1,000 free points.</p>
+            <h1 className="page-title">Your forecasts live here.</h1>
+            <p className="lede">Connect a wallet to see what you&apos;ve called, how it went, and what you can collect.</p>
             <button style={{ marginTop: 24 }} onClick={wallet.signIn} disabled={wallet.loading}>
               Connect wallet
             </button>
           </div>
-          <PrintedReceipt title="Waiting for your first forecast" outcome={null} reported="?" range="your call" measured={null} hash="" print />
+          <PointsStack />
         </div>
         <AnyChainPanel />
       </>
@@ -88,7 +88,7 @@ export default function PortfolioPage() {
         </div>
         <div className="figure">
           <b>{d ? <RollingNumber value={fmtUnits(d.money)} /> : "…"}</b>
-          <span>tUSDC ready to withdraw</span>
+          <span>test USDC ready to withdraw</span>
         </div>
       </div>
       {d && BigInt(d.money) > 0n && (
@@ -100,7 +100,7 @@ export default function PortfolioPage() {
 
       <section className="section">
         <div className="section-head">
-          <h2>Your forecasts</h2>
+          <h2>Claim by claim</h2>
         </div>
         {data.error && !d && <p className="notice notice--error">Unable to load your forecasts. This page keeps trying.</p>}
         {data.loading && !d && <p className="dim">Finding your forecasts on the blockchain…</p>}

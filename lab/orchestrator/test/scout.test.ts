@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { doiInText, EVERYDAY_TOPICS, searchWords, titleMatches, topicsForDay } from "../src/scout/scout.ts";
 import { doiIn, fetchPaperText, htmlToText, isPrivateAddress, numberInText, numberNearWording, pdfLinkIn, sameNumber } from "../src/scout/paper.ts";
 import { articleFile, type ClaimDraft } from "../src/lab/draft.ts";
 import { checkRepo, hasDataInRepo, isClearNumber, type RepoFacts } from "../src/scout/filters.ts";
@@ -361,5 +362,25 @@ describe("suggesting a paper again", () => {
     addSuggestion(state, "https://github.com/a/b", "https://doi.org/10.1/z");
     expect(state.candidates[id]!.status).toBe("pending");
     expect(state.candidates[id]!.paperUrl).toBe("https://doi.org/10.1/y");
+  });
+});
+
+describe("everyday leads", () => {
+  it("finds a DOI in a README, without the punctuation after it", () => {
+    expect(doiInText("See https://doi.org/10.1257/aer.100.2.573.")).toBe("10.1257/aer.100.2.573");
+    expect(doiInText("No paper named here")).toBeNull();
+  });
+
+  it("only takes a title match when most of the words are really there", () => {
+    const words = searchWords("Replication code and data for The Diffusion of Online Vaccine Misinformation");
+    expect(words).toBe("Diffusion Online Vaccine Misinformation");
+    expect(titleMatches(words, "The diffusion of online vaccine misinformation on social media")).toBe(true);
+    expect(titleMatches(words, "Shopping for lower sales tax rates")).toBe(false);
+  });
+
+  it("takes turns through the topics", () => {
+    const day = new Date(0);
+    expect(topicsForDay(day, 2)).toEqual(EVERYDAY_TOPICS.slice(0, 2));
+    expect(topicsForDay(new Date(86_400_000), 1)).toEqual([EVERYDAY_TOPICS[1]]);
   });
 });

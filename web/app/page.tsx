@@ -63,7 +63,6 @@ export default function Home() {
           <p className="lede">
             Many published results don&apos;t. Here you predict which ones will, then an AI lab re-runs the code and data behind them and prints public proof.
           </p>
-          <p className="hero-steps">Predict, we rerun the study, then see the proof and collect.</p>
           <div className="hero-actions">
             <TryItNow />
             <a className="btn quiet" href="#claims">
@@ -115,7 +114,7 @@ export default function Home() {
       <section className="band">
         <div className="band-inner">
           <div className="section-head">
-            <h2>From a published claim to printed proof, in four steps.</h2>
+            <h2>How a claim gets settled</h2>
             <Link className="band-cta" href="/how">Watch the machine run</Link>
           </div>
           <ol className="how-short">
@@ -129,11 +128,11 @@ export default function Home() {
             </li>
             <li>
               <h3>The Lab checks it</h3>
-              <p>An AI lab re-runs the original code. You can watch it live.</p>
+              <p>An AI lab re-runs the code with the internet cut off. You can watch it live.</p>
             </li>
             <li>
               <h3>Winners collect</h3>
-              <p>The receipt goes on the blockchain and right forecasts pay out.</p>
+              <p>The verdict goes on the blockchain. Anyone can challenge it, and when that time is up, right forecasts pay out.</p>
             </li>
           </ol>
         </div>
@@ -141,7 +140,7 @@ export default function Home() {
 
       <section className="section" id="claims">
         <div className="section-head">
-          <h2>Claims you can forecast</h2>
+          <h2>The claims</h2>
           <div className="filters" role="group" aria-label="Filter claims">
             {FILTERS.map((f) => (
               <button key={f.key} aria-pressed={filter === f.key} onClick={() => setFilter(f.key)}>

@@ -4,6 +4,7 @@ import { ClaimSpec, canonicalJson } from "@rerun/shared/browser";
 import Link from "next/link";
 import { nearToYocto } from "near-api-js";
 import { useState } from "react";
+import { ScoutSieve } from "@/components/ScoutSieve";
 import { usePoll } from "@/components/usePoll";
 import { chain } from "@/lib/chain";
 import { lab, type ScoutCandidate } from "@/lib/lab";
@@ -149,8 +150,19 @@ export default function ScoutPage() {
   return (
     <>
       <h1 className="page-title">The scout finds. A person decides.</h1>
-      <p className="lede">An AI agent scans newly published replications that share their code, and drafts a claim for each one that passes its checks. Nothing goes live until a person approves it.</p>
-      <p className="hint">{scout.data?.lastScanAt ? `Last scan: ${new Date(scout.data.lastScanAt).toLocaleString()}. It reads ReScience C and Hugging Face Papers, and never runs anyone's code.` : "It reads ReScience C and Hugging Face Papers, and never runs anyone's code."}</p>
+      <p className="lede">Twice a day, an AI agent looks for published research with code and data anyone can re-run, and drafts a claim for each paper that passes its checks. Nothing goes live until a person approves it.</p>
+      <p className="hint">{scout.data?.lastScanAt ? `Last scan: ${new Date(scout.data.lastScanAt).toLocaleString()}. ` : ""}It reads replication code on everyday topics from GitHub, the journal ReScience C and Hugging Face Papers. It never runs anyone&apos;s code.</p>
+
+      {all.length > 0 && (
+        <section className="section">
+          <div className="section-head">
+            <h2 className="big-head">Most papers can&apos;t be re-run</h2>
+          </div>
+          <p className="lede">Of the {all.length} papers read so far, here&apos;s where each one stopped. Being turned down says nothing about the research. It means the Lab can&apos;t test it fairly, so the scout moves on.</p>
+          <ScoutSieve candidates={all} />
+          <p className="hint">Interest only decides which paper a person reviews first. Citations and an AI&apos;s score of how much people would care put the widely known papers on top, and neither can touch a verdict.</p>
+        </section>
+      )}
 
       <section className="section">
         <div className="section-head">
@@ -186,8 +198,8 @@ export default function ScoutPage() {
 
       {turnedDown.length > 0 && (
         <section className="section">
-          <details open>
-            <summary>What the scout turned down, and why ({turnedDown.length})</summary>
+          <details>
+            <summary>Every paper turned down, and why ({turnedDown.length})</summary>
             <ul className="scout-rejected">
               {turnedDown.map((c) => (
                 <li key={c.id}>

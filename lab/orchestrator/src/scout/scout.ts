@@ -115,7 +115,7 @@ export async function runScout(state: ScoutState, deps: ScoutDeps): Promise<Scou
     return true;
   });
   // Papers already through the checks go first, so they aren't checked again and again.
-  const waiting = (l: Lead) => (l.id.startsWith("suggested:") ? 2000 : next.candidates[l.id]?.reasons.some((r) => r.startsWith("Passed the checks")) ? 1000 : 0);
+  const waiting = (l: Lead) => (l.id.startsWith("suggested:") ? 2000 : l.id.startsWith("everyday:") ? 500 : next.candidates[l.id]?.reasons.some((r) => r.startsWith("Passed the checks")) ? 1000 : 0);
   fresh.sort((a, b) => waiting(b) + titleInterest(b) - waiting(a) - titleInterest(a));
   log(`scout: ${leads.length} leads, ${fresh.length} not checked yet`);
 
@@ -266,6 +266,84 @@ export async function huggingFaceLeads(limit: number): Promise<Lead[]> {
   });
 }
 
+/** Things most people have an opinion about. ReScience and Hugging Face rarely cover them. */
+export const EVERYDAY_TOPICS = ["minimum wage", "sleep", "social media", "coffee", "exercise", "vaccine", "smoking", "air pollution", "school", "happiness", "alcohol", "unemployment", "inequality", "diet", "immigration", "police"];
+
+/** Below this many citations, a paper on an everyday topic is still one nobody has heard of. */
+export const MIN_EVERYDAY_CITATIONS = 20;
+
+/** The first DOI in a README, without the punctuation that often follows one. */
+export function doiInText(text: string): string | null {
+  const found = /\b10\.\d{4,9}\/[-._;()/:A-Za-z0-9]+/.exec(text)?.[0];
+  return found ? found.replace(/[.,;:)]+$/, "") : null;
+}
+
+/** Topics take turns, because GitHub allows few searches a minute. */
+export function topicsForDay(date: Date, count: number): string[] {
+  const day = Math.floor(date.getTime() / 86_400_000);
+  return Array.from({ length: count }, (_, i) => EVERYDAY_TOPICS[(day + i) % EVERYDAY_TOPICS.length]!);
+}
+
+interface FoundWork {
+  title?: string;
+  doi?: string | null;
+  cited_by_count?: number;
+}
+
+/** A repository's description, without the words every replication package uses. */
+export function searchWords(description: string): string {
+  const cleaned = description.replace(/\b(replication|replicate|replicating|reproduce|package|materials?|files?|code|data|repository|contains|necessary|required|scripts?|paper|study|for|the|to|and|of|this|in|on|analyzing|findings)\b/gi, " ");
+  return cleaned.replace(/[^\p{L}\p{N} -]/gu, " ").replace(/\s+/g, " ").trim().split(" ").slice(0, 12).join(" ");
+}
+
+/** True when most of the search words really are in the title, so a loose match isn't taken for the paper. */
+export function titleMatches(words: string, title: string): boolean {
+  const list = words.toLowerCase().split(" ").filter((w) => w.length > 3);
+  if (list.length < 3) return false;
+  const lower = title.toLowerCase();
+  return list.filter((w) => lower.includes(w)).length / list.length >= 0.6;
+}
+
+async function findWork(doi: string | null, description: string): Promise<FoundWork | null> {
+  const headers = { "user-agent": "rerun-scout" };
+  if (doi) {
+    const res = await fetch(`https://api.openalex.org/works/https://doi.org/${doi}`, { headers }).catch(() => null);
+    return res?.ok ? ((await res.json()) as FoundWork) : null;
+  }
+  const words = searchWords(description);
+  if (!words) return null;
+  const res = await fetch(`https://api.openalex.org/works?search=${encodeURIComponent(words)}&per-page=1`, { headers }).catch(() => null);
+  if (!res?.ok) return null;
+  const top = ((await res.json()) as { results?: FoundWork[] }).results?.[0];
+  return top?.title && titleMatches(words, top.title) ? top : null;
+}
+
+/**
+ * Replication code on GitHub for well-known findings on everyday topics. A repository only becomes a
+ * lead if it has a licence and leads to a widely cited paper. The usual checks and both AI number
+ * checks still apply, and a person still reviews every draft.
+ */
+export async function everydayLeads(date = new Date(), topicCount = 4): Promise<Lead[]> {
+  const leads: Lead[] = [];
+  for (const topic of topicsForDay(date, topicCount)) {
+    for (const language of ["R", "Python"]) {
+      const q = encodeURIComponent(`replication ${topic} in:name,description size:<60000 language:${language}`);
+      const found = await github<{ items: { full_name: string; html_url: string; default_branch: string; description: string | null; license: { spdx_id?: string } | null; archived: boolean }[] }>(`/search/repositories?q=${q}&per_page=30`);
+      for (const repo of found.items) {
+        if (!repo.license || repo.license.spdx_id === "NOASSERTION" || repo.archived) continue;
+        const doi = doiInText(await raw(`https://raw.githubusercontent.com/${repo.full_name}/${repo.default_branch}/README.md`));
+        const work = await findWork(doi, repo.description ?? "");
+        // A README can name any paper, so the paper itself has to be about the topic we searched for.
+        if (!work?.title || (work.cited_by_count ?? 0) < MIN_EVERYDAY_CITATIONS || !work.title.toLowerCase().includes(topic)) continue;
+        const paperDoi = doi ?? work.doi?.replace("https://doi.org/", "") ?? undefined;
+        if (!paperDoi) continue;
+        leads.push({ id: `everyday:${repo.full_name}`, source: "Replication code on GitHub", title: work.title, paperUrl: `https://doi.org/${paperDoi}`, doi: paperDoi, repoUrl: repoRoot(repo.html_url), needsDataCheck: true, upvotes: Math.min(work.cited_by_count ?? 0, 50) });
+      }
+    }
+  }
+  return leads;
+}
+
 interface OpenAlexWork {
   cited_by_count?: number;
   counts_by_year?: { year: number; cited_by_count: number }[];
@@ -318,9 +396,9 @@ export function addSuggestion(state: ScoutState, repoUrl: string, paperUrl: stri
 }
 
 export const allLeads = async (): Promise<Lead[]> => {
-  const [rescience, huggingFace] = await Promise.allSettled([reScienceLeads(70), huggingFaceLeads(100)]);
-  if (rescience.status === "rejected" && huggingFace.status === "rejected") throw new Error(`no source answered: ${String(rescience.reason)}`);
-  return [...(rescience.status === "fulfilled" ? rescience.value : []), ...(huggingFace.status === "fulfilled" ? huggingFace.value : [])];
+  const sources = await Promise.allSettled([everydayLeads(), reScienceLeads(70), huggingFaceLeads(100)]);
+  if (sources.every((x) => x.status === "rejected")) throw new Error(`no source answered: ${String((sources[0] as PromiseRejectedResult).reason)}`);
+  return sources.flatMap((x) => (x.status === "fulfilled" ? x.value : []));
 };
 
 export async function githubRepoFacts(repoUrl: string): Promise<RepoFacts> {

@@ -1,5 +1,5 @@
 {
-  "lastScanAt": "2026-11-06T03:23:48.762Z",
+  "lastScanAt": "2026-11-06T06:31:04.696Z",
   "draftsByDay": {
     "2026-11-06": 6
   },
@@ -196,7 +196,7 @@
       "reasons": [
         "Passed the checks, and waiting for the AI budget."
       ],
-      "checkedAt": "2026-11-06T03:23:48.762Z",
+      "checkedAt": "2026-11-06T06:31:04.696Z",
       "license": "CC-BY-4.0",
       "runtime": "r4.4"
     },
@@ -225,7 +225,7 @@
       "reasons": [
         "Passed the checks, and waiting for the AI budget."
       ],
-      "checkedAt": "2026-11-06T03:23:48.762Z",
+      "checkedAt": "2026-11-06T06:31:04.696Z",
       "license": "BSD-3-Clause",
       "runtime": "python3.11"
     },
@@ -426,7 +426,7 @@
         "repo_url": "https://github.com/Parv17k/decision-models-conflict-typing",
         "commit": "c5dc2cb8b12a7be45f55715d9c3ee3cdec7ad379",
         "title": "Tiny AI Models Classify Why Search Results Disagree Nearly as Well as Big LLMs",
-        "statement": "On the CONFLICTS benchmark (406 test queries), 11 small 'decision models' typed why retrieved sources disagree. Asked directly with one choice question, they reached 50.0\u201367.0% accuracy; 10 of 11 matched or beat Gemini 2.5 Flash (61.3%) at far lower cost and latency, while Gemini 3.8 Flash led at 70.0%. Routing each small model's least-confident quarter of queries to Gemini 3.8 Flash tied it for 8 of 11 models at 25\u201337% of the LLM's cost, and downstream answers were as good as with LLM-typed conflicts. Suggested by the scout agent.",
+        "statement": "On the CONFLICTS benchmark (406 test queries), 11 small 'decision models' typed why retrieved sources disagree. Asked directly with one choice question, they reached 50.0–67.0% accuracy; 10 of 11 matched or beat Gemini 2.5 Flash (61.3%) at far lower cost and latency, while Gemini 3.8 Flash led at 70.0%. Routing each small model's least-confident quarter of queries to Gemini 3.8 Flash tied it for 8 of 11 models at 25–37% of the LLM's cost, and downstream answers were as good as with LLM-typed conflicts. Suggested by the scout agent.",
         "authors": "Parv Khatri, Harshul Jain, Mehak Kapoor, Tanya Sah",
         "license": "Apache-2.0",
         "runtime": "python3.11",
@@ -439,7 +439,7 @@
         "extractor_expr": "Liquid d1 Ultra \\| (\\d+\\.\\d+) \\[",
         "metric_name": "accuracy_on_test_split_for_best_decision_model_flat_question",
         "reported_value": "67.0",
-        "notes": "Eval code re-scores stored JSONL outputs already in the repo, so no API key is needed and reruns are fully deterministic. Requires uv/pip, network for scripts/download_data.sh (CONFLICTS dataset, checksum-verified, Apache-2.0, \u00a9 Google). Statement values are paper-reported ranges; extractor targets the Liquid d1 Ultra row in comparison_test.md.",
+        "notes": "Eval code re-scores stored JSONL outputs already in the repo, so no API key is needed and reruns are fully deterministic. Requires uv/pip, network for scripts/download_data.sh (CONFLICTS dataset, checksum-verified, Apache-2.0, © Google). Statement values are paper-reported ranges; extractor targets the Liquid d1 Ultra row in comparison_test.md.",
         "question": "Can tiny AI tools figure out why search results disagree as well as giant AI models, but much cheaper and faster?",
         "topic": "ai",
         "relatability": 5,
@@ -657,7 +657,7 @@
       "reasons": [
         "Passed the checks, and waiting for the AI budget."
       ],
-      "checkedAt": "2026-11-06T03:23:48.762Z",
+      "checkedAt": "2026-11-06T06:31:04.696Z",
       "license": "MIT",
       "runtime": "python3.11"
     },
@@ -715,6 +715,90 @@
       ],
       "checkedAt": "2026-11-06T03:23:48.762Z",
       "license": "NOASSERTION",
+      "runtime": "python3.11"
+    },
+    "suggested:https://github.com/dylouie/lancet-meta-analysis-verification": {
+      "id": "suggested:https://github.com/dylouie/lancet-meta-analysis-verification",
+      "source": "Suggested by a visitor",
+      "title": "dylouie/lancet-meta-analysis-verification",
+      "paperUrl": "https://doi.org/10.1016/S0140-6736(20)31142-9",
+      "repoUrl": "https://github.com/dylouie/lancet-meta-analysis-verification",
+      "needsDataCheck": true,
+      "status": "retry",
+      "reasons": [
+        "Passed the checks, and waiting for the AI budget."
+      ],
+      "checkedAt": "2026-11-06T06:31:04.696Z",
+      "license": "GPL-3.0",
+      "runtime": "r4.4"
+    },
+    "suggested:https://github.com/dogunbamowo/payne2008_rescue": {
+      "id": "suggested:https://github.com/dogunbamowo/payne2008_rescue",
+      "source": "Suggested by a visitor",
+      "title": "dogunbamowo/payne2008_rescue",
+      "paperUrl": "https://doi.org/10.1111/j.1467-9280.2008.02157.x",
+      "repoUrl": "https://github.com/dogunbamowo/payne2008_rescue",
+      "needsDataCheck": true,
+      "status": "retry",
+      "reasons": [
+        "Passed the checks, and waiting for the AI budget."
+      ],
+      "checkedAt": "2026-11-06T06:31:04.696Z",
+      "license": "MIT",
+      "runtime": "python3.11"
+    },
+    "arxiv:2610.34074": {
+      "id": "arxiv:2610.34074",
+      "source": "Hugging Face Papers",
+      "title": "Identically Trained Language Models Break on Different Jailbreaks",
+      "paperUrl": "https://arxiv.org/abs/2610.34074",
+      "doi": "10.48550/arXiv.2610.34074",
+      "upvotes": 0,
+      "abstract": "Jailbreak benchmarks test one checkpoint and treat which jailbreaks break it as a property of its pretraining data and safety training. We ask whether another pretraining run of the same data, given the same safety training, would break on the same jailbreaks. For each of 25 pretraining data recipes, we take 1B base models from 3 pretraining seeds and give each the same safety post-training with 2 post-training seeds, for 150 models in all. We then collect 20 responses from every model to a shared set of jailbreak prompts and correlate the per-prompt non-refusal rates between every pair of models. On average, two post-trained copies of the same pretraining run have per-prompt non-refusal rates that correlate at 0.984. A different pretraining seed lowers the correlation to 0.811, and a different data recipe lowers it only slightly further, to 0.779. These results indicate that which jailbreaks break a checkpoint depends much more on its pretraining run than on its data, a pattern that holds in all 25 data recipes and at 150M and 300M parameters. In practice, the best of 91 attack templates found on one checkpoint stays the best after a new pretraining seed in only 27% of model pairs, against 67% after a new post-training seed. Each pretraining run also leaves a fingerprint: across 3,211 prompts, a model's per-prompt non-refusal rates identify its pretraining run among all 75 runs every time, and a random subset of 50 prompts still does so 98% of the time.",
+      "repoUrl": "https://github.com/cerulean-works/castor",
+      "needsDataCheck": true,
+      "status": "retry",
+      "reasons": [
+        "Passed the checks, and waiting for the AI budget."
+      ],
+      "checkedAt": "2026-11-06T06:31:04.696Z",
+      "license": "Apache-2.0",
+      "runtime": "python3.11"
+    },
+    "arxiv:2611.05193": {
+      "id": "arxiv:2611.05193",
+      "source": "Hugging Face Papers",
+      "title": "Factorized MLLM Embeddings for Composed Image Retrieval",
+      "paperUrl": "https://arxiv.org/abs/2611.05193",
+      "doi": "10.48550/arXiv.2611.05193",
+      "upvotes": 47,
+      "abstract": "Composed Image Retrieval (CIR) aims to retrieve a target image given a reference image and a modification text. Although recent approaches leveraging Multimodal Large Language Models (MLLMs) have shown significant progress, we argue that the MLLM's compositional understanding remains underutilized. This stems from directly mapping composed queries into a retrieval embedding via contrastive supervision alone, without explicitly resolving the intended visual modifications. In this work, we introduce Factorized MLLM Embeddings (FactEmbed), which decouples compositional query comprehension from building discriminative embeddings. Rather than directly projecting the composed query into a single embedding without internal reasoning, FactEmbed employs a set of factorized latents that simulate the intended visual modifications via an intermediate target imagination objective. This process encourages the latents to ground into target semantics before forming discriminative representations for retrieval. Subsequently, to propagate these factorized representations throughout the model for retrieval, we optimize a factor-level contrastive loss while distilling the decomposed representations into a deeper attention layer of the MLLM. Finally, for efficient inference, we retain the [EOS] token to establish a global-level embedding on top of these factorized latents, while we exploit the mean-pooled factorized latents to rerank a short candidate list at negligible cost, as both are produced by the same forward pass. Extensive evaluations demonstrate that FactEmbed outperforms prior works across CIR benchmarks.",
+      "repoUrl": "https://github.com/cvlab-kaist/FactEmbed",
+      "needsDataCheck": true,
+      "status": "rejected",
+      "reasons": [
+        "Mostly none. The Lab only runs Python and R."
+      ],
+      "checkedAt": "2026-11-06T06:31:04.696Z",
+      "license": "MIT",
+      "runtime": null
+    },
+    "arxiv:2611.03233": {
+      "id": "arxiv:2611.03233",
+      "source": "Hugging Face Papers",
+      "title": "Axion 1.0: Open Agent Foundation Models, Simplified",
+      "paperUrl": "https://arxiv.org/abs/2611.03233",
+      "doi": "10.48550/arXiv.2611.03233",
+      "upvotes": 46,
+      "abstract": "We introduce Axion 1.0, a fully open agent foundation model that combines strong and broad agentic capabilities with a remarkably simple training recipe. Axion 1.0 is trained in only three stages: two lightweight supervised fine-tuning stages followed by reinforcement learning, without dedicated mid-training, direct preference optimization (DPO), or on-policy distillation (OPD). The first SFT stage develops strong self-contained reasoning through model-aware data construction, where we synthesize challenging problems and adversarially strengthen them based on the base model's own successful solution strategies. The second stage extends these capabilities to tool-dependent reasoning through a scalable pipeline for constructing diverse and automatically verifiable tasks grounded in real-world data sources and deterministic computation. Finally, reinforcement learning further strengthens long-horizon reasoning and interaction with external tools and environments. Despite this compact training recipe, Axion 1.0 achieves strong performance across a broad suite of agentic benchmarks and is competitive with leading commercial models on several of them. Equally importantly, Axion 1.0 is open beyond model weights: we release the complete recipe, including data construction, generation, filtering, verification, prompts, and training code, enabling the entire development process to be reproduced and extended. Axion 1.0 demonstrates that strong agent foundation models can be both open and simple, offering a practical and reproducible path toward advancing open agentic intelligence.",
+      "repoUrl": "https://github.com/bytedance/axion1_0",
+      "needsDataCheck": true,
+      "status": "retry",
+      "reasons": [
+        "Passed the checks, and waiting for the AI budget."
+      ],
+      "checkedAt": "2026-11-06T06:31:04.696Z",
+      "license": "Apache-2.0",
       "runtime": "python3.11"
     }
   }

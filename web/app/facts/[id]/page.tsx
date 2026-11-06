@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { use } from "react";
 import { ClaimNotes } from "@/components/ClaimNotes";
+import { NumberLine } from "@/components/NumberLine";
 import { usePoll } from "@/components/usePoll";
 import { chain } from "@/lib/chain";
 import { citedByText, factsFor } from "@/lib/facts";
@@ -30,10 +31,11 @@ export default function FactPage({ params }: { params: Promise<{ id: string }> }
 
   return (
     <article className="facts fact" style={{ paddingTop: 36 }}>
-      <p className="hint"><Link href="/facts">Verified facts</Link></p>
+      <p className="hint"><Link href="/facts">All results</Link></p>
       <h1 className="page-title">{p.question ?? m.spec.title}</h1>
       <p className={`fact-verdict fact-verdict--${words?.tone}`}>{words?.mark} {words?.words}</p>
-      {words?.reason && <p className="fact-numbers">{words.reason}</p>}
+      {receipts.data && <NumberLine reported={m.spec.reported_value} kind={m.spec.tolerance_kind} margin={m.spec.tolerance_value} measured={measured} tone={words?.tone} noNumber="No number came out of this run" />}
+      {m.outcome === "INVALID" && words?.reason && <p className="fact-numbers">{words.reason}</p>}
       {m.outcome === "REPRODUCED" && <p className="hint">{CHECK_OUT_NOTE}</p>}
 
       {entry ? (
@@ -44,7 +46,7 @@ export default function FactPage({ params }: { params: Promise<{ id: string }> }
           <p className="hint">The text was written by a private AI model on NEAR AI ({entry.model}). The verdict and numbers come straight from the blockchain, and the AI can&apos;t change them.</p>
         </>
       ) : (
-        <p className="hint">The plain-English write-up for this entry hasn&apos;t been written yet. The verdict and numbers above are final.</p>
+        <p className="hint">The write-up for this result is on its way. The verdict and numbers above are final.</p>
       )}
 
       <dl className="fact-table">
@@ -54,11 +56,11 @@ export default function FactPage({ params }: { params: Promise<{ id: string }> }
         </dd>
         <dt>What we got</dt>
         <dd>{measured ?? "No number came out of this run."}</dd>
-        <dt>Whose code</dt>
+        <dt>Whose code ran</dt>
         <dd>{ORIGIN_LABEL[p.origin]}</dd>
-        {cited && (<><dt>Attention</dt><dd>{cited}</dd></>)}
+        {cited && (<><dt>How well known</dt><dd>{cited}</dd></>)}
         <dt>What forecasters thought</dt>
-        <dd>{p.settledShowcase ? "Nobody forecast this one. It was posted as a settled showcase, with the result already known." : `${(m.yes_price_ppm / 10_000).toFixed(0)}% expected it to hold up when forecasting closed. ${PRICE_RULE}`}</dd>
+        <dd>{p.settledShowcase ? "Nobody forecast this one. We posted it with the result already known, to show how a famous paper looks." : `${(m.yes_price_ppm / 10_000).toFixed(0)}% expected it to hold up when forecasting closed. ${PRICE_RULE}`}</dd>
         <dt>Proof</dt>
         <dd>
           {receipt ? <Link href={`/receipt/${m.id}/${receipt.run_index}`}>Read the receipt</Link> : "Reading the receipt…"}{" "}

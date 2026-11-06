@@ -45,7 +45,20 @@ export function verdictWords(outcome: Outcome | null | undefined, reason?: strin
   }
 }
 
-export const CHECK_OUT_NOTE = "The authors' code and data produced the same result. This doesn't prove the study's method is right.";
+export const CHECK_OUT_NOTE = "The code and data produced the same result. That doesn't prove the study's method is right.";
+
+/** "24 hours", "1 minute". */
+export function durationWords(secs: number): string {
+  const [n, unit] = secs < 3600 ? [Math.round(secs / 60), "minute"] : secs < 172_800 ? [Math.round(secs / 3600), "hour"] : [Math.round(secs / 86_400), "day"];
+  return `${n} ${unit}${n === 1 ? "" : "s"}`;
+}
+
+/** What a challenge costs: a share of the pool, with a floor. Mirrors the contract. */
+export function challengeBond(market: Market, config: Config): bigint {
+  const params = market.mode === "money" ? config.money : config.points;
+  const share = (BigInt(market.collateral) * BigInt(params.challenge_bond_bps)) / 10_000n;
+  return share > BigInt(params.challenge_bond_min) ? share : BigInt(params.challenge_bond_min);
+}
 
 /** Who made each change, read from the receipt's on-chain diff headers. */
 export function patchAuthors(excerpt: string): { file: string; kind: string; by: string; why: string }[] {
@@ -230,7 +243,7 @@ export function rangeText(reported: string, kind: string, value: string): string
 }
 
 const OUTCOME_MEANING: Record<Outcome, string> = {
-  REPRODUCED: "The Lab re-ran the authors' code and data and got a number inside the claim's range. YES wins.",
+  REPRODUCED: "The Lab re-ran the code and data and got a number inside the claim's range. YES wins.",
   NOT_REPRODUCED: "The code ran, but the number came out outside the claim's range. NO wins.",
   BROKEN: "The code ran past its time limit. NO wins.",
   INVALID: "The test couldn't be run fairly, for example because the data changed. Every share pays back half.",

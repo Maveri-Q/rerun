@@ -12,10 +12,11 @@ const LINKS = [
   { href: "/how", label: "How it works" },
   { href: "/facts", label: "Verified facts" },
   { href: "/check", label: "Check a paper" },
-  { href: "/portfolio", label: "Portfolio" },
-  { href: "/leaderboard", label: "Leaderboard" },
+  { href: "/scout", label: "The scout" },
   { href: "/lab", label: "The Lab" },
-  { href: "/create", label: "Suggest a paper" },
+  { href: "/leaderboard", label: "Leaderboard" },
+  { href: "/portfolio", label: "My forecasts" },
+  { href: "/create", label: "Suggest" },
 ];
 
 export function Topbar() {

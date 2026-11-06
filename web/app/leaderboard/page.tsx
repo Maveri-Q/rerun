@@ -33,7 +33,6 @@ export default function LeaderboardPage() {
 
       {top.length > 0 && (
         <div className="podium">
-          <div className="receipt-slot podium-slot" aria-hidden="true" />
           <ol className="podium-list">
             {top.map((e, i) => (
               <li key={e.account_id} className={`pod pod--${i + 1}`} style={{ "--i": i } as React.CSSProperties}>
