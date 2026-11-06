@@ -1,0 +1,9 @@
+AI-written report (z-ai/glm-5.3-flash). The outcome was decided by deterministic code, not by this text.
+
+**Reproduction Report (DEMO fixture — not real research)**
+
+The Lab attempted to verify the claim's stated accuracy but declined to run any code, because the dataset no longer matched the spec. Outcome: INVALID (HASH_MISMATCH). The file data/trials.csv has sha256 65cb2675...46b, while the spec pins be35dcd4...9b7d.
+
+Because nothing ran, the reported accuracy of 0.93 was not measured (measured: none; tolerance: absolute 0.02). Runtime was 0 seconds. No environment patches were applied and no repair attempts were made.
+
+The claim alleges the data file was swapped after the market opened; the hash mismatch is consistent with the data differing from what the spec pinned. No verdict on the claim's truth follows. Per the outcome, both sides redeem at 0.5 and the creator's bond is forfeited.

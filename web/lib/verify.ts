@@ -1,7 +1,6 @@
 import { parseDecimal, withinTolerance, type ToleranceKind } from "@rerun/shared/browser";
 import { chain } from "./chain";
 import { evidenceHashIn, lab, type AttestationRecord } from "./lab";
-import { LAB_URL } from "./config";
 import type { Market, Receipt } from "./market";
 import { sha256Hex } from "./seal";
 
@@ -97,16 +96,17 @@ export async function verifyReceipt(market: Market, r: Receipt): Promise<Verific
   } else {
     const same = (await sha256Hex(report)) === r.report_hash;
     const evidenceHash = evidenceHashIn(report);
-    let evidenceOk = true;
-    if (same && evidenceHash) {
-      const res = await fetch(`${LAB_URL}/evidence/${evidenceHash}`).catch(() => null);
-      evidenceOk = res?.ok ? (await sha256Hex(await res.text())) === evidenceHash : false;
+    const evidence = same && evidenceHash ? await lab.evidenceText(evidenceHash) : null;
+    if (same && evidenceHash && evidence === null) {
+      add("The write-up hasn't changed", "warn", "The write-up matches its fingerprint on-chain, but its evidence file couldn't be loaded, so that part can't be shown right now.");
+    } else {
+      const evidenceOk = evidence === null || (await sha256Hex(evidence)) === evidenceHash;
+      add(
+        "The write-up hasn't changed",
+        same && evidenceOk ? "pass" : "fail",
+        same && evidenceOk ? "The write-up and its evidence match the fingerprint recorded on-chain." : "The write-up or its evidence doesn't match the fingerprint recorded on-chain.",
+      );
     }
-    add(
-      "The write-up hasn't changed",
-      same && evidenceOk ? "pass" : "fail",
-      same && evidenceOk ? "The write-up and its evidence match the fingerprint recorded on-chain." : "The write-up or its evidence doesn't match the fingerprint recorded on-chain.",
-    );
   }
 
   return { checks, attestation };

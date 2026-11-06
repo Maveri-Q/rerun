@@ -1,0 +1,9 @@
+AI-written report (z-ai/glm-5.3-flash). The outcome was decided by deterministic code, not by this text.
+
+**Reproduction report (demo fixture — not real research)**
+
+A demonstration script, `reproduce.py`, was run. It originally failed because it pointed to a data file stored at an absolute path on the original author's laptop. One fix was applied: that path was changed to the repository's bundled data file, `data/trials.csv`. No analysis code, data, or numerical behavior was altered — only the file location.
+
+With that single patch, the unchanged analysis ran in 7 seconds and reproduced the result, marked REPRODUCED. The reported accuracy (0.93) matched the measured accuracy (0.93), within the allowed tolerance of ±0.02.
+
+Note: "reproduced" here means the same number came out under the stated conditions. It does not judge whether the underlying science is correct.

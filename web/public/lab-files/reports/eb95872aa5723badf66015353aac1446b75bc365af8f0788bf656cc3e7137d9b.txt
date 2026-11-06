@@ -1,0 +1,7 @@
+AI-written report (z-ai/glm-5.3-flash). The outcome was decided by deterministic code, not by this text.
+
+This was a demo test, not real research. A logistic model predicting trial response was run using the same code and data behind the claim, but the claim's number had been deliberately misreported as 97%. Nothing was patched or repaired beforehand. The code ran in about four seconds, but it measured 93% accuracy, outside the allowed tolerance of one percentage point from the reported 97%.
+
+Across five extra runs the result shifted by more than one point, so it was unstable. An independent AI re-analysis also found 93%, though that check is experimental and may reflect its own error. The claim was not reproduced; this does not confirm or deny the science.
+
+Evidence file sha256: 28ae9919c2ee97c57959bc053348610c5eab30c191bbfe10d2d7974441e8ed4f

@@ -1,0 +1,11 @@
+AI-written report (z-ai/glm-5.3-flash). The outcome was decided by deterministic code, not by this text.
+
+**Reproduction report**
+
+An independent run of the lab's test pipeline was completed using the sample repository from the lab's GitHub account. This is a functional test, not a research claim: the pipeline takes a one-line command as input and writes the number 1, and the lab's measurement step should read that value back.
+
+The reported value was 1. The independently measured value was also 1, matching the reported figure well within the stated tolerance of ±0.1. The outcome is REPRODUCED.
+
+No changes to the software environment were needed, and no repair attempts were made. Total runtime was about one second.
+
+This confirms the test procedure works as described on this sample; it does not independently verify any scientific claim.

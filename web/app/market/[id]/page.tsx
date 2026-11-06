@@ -203,10 +203,10 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
         </section>
 
         <section className="section">
-          {history.data ? <OddsChart points={history.data} /> : <p className="empty dim">Reading how the odds moved…</p>}
+          {origin?.settledShowcase ? <p className="empty">No forecasting on this claim. It was posted with the result already known.</p> : history.data ? <OddsChart points={history.data} /> : <p className="empty dim">Reading how the odds moved…</p>}
         </section>
 
-        <section className="section">
+        {(m.state !== "Final" || stream.events.length > 0) && <section className="section">
           <div className="section-head">
             <h2>Watch the Lab work</h2>
             <span className="dim">{stateLabel(m.state)}</span>
@@ -222,7 +222,7 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
                   : "Waiting for the Lab to pick this up."
             }
           />
-        </section>
+        </section>}
 
         {latestReceipt && (
           <section className="section">

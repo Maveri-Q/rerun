@@ -1,0 +1,9 @@
+AI-written report (z-ai/glm-5.3-flash). The outcome was decided by deterministic code, not by this text.
+
+**Reproduction report — demo fixture (not real research)**
+
+This was a demonstration case, not actual research. The reproduction script ran for 2 seconds and failed immediately: it imports a package called `labtools_internal`, described in the code as the lab's private package that was never published. That package is not in the repository and cannot be installed from any public index, so the environment-repair process could not make the code run.
+
+One repair attempt was made: checking whether the missing package could be obtained or reconstructed. Nothing was installed or changed; rewriting the missing analysis code myself was not allowed, since it could change numeric results.
+
+Outcome: broken. The run failed and could not be repaired. No result was measured (the authors reported 0.9).

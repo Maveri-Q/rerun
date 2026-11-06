@@ -1,0 +1,9 @@
+AI-written report (z-ai/glm-5.3-flash). The outcome was decided by deterministic code, not by this text.
+
+The user wants a short, plain reproduction report, at most 120 words, for a general reader. Use only facts given, plain paragraphs, no markdown or headings. Should say what ran, what was patched, and the result. Note reproduction isn't replication—don't claim true or false.
+
+Content: rebuild on Card and Krueger 1994 public survey data, comparing NJ vs eastern PA fast-food employment after NJ's 1992 minimum wage raise. Reported 2.76 FTE jobs per store relative change; measured 2.7536, tolerance 0.05, so within tolerance — REPRODUCED. Runtime 1 second, no environment patches, no repair attempts, robustness: stayed within 0.05 across 3 extra runs. Also mention rebuild isn't authors' code so mismatch would be inconclusive.
+
+Write plainly, ~100 words.</think>We ran an independent rebuild of the Card and Krueger (1994) study, which compared fast-food restaurants in New Jersey after its 1992 minimum wage rise with those in eastern Pennsylvania. The rebuild used the authors' public survey data but is not their original code, so any mismatch would have ended as inconclusive. The reported change was 2.76 full-time-equivalent jobs per store in New Jersey relative to Pennsylvania; our rebuild measured 2.7536, within the 0.05 tolerance. No environment patches and no repair attempts were needed, and the run took one second. The result stayed within tolerance across three extra runs, so the rebuild is marked REPRODUCED, though this is not a claim the study's conclusion is true or false.
+
+Evidence file sha256: 1d984bfe52c39116e2456139b73c6fcc5b4c377943ea7e281baecc663be3a8c6

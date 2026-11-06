@@ -1,0 +1,5 @@
+AI-written report (z-ai/glm-5.3-flash). The outcome was decided by deterministic code, not by this text.
+
+The claim is a demo fixture, not real research. The released code trains a logistic regression on the synthetic trials dataset and reports 93% test accuracy. I ran it once; the measured accuracy was 0.93, matching the reported 0.93 within the allowed tolerance of 0.02, so the main run reproduced. Runtime was about 4 seconds. No environment patches and no repair attempts were needed. Across five extra robustness runs, the result moved by more than 0.02, so it is less stable between runs. An independent re-implementation using the AI's own analysis also got 0.93, agreeing with the claim. Reproduction confirms the pipeline works as described; it does not establish the underlying science as true or false.
+
+Evidence file sha256: f2b4e929e41b25832f3a17f4359a4e769f45b73da5299b68ce7654481fd415db

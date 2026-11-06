@@ -1,0 +1,5 @@
+AI-written report (z-ai/glm-5.3-flash). The outcome was decided by deterministic code, not by this text.
+
+**Reproduction report (demo fixture — not real research)**
+
+The claim, that a readmission model reaches its reported AUC of 0.94, was tested. The hospital records were synthetic. Data stayed encrypted to the attested Lab and was never revealed; only hashes and the final result left. The measured AUC was 0.937216, within the stated absolute tolerance of 0.03, so the outcome was REPRODUCED. Runtime was 3 seconds. No environment patches and no repair attempts were used. Because the private data was never revealed, nothing can be said about its contents. Reproduction here means the reported number was re-measured within tolerance; it does not establish whether the underlying science is true or false.

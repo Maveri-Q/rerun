@@ -1,0 +1,7 @@
+AI-written report (z-ai/glm-5.3-flash). The outcome was decided by deterministic code, not by this text.
+
+**Reproduction report — NOT_REPRODUCED**
+
+Claim tested: a logistic model predicts trial response with 97% accuracy. The reproduction run used the same code and data. The code ran successfully in 3 seconds, with no environment patches or repair attempts. Measured accuracy was 93%, versus the reported 97%, with an allowed tolerance of 1 percentage point. The 4-point gap exceeds tolerance, so the outcome was NOT_REPRODUCED.
+
+Context: this is a demo fixture, not real research; the reported number was deliberately misreported as 97% for demonstration purposes. A failed reproduction means the reported figure did not match what the code produced when re-run; it does not establish whether the underlying science is true or false.

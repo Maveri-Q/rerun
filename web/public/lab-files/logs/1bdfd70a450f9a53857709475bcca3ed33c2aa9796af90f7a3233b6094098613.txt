@@ -1,0 +1,3 @@
+PA before 23.33 after 21.17 change -2.17
+NJ before 20.44 after 21.03 change 0.59
+nj_minus_pa 2.7536

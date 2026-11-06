@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "note": "Extra evidence. It does not settle the market: only the normal re-run does. The re-implementation is experimental, and a difference does not mean the paper is wrong.",
+  "robustness": {
+    "status": "sensitive",
+    "seed_had_effect": true,
+    "measured": "0.93",
+    "runs": [
+      {
+        "kind": "seed",
+        "label": "Seed shifted by 1",
+        "value": "0.93"
+      },
+      {
+        "kind": "seed",
+        "label": "Seed shifted by 2",
+        "value": "0.895"
+      },
+      {
+        "kind": "seed",
+        "label": "Seed shifted by 3",
+        "value": "0.885"
+      },
+      {
+        "kind": "resample",
+        "label": "Resampled data 1",
+        "value": "0.88"
+      },
+      {
+        "kind": "resample",
+        "label": "Resampled data 2",
+        "value": "0.895"
+      }
+    ]
+  },
+  "reimplementation": {
+    "status": "agrees",
+    "model": "z-ai/glm-5.3-flash",
+    "methods_hash": "7091ebe6da8505056ea988040728dd60d63a7eb4b0338f66ad804b16843ca79a",
+    "value": "0.93",
+    "attempts": 1,
+    "script": "# Re-implementation of a published analysis from its written methods only.\n# Metric to reproduce: classification accuracy on a held-out test set.\n\nimport json\nimport os\n\nimport pandas as pd\nfrom sklearn.linear_model import LogisticRegression\nfrom sklearn.model_selection import train_test_split\nfrom sklearn.metrics import accuracy_score\n\nDATA_PATH = os.path.join(\"/work/repo\", \"data\", \"trials.csv\")\nOUT_PATH = \"reimplementation_result.json\"\n\n# Load data\ndf = pd.read_csv(DATA_PATH)\n\n# Predictors and binary outcome as specified in the methods\nfeature_cols = [\"age\", \"dose\", \"biomarker\"]\nX = df[feature_cols]\ny = df[\"response\"]\n\n# Hold out 25% of rows at random for testing, seed 42.\n# Standard choice: train_test_split with test_size=0.25, shuffle=True (default),\n# no stratification (not mentioned in the methods).\nX_train, X_test, y_train, y_test = train_test_split(\n    X, y, test_size=0.25, random_state=42\n)\n\n# Logistic regression with scikit-learn default settings, max_iter=1000.\nmodel = LogisticRegression(max_iter=1000)\nmodel.fit(X_train, y_train)\n\n# Classification accuracy on the held-out rows\ny_pred = model.predict(X_test)\naccuracy = accuracy_score(y_test, y_pred)\n\nwith open(OUT_PATH, \"w\") as f:\n    json.dump({\"value\": accuracy}, f)",
+    "script_hash": "6688cd0310fab89193fbcb56bcb6edb55d5b4a45010389c6b6d7d35a0566fc31"
+  }
+}

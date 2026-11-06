@@ -8,10 +8,10 @@ import { usePoll } from "@/components/usePoll";
 import { APP_NAME } from "@rerun/shared/browser";
 import { VerifiedPanel } from "@/components/VerifiedPanel";
 import { chain } from "@/lib/chain";
-import { accountLink, CONTRACT, LAB_URL } from "@/lib/config";
-import { lab } from "@/lib/lab";
+import { accountLink, CONTRACT } from "@/lib/config";
+import { lab, labFileHref } from "@/lib/lab";
 import { Hint } from "@/components/Hint";
-import { CHECK_OUT_NOTE, outcomeMeaning, patchAuthors, rangeText, verdictWords } from "@/lib/market";
+import { CHECK_OUT_NOTE, outcomeMeaning, patchAuthors, rangeText, verdictWords, readableReport } from "@/lib/market";
 
 const when = (t: number) => new Date(t * 1000).toLocaleString();
 
@@ -81,10 +81,17 @@ export default function ReceiptPage({ params }: { params: Promise<{ market: stri
         <VerifiedPanel market={m} receipt={r} />
         <section>
           <h2>The write-up</h2>
-          {report.data ? <div className="report">{report.data}</div> : <p className="dim">The write-up isn't available right now. Its fingerprint is below.</p>}
+          {report.data ? (
+            <>
+              <div className="report">{readableReport(report.data).text}</div>
+              {readableReport(report.data).trimmed && <p className="hint">The stored file also holds the AI&apos;s working notes, which are left out here. The fingerprint below covers the whole file.</p>}
+            </>
+          ) : (
+            <p className="dim">The write-up isn&apos;t available right now. Its fingerprint is below.</p>
+          )}
           {r.patches.length > 0 && (
             <>
-              <h3 style={{ marginTop: 24 }}>Setup fixes the AI made</h3>
+              <h3 style={{ marginTop: 24 }}>Setup changes, and who made them</h3>
               <ul className="patch-list">
                 {patchAuthors(r.patches_diff_excerpt).map((p, i) => (
                   <li key={i}>
@@ -136,11 +143,11 @@ export default function ReceiptPage({ params }: { params: Promise<{ market: stri
           <dd>{r.nearai.response_signature_refs.join(", ") || "None"}</dd>
           <dt>Log fingerprint</dt>
           <dd>
-            {r.full_log_uri ? <a href={`${LAB_URL}/logs/${r.log_hash}`}>{r.log_hash}</a> : r.log_hash}
+            {r.full_log_uri ? <a href={labFileHref("logs", r.log_hash)}>{r.log_hash}</a> : r.log_hash}
           </dd>
           <dt>Write-up fingerprint</dt>
           <dd>
-            <a href={`${LAB_URL}/reports/${r.report_hash}`}>{r.report_hash}</a>
+            <a href={labFileHref("reports", r.report_hash)}>{r.report_hash}</a>
           </dd>
         </dl>
         {r.log_tail ? (

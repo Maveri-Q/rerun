@@ -123,6 +123,24 @@ export function isNetworkFailure(log: string): boolean {
 
 // The model's hidden reasoning counts against this, so it needs far more room than the 120-word report.
 const REPORT_MAX_TOKENS = 5000;
+/** The report's limit is 120 words, so anything far past it is the AI's notes or noise, not a report. */
+const REPORT_MAX_CHARS = 1500;
+
+/**
+ * The report from a structured reply, or "" if it isn't usable, which falls back to the plain summary.
+ * Without a format, glm-5.3-flash writes its thinking into the answer, and with one but no mention of JSON
+ * in the prompt it can return noise. A plain reply, which only the scripted test AI sends, is used as it is.
+ */
+export function reportFromReply(reply: string): string {
+  if (!reply.trimStart().startsWith("{")) return reply;
+  try {
+    const { report } = parseJsonReply(reply) as { report?: unknown };
+    if (typeof report !== "string" || report.length > REPORT_MAX_CHARS || /[\u2E80-\uFFEF]/.test(report)) return "";
+    return report;
+  } catch {
+    return "";
+  }
+}
 
 class Stop extends Error {
   constructor(
@@ -515,18 +533,19 @@ async function writeReport(a: {
     .join("\n");
   let body: string;
   try {
-    body = await a.model.ask(
+    body = reportFromReply(await a.model.ask(
       "report",
       [
         {
           role: "system",
           content:
-            "Write a short, plain reproduction report (at most 120 words) for a general reader: what ran, what was patched, and the result. Use only the facts given, in plain paragraphs with no markdown or headings. Reproduction is not replication: do not claim the science is true or false.",
+            "Reply with one JSON object and nothing else: {\"report\": \"the report\"}. Write a short, plain reproduction report (at most 120 words) for a general reader: what ran, what was patched, and the result. Use only the facts given, in plain paragraphs with no markdown or headings. Reproduction is not replication: do not claim the science is true or false.",
         },
         { role: "user", content: facts },
       ],
       REPORT_MAX_TOKENS, // reasoning tokens count against this
-    );
+      JSON_OBJECT_FORMAT,
+    ));
   } catch (e) {
     if (e instanceof ModelVerificationError) throw e;
     body = "";

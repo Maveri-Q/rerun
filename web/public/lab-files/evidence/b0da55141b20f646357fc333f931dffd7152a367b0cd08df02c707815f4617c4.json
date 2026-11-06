@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "note": "Extra evidence. It does not settle the market: only the normal re-run does. The re-implementation is experimental, and a difference does not mean the paper is wrong.",
+  "robustness": {
+    "status": "sensitive",
+    "seed_had_effect": true,
+    "measured": "0.93",
+    "runs": [
+      {
+        "kind": "seed",
+        "label": "Seed shifted by 1",
+        "value": "0.93"
+      },
+      {
+        "kind": "seed",
+        "label": "Seed shifted by 2",
+        "value": "0.895"
+      },
+      {
+        "kind": "seed",
+        "label": "Seed shifted by 3",
+        "value": "0.885"
+      },
+      {
+        "kind": "resample",
+        "label": "Resampled data 1",
+        "value": "0.88"
+      },
+      {
+        "kind": "resample",
+        "label": "Resampled data 2",
+        "value": "0.895"
+      }
+    ]
+  },
+  "reimplementation": {
+    "status": "agrees",
+    "model": "z-ai/glm-5.3-flash",
+    "methods_hash": "7091ebe6da8505056ea988040728dd60d63a7eb4b0338f66ad804b16843ca79a",
+    "value": "0.93",
+    "attempts": 1,
+    "script": "\"\"\"\nReimplementation of the described analysis:\n\n- Predict binary outcome `response` from age, dose, biomarker.\n- Logistic regression via scikit-learn with default settings, max_iter=1000.\n- Hold out 25% of rows at random for testing using train_test_split with\n  random_state=42, fit on the remainder.\n- Report classification accuracy on the held-out rows.\n\nStandard choices made where the methods are open:\n- train_test_split is used with its defaults for shuffle=True and\n  stratify=None (methods only specify the 25% holdout and seed 42).\n- LogisticRegression defaults are kept (C=1.0, penalty='l2', lbfgs solver);\n  only max_iter is set to 1000, as stated.\n- Accuracy is computed with sklearn.metrics.accuracy_score on the test rows.\n\"\"\"\n\nimport json\n\nimport pandas as pd\nfrom sklearn.linear_model import LogisticRegression\nfrom sklearn.metrics import accuracy_score\nfrom sklearn.model_selection import train_test_split\n\n# Load the data\ndf = pd.read_csv(\"data/trials.csv\")\n\n# Predictors and binary outcome as described\nfeature_cols = [\"age\", \"dose\", \"biomarker\"]\nX = df[feature_cols]\ny = df[\"response\"]\n\n# 25% of rows held out at random, seed 42 (scikit-learn train_test_split)\nX_train, X_test, y_train, y_test = train_test_split(\n    X, y, test_size=0.25, random_state=42\n)\n\n# Logistic regression, default settings, up to 1000 iterations\nmodel = LogisticRegression(max_iter=1000)\nmodel.fit(X_train, y_train)\n\n# Classification accuracy on the held-out rows\ny_pred = model.predict(X_test)\naccuracy = accuracy_score(y_test, y_pred)\n\nwith open(\"reimplementation_result.json\", \"w\") as f:\n    json.dump({\"value\": float(accuracy)}, f)",
+    "script_hash": "8c9d395c034780afe2357cbb5b4f1c7fa8009f4a62e945c9c57450ae46158dde"
+  }
+}

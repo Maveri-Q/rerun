@@ -1,0 +1,721 @@
+{
+  "lastScanAt": "2026-11-06T03:23:48.762Z",
+  "draftsByDay": {
+    "2026-11-06": 6
+  },
+  "candidates": {
+    "rescience:10.5281_zenodo.20613595": {
+      "id": "rescience:10.5281_zenodo.20613595",
+      "source": "ReScience C",
+      "title": "[Re] Computational Modelling of Glucose Uptake by SGLT1 and Apical GLUT2 in the Enterocyte",
+      "paperUrl": "https://doi.org/10.5281/zenodo.20613595",
+      "repoUrl": null,
+      "status": "rejected",
+      "reasons": [
+        "It doesn't link to a GitHub repository, which the Lab needs."
+      ],
+      "checkedAt": "2026-11-05T06:19:31.782Z"
+    },
+    "rescience:10.5281_zenodo.18401497": {
+      "id": "rescience:10.5281_zenodo.18401497",
+      "source": "ReScience C",
+      "title": "[Re] A Reservoir Computing Model of Reward-Modulated Motor Learning and Automaticity",
+      "paperUrl": "https://doi.org/10.5281/zenodo.18401497",
+      "repoUrl": "https://github.com/rsankar9/Reimplementation-SUPERTREX",
+      "status": "rejected",
+      "reasons": [
+        "GitHub can't identify an open licence."
+      ],
+      "checkedAt": "2026-11-05T06:19:31.782Z",
+      "license": null,
+      "runtime": "python3.11"
+    },
+    "rescience:10.5281_zenodo.14941471": {
+      "id": "rescience:10.5281_zenodo.14941471",
+      "source": "ReScience C",
+      "title": "[Re] When Does Label Smoothing Help?",
+      "paperUrl": "https://doi.org/10.5281/zenodo.14941471",
+      "repoUrl": "https://github.com/sdwagner/re-labelsmoothing",
+      "status": "rejected",
+      "reasons": [
+        "Depends on pytorch, which usually needs a graphics card. The Lab only has CPUs."
+      ],
+      "checkedAt": "2026-11-05T06:19:31.782Z",
+      "license": "BSD-3-Clause",
+      "runtime": "python3.11"
+    },
+    "rescience:10.5281_zenodo.13627804": {
+      "id": "rescience:10.5281_zenodo.13627804",
+      "source": "ReScience C",
+      "title": "[$\\\\sim$Re] Exploration in Model-based Reinforcement Learning by Empirically Estimating Learning Progress",
+      "paperUrl": "https://doi.org/10.5281/zenodo.13627804",
+      "repoUrl": "https://github.com/AugustinChrtn/Reproduction",
+      "status": "rejected",
+      "reasons": [
+        "The repository is 470 MB, too big to re-run quickly."
+      ],
+      "checkedAt": "2026-11-05T06:19:31.782Z",
+      "license": "MIT",
+      "runtime": "python3.11"
+    },
+    "rescience:10.5281_zenodo.11077385": {
+      "id": "rescience:10.5281_zenodo.11077385",
+      "source": "ReScience C",
+      "title": "[Re] An anatomically constrained neural network model of fear conditioning",
+      "paperUrl": "https://doi.org/10.5281/zenodo.11077385",
+      "repoUrl": null,
+      "status": "rejected",
+      "reasons": [
+        "It doesn't link to a GitHub repository, which the Lab needs."
+      ],
+      "checkedAt": "2026-11-05T06:19:31.782Z"
+    },
+    "rescience:10.5281_zenodo.6801765": {
+      "id": "rescience:10.5281_zenodo.6801765",
+      "source": "ReScience C",
+      "title": "[Re] A Multi-Functional Synthetic Gene Network",
+      "paperUrl": "https://doi.org/10.5281/zenodo.6801765",
+      "repoUrl": "https://github.com/baioc/re-multif",
+      "status": "rejected",
+      "reasons": [
+        "Mostly MATLAB. The Lab only runs Python and R."
+      ],
+      "checkedAt": "2026-11-05T06:19:31.782Z",
+      "license": "CC-BY-4.0",
+      "runtime": null
+    },
+    "rescience:10.5281_zenodo.6546488": {
+      "id": "rescience:10.5281_zenodo.6546488",
+      "source": "ReScience C",
+      "title": "[Re] Reproductive pair correlations and the clustering of organisms",
+      "paperUrl": "https://doi.org/10.5281/zenodo.6546488",
+      "repoUrl": "https://github.com/CoraliePicoche/brownian_bug_fluid",
+      "status": "rejected",
+      "reasons": [
+        "Mostly C++. The Lab only runs Python and R."
+      ],
+      "checkedAt": "2026-11-05T06:19:31.782Z",
+      "license": "GPL-3.0",
+      "runtime": null
+    },
+    "rescience:10.5281_zenodo.6255131": {
+      "id": "rescience:10.5281_zenodo.6255131",
+      "source": "ReScience C",
+      "title": "[Re] Effective Program Debloating via Reinforcement Learning",
+      "paperUrl": "https://doi.org/10.5281/zenodo.6255131",
+      "repoUrl": null,
+      "status": "rejected",
+      "reasons": [
+        "It doesn't link to a GitHub repository, which the Lab needs."
+      ],
+      "checkedAt": "2026-11-05T06:19:31.782Z"
+    },
+    "rescience:10.5281_zenodo.5657320": {
+      "id": "rescience:10.5281_zenodo.5657320",
+      "source": "ReScience C",
+      "title": "[Re] Context-Dependent Encoding of Fear and Extinction Memories in a Large-Scale Network Model of the Basal Amygdala",
+      "paperUrl": "https://doi.org/10.5281/zenodo.5657320",
+      "repoUrl": "https://github.com/tawantayron/RE-Fear-and-extinction-in-a-BA-net-model",
+      "status": "retry",
+      "reasons": [
+        "The AI draft failed: reply contains no JSON object"
+      ],
+      "checkedAt": "2026-11-05T06:20:35.898Z",
+      "license": "GPL-3.0",
+      "runtime": "python3.11"
+    },
+    "rescience:10.5281_zenodo.5379631": {
+      "id": "rescience:10.5281_zenodo.5379631",
+      "source": "ReScience C",
+      "title": "[Re] Spread of alpha-synuclein pathology through the brain connectome is modulated by selective vulnerability and predicted by network analysis",
+      "paperUrl": "https://doi.org/10.5281/zenodo.5379631",
+      "repoUrl": "https://github.com/MathieuBo/PathoSpreading",
+      "status": "retry",
+      "reasons": [
+        "The AI draft failed: Expected property name or '}' in JSON at position 1 (line 1 column 2)"
+      ],
+      "checkedAt": "2026-11-05T06:20:35.898Z",
+      "license": "MIT",
+      "runtime": "python3.11"
+    },
+    "rescience:10.5281_zenodo.5347786": {
+      "id": "rescience:10.5281_zenodo.5347786",
+      "source": "ReScience C",
+      "title": "[Re] Spatial constraints",
+      "paperUrl": "https://doi.org/10.5281/zenodo.5347786",
+      "repoUrl": "https://github.com/sje30/rescience-hor",
+      "status": "rejected",
+      "reasons": [
+        "GitHub can't identify an open licence."
+      ],
+      "checkedAt": "2026-11-05T06:20:35.898Z",
+      "license": "NOASSERTION",
+      "runtime": "r4.4"
+    },
+    "rescience:10.5281_zenodo.5234931": {
+      "id": "rescience:10.5281_zenodo.5234931",
+      "source": "ReScience C",
+      "title": "[Re] Three-dimensional wake topology and propulsive performance of low-aspect-ratio pitching-rolling plates",
+      "paperUrl": "https://doi.org/10.5281/zenodo.5234931",
+      "doi": "10.5281/zenodo.5234931",
+      "repoUrl": "https://github.com/barbagroup/petibm-rollingpitching",
+      "status": "rejected",
+      "reasons": [
+        "Open licence: BSD-3-Clause.",
+        "Mostly Python (94% of the code).",
+        "No sign it needs a graphics card.",
+        "Small enough to re-run.",
+        "The AI couldn't find one clear number to check, and how to produce it."
+      ],
+      "checkedAt": "2026-11-05T12:11:12.014Z",
+      "license": "BSD-3-Clause",
+      "runtime": "python3.11"
+    },
+    "rescience:10.5281_zenodo.5217602": {
+      "id": "rescience:10.5281_zenodo.5217602",
+      "source": "ReScience C",
+      "title": "[Re] On the Relationship between Self-Attention and Convolutional Layers",
+      "paperUrl": "https://doi.org/10.5281/zenodo.5217602",
+      "repoUrl": "https://github.com/NishantPrabhu/Self-Attention-and-Convolutions",
+      "status": "rejected",
+      "reasons": [
+        "GitHub can't identify an open licence."
+      ],
+      "checkedAt": "2026-11-05T06:20:35.898Z",
+      "license": null,
+      "runtime": "python3.11"
+    },
+    "rescience:10.5281_zenodo.5006005": {
+      "id": "rescience:10.5281_zenodo.5006005",
+      "source": "ReScience C",
+      "title": "[Re] Modeling Insect Phenology Using Ordinal Regression and Continuation Ratio Models",
+      "paperUrl": "https://doi.org/10.5281/zenodo.5006005",
+      "doi": "10.5281/zenodo.5006005",
+      "repoUrl": "https://github.com/pboesu/replication_candy_1991",
+      "status": "retry",
+      "reasons": [
+        "Passed the checks, and waiting for the AI budget."
+      ],
+      "checkedAt": "2026-11-06T03:23:48.762Z",
+      "license": "CC-BY-4.0",
+      "runtime": "r4.4"
+    },
+    "rescience:10.5281_zenodo.4836230": {
+      "id": "rescience:10.5281_zenodo.4836230",
+      "source": "ReScience C",
+      "title": "[Re] Speedup Graph Processing by Graph Ordering",
+      "paperUrl": "https://doi.org/10.5281/zenodo.4836230",
+      "repoUrl": "https://github.com/lecfab/rescience-gorder",
+      "status": "rejected",
+      "reasons": [
+        "Mostly C++. The Lab only runs Python and R."
+      ],
+      "checkedAt": "2026-11-05T06:20:35.898Z",
+      "license": "MIT",
+      "runtime": null
+    },
+    "rescience:10.5281_zenodo.4655870": {
+      "id": "rescience:10.5281_zenodo.4655870",
+      "source": "ReScience C",
+      "title": "[Re] A Neurodynamical Model for Working Memory",
+      "paperUrl": "https://doi.org/10.5281/zenodo.4655870",
+      "doi": "10.5281/zenodo.4655870",
+      "repoUrl": "https://github.com/theoboraud/JaegerESN",
+      "status": "retry",
+      "reasons": [
+        "Passed the checks, and waiting for the AI budget."
+      ],
+      "checkedAt": "2026-11-06T03:23:48.762Z",
+      "license": "BSD-3-Clause",
+      "runtime": "python3.11"
+    },
+    "arxiv:2611.00617": {
+      "id": "arxiv:2611.00617",
+      "source": "Hugging Face Papers",
+      "title": "Words Caught in the Heart: Simulating Person-Specific Expression for Self-Opaque Clients in Psychotherapy",
+      "paperUrl": "https://arxiv.org/abs/2611.00617",
+      "doi": "10.48550/arXiv.2611.00617",
+      "upvotes": 70,
+      "repoUrl": "https://github.com/whunextgen/Pandora",
+      "needsDataCheck": true,
+      "status": "rejected",
+      "reasons": [
+        "GitHub can't identify an open licence."
+      ],
+      "checkedAt": "2026-11-05T07:42:39.747Z",
+      "license": null,
+      "runtime": "python3.11"
+    },
+    "arxiv:2611.03424": {
+      "id": "arxiv:2611.03424",
+      "source": "Hugging Face Papers",
+      "title": "IdeaTaste: Do LLMs Share the Research Taste of Human Researchers?",
+      "paperUrl": "https://arxiv.org/abs/2611.03424",
+      "doi": "10.48550/arXiv.2611.03424",
+      "upvotes": 46,
+      "repoUrl": "https://github.com/cxcscmu/IdeaTaste",
+      "needsDataCheck": true,
+      "status": "rejected",
+      "reasons": [
+        "Open licence: MIT.",
+        "Mostly Python (100% of the code).",
+        "No sign it needs a graphics card.",
+        "Small enough to re-run.",
+        "The AI couldn't find one clear number to check, and how to produce it."
+      ],
+      "checkedAt": "2026-11-05T07:42:39.747Z",
+      "license": "MIT",
+      "runtime": "python3.11"
+    },
+    "arxiv:2611.06483": {
+      "id": "arxiv:2611.06483",
+      "source": "Hugging Face Papers",
+      "title": "What Does Multi-Turn Reinforcement Learning Really Improve in LLM Agents?",
+      "paperUrl": "https://arxiv.org/abs/2611.06483",
+      "doi": "10.48550/arXiv.2611.06483",
+      "upvotes": 14,
+      "repoUrl": "https://github.com/GaryStack/Rethinking-Agent-RL",
+      "needsDataCheck": true,
+      "status": "rejected",
+      "reasons": [
+        "Open licence: MIT.",
+        "Mostly Python (100% of the code).",
+        "No sign it needs a graphics card.",
+        "Small enough to re-run.",
+        "The AI couldn't find one clear number to check, and how to produce it."
+      ],
+      "checkedAt": "2026-11-05T07:42:39.747Z",
+      "license": "MIT",
+      "runtime": "python3.11"
+    },
+    "arxiv:2610.41574": {
+      "id": "arxiv:2610.41574",
+      "source": "Hugging Face Papers",
+      "title": "BYOD: Build Your Own DLM - Efficient Autoregressive-to-Diffusion Language Model Conversion",
+      "paperUrl": "https://arxiv.org/abs/2610.41574",
+      "doi": "10.48550/arXiv.2610.41574",
+      "upvotes": 10,
+      "repoUrl": "https://github.com/RuurdKuiper/BYOD",
+      "needsDataCheck": true,
+      "status": "rejected",
+      "reasons": [
+        "Depends on cuda, which usually needs a graphics card. The Lab only has CPUs."
+      ],
+      "checkedAt": "2026-11-05T07:42:39.747Z",
+      "license": "MIT",
+      "runtime": "python3.11"
+    },
+    "arxiv:2610.32878": {
+      "id": "arxiv:2610.32878",
+      "source": "Hugging Face Papers",
+      "title": "Advancing SVD-based LLM Compression via Layer-Wise Error Model Search",
+      "paperUrl": "https://arxiv.org/abs/2610.32878",
+      "doi": "10.48550/arXiv.2610.32878",
+      "upvotes": 5,
+      "repoUrl": "https://github.com/lems-svd/lems",
+      "needsDataCheck": true,
+      "status": "rejected",
+      "reasons": [
+        "GitHub can't identify an open licence.",
+        "Depends on torch, which usually needs a graphics card. The Lab only has CPUs."
+      ],
+      "checkedAt": "2026-11-05T07:42:39.747Z",
+      "license": null,
+      "runtime": "python3.11"
+    },
+    "arxiv:2611.03097": {
+      "id": "arxiv:2611.03097",
+      "source": "Hugging Face Papers",
+      "title": "DR Pixel: Page-Native Deep Research with Vision-Language Models",
+      "paperUrl": "https://arxiv.org/abs/2611.03097",
+      "doi": "10.48550/arXiv.2611.03097",
+      "upvotes": 5,
+      "abstract": "Complex documents such as scientific papers contain rich information in tables, figures, and equations; however, existing deep research (DR) agents typically reduce papers to OCR-extracted text. We instead ask whether vision-language models (VLMs) can enable page-native deep research: directly retrieving and reasoning over rendered document page images. We introduce DR Pixel, the first open-source end-to-end multimodal DR agent that uses rendered page images as its sole retrieval and reasoning unit, operating over a corpus of 1.06M pages. To evaluate this setting, we construct DRPixelBench, a benchmark on scientific papers requiring reasoning over text, figures, tables, and equations. Surprisingly, page-native DR already works well without training, outperforming OCR-based baselines across state-of-the-art models like GPT-5.4, Gemini-3.5-Flash, and Qwen3.6-27B, while requiring fewer tool calls. We next turn to DR training. A key challenge is that teacher trajectories for agentic supervised finetuning are noisy, mixing critical reasoning and action steps with redundant or failed attempts. To address this, we introduce counterfactual credit reweighting, a fine-grained credit assignment method that weights individual reasoning and action steps by their counterfactual contribution to the final answer. Our training improves retrieval recall by about 15 points and final accuracy by over 10 points on DRPixelBench, and likewise outperforms the untrained baseline on four existing benchmarks. On out-of-distribution ViDoRe-V3, DR Pixel comes within 1.8 points of an oracle that is given the gold pages directly. Our results suggest that the conventional OCR-then-retrieve pipeline is not only unnecessary but suboptimal: directly retrieving and reasoning over visual document pages makes complex DR both more effective and more efficient.",
+      "repoUrl": "https://github.com/StarTrail-org/DRPixel",
+      "needsDataCheck": true,
+      "status": "rejected",
+      "reasons": [
+        "Open licence: Apache-2.0.",
+        "Mostly Python (100% of the code).",
+        "No sign it needs a graphics card.",
+        "Small enough to re-run.",
+        "The AI couldn't find one clear number to check, and how to produce it."
+      ],
+      "checkedAt": "2026-11-05T12:11:12.014Z",
+      "license": "Apache-2.0",
+      "runtime": "python3.11"
+    },
+    "arxiv:2611.00053": {
+      "id": "arxiv:2611.00053",
+      "source": "Hugging Face Papers",
+      "title": "SIMIT: Self-Improving Vision-Language Models via Imagination at Test-Time",
+      "paperUrl": "https://arxiv.org/abs/2611.00053",
+      "doi": "10.48550/arXiv.2611.00053",
+      "upvotes": 5,
+      "repoUrl": "https://github.com/monurcan/simit_paper",
+      "needsDataCheck": true,
+      "status": "rejected",
+      "reasons": [
+        "Depends on torch, which usually needs a graphics card. The Lab only has CPUs."
+      ],
+      "checkedAt": "2026-11-05T07:42:39.747Z",
+      "license": "Apache-2.0",
+      "runtime": "python3.11"
+    },
+    "arxiv:2610.39639": {
+      "id": "arxiv:2610.39639",
+      "source": "Hugging Face Papers",
+      "title": "Where Do Vision Language Models Fail at 3D Reasoning?",
+      "paperUrl": "https://arxiv.org/abs/2610.39639",
+      "doi": "10.48550/arXiv.2610.39639",
+      "upvotes": 4,
+      "repoUrl": "https://github.com/leduckhai/BedBench",
+      "needsDataCheck": true,
+      "status": "rejected",
+      "reasons": [
+        "Depends on torch, which usually needs a graphics card. The Lab only has CPUs."
+      ],
+      "checkedAt": "2026-11-05T07:42:39.747Z",
+      "license": "Apache-2.0",
+      "runtime": "python3.11"
+    },
+    "arxiv:2611.04634": {
+      "id": "arxiv:2611.04634",
+      "source": "Hugging Face Papers",
+      "title": "VeriSpoof: Beyond Real or Fake with One Audio LLM",
+      "paperUrl": "https://arxiv.org/abs/2611.04634",
+      "doi": "10.48550/arXiv.2611.04634",
+      "upvotes": 5,
+      "abstract": "A speech deepfake detector estimates whether a recording is synthetic, but a forensic analyst also asks which system produced it, whether recordings share a source, and what evidence supports each conclusion. We present VeriSpoof, an audio language model that unifies five tasks with shared weights: deepfake detection, generator attribution (generator, acoustic model and vocoder), recording-condition analysis, synthesized-span localisation, and source verification. Each decision is supported by grounded rationales whose statements can be independently verified. Answers are scored by sentence likelihood, allowing detection and source verification to be thresholded without separate heads. Rationale statements can be checked against waveform measurements, span labels, or generator metadata. Counterfactual examples train decisions to follow the stated evidence. Across the 14 Speech-DF-Arena test sets, VeriSpoof-Plus achieves 2.14% pooled EER, ranking third of 28 systems and first among open-weight systems. VeriSpoof-Base, trained only on official training splits of eight corpora, achieves 4.43% EER, less than half that of the next open-weight detector. With the same weights, VeriSpoof-Plus verifies whether recordings from generators unseen in training share a source at 6.2% EER. Controlled studies show that the audio representation governs detection, the LLM governs recording comparison, and source supervision is necessary for neural-codec fakes. Statement-checkable rationales catch partial fakes missed by one-step answers (99.6% vs. 78.4% on PartialEdit) and determine decisions under edits unseen in training (99.5%). Training updates only 29.7M of 2.85B parameters, fitting a single 24 GB GPU with gradient checkpointing. We release both models, inference code, a demo, and VeriSpoof-Bench, the evaluation suite covering these questions.",
+      "repoUrl": "https://github.com/swagshaw/verispoof",
+      "needsDataCheck": true,
+      "status": "rejected",
+      "reasons": [
+        "Open licence: CC-BY, read from the licence file. Check this one yourself.",
+        "Mostly Python (100% of the code).",
+        "No sign it needs a graphics card.",
+        "Small enough to re-run.",
+        "The AI couldn't find one clear number to check, and how to produce it."
+      ],
+      "checkedAt": "2026-11-06T02:52:30.686Z",
+      "license": "NOASSERTION",
+      "runtime": "python3.11"
+    },
+    "arxiv:2610.36915": {
+      "id": "arxiv:2610.36915",
+      "source": "Hugging Face Papers",
+      "title": "Do We Need an LLM to Know Why Sources Conflict? Decision Models for Knowledge-Conflict Typing in RAG",
+      "paperUrl": "https://arxiv.org/abs/2610.36915",
+      "doi": "10.48550/arXiv.2610.36915",
+      "upvotes": 4,
+      "abstract": "When the sources retrieved for a query disagree, the right response depends on why they disagree: a question with several valid answers, a contested topic, stale information and a false source each call for different behaviour. Cattan et al. (2025) showed that telling a generator the conflict type improves its responses by about 24 points, but that predicting the type is hard even for frontier LLMs. We study whether typed decision models, which return probabilities over fixed options in a single forward pass instead of generating text, can do this classification fast and cheaply. Using the CONFLICTS benchmark and the original paper's prompt verbatim, we evaluate all 11 decision models served by one commercial inference gateway, from 7 providers, against Gemini models on identical inputs. Asked directly, the decision models reach 50.0--67.0% accuracy; 10 of the 11 match or exceed Gemini 2.5 Flash, the paper's model (61.3%), at 4--39x lower billed cost (2 were free) and 2.6--6.0x lower latency. The current Gemini 3.8 Flash (70.0%) is significantly more accurate than 8 of them, but sending each decision model's least confident quarter of queries to it gives a cascade statistically tied with it for 8 of the 11, at 25--37% of its cost. End to end, answers generated with the types of 10 of the 11 follow the expected behaviour as often as with the LLM's types. Decomposing the taxonomy into yes/no questions lowers accuracy for every model, and a repair fitted on one model does not transfer. Pre-specified diagnostics show that dates play no measurable role and that sensitivity to source order varies widely between models. Decision models detect a planted false source less reliably than the LLM as hard labels, but their probabilities still separate planted from clean sources. We release code, prompts and all model outputs at https://github.com/Parv17k/decision-models-conflict-typing.",
+      "repoUrl": "https://github.com/Parv17k/decision-models-conflict-typing",
+      "needsDataCheck": true,
+      "status": "pending",
+      "reasons": [
+        "Open licence: Apache-2.0.",
+        "Mostly Python (76% of the code).",
+        "No sign it needs a graphics card.",
+        "Small enough to re-run.",
+        "The number 67.0 appears in the paper's text, read from https://arxiv.org/pdf/2610.36915."
+      ],
+      "checkedAt": "2026-11-06T03:19:25.593Z",
+      "license": "Apache-2.0",
+      "runtime": "python3.11",
+      "draft": {
+        "repo_url": "https://github.com/Parv17k/decision-models-conflict-typing",
+        "commit": "c5dc2cb8b12a7be45f55715d9c3ee3cdec7ad379",
+        "title": "Tiny AI Models Classify Why Search Results Disagree Nearly as Well as Big LLMs",
+        "statement": "On the CONFLICTS benchmark (406 test queries), 11 small 'decision models' typed why retrieved sources disagree. Asked directly with one choice question, they reached 50.0\u201367.0% accuracy; 10 of 11 matched or beat Gemini 2.5 Flash (61.3%) at far lower cost and latency, while Gemini 3.8 Flash led at 70.0%. Routing each small model's least-confident quarter of queries to Gemini 3.8 Flash tied it for 8 of 11 models at 25\u201337% of the LLM's cost, and downstream answers were as good as with LLM-typed conflicts. Suggested by the scout agent.",
+        "authors": "Parv Khatri, Harshul Jain, Mehak Kapoor, Tanya Sah",
+        "license": "Apache-2.0",
+        "runtime": "python3.11",
+        "setup": [
+          "uv pip install -e '.[dev,plot]'"
+        ],
+        "entrypoint": "uv pip install -e '.[dev,plot]' && bash scripts/download_data.sh && .venv/bin/dmconflict evaluate --split test",
+        "output_path": "runs/comparison_test.md",
+        "extractor_type": "regex",
+        "extractor_expr": "Liquid d1 Ultra \\| (\\d+\\.\\d+) \\[",
+        "metric_name": "accuracy_on_test_split_for_best_decision_model_flat_question",
+        "reported_value": "67.0",
+        "notes": "Eval code re-scores stored JSONL outputs already in the repo, so no API key is needed and reruns are fully deterministic. Requires uv/pip, network for scripts/download_data.sh (CONFLICTS dataset, checksum-verified, Apache-2.0, \u00a9 Google). Statement values are paper-reported ranges; extractor targets the Liquid d1 Ultra row in comparison_test.md.",
+        "question": "Can tiny AI tools figure out why search results disagree as well as giant AI models, but much cheaper and faster?",
+        "topic": "ai",
+        "relatability": 5,
+        "relatability_why": "Everyone gets confusing or contradictory search results, and cheaper conflict detection could make AI answers quicker and less costly."
+      },
+      "attention": {
+        "source": "Hugging Face",
+        "label": "4 upvotes",
+        "value": 4
+      },
+      "interest": 58
+    },
+    "arxiv:2611.04785": {
+      "id": "arxiv:2611.04785",
+      "source": "Hugging Face Papers",
+      "title": "Kierston & KierstonBench: Simulation of Allentown, PA and Evaluation of Language Models in Crime Investigation and Surveillance Tasks",
+      "paperUrl": "https://arxiv.org/abs/2611.04785",
+      "doi": "10.48550/arXiv.2611.04785",
+      "upvotes": 1,
+      "abstract": "Large language models are candidates for collecting and analyzing records in criminal investigations and mass surveillance. Their capability and accuracy in this work cannot currently be measured. Real deployments lack the ground truth needed to score a model's conclusions, and no benchmark evaluates these capabilities in a simulated environment. We present Kierston, a city-scale simulation engine, and KierstonBench, a benchmark that tests these capabilities against known simulated events. Kierston models approximately 125,000 residents of Allentown, Pennsylvania, generating their daily activities and the telecommunications, financial, administrative and license-plate records that surveillance and investigative systems collect about them. These records derive from a common behavioral timeline and are distributed across sources representing separate providers. Models investigate through a restricted records interface, linking observations across sources without access to the underlying simulation. The benchmark comprises 32 task families covering record linkage, routine reconstruction, incident investigation and assessment of deceptive accounts. In an evaluation of sixteen language models, most could not perform records investigation and submitted identifications the records did not support. A small number of frontier models solved most of the tasks and abstained when evidence was insufficient. In some cases these models still fell for common deceptions and assumptions, and none replaced an investigator.",
+      "repoUrl": "https://github.com/Kiz8-Team/kierston-oss",
+      "needsDataCheck": true,
+      "status": "rejected",
+      "reasons": [
+        "Mostly TypeScript. The Lab only runs Python and R."
+      ],
+      "checkedAt": "2026-11-05T12:11:12.014Z",
+      "license": "NOASSERTION",
+      "runtime": null
+    },
+    "arxiv:2611.03747": {
+      "id": "arxiv:2611.03747",
+      "source": "Hugging Face Papers",
+      "title": "Enhancing Stock Market Information Retrieval with Retrieval-Augmented Generation",
+      "paperUrl": "https://arxiv.org/abs/2611.03747",
+      "doi": "10.48550/arXiv.2611.03747",
+      "upvotes": 1,
+      "abstract": "Natural Language Processing (NLP) has been widely applied in financial domains, enabling automated analysis and retrieval of stock market information. However, traditional NLP-based systems often struggle with maintaining contextual accuracy and generating relevant responses in dynamic financial environments. To address these challenges, Retrieval-Augmented Generation (RAG) models have emerged as a powerful solution, combining retrieval-based methods with generative capabilities to enhance response quality. In this study, we present a Retrieval-Augmented Generation (RAG) system designed to generate responses related to stock market information. The system integrates retrieval-based and generative approaches to enhance the accuracy and relevance of financial text generation. To evaluate its effectiveness, we employ the ROUGE metric, specifically ROUGE-1, ROUGE-2, and ROUGE-L, to measure lexical and structural similarity between generated and reference texts. Experimental results on a dataset of 100 stock market-related queries demonstrate high ROUGE scores, indicating strong alignment with reference documents. Additionally, we assess latency to evaluate the system responsiveness, achieving an average response time of 1.16 seconds. These findings confirm that our RAG model is capable of providing accurate and timely stock market insights, making it a promising approach for financial information retrieval.",
+      "repoUrl": "https://github.com/nhunguet/SearchEngine",
+      "needsDataCheck": true,
+      "status": "rejected",
+      "reasons": [
+        "GitHub can't identify an open licence.",
+        "Depends on tensorflow, which usually needs a graphics card. The Lab only has CPUs."
+      ],
+      "checkedAt": "2026-11-05T12:11:12.014Z",
+      "license": null,
+      "runtime": "python3.11"
+    },
+    "rescience:10.5281_zenodo.4617894": {
+      "id": "rescience:10.5281_zenodo.4617894",
+      "source": "ReScience C",
+      "title": "[Re] Drivers of evapotranspiration from boreal wildfires",
+      "paperUrl": "https://doi.org/10.5281/zenodo.4617894",
+      "doi": "10.5281/zenodo.4617894",
+      "repoUrl": "https://github.com/bpbond/ten-years-paper33",
+      "status": "rejected",
+      "reasons": [
+        "Open licence: MIT.",
+        "Mostly Python (93% of the code).",
+        "No sign it needs a graphics card.",
+        "Small enough to re-run.",
+        "The AI couldn't find one clear number to check, and how to produce it."
+      ],
+      "checkedAt": "2026-11-06T03:23:48.762Z",
+      "license": "MIT",
+      "runtime": "python3.11"
+    },
+    "rescience:10.5281_zenodo.4290512": {
+      "id": "rescience:10.5281_zenodo.4290512",
+      "source": "ReScience C",
+      "title": "[Rp] Estimating trends and seasonality in coronary heart disease",
+      "paperUrl": "https://doi.org/10.5281/zenodo.4290512",
+      "doi": "10.5281/zenodo.4290512",
+      "repoUrl": "https://github.com/agbarnett/tenyears",
+      "status": "rejected",
+      "reasons": [
+        "Mostly SAS. The Lab only runs Python and R."
+      ],
+      "checkedAt": "2026-11-06T03:19:25.593Z",
+      "license": "MIT",
+      "runtime": null
+    },
+    "rescience:10.5281_zenodo.4022518": {
+      "id": "rescience:10.5281_zenodo.4022518",
+      "source": "ReScience C",
+      "title": "[Re] Chaos in a Three-Species Food Chain",
+      "paperUrl": "https://doi.org/10.5281/zenodo.4022518",
+      "doi": "10.5281/zenodo.4022518",
+      "repoUrl": "https://github.com/BIO6032/2019_replication_HastingsPowell_1991",
+      "status": "rejected",
+      "reasons": [
+        "Mostly Julia. The Lab only runs Python and R."
+      ],
+      "checkedAt": "2026-11-06T03:19:25.593Z",
+      "license": "MIT",
+      "runtime": null
+    },
+    "arxiv:2611.06728": {
+      "id": "arxiv:2611.06728",
+      "source": "Hugging Face Papers",
+      "title": "Turns Matter: Advancing Streaming Video RL via Turn-Level Credit",
+      "paperUrl": "https://arxiv.org/abs/2611.06728",
+      "doi": "10.48550/arXiv.2611.06728",
+      "upvotes": 124,
+      "abstract": "Streaming video understanding requires models to repeatedly decide whether to respond or continue observing. Recently, Group Relative Policy Optimization (GRPO) has been applied to this setting, with existing approaches emphasizing reward design while retaining a single trajectory-level advantage across turns. Such shared credit can reinforce redundant replies after earlier successes and discourage useful follow-ups after earlier failures. We propose TurnWise, a turn-level GRPO framework that aligns learning with individual streaming decisions. TurnWise addresses the mismatch between trajectory-level feedback and turn-level interaction, promoting informative responses and reducing redundancy. Specifically, turn-level credit assignment uses silence-completed prefix scoring to construct group-relative advantages from each decision's remaining return, separating its learning signal from earlier rewards. Turn-mean policy optimization averages token losses within each turn and then across turns, giving response and waiting decisions equal weight regardless of output length. These complementary designs improve streaming policy learning without a learned critic or additional rollouts. Extensive experiments show our method outperforms prior RL approaches for streaming video understanding.",
+      "repoUrl": "https://github.com/XD111ds/turn-wise-rl",
+      "needsDataCheck": true,
+      "status": "rejected",
+      "reasons": [
+        "GitHub can't identify an open licence.",
+        "Depends on cuda, which usually needs a graphics card. The Lab only has CPUs."
+      ],
+      "checkedAt": "2026-11-06T03:19:25.593Z",
+      "license": null,
+      "runtime": "python3.11"
+    },
+    "suggested:https://github.com/michaelaoash/HAP-RR-git": {
+      "id": "suggested:https://github.com/michaelaoash/HAP-RR-git",
+      "source": "Suggested by a visitor",
+      "title": "michaelaoash/HAP-RR-git",
+      "paperUrl": "https://doi.org/10.1257/aer.100.2.573",
+      "repoUrl": "https://github.com/michaelaoash/HAP-RR-git",
+      "needsDataCheck": true,
+      "status": "rejected",
+      "reasons": [
+        "Turned down by a person: the AI picked 2.2, but the paper's figure is -0.1, and its command and output file were wrong. The checked claim is posted separately.",
+        "Open licence: CC0-1.0.",
+        "Mostly R (100% of the code).",
+        "No sign it needs a graphics card.",
+        "Small enough to re-run.",
+        "The number 2.2 appears in the paper's text, read from https://doi.org/10.3386/w15639."
+      ],
+      "checkedAt": "2026-11-06T03:23:48.762Z",
+      "license": "CC0-1.0",
+      "runtime": "r4.4",
+      "draft": {
+        "repo_url": "https://github.com/michaelaoash/HAP-RR-git",
+        "commit": "b9c34472da97465050780dae5a4dab9ab7c69a63",
+        "title": "Does high government debt slow economic growth?",
+        "statement": "Herndon, Ash, and Pollin reproduced Reinhart and Rogoff's finding that countries with public debt above 90 percent of GDP grow about as fast as countries with less debt. Instead of the negative growth Reinhart and Rogoff reported (-0.1 percent average GDP growth), countries above 90 percent debt had positive average growth of 2.2 percent between 1946 and 2009, meaning high debt does not sharply reduce growth. Suggested by the scout agent.",
+        "authors": "Thomas Herndon, Michael Ash, Robert Pollin",
+        "license": "CC0-1.0",
+        "runtime": "r4.4",
+        "setup": [],
+        "entrypoint": "Rscript RR.R",
+        "output_path": "RR-keycolumns.xlsx",
+        "extractor_type": "regex",
+        "extractor_expr": "\\(RR.correctnew <- with\\(RR, tapply\\(dRGDP, dgcat.lm, mean\\)\\)\\)\\n\\s*\\(0,30\\]\\s+([0-9.]+)",
+        "metric_name": "Average real GDP growth, public debt/GDP above 90 percent, 20 advanced economies, 1946-2009",
+        "reported_value": "2.2",
+        "notes": "Verify RR.R produces Table 3 'Corrected' with the above 90 percent category averaging 2.2 percent real GDP growth.",
+        "question": "Does high government debt slow a country's economic growth?",
+        "topic": "economics",
+        "relatability": 8,
+        "relatability_why": "Government debt levels shape debates over taxes, spending, and job growth that touch most people's lives."
+      }
+    },
+    "suggested:https://github.com/aloisgeyer/female-hurricanes": {
+      "id": "suggested:https://github.com/aloisgeyer/female-hurricanes",
+      "source": "Suggested by a visitor",
+      "title": "aloisgeyer/female-hurricanes",
+      "paperUrl": "https://doi.org/10.1073/pnas.1402786111",
+      "repoUrl": "https://github.com/aloisgeyer/female-hurricanes",
+      "needsDataCheck": true,
+      "status": "rejected",
+      "reasons": [
+        "GitHub can't identify an open licence."
+      ],
+      "checkedAt": "2026-11-06T02:52:30.686Z",
+      "license": null,
+      "runtime": "r4.4"
+    },
+    "suggested:https://github.com/OndrejMarvan/chocolate-nobel-eda": {
+      "id": "suggested:https://github.com/OndrejMarvan/chocolate-nobel-eda",
+      "source": "Suggested by a visitor",
+      "title": "OndrejMarvan/chocolate-nobel-eda",
+      "paperUrl": "https://doi.org/10.1056/NEJMon1211064",
+      "repoUrl": "https://github.com/OndrejMarvan/chocolate-nobel-eda",
+      "needsDataCheck": true,
+      "status": "rejected",
+      "reasons": [
+        "GitHub can't identify an open licence."
+      ],
+      "checkedAt": "2026-11-06T02:52:30.686Z",
+      "license": null,
+      "runtime": "r4.4"
+    },
+    "suggested:https://github.com/laibabasraa-ux/card-krueger-1994-replication": {
+      "id": "suggested:https://github.com/laibabasraa-ux/card-krueger-1994-replication",
+      "source": "Suggested by a visitor",
+      "title": "laibabasraa-ux/card-krueger-1994-replication",
+      "paperUrl": "https://www.jstor.org/stable/2118030",
+      "repoUrl": "https://github.com/laibabasraa-ux/card-krueger-1994-replication",
+      "needsDataCheck": true,
+      "status": "rejected",
+      "reasons": [
+        "No small public dataset in the repository, so the Lab would have nothing to run on."
+      ],
+      "checkedAt": "2026-11-06T02:52:30.686Z",
+      "license": "MIT",
+      "runtime": "r4.4"
+    },
+    "arxiv:2611.04814": {
+      "id": "arxiv:2611.04814",
+      "source": "Hugging Face Papers",
+      "title": "Think Less, Locally: Local Preference Learning for Reasoning Compression",
+      "paperUrl": "https://arxiv.org/abs/2611.04814",
+      "doi": "10.48550/arXiv.2611.04814",
+      "upvotes": 56,
+      "abstract": "Large reasoning models achieve strong performance on challenging tasks, but their long chain-of-thought often incurs substantial inference costs by continuing to deliberate after sufficient information has been obtained. Existing reasoning compression methods primarily operate on reasoning trajectories, paying less attention to the local decision of whether further reasoning is necessary given the current state. We propose LoCo, a local preference learning method for reasoning compression. LoCo detects candidate overthinking states from the model's own traces, freezes the corresponding reasoning prefixes, regenerates shorter verified continuations from the same states, and trains on the resulting state-conditioned preference pairs with DPO. This formulation teaches the model when to continue reasoning and when to conclude, rather than simply encouraging shorter trajectories overall. We construct training data entirely from self-generated mathematical traces and evaluate LoCo on five mathematical and three code generation benchmarks. LoCo reduces completion length by 41.7\\%--45.4\\% on mathematics and 23.4\\%--36.3\\% on code, while maintaining or improving accuracy and achieving the best AUC across all code benchmarks. LoCo consistently improves the accuracy-efficiency trade-off on mathematics and transfers effectively to code generation despite math-only training, demonstrating the cross-domain generality of local preference learning for reasoning compression. The code and model will be publicly released at https://github.com/MuyaoYuan/LoCo.",
+      "repoUrl": "https://github.com/MuyaoYuan/LoCo",
+      "needsDataCheck": true,
+      "status": "retry",
+      "reasons": [
+        "Passed the checks, and waiting for the AI budget."
+      ],
+      "checkedAt": "2026-11-06T03:23:48.762Z",
+      "license": "MIT",
+      "runtime": "python3.11"
+    },
+    "arxiv:2611.05275": {
+      "id": "arxiv:2611.05275",
+      "source": "Hugging Face Papers",
+      "title": "Route Anything: A Study of Model and Policy Routing for General-Purpose AI Systems",
+      "paperUrl": "https://arxiv.org/abs/2611.05275",
+      "doi": "10.48550/arXiv.2611.05275",
+      "upvotes": 85,
+      "abstract": "Artificial general intelligence (AGI) requires a method that can understand, generate, reason, and act across diverse domains and modalities. Rather than relying on a single model to master every capability, a promising path toward AGI now is to orchestrate a heterogeneous ecosystem of specialized models, tools, and policies (candidates) into a unified AI system. At the heart of this vision lies a fundamental question: how can an AI system dynamically select and coordinate the most capable candidate for each task while balancing performance and computational cost? In this work, we present Route Anything, a unified framework for studying model and policy routing across general-purpose AI systems. We develop a unified theoretical foundation that characterizes optimal routing under quality--cost trade-offs and establishes how the information available to a router determines its attainable performance. To systematically investigate routing across diverse capabilities, we first construct an omni-modal trajectory matrix spanning 25 benchmarks across language understanding, image, video, and speech generation, coding and workplace agents, and robotic manipulation, comprising 374,401 scored runs from 452 candidate configurations. Building on this framework, we train and test different routers to investigate the potential of omni-modal model routing, the capabilities of learned routers, and the conditions under which routing improves efficiency. Our results reveal substantial opportunities for capability orchestration: per-input oracle routing outperforms the best fixed candidate by 5.4 points, and learned routers outperform it by 0.3 points across 16 benchmarks, by 2.1 points on video generation, and by 1.1 points on robot manipulation while using 24% less policy time. More importantly, routing raises efficiency by 8.82x on average compared with the reference model.",
+      "repoUrl": "https://github.com/InfRec-Cardinal/route-anything",
+      "needsDataCheck": true,
+      "status": "rejected",
+      "reasons": [
+        "Depends on torch, which usually needs a graphics card. The Lab only has CPUs."
+      ],
+      "checkedAt": "2026-11-06T03:23:48.762Z",
+      "license": "MIT",
+      "runtime": "python3.11"
+    },
+    "arxiv:2610.00854": {
+      "id": "arxiv:2610.00854",
+      "source": "Hugging Face Papers",
+      "title": "Are Frontier VLM Agents Ready to Be Robot Generalists? An Empirical Study with the Embodied Agent Arena",
+      "paperUrl": "https://arxiv.org/abs/2610.00854",
+      "doi": "10.48550/arXiv.2610.00854",
+      "upvotes": 84,
+      "abstract": "A robot generalist must interpret a scene, act on it, and satisfy every condition of a task. How far do frontier vision-language models (VLMs) meet these demands? We introduce Embodied Agent Arena, evaluating ten VLM agents across Geometry, Spatial Reasoning, Affordance, Task Planning, and Manipulation. Its 1,000 cases combine 32 established sources with GeoProbe, our 168-case benchmark for camera, motion, depth, and scale estimation. A minimal harness leaves task decisions to the model through source-native interfaces. Closed-weight models lead all five domains, whereas open-weight VLMs show useful spatial reasoning but substantially lower planning and manipulation success. Beneath these averages, similar geometric errors conceal different scale and shape distortions, and valid region estimates need not identify usable action points. During execution, agents can achieve early subgoals yet lose object control, bind an action to the wrong receiving region, or stop before the required physical state holds. Additional computation does not uniformly resolve these failures: code repair can restore execution without completing the task, while self-review can reverse correct judgments. Failure costs also differ: the strongest planners concentrate failed-token expenditure in prolonged body-control tasks, whereas other models fail broadly across procedures. Matched traces show how successful recovery uses feedback to restore a missing prerequisite and advance the remaining task.",
+      "repoUrl": "https://github.com/embodied-agent-arena/embodied-agent-arena",
+      "needsDataCheck": true,
+      "status": "rejected",
+      "reasons": [
+        "Depends on pytorch, which usually needs a graphics card. The Lab only has CPUs.",
+        "The repository is 820 MB, too big to re-run quickly."
+      ],
+      "checkedAt": "2026-11-06T03:23:48.762Z",
+      "license": "MIT",
+      "runtime": "python3.11"
+    },
+    "arxiv:2611.02737": {
+      "id": "arxiv:2611.02737",
+      "source": "Hugging Face Papers",
+      "title": "MoviEdit: Long-form Multi-Shot Video Editing Made Easy",
+      "paperUrl": "https://arxiv.org/abs/2611.02737",
+      "doi": "10.48550/arXiv.2611.02737",
+      "upvotes": 74,
+      "abstract": "Long-form multi-shot video editing requires an intended edit to remain coherent across abrupt changes in scene, viewpoint, and subject appearance, while processing substantially longer visual context than conventional single-shot editors. We introduce MoviEdit, an end-to-end framework for scalable long-form multi-shot video editing that jointly addresses the challenges of data, modeling, and evaluation. To provide cross-shot supervision data at scale, we develop automatic data-generation pipelines spanning synchronized multi-view footage, real-world multi-shot videos, and generated multi-shot content, yielding 87K paired editing videos without manual annotation. Architecturally, MoviEdit employs a cascaded bidirectional-autoregressive design: a lightweight bidirectional stage first establishes a globally coherent editing draft over a spatiotemporally compressed representation, which is then autoregressively propagated and refined over the full video. We further introduce MoviEdit-Bench, a dedicated benchmark for systematic evaluation of long-form multi-shot video editing. Extensive experiments show that MoviEdit substantially outperforms existing open-source models and performs on par with industry frontier models across text-guided and image-guided editing. Visit our project page for complete results and to access the benchmark: https://multi-shot-edit.github.io/",
+      "repoUrl": "https://github.com/adobe-research/MoviEdit-Bench",
+      "needsDataCheck": true,
+      "status": "rejected",
+      "reasons": [
+        "GitHub can't identify an open licence.",
+        "Depends on cuda, which usually needs a graphics card. The Lab only has CPUs."
+      ],
+      "checkedAt": "2026-11-06T03:23:48.762Z",
+      "license": "NOASSERTION",
+      "runtime": "python3.11"
+    }
+  }
+}

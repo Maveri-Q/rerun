@@ -1,0 +1,5 @@
+AI-written report (Qwen/Qwen3.8-27B). The outcome was decided by deterministic code, not by this text.
+
+This report covers a demo fixture, not real research. We ran the released code, which trained a logistic regression model on a synthetic trials dataset to predict trial response. No environment patches or repair attempts were applied. The run took about 3 seconds and produced a test accuracy of 0.93, matching the reported 0.93 within the absolute tolerance of 0.02. An independent experimental re-implementation also produced 0.93. Across five extra runs, the accuracy moved by more than 0.02, so the result was not stable under that check. This only reports that the demo code produced the reported number.
+
+Evidence file sha256: 161575e856f5e87ac7b4f9b3cc71105240f3be5d5d1529f80ee23b0cebb22e04

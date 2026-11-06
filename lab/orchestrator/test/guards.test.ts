@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { reportFromReply } from "../src/pipeline/pipeline.ts";
 import { proposeAndApplyRepair, resolveRepoFile, sourceForRepair } from "../src/pipeline/repair.ts";
 import { checkEdit, parseJsonReply, type RepairEdit } from "../src/pipeline/guards.ts";
 
@@ -157,5 +158,16 @@ describe("repairing with the exact code in view", () => {
     const { result, text } = await run("glue.py", "from foo import a\r\nfrom bar import b\r\nrun()\r\n", [{ search: "from foo import a\nfrom bar import b", replace: "from foo2 import a\nfrom bar import b" }]);
     expect(result.rejected).toEqual([]);
     expect(text).toBe("from foo2 import a\r\nfrom bar import b\r\nrun()\r\n");
+  });
+});
+
+describe("the report reply", () => {
+  it("takes the report from a structured reply, and drops one it can't read", () => {
+    expect(reportFromReply('{"report": "It ran."}')).toBe("It ran.");
+    expect(reportFromReply('{"report": 3}')).toBe("");
+    expect(reportFromReply('{"report": "cut off')).toBe("");
+    expect(reportFromReply(JSON.stringify({ report: "notes ".repeat(400) }))).toBe("");
+    expect(reportFromReply(JSON.stringify({ report: "R2 of 0.19 \u5f15 =0" }))).toBe("");
+    expect(reportFromReply("MOCK report")).toBe("MOCK report");
   });
 });

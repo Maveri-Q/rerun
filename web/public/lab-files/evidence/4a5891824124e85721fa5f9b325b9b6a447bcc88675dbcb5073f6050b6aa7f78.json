@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "note": "Extra evidence. It does not settle the market: only the normal re-run does. The re-implementation is experimental, and a difference does not mean the paper is wrong.",
+  "robustness": {
+    "status": "stable",
+    "seed_had_effect": false,
+    "measured": "0.69605221",
+    "runs": [
+      {
+        "kind": "seed",
+        "label": "Seed shifted by 1",
+        "value": "0.69605221"
+      },
+      {
+        "kind": "seed",
+        "label": "Seed shifted by 2",
+        "value": "0.69605221"
+      },
+      {
+        "kind": "seed",
+        "label": "Seed shifted by 3",
+        "value": "0.69605221"
+      }
+    ]
+  },
+  "reimplementation": {
+    "status": "not_attempted",
+    "reason": "This check only handles Python for now."
+  }
+}

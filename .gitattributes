@@ -1,2 +1,4 @@
 * text=auto eol=lf
 *.json text eol=lf
+# Served as published, so their fingerprints keep matching.
+web/public/lab-files/** -text

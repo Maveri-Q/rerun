@@ -51,14 +51,17 @@ export default function Home() {
   const measured = receipts.data?.at(-1)?.measured_value ?? null;
 
   const s = stats.data;
-  const rate = s?.reproduction_rate_bps === null || !s ? "0" : (s.reproduction_rate_bps / 100).toFixed(0);
+  // Only published papers count here. The demo and test claims would make this figure meaningless.
+  const papers = listed.filter((m) => provenanceOf(m.spec.spec_hash));
+  const checked = papers.filter((m) => m.state === "Final" && (m.outcome === "REPRODUCED" || m.outcome === "NOT_REPRODUCED"));
+  const held = checked.filter((m) => m.outcome === "REPRODUCED");
   return (
     <>
       <section className="hero">
         <div className="hero-copy">
           <h1>Will this research hold up?</h1>
           <p className="lede">
-            Many published results don&apos;t. Here you predict which ones will, then an AI lab re-runs the authors&apos; own code and data and prints public proof.
+            Many published results don&apos;t. Here you predict which ones will, then an AI lab re-runs the code and data behind them and prints public proof.
           </p>
           <p className="hero-steps">Predict, we rerun the study, then see the proof and collect.</p>
           <div className="hero-actions">
@@ -73,19 +76,19 @@ export default function Home() {
           <div className="figures">
             <div className="figure">
               <b>
-                <RollingNumber value={`${rate}%`} />
+                <RollingNumber value={markets.data ? `${held.length}/${checked.length}` : "\u2013"} />
               </b>
-              <span>of checked claims held up</span>
+              <span>checked papers held up</span>
             </div>
             <div className="figure">
               <b>
-                <RollingNumber value={String(s?.markets ?? 0)} />
+                <RollingNumber value={markets.data ? String(papers.length) : "\u2013"} />
               </b>
-              <span>claims opened</span>
+              <span>real papers posted</span>
             </div>
             <div className="figure">
               <b>
-                <RollingNumber value={s ? fmtUnits(s.volume_points, 0) : "0"} />
+                <RollingNumber value={s ? fmtUnits(s.volume_points, 0) : "\u2013"} />
               </b>
               <span>points predicted</span>
             </div>
@@ -107,7 +110,7 @@ export default function Home() {
         )}
       </section>
 
-      <PaperTape markets={listed} />
+      <PaperTape markets={[...listed].sort((a, b) => Math.min(rank(a), 1) - Math.min(rank(b), 1) || b.id - a.id)} />
 
       <section className="band">
         <div className="band-inner">

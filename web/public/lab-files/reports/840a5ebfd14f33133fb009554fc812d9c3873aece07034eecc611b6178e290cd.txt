@@ -1,0 +1,9 @@
+AI-written report (z-ai/glm-5.3-flash). The outcome was decided by deterministic code, not by this text.
+
+**Reproduction Report**
+
+This was a demo fixture, not real research. The released code trains a logistic regression model on a synthetic trials dataset, and its documentation reports a test accuracy of 93%.
+
+I ran the code as provided and measured the accuracy myself. The measured value was 0.93, exactly matching the reported 0.93 and comfortably within the allowed tolerance of ±0.02. No changes to the computing environment were needed, and no repairs or fixes were required. The run took about 4 seconds.
+
+The reproduction succeeded. Note that this confirms the code produces the stated number — it does not verify whether the underlying claim or method is scientifically valid.

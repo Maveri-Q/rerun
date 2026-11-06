@@ -11,6 +11,7 @@
     "seed": "tsx seed.ts",
     "post-real": "tsx post-real.ts",
     "facts": "tsx facts.ts",
+    "site-snapshot": "tsx site-snapshot.ts",
     "settle-claim": "tsx settle-claim.ts",
     "verify-claim": "tsx verify-claim.ts",
     "upgrade-contract": "tsx upgrade-contract.ts",

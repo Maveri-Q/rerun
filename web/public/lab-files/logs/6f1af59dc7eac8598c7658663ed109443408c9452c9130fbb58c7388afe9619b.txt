@@ -1,0 +1,27 @@
+R.matlab v3.6.2 (2018-09-26) successfully loaded. See ?R.matlab for help.
+
+Attaching package: ‘R.matlab’
+
+The following objects are masked from ‘package:base’:
+
+    getOption, isOpen
+
+Loading required package: Matrix
+
+Attaching package: ‘expm’
+
+The following object is masked from ‘package:Matrix’:
+
+    expm
+
+Loading required package: viridisLite
+Loading required package: nlme
+This is mgcv 1.9-1. For overview type 'help("mgcv-package")'.
+Warning message:
+In dir.create(savedir, recursive = T) : 'out/processed' already exists
+`geom_smooth()` using formula = 'y ~ x'
+`geom_smooth()` using formula = 'y ~ x'
+`geom_smooth()` using formula = 'y ~ x'
+Warning message:
+Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
+ℹ Please use `linewidth` instead. 

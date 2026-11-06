@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/work/repo/reproduce.py", line 3, in <module>
+    import labtools_internal as lt  # the lab's private package; never published
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ModuleNotFoundError: No module named 'labtools_internal'

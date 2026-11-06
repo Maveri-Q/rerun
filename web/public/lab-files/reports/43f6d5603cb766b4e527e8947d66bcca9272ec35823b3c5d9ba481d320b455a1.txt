@@ -1,0 +1,74 @@
+AI-written report (z-ai/glm-5.3-flash). The outcome was decided by deterministic code, not by this text.
+
+The task: write a short, plain reproduction report (max 120 words) for a general reader: what ran, what was patched, and the result. Use only the facts given, in plain paragraphs, no markdown or headings. Reproduction is not replication: don't claim the science is true or false.
+
+Key facts:
+- DEMO FIXTURE, not real research. Released code trains logistic regression on synthetic trials dataset and reaches reported test accuracy.
+- Outcome: REPRODUCED
+- Finding: measured value within tolerance.
+- Metric accuracy: reported 0.93, measured 0.93, tolerance abs 0.02.
+- Runtime: 4s.
+- Environment patches: none.
+- Repair attempts: none.
+- Robustness: result moved by more than 0.02 across 5 extra runs. Wait — this is interesting. The main run was within tolerance, but robustness check showed the result moving by more than 0.02 across 5 extra runs. Hmm — that suggests instability, but the outcome is still REPRODUCED per the finding. I should report both facts without interpretation beyond what's given? I should include it faithfully. Note: I shouldn't overinterpret. Just state it.
+- Independent re-implementation (experimental): AI's own analysis got 0.93, agreeing with the claim.
+
+Also must note it's a demo fixture, not real research.
+
+Word count: max 120 words. Plain paragraphs, no markdown. No headings.
+
+Draft:
+
+"This was a demonstration fixture, not real research. The released code trains a logistic regression on a synthetic trials dataset and reaches the reported test accuracy. The reproduction ran that code, took 4 seconds, and needed no environment patches or repair attempts. Accuracy was reported as 0.93 and measured as 0.93, within the allowed tolerance of plus or minus 0.02, so the outcome is recorded as reproduced. An experimental independent re-implementation by the AI's own analysis also got 0.93, agreeing with the claim. However, in a robustness check across five extra runs, the result moved by more than 0.02. Reproduction confirms the code produces the reported number; it does not establish whether the underlying science is true or false."
+
+Count words: Let me count.
+
+"This(1) was(2) a(3) demonstration(4) fixture(5), not(6) real(7) research(8). The(9) released(10) code(11) trains(12) a(13) logistic(14) regression(15) on(16) a(17) synthetic(18) trials(19) dataset(20) and(21) reaches(22) the(23) reported(24) test(25) accuracy(26). The(27) reproduction(28) ran(29) that(30) code(31), took(32) 4(33) seconds(34), and(35) needed(36) no(37) environment(38) patches(39) or(40) repair(41) attempts(42). Accuracy(43) was(44) reported(45) as(46) 0.93(47) and(48) measured(49) as(50) 0.93(51), within(52) the(53) allowed(54) tolerance(55) of(56) plus(57) or(58) minus(59) 0.02(60), so(61) the(62) outcome(63) is(64) recorded(65) as(66) reproduced(67). An(68) experimental(69) independent(70) re-implementation(71) by(72) the(73) AI's(74) own(75) analysis(76) also(77) got(78) 0.93(79), agreeing(80) with(81) the(82) claim(83). However(84), in(85) a(86) robustness(87) check(88) across(89) five(90) extra(91) runs(92), the(93) result(94) moved(95) by(96) more(97) than(98) 0.02(99). Reproduction(100) confirms(101) the(102) code(103) produces(104) the(105) reported(106) number(107); it(108) does(109) not(110) establish(111) whether(112) the(113) underlying(114) science(115) is(116) true(117) or(118) false(119)."
+
+119 words. Under 120. 
+
+Wait — should I be careful about the robustness finding? It says "the result moved by more than 0.02 across 5 extra runs." This is potentially conflicting with the "reproduced" outcome, but I just report the facts. Maybe I should note it plainly without editorializing. My phrasing "However, in a robustness check..." is a slight signal but factual. That seems fine.
+
+Actually the instruction says "Reproduction is not replication: do not claim the science is true or false." My last sentence says reproduction "does not establish whether the underlying science is true or false" — that's a meta statement, not claiming truth/falsity. It's allowed and helpful. But maybe simpler: "This confirms the code produces the reported number, not that the underlying claim is scientifically true or false." Fine.
+
+Hmm, but is the fixture note sufficient? "Demonstration fixture" — the original says "DEMO FIXTURE". I could say "demo fixture". Keep it.
+
+No markdown, plain paragraphs. Good. Maybe split into two paragraphs for readability? Plain paragraphs plural allowed. One or two paragraphs. Let me do two short paragraphs perhaps. But one block is fine too. I'll do two paragraphs.
+
+Paragraph 1: what ran and patches.
+Paragraph 2: result, robustness, re-implementation, caveat.
+
+Rewrite:
+
+"This was a demo fixture, not real research. What ran: the released code trains a logistic regression on the synthetic trials dataset and reaches the reported test accuracy. Nothing was patched — no environment patches and no repair attempts. The run took 4 seconds.
+
+The result: accuracy was reported as 0.93 and measured as 0.93, within the allowed tolerance of plus or minus 0.02, so the outcome is recorded as reproduced. An experimental independent re-implementation by the AI's own analysis also got 0.93, agreeing with the claim. In a robustness check across five extra runs, though, the result moved by more than 0.02. Reproduction means the code produced the reported number; it does not settle whether the claim is scientifically true or false."
+
+Count: paragraph 1: This(1) was(2) a(3) demo(4) fixture(5), not(6) real(7) research(8). What(9) ran(10): the(11) released(12) code(13) trains(14) a(15) logistic(16) regression(17) on(18) the(19) synthetic(20) trials(21) dataset(22) and(23) reaches(24) the(25) reported(26) test(27) accuracy(28). Nothing(29) was(30) patched(31) —(skip) no(32) environment(33) patches(34) and(35) no(36) repair(37) attempts(38). The(39) run(40) took(41) 4(42) seconds(43).
+
+Paragraph 2: The(44) result(45): accuracy(46) was(47) reported(48) as(49) 0.93(50) and(51) measured(52) as(53) 0.93(54), within(55) the(56) allowed(57) tolerance(58) of(59) plus(60) or(61) minus(62) 0.02(63), so(64) the(65) outcome(66) is(67) recorded(68) as(69) reproduced(70). An(71) experimental(72) independent(73) re-implementation(74) by(75) the(76) AI's(77) own(78) analysis(79) also(80) got(81) 0.93(82), agreeing(83) with(84) the(85) claim(86). In(87) a(88) robustness(89) check(90) across(91) five(92) extra(93) runs(94), though(95), the(96) result(97) moved(98) by(99) more(100) than(101) 0.02(102). Reproduction(103) means(104) the(105) code(106) produced(107) the(108) reported(109) number(110); it(111) does(112) not(113) settle(114) whether(115) the(116) claim(117) is(118) scientifically(119) true(120) or(121) false(122).
+
+122 words — slightly over 120. Trim. Remove "though" (−1 = 121). Change "it does not settle whether the claim is scientifically true or false" to "not whether the claim is true or false" — hmm. Change last sentence: "Reproduction means the code produced the reported number, not that the science is true or false." That's: Reproduction(103) means(104) the(105) code(106) produced(107) the(108) reported(109) number(110), not(111) that(112) the(113) science(114) is(115) true(116) or(117) false(118). = 118 words total. Good.
+
+Actually, "What ran:" colon style is fine, plain prose. Avoid headings — colons inside sentences are okay.
+
+Also avoid em dash? Plain text is fine, em dash is not markdown. But formatting guidance says avoid em dashes in casual contexts? The general instruction about em dashes — I'll just use a period or comma. Replace "Nothing was patched — no environment patches and no repair attempts." with "Nothing was patched: no environment changes and no repair attempts were needed." Count adjust.
+
+Let me finalize:
+
+Paragraph 1: "This was a demo fixture, not real research. What ran: the released code trains a logistic regression on the synthetic trials dataset and reaches the reported test accuracy. Nothing was patched: no environment patches and no repair attempts were needed, and the run took 4 seconds."
+
+Count: This(1) was(2) a(3) demo(4) fixture(5), not(6) real(7) research(8). What(9) ran(10): the(11) released(12) code(13) trains(14) a(15) logistic(16) regression(17) on(18) the(19) synthetic(20) trials(21) dataset(22) and(23) reaches(24) the(25) reported(26) test(27) accuracy(28). Nothing(29) was(30) patched(31): no(32) environment(33) patches(34) and(35) no(36) repair(37) attempts(38) were(39) needed(40), and(41) the(42) run(43) took(44) 4(45) seconds(46).
+
+Paragraph 2: "Accuracy was reported as 0.93 and measured as 0.93, within the allowed tolerance of plus or minus 0.02, so the outcome is recorded as reproduced. An experimental independent re-implementation by the AI's own analysis also got 0.93, agreeing with the claim. In a robustness check across five extra runs, however, the result moved by more than 0.02. Reproduction means the code produced the reported number, not that the science is true or false."
+
+Count: Accuracy(1) was(2) reported(3) as(4) 0.93(5) and(6) measured(7) as(8) 0.93(9), within(10) the(11) allowed(12) tolerance(13) of(14) plus(15) or(16) minus(17) 0.02(18), so(19) the(20) outcome(21) is(22) recorded(23) as(24) reproduced(25). An(26) experimental(27) independent(28) re-implementation(29) by(30) the(31) AI's(32) own(33) analysis(34) also(35) got(36) 0.93(37), agreeing(38) with(39) the(40) claim(41). In(42) a(43) robustness(44) check(45) across(46) five(47) extra(48) runs(49), however(50), the(51) result(52) moved(53) by(54) more(55) than(56) 0.02(57). Reproduction(58) means(59) the(60) code(61) produced(62) the(63) reported(64) number(65), not(66) that(67) the(68) science(69) is(70) true(71) or(72) false(73).
+
+Total: 46 + 73 = 119 words. Under 120. 
+
+Both paragraphs plain prose, no markdown, no headings. Good. Include "however" for robustness — that's factual framing. Fine.
+</think>This was a demo fixture, not real research. What ran: the released code trains a logistic regression on the synthetic trials dataset and reaches the reported test accuracy. Nothing was patched: no environment patches and no repair attempts were needed, and the run took 4 seconds.
+
+Accuracy was reported as 0.93 and measured as 0.93, within the allowed tolerance of plus or minus 0.02, so the outcome is recorded as reproduced. An experimental independent re-implementation by the AI's own analysis also got 0.93, agreeing with the claim. In a robustness check across five extra runs, however, the result moved by more than 0.02. Reproduction means the code produced the reported number, not that the science is true or false.
+
+Evidence file sha256: b0da55141b20f646357fc333f931dffd7152a367b0cd08df02c707815f4617c4

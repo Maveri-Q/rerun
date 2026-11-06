@@ -315,3 +315,14 @@ export function quoteSell(m: Market, side: Side, shares: bigint, feeBps: number)
   const gross = (a - root) / 2n;
   return { out: gross - (gross * BigInt(feeBps)) / 10_000n, yesPriceAfterPpm: priceAfter(side, thisPool + shares - gross, other - gross) };
 }
+
+/**
+ * Some early write-ups were stored with the AI's working notes in front of them. The stored file can't
+ * change, because its fingerprint is on the chain, so the page shows the finished last paragraph and says so.
+ */
+export function readableReport(stored: string): { text: string; trimmed: boolean } {
+  const parts = stored.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
+  const body = parts.filter((p) => !p.startsWith("Evidence file sha256:"));
+  if (!body[1]?.startsWith("The user wants") || body.length < 3) return { text: stored, trimmed: false };
+  return { text: `${body[0]}\n\n${body.at(-1)!.replace(/^"|"$/g, "")}`, trimmed: true };
+}

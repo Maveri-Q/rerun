@@ -1,0 +1,14 @@
+Automated summary (the AI report was unavailable).
+
+Claim: [DEMO] A logistic model predicts trial response with 93% accuracy
+Statement: DEMO FIXTURE, not real research. The released code trains a logistic regression on the synthetic trials dataset and reaches the reported test accuracy.
+Outcome: REPRODUCED
+Finding: The measured value is within tolerance.
+Metric accuracy: reported 0.93, measured 0.93, tolerance abs:0.02
+Runtime: 3s
+Environment patches: none
+Repair attempts: none
+Robustness: the result moved by more than 0.02 across 5 extra runs.
+Independent re-implementation (experimental): the AI's own analysis got 0.93, which agrees with the claim.
+
+Evidence file sha256: 7a9525ce07ae90a0037ddc2d3addf58c63c563163495c745643677a4526a6b4b

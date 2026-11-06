@@ -1,0 +1,167 @@
+AI-written report (z-ai/glm-5.3-flash). The outcome was decided by deterministic code, not by this text.
+
+The user wants a short reproduction report, max 120 words, plain paragraphs, no markdown or headings. General reader audience. Use only facts given. State what ran, what was patched, and the result. Note reproduction is not replication—don't claim truth or falsity of the science.
+
+Facts:
+- Henderson et al. Nature Neuroscience 2019, alpha-synuclein spread model in mouse brain, correlation 0.696 at 3 months.
+- Re-run authors' own R code on published data with packages from code's date.
+- Outcome: REPRODUCED. Measured 0.69605221 vs reported 0.696, tolerance 0.005.
+- Runtime 42s.
+- Patches: ENV entrypoint sets folder settings, runs only steps behind this number, MATLAB side not included; DEPENDENCY installs R packages as of 2020-02-28 dated CRAN copy.
+- No repair attempts.
+- Robustness: result stayed within 0.005 across 3 extra runs.
+
+Draft (under 120 words):
+
+"This re-run reproduced Henderson et al.'s 2019 Nature Neuroscience result. Their R code, published alongside a model of alpha-synuclein spread along mouse brain wiring, was run on their published data. Two adjustments were needed: an entry point setting the script's folder settings and running only the steps behind the number (excluding the MATLAB-side analysis), and installation of the R packages as they existed on 2020-02-28, the code's date, from a dated CRAN copy. No repairs were attempted. The correlation between predicted and measured pathology at 3 months measured 0.69605221 against the reported 0.696, within the 0.005 tolerance, in 42 seconds. Three extra runs stayed within tolerance. This confirms the code runs and gives its result; it does not verify the science itself."
+
+Word count check: Let me count roughly. That's about 120. Let me count precisely.
+
+"This re-run reproduced Henderson et al.'s 2019 Nature Neuroscience result." = 10 words (This=1, re-run=2, reproduced=3, Henderson=4, et=5, al.'s=6, 2019=7, Nature=8, Neuroscience=9, result=10).
+
+"Their R code, published alongside a model of alpha-synuclein spread along mouse brain wiring, was run on their published data." Their=11, R=12, code=13, published=14, alongside=15, a=16, model=17, of=18, alpha-synuclein=19, spread=20, along=21, mouse=22, brain=23, wiring=24, was=25, run=26, on=27, their=28, published=29, data=30.
+
+"Two adjustments were needed: an entry point setting the script's folder settings and running only the steps behind the number (excluding the MATLAB-side analysis), and installation of the R packages as they existed on 2020-02-28, the code's date, from a dated CRAN copy." Two=31, adjustments=32, were=33, needed=34, an=35, entry=36, point=37, setting=38, the=39, script's=40, folder=41, settings=42, and=43, running=44, only=45, the=46, steps=47, behind=48, the=49, number=50, excluding=51, the=52, MATLAB-side=53, analysis=54, and=55, installation=56, of=57, the=58, R=59, packages=60, as=61, they=62, existed=63, on=64, 2020-02-28=65, the=66, code's=67, date=68, from=69, a=70, dated=71, CRAN=72, copy=73.
+
+"No repairs were attempted." = 76.
+
+"The correlation between predicted and measured pathology at 3 months measured 0.69605221 against the reported 0.696, within the 0.005 tolerance, in 42 seconds." The=77, correlation=78, between=79, predicted=80, and=81, measured=82, pathology=83, at=84, 3=85, months=86, measured=87, 0.69605221=88, against=89, the=90, reported=91, 0.696=92, within=93, the=94, 0.005=95, tolerance=96, in=97, 42=98, seconds=99.
+
+Hmm, "measured... measured" repetition. Reword: "The correlation between predicted and measured pathology at 3 months came out at 0.69605221 versus the reported 0.696, within the 0.005 tolerance, in 42 seconds."
+
+"Three extra runs stayed within tolerance." = +6 words → ~105.
+
+"This confirms the code runs and gives its result; it does not verify the science itself." That's +16 → ~121. Slightly over. Trim.
+
+Alternative closing: "This checks the code's output, not the truth of the science." = +12 → ~117. Or fold into one sentence.
+
+Actually let me simplify and recount carefully with the final text.
+
+Final draft:
+
+"This re-run reproduced Henderson et al.'s 2019 Nature Neuroscience result. Their R code, modelling alpha-synuclein spread along mouse brain wiring, was run on their published data. Two manual adjustments were made: an entry point setting folder locations and running only the steps behind the number, excluding the MATLAB-side analysis; and installing the R packages as they existed on 2020-02-28, the code's date, from a dated CRAN copy. No repairs were attempted. The correlation between predicted and measured pathology at 3 months came out at 0.69605221 against the reported 0.696, within the 0.005 tolerance, in 42 seconds. Three extra runs also stayed within tolerance. This checks the code's output only, not whether the science is true."
+
+Count: 
+1 This
+2 re-run
+3 reproduced
+4 Henderson
+5 et
+6 al.'s
+7 2019
+8 Nature
+9 Neuroscience
+10 result.
+11 Their
+12 R
+13 code,
+14 modelling
+15 alpha-synuclein
+16 spread
+17 along
+18 mouse
+19 brain
+20 wiring,
+21 was
+22 run
+23 on
+24 their
+25 published
+26 data.
+27 Two
+28 manual
+29 adjustments
+30 were
+31 made:
+32 an
+33 entry
+34 point
+35 setting
+36 folder
+37 locations
+38 and
+39 running
+40 only
+41 the
+42 steps
+43 behind
+44 the
+45 number,
+46 excluding
+47 the
+48 MATLAB-side
+49 analysis;
+50 and
+51 installing
+52 the
+53 R
+54 packages
+55 as
+56 they
+57 existed
+58 on
+59 2020-02-28,
+60 the
+61 code's
+62 date,
+63 from
+64 a
+65 dated
+66 CRAN
+67 copy.
+68 No
+69 repairs
+70 were
+71 attempted.
+72 The
+73 correlation
+74 between
+75 predicted
+76 and
+77 measured
+78 pathology
+79 at
+80 3
+81 months
+82 came
+83 out
+84 at
+85 0.69605221
+86 against
+87 the
+88 reported
+89 0.696,
+90 within
+91 the
+92 0.005
+93 tolerance,
+94 in
+95 42
+96 seconds.
+97 Three
+98 extra
+99 runs
+100 also
+101 stayed
+102 within
+103 tolerance.
+104 This
+105 checks
+106 the
+107 code's
+108 output
+109 only,
+110 not
+111 whether
+112 the
+113 science
+114 is
+115 true.
+
+115 words. Good, under 120.
+
+Check plain paragraphs, no markdown: single paragraph or maybe two. Plain paragraphs allowed. Single paragraph fine. "0.69605221" correct from data. Runtime 42s mentioned. Outcome reproduced — should I say "REPRODUCED"? I say "reproduced" in first sentence, lowercase; that's fine. Maybe mention it was settled showcase not forecast? Not necessary but could add. Keep as is; word budget fine.
+
+Ensure no claim truth/false of science: last sentence handles it.</think>This re-run reproduced Henderson et al.'s 2019 Nature Neuroscience result. Their R code, modelling alpha-synuclein spread along mouse brain wiring, was run on their published data. Two manual adjustments were made: an entry point setting folder locations and running only the steps behind the number, excluding the MATLAB-side analysis; and installing the R packages as they existed on 2020-02-28, the code's date, from a dated CRAN copy. No repairs were attempted. The correlation between predicted and measured pathology at 3 months came out at 0.69605221 against the reported 0.696, within the 0.005 tolerance, in 42 seconds. Three extra runs also stayed within tolerance. This checks the code's output only, not whether the science is true.
+
+Evidence file sha256: 4a5891824124e85721fa5f9b325b9b6a447bcc88675dbcb5073f6050b6aa7f78

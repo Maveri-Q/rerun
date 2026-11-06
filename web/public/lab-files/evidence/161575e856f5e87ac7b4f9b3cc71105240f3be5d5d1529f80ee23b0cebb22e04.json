@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "note": "Extra evidence. It does not settle the market: only the normal re-run does. The re-implementation is experimental, and a difference does not mean the paper is wrong.",
+  "robustness": {
+    "status": "sensitive",
+    "seed_had_effect": true,
+    "measured": "0.93",
+    "runs": [
+      {
+        "kind": "seed",
+        "label": "Seed shifted by 1",
+        "value": "0.93"
+      },
+      {
+        "kind": "seed",
+        "label": "Seed shifted by 2",
+        "value": "0.895"
+      },
+      {
+        "kind": "seed",
+        "label": "Seed shifted by 3",
+        "value": "0.885"
+      },
+      {
+        "kind": "resample",
+        "label": "Resampled data 1",
+        "value": "0.88"
+      },
+      {
+        "kind": "resample",
+        "label": "Resampled data 2",
+        "value": "0.895"
+      }
+    ]
+  },
+  "reimplementation": {
+    "status": "agrees",
+    "model": "Qwen/Qwen3.8-27B",
+    "methods_hash": "7091ebe6da8505056ea988040728dd60d63a7eb4b0338f66ad804b16843ca79a",
+    "value": "0.93",
+    "attempts": 1,
+    "script": "import json\nfrom pathlib import Path\n\nimport pandas as pd\nfrom sklearn.linear_model import LogisticRegression\nfrom sklearn.metrics import accuracy_score\nfrom sklearn.model_selection import train_test_split\n\n\ndef main() -> None:\n    # Use the stated working-directory path, with an absolute fallback.\n    data_path = Path(\"data/trials.csv\")\n    if not data_path.exists():\n        data_path = Path(\"/work/repo/data/trials.csv\")\n\n    df = pd.read_csv(data_path)\n\n    X = df[[\"age\", \"dose\", \"biomarker\"]]\n    y = pd.to_numeric(df[\"response\"]).astype(int)\n\n    # Methods: hold out 25% at random with seed 42 using train_test_split.\n    # train_test_split defaults are used otherwise (shuffle=True, stratify=None).\n    X_train, X_test, y_train, y_test = train_test_split(\n        X,\n        y,\n        test_size=0.25,\n        random_state=42,\n    )\n\n    # Logistic regression with scikit-learn defaults, but max_iter=1000.\n    model = LogisticRegression(max_iter=1000)\n    model.fit(X_train, y_train)\n\n    y_pred = model.predict(X_test)\n    accuracy = float(accuracy_score(y_test, y_pred))\n\n    with open(\"reimplementation_result.json\", \"w\") as f:\n        json.dump({\"value\": accuracy}, f)\n\n\nif __name__ == \"__main__\":\n    main()",
+    "script_hash": "31e0554a8396720824d368c0de491ba208b3481bc175eecc7de856eb62610ee7"
+  }
+}
