@@ -1,11 +1,12 @@
 {
-  "generated_at": "2026-11-05T21:23:49.873Z",
+  "generated_at": "2026-11-06T02:32:33.683Z",
   "model": "z-ai/glm-5.3-flash",
   "max_attempts": 6,
   "target_papers": 5,
   "papers_counted": 4,
-  "repaired": 1,
+  "repaired": 1.5,
   "complete": false,
+  "changed_after_results": "The first complete run scored 1 of 4. After seeing that, on 2026-11-05, we changed what the AI is shown: it now gets the exact text of the files it edits, because many of its blocked edits were for text it couldn't see. The safety checks on its edits did not change.",
   "rows": [
     {
       "name": "parkinsons-rebuild",
@@ -14,13 +15,13 @@
       "result": "repaired",
       "baseline": "0.6960522094835953",
       "measured": "0.6960522094835953",
-      "ai_patches": 5,
-      "blocked_edits": 3,
-      "cost_usd": 0.0035996199999999996,
-      "detail": "Repaired with 5 change(s). The number matches the baseline. Runs: repaired, repaired, both matched.",
+      "ai_patches": 2,
+      "blocked_edits": 1,
+      "cost_usd": 0.0027655199999999996,
+      "detail": "Repaired with 2 change(s). The number matches the baseline. Runs: repaired, failed.",
       "runs": [
         "repaired",
-        "repaired"
+        "failed"
       ]
     },
     {
@@ -54,16 +55,16 @@
       "name": "contextual-modulation",
       "title": "Contextual modulation of information (Mahmoudian, ReScience C)",
       "paper": "https://doi.org/10.5281/zenodo.3885793",
-      "result": "failed",
+      "result": "repaired",
       "baseline": "35841.07630245015",
-      "measured": null,
-      "ai_patches": 4,
-      "blocked_edits": 8,
-      "cost_usd": 0.00725342,
-      "detail": "INVALID (ENV_SETUP_FAILED), measured nothing. Runs: failed, failed.",
+      "measured": "35841.07630245015",
+      "ai_patches": 6,
+      "blocked_edits": 1,
+      "cost_usd": 0.0047721,
+      "detail": "Repaired with 6 change(s). The number matches the baseline. Runs: repaired, repaired, both matched.",
       "runs": [
-        "failed",
-        "failed"
+        "repaired",
+        "repaired"
       ]
     },
     {
@@ -85,10 +86,10 @@
       "result": "failed",
       "baseline": "32.68618164802546",
       "measured": null,
-      "ai_patches": 4,
-      "blocked_edits": 4,
-      "cost_usd": 0.00709816,
-      "detail": "INVALID (ENV_SETUP_FAILED), measured nothing. Runs: failed, failed.",
+      "ai_patches": 0,
+      "blocked_edits": 0,
+      "cost_usd": 0.0034702200000000004,
+      "detail": "timed out after 15 minutes Runs: failed, failed.",
       "runs": [
         "failed",
         "failed"
@@ -103,7 +104,7 @@
       "measured": null,
       "ai_patches": 0,
       "blocked_edits": 0,
-      "cost_usd": 0.00051018,
+      "cost_usd": 0.00047018,
       "detail": "INVALID (EXTRACTION_FAILED), measured nothing. Runs: failed, failed.",
       "runs": [
         "failed",
@@ -125,6 +126,5 @@
         "not_broken"
       ]
     }
-  ],
-  "changed_after_results": "The first complete run scored 1 of 4. After seeing that, on 2026-11-05, we changed what the AI is shown: it now gets the exact text of the files it edits, because many of its blocked edits were for text it couldn't see. The safety checks on its edits did not change."
+  ]
 }
