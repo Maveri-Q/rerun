@@ -4,7 +4,7 @@
  * corrected. lab/orchestrator/src/demo/real.test.ts checks these fingerprints against claims/real.
  */
 
-export type CodeOrigin = "authors" | "rebuild";
+export type CodeOrigin = "authors" | "rebuild" | "critics";
 
 export interface Provenance {
   name: string;
@@ -22,6 +22,10 @@ export interface Provenance {
   question?: string;
   /** The paper whose citations are counted on its pages. */
   citeDoi?: string;
+  /** Numbers that only make sense side by side, each with what produced it. */
+  numbers?: { value: string; label: string; detail: string }[];
+  /** Outside sources for what the page says about the authors. */
+  sources?: { label: string; href: string }[];
   /** Posted with the result already known, so nobody forecast it. */
   settledShowcase?: boolean;
   /** Extra limits for this claim, added to the standard list. */
@@ -42,6 +46,7 @@ export const PRICE_RULE = "The forecast price never changes the verdict.";
 export const ORIGIN_LABEL: Record<CodeOrigin, string> = {
   authors: "Authors' own code",
   rebuild: "Independent rebuild",
+  critics: "Critics' code on the authors' data",
 };
 
 export const PROVENANCE: Record<string, Provenance> = {
@@ -58,6 +63,29 @@ export const PROVENANCE: Record<string, Provenance> = {
       heading: "Whose code is this?",
       text: "Henderson and colleagues' own R code, run on their published data with packages from the date of the code. It's a settled showcase, so there was no forecasting. The same result also came from an independent rebuild (claim 21).",
       link: { label: "See the code", href: "https://github.com/ejcorn/connectome_diffusion" },
+    },
+  },
+  "fa35d7e5ffd002b0b8496bed8020579611c19cef349d5ec4658021a5b04bf3d7": {
+    name: "reinhart-rogoff",
+    origin: "critics",
+    question: "Does high government debt kill growth?",
+    citeDoi: "10.1257/aer.100.2.573",
+    settledShowcase: true,
+    paperSays: { quote: "Average 1946-2009 4.1 2.8 2.8 -0.1", where: "Summary table for advanced economies, last column is 90 percent and above, in the working paper version (NBER w15639)", href: "https://doi.org/10.3386/w15639" },
+    whyItMatters: "After 2008, politicians pointed to the 90 percent line when they argued for cutting budgets.",
+    numbers: [
+      { value: "\u22120.1%", label: "Reproduced with the original spreadsheet error and choices", detail: "The run printed -0.06206." },
+      { value: "2.2%", label: "Corrected", detail: "The run printed 2.168. This fixes the spreadsheet error and also changes which years count and how countries are weighed, as the critics argue it should." },
+    ],
+    sources: [
+      { label: "Reuters, 22 April 2013, via Daily FT", href: "https://www.ft.lk/financial-services/influential-economists-acknowledge-errors-in-debt-paper/42-147010" },
+      { label: "The Harvard Crimson, April 2013", href: "https://thecrimson.com/article/2013/4/24/rogoff-error-defense" },
+    ],
+    notChecked: ["Whether high debt slows growth, or slow growth raises debt.", "Whether the critics' choices about years and weights are the only fair ones."],
+    why: {
+      heading: "Whose code is this?",
+      text: "Herndon, Ash and Pollin's R code, run on the data Reinhart and Rogoff gave them. It isn't the authors' own code, and the label says so. Reinhart and Rogoff acknowledged the spreadsheet error in 2013, and said it doesn't change their central message. It's a settled showcase, so there was no forecasting.",
+      link: { label: "See the code", href: "https://github.com/michaelaoash/HAP-RR-git" },
     },
   },
   "a942a4e8eee4390f46ae932c48d15ccd0c83ebc0a39eab408c50e054088f6986": {

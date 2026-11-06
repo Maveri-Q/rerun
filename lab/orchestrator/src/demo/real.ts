@@ -26,7 +26,7 @@ export interface RealClaim {
   mockResponder: (req: ChatRequest) => string | undefined;
   methods?: string;
   humanPatches: HumanPatch[];
-  origin: "authors" | "rebuild";
+  origin: "authors" | "rebuild" | "critics";
 }
 
 export function loadReal(name: string): RealClaim {

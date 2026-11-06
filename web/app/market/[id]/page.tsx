@@ -106,6 +106,30 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
             {origin.why.link && <a href={origin.why.link.href}>{origin.why.link.label}</a>}
           </div>
         )}
+        {origin?.numbers && (
+          <dl className="both-numbers">
+            {origin.numbers.map((n) => (
+              <div key={n.value}>
+                <dt>{n.value}</dt>
+                <dd>
+                  <strong>{n.label}</strong>
+                  <span>{n.detail}</span>
+                </dd>
+              </div>
+            ))}
+          </dl>
+        )}
+        {origin?.sources && (
+          <p className="origin-sources">
+            On the acknowledgement:{" "}
+            {origin.sources.map((source, i) => (
+              <span key={source.href}>
+                {i > 0 && ", "}
+                <a href={source.href}>{source.label}</a>
+              </span>
+            ))}
+          </p>
+        )}
         {origin?.paperSays && (
           <blockquote className="paper-says">
             <span>Paper says</span>

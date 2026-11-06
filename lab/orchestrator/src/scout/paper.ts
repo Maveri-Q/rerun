@@ -44,7 +44,9 @@ async function get(url: string, fetcher: Fetcher, check: HostCheck): Promise<Res
   let current = url;
   for (let hop = 0; hop <= MAX_HOPS; hop++) {
     const parsed = new URL(current);
-    if (parsed.protocol !== "https:" || !(await check(parsed.hostname).catch(() => false))) return null;
+    // DOI links often pass through an http address on the way to https, so a redirect may, but nothing is read from one.
+    const allowed = parsed.protocol === "https:" || (hop > 0 && parsed.protocol === "http:");
+    if (!allowed || !(await check(parsed.hostname).catch(() => false))) return null;
     const res = await fetcher(current, { redirect: "manual", signal: AbortSignal.timeout(TIMEOUT_MS), headers: { "user-agent": "rerun-scout", accept: "application/pdf,text/html;q=0.9,*/*;q=0.5" } });
     const next = res.headers.get("location");
     if (res.status >= 300 && res.status < 400 && next) {
@@ -52,7 +54,7 @@ async function get(url: string, fetcher: Fetcher, check: HostCheck): Promise<Res
       current = new URL(next, current).toString();
       continue;
     }
-    return res.ok ? res : null;
+    return res.ok && parsed.protocol === "https:" ? res : null;
   }
   return null;
 }

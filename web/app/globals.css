@@ -2827,8 +2827,48 @@ a {
   border-color: var(--mint-dim);
 }
 
-.origin-chip--rebuild {
+.origin-chip--rebuild,
+.origin-chip--critics {
   color: var(--ink);
+}
+
+.both-numbers {
+  display: grid;
+  gap: 14px;
+  margin: 20px 0 0;
+  max-width: 62ch;
+}
+
+.both-numbers > div {
+  display: grid;
+  grid-template-columns: 5.5rem 1fr;
+  gap: 12px;
+  align-items: baseline;
+}
+
+.both-numbers dt {
+  font: 600 22px/1.2 var(--font-geist-mono), monospace;
+}
+
+.both-numbers dd {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+}
+
+.both-numbers strong {
+  font-weight: 500;
+}
+
+.both-numbers span {
+  font-size: 13.5px;
+  color: var(--ink-3);
+}
+
+.origin-sources {
+  margin: 12px 0 0;
+  font-size: 13.5px;
+  color: var(--ink-3);
 }
 
 .origin {

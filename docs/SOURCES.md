@@ -20,6 +20,8 @@ replication's code against the number the original paper published.
 - `budworm-timing`: slope -0.0457, the "Original" logit row of Table 2 of the ReScience article.
 - `budworm-spread`: 1.559, transcribed from Kemp et al. 1986 Table 1 in the replication's `code/03_fit_dennis_et_al_model.R`. The replication's author reports a difference of about 9% for this value and good overall agreement.
 
+- `reinhart-rogoff`: -0.1, the "90 percent and above" column of the average row for advanced economies, 1946-2009, in the summary table of NBER w15639. The acknowledgement of the spreadsheet error is cited from Reuters (via Daily FT, 22 April 2013) and The Harvard Crimson (April 2013). Their own statement refused automated reading, so it was not read directly.
+
 ## Setup changes
 
 Nothing in any author's code is edited. Two claims needed a change to how the code is launched, and both are in the claim's public spec:

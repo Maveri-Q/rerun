@@ -275,6 +275,14 @@ describe("reading the paper", () => {
     expect(await fetchPaperText("http://example.org/paper", fetcher, allow)).toBeNull();
   });
 
+  it("follows a redirect through http to https, but reads nothing over http", async () => {
+    const text = `<p>${"A gain of 2.76 jobs. ".repeat(200)}</p>`;
+    const through = (async (u: string) => (u.startsWith("https://a.example") ? page("", { location: "http://b.example/p" }, 302) : u.startsWith("http://b.example") ? page("", { location: "https://b.example/p" }, 301) : page(text))) as unknown as typeof fetch;
+    expect((await fetchPaperText("https://a.example/p", through, allow))?.from).toBe("https://a.example/p");
+    const ends = (async (u: string) => (u.startsWith("https://") ? page("", { location: "http://b.example/p" }, 302) : page(text))) as unknown as typeof fetch;
+    expect(await fetchPaperText("https://a.example/p", ends, allow)).toBeNull();
+  });
+
   it("reads a long page, and treats a short one as a paywall", async () => {
     const long = (async () => page(`<p>${"The gain was 2.76 jobs. ".repeat(200)}</p>`)) as unknown as typeof fetch;
     expect((await fetchPaperText("https://example.org/paper", long, allow))?.text).toContain("2.76");
