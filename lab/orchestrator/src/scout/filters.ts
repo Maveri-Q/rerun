@@ -36,7 +36,8 @@ function licenseFromText(text: string): string | null {
 const NOT_ANALYSIS = new Set(["TeX", "HTML", "CSS", "Makefile", "Shell", "Batchfile", "Dockerfile", "PostScript", "SCSS", "JavaScript", "Roff", "Rich Text Format"]);
 
 /** A paper needs data the Lab can reach. This looks for it in the repository. */
-const DATA_FILE = /\.(csv|tsv|json|jsonl|parquet|npz|npy|h5|hdf5|rds|rdata|xlsx|xls|mat|pkl|txt\.gz|csv\.gz)$/i;
+/** Older studies keep data in plain or statistics-package files: .dat, Stata, SPSS, SAS and the like. */
+const DATA_FILE = /\.(csv|tsv|tab|dat|data|asc|fwf|dta|sav|por|xpt|sas7bdat|json|jsonl|parquet|feather|fst|arff|npz|npy|h5|hdf5|rds|rda|rdata|xlsx|xls|ods|mat|pkl|txt\.gz|csv\.gz|dat\.gz)$/i;
 
 export function hasDataInRepo(files: string[]): boolean {
   return files.some((f) => DATA_FILE.test(f) && !/(^|\/)(package|tsconfig|package-lock|codemeta|\.zenodo)[^/]*$/i.test(f));

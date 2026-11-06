@@ -4,6 +4,7 @@ import { draftClaim, parseGithubUrl, type ClaimDraft } from "../lab/draft.ts";
 import { withNetworkRetry } from "../nearai/attestation.ts";
 import type { PrivateModel } from "../pipeline/model.ts";
 import { checkRepo, hasDataInRepo, isClearNumber, type RepoFacts } from "./filters.ts";
+import { fetchPaperText, numberInText, type PaperText } from "./paper.ts";
 
 /**
  * The scout agent (build plan §5.4). It looks for published research that ships code, checks it in
@@ -83,7 +84,9 @@ export const emptyState = (): ScoutState => ({ lastScanAt: null, draftsByDay: {}
 export interface ScoutDeps {
   leads: () => Promise<Lead[]>;
   repoFacts: (repoUrl: string) => Promise<RepoFacts>;
-  draft: (lead: Lead) => Promise<ClaimDraft>;
+  draft: (lead: Lead, paperText?: string) => Promise<ClaimDraft>;
+  /** Reads the paper itself. Without a readable copy the draft goes ahead, marked for the reviewer to check. */
+  paperText?: (lead: Lead) => Promise<PaperText | null>;
   /** Optional, and never required: a paper with no attention data can still rank highly. */
   attention?: (lead: Lead) => Promise<Attention | undefined>;
   log?: (message: string) => void;
@@ -148,9 +151,10 @@ export async function runScout(state: ScoutState, deps: ScoutDeps): Promise<Scou
     }
     draftsThisScan++;
     next.draftsByDay[today] = (next.draftsByDay[today] ?? 0) + 1;
+    const paper = await deps.paperText?.(lead).catch(() => null);
     let draft: ClaimDraft;
     try {
-      draft = await deps.draft(lead);
+      draft = await deps.draft(lead, paper?.text ?? lead.abstract);
     } catch (e) {
       record("retry", [`The AI draft failed: ${(e as Error).message.slice(0, 120)}`], { license: facts.license, runtime: checked.runtime });
       continue;
@@ -159,12 +163,17 @@ export async function runScout(state: ScoutState, deps: ScoutDeps): Promise<Scou
       record("rejected", [...checked.reasons, "The AI couldn't find one clear number to check, and how to produce it."], { license: facts.license, runtime: checked.runtime });
       continue;
     }
+    if (paper && !numberInText(draft.reported_value, paper.text)) {
+      record("rejected", [...checked.reasons, `The AI picked ${draft.reported_value}, but that number isn't in the paper's text.`], { license: facts.license, runtime: checked.runtime });
+      continue;
+    }
     if (draft.relatability < MIN_RELATABILITY) {
       record("rejected", [`Relatability ${draft.relatability} of 10, below our limit of ${MIN_RELATABILITY}: ${draft.relatability_why}`], { license: facts.license, runtime: checked.runtime });
       continue;
     }
     const attention = await deps.attention?.(lead).catch(() => undefined);
-    record("pending", checked.reasons, { license: facts.license, runtime: checked.runtime, draft: withScoutNote(draft), attention, interest: interestScore(draft.relatability, draft.topic, attention) });
+    const paperCheck = paper ? `The number ${draft.reported_value} appears in the paper's text, read from ${paper.from}.` : "Couldn't read a free copy of the paper, so check the number against it yourself.";
+    record("pending", [...checked.reasons, paperCheck], { license: facts.license, runtime: checked.runtime, draft: withScoutNote(draft), attention, interest: interestScore(draft.relatability, draft.topic, attention) });
   }
   return next;
 }
@@ -283,7 +292,8 @@ export function addSuggestion(state: ScoutState, repoUrl: string, paperUrl: stri
   if (!repo) return { ok: false, message: "Enter the code's GitHub address, like https://github.com/owner/name" };
   if (!/^https:\/\/\S+$/.test(paperUrl)) return { ok: false, message: "Enter the paper's address, starting with https://" };
   const id = `suggested:${repo}`;
-  if (!state.candidates[id]) {
+  // Someone asking again gets a turned-down paper a fresh look, since the reason may no longer hold.
+  if (!state.candidates[id] || state.candidates[id]!.status === "rejected") {
     state.candidates[id] = { id, source: "Suggested by a visitor", title: repo.replace("https://github.com/", ""), paperUrl, repoUrl: repo, needsDataCheck: true, status: "retry", reasons: ["Waiting for the next scan."], checkedAt: new Date().toISOString() };
   }
   return { ok: true, message: "Thanks! New papers are reviewed within 24 hours." };
@@ -309,7 +319,7 @@ export async function githubRepoFacts(repoUrl: string): Promise<RepoFacts> {
 }
 
 export function draftWithModel(model: PrivateModel) {
-  return (lead: Lead) => draftClaim(lead.repoUrl!, lead.paperUrl, model, lead.abstract);
+  return (lead: Lead, paperText?: string) => draftClaim(lead.repoUrl!, lead.paperUrl, model, paperText);
 }
 
 /* Saved state */
@@ -330,3 +340,6 @@ export function saveScoutState(dataDir: string, state: ScoutState): void {
   writeFileSync(`${file}.tmp`, JSON.stringify(state, null, 2));
   renameSync(`${file}.tmp`, file);
 }
+
+/** For deps.paperText: reads the paper a lead links to. */
+export const readLeadPaper = (lead: Lead): Promise<PaperText | null> => (lead.paperUrl ? fetchPaperText(lead.paperUrl) : Promise.resolve(null));

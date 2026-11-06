@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { doiIn, fetchPaperText, htmlToText, isPrivateAddress, numberInText, pdfLinkIn } from "../src/scout/paper.ts";
 import { articleFile, type ClaimDraft } from "../src/lab/draft.ts";
 import { checkRepo, hasDataInRepo, isClearNumber, type RepoFacts } from "../src/scout/filters.ts";
 import { addSuggestion, emptyState, interestScore, LIMITS, parseArticleYaml, repoRoot, runScout, SUGGESTED_BY, type Lead, citationAttention } from "../src/scout/scout.ts";
@@ -230,5 +231,77 @@ describe("citationAttention", () => {
   it("finds nothing for an uncited paper", () => {
     expect(citationAttention({ cited_by_count: 0 }, 2026)).toBeUndefined();
     expect(citationAttention({}, 2026)).toBeUndefined();
+  });
+});
+
+describe("reading the paper", () => {
+  const allow = async () => true;
+  const page = (body: string, headers: Record<string, string> = { "content-type": "text/html" }, status = 200) => new Response(status >= 300 ? null : body, { status, headers });
+
+  it("recognises older data formats", () => {
+    expect(hasDataInRepo(["data/raw/public.dat"])).toBe(true);
+    expect(hasDataInRepo(["RR-basic.dta"])).toBe(true);
+    expect(hasDataInRepo(["survey.sav"])).toBe(true);
+    expect(hasDataInRepo(["analysis.R", "README.md"])).toBe(false);
+  });
+
+  it("finds a number however its minus sign was typeset, and only the whole number", () => {
+    expect(numberInText("-0.1", "growth averages −0.1 percent")).toBe(true);
+    expect(numberInText("-0.1", "growth averages -0.1 percent")).toBe(true);
+    expect(numberInText("2.76", "a gain of 2.76 FTE")).toBe(true);
+    expect(numberInText("2.7", "a gain of 2.76 FTE")).toBe(false);
+    expect(numberInText("0.1", "a value of 10.1 here")).toBe(false);
+    expect(numberInText("-0.1", "a value of 0.1 here")).toBe(false);
+  });
+
+  it("refuses private addresses, including in a redirect", async () => {
+    expect(isPrivateAddress("127.0.0.1")).toBe(true);
+    expect(isPrivateAddress("169.254.169.254")).toBe(true);
+    expect(isPrivateAddress("192.168.1.9")).toBe(true);
+    expect(isPrivateAddress("::1")).toBe(true);
+    expect(isPrivateAddress("8.8.8.8")).toBe(false);
+    const asked: string[] = [];
+    const fetcher = (async (u: string) => {
+      asked.push(u);
+      return page("", { location: "https://inner.example/secret" }, 302);
+    }) as typeof fetch;
+    const found = await fetchPaperText("https://outer.example/paper", fetcher, async (h) => h !== "inner.example");
+    expect(found).toBeNull();
+    expect(asked).toEqual(["https://outer.example/paper"]);
+  });
+
+  it("won't read anything but https", async () => {
+    const fetcher = (async () => page("x".repeat(5000))) as unknown as typeof fetch;
+    expect(await fetchPaperText("http://example.org/paper", fetcher, allow)).toBeNull();
+  });
+
+  it("reads a long page, and treats a short one as a paywall", async () => {
+    const long = (async () => page(`<p>${"The gain was 2.76 jobs. ".repeat(200)}</p>`)) as unknown as typeof fetch;
+    expect((await fetchPaperText("https://example.org/paper", long, allow))?.text).toContain("2.76");
+    const short = (async () => page("<p>Subscribe to read this article.</p>")) as unknown as typeof fetch;
+    expect(await fetchPaperText("https://example.org/paper", short, allow)).toBeNull();
+  });
+
+  it("finds the DOI and a page's PDF link, and strips markup", () => {
+    expect(doiIn("https://doi.org/10.1257/aer.100.2.573")).toBe("10.1257/aer.100.2.573");
+    expect(doiIn("https://example.org/paper")).toBeNull();
+    expect(pdfLinkIn('<meta name="citation_pdf_url" content="/a/b.pdf">', "https://x.org/p")).toBe("https://x.org/a/b.pdf");
+    expect(htmlToText("<style>a{}</style><p>Hi&nbsp;there</p>")).toBe("Hi there");
+  });
+});
+
+describe("suggesting a paper again", () => {
+  it("gives a turned-down paper a fresh look, and leaves one waiting for review alone", () => {
+    const state = emptyState();
+    addSuggestion(state, "https://github.com/a/b", "https://doi.org/10.1/x");
+    const id = "suggested:https://github.com/a/b";
+    state.candidates[id]!.status = "rejected";
+    addSuggestion(state, "https://github.com/a/b", "https://doi.org/10.1/y");
+    expect(state.candidates[id]!.status).not.toBe("rejected");
+    expect(state.candidates[id]!.paperUrl).toBe("https://doi.org/10.1/y");
+    state.candidates[id]!.status = "pending";
+    addSuggestion(state, "https://github.com/a/b", "https://doi.org/10.1/z");
+    expect(state.candidates[id]!.status).toBe("pending");
+    expect(state.candidates[id]!.paperUrl).toBe("https://doi.org/10.1/y");
   });
 });
