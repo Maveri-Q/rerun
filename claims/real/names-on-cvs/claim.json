@@ -1,0 +1,59 @@
+{
+  "expected": "REPRODUCED",
+  "origin": "rebuild",
+  "paper_says": {
+    "quote": "All sent resumes: 10.06%, 6.70%, ratio 1.50",
+    "where": "Table 1, first row, of the working paper (NBER 9873)",
+    "href": "https://www.nber.org/papers/w9873"
+  },
+  "human_patches": [],
+  "spec": {
+    "version": 1,
+    "title": "Do CVs with white-sounding names get more callbacks? Bertrand and Mullainathan found 1.5 times as many",
+    "statement": "Bertrand and Mullainathan (American Economic Review, 2004) sent about 5,000 made-up CVs to real job ads in Boston and Chicago, giving them either white-sounding or Black-sounding names at random. CVs with white-sounding names got 1.50 times as many callbacks. This runs our own small program on a public copy of the experiment's data. The working paper's table has slightly more CVs than this data. The rebuild isn't the authors' code, so a mismatch ends as inconclusive.",
+    "source": {
+      "type": "paper",
+      "url": "https://doi.org/10.1257/0002828042002561",
+      "doi": "10.1257/0002828042002561",
+      "license": "Rebuild: MIT. Data: GPL-3 (OpenIntro), fetched from OpenIntro, not redistributed.",
+      "authors": "M. Bertrand, S. Mullainathan; rebuild by the RERUN project"
+    },
+    "artifact": {
+      "repo_url": "https://github.com/Maveri-Q/rerun-rebuilds",
+      "commit": "175eddea88cc8adab8dd20f2100b5b453d359244",
+      "data": [
+        {
+          "url": "https://www.openintro.org/data/csv/resume.csv",
+          "sha256": "3085bba2a81ac05dde852e697fdc35aa7f4333e0b9a28f535ab6353c7af5d438",
+          "path": "resume.csv"
+        }
+      ],
+      "runtime": "python3.11",
+      "setup": [],
+      "entrypoint": "python names-on-cvs-2004/rebuild.py resume.csv > rerun_output.txt && cat rerun_output.txt",
+      "output": {
+        "path": "rerun_output.txt",
+        "extractor": {
+          "type": "regex",
+          "expr": "callback_ratio (-?[0-9.]+)"
+        }
+      }
+    },
+    "metric": {
+      "name": "callbacks for white-sounding names per callback for Black-sounding names",
+      "reported_value": "1.50",
+      "tolerance": {
+        "type": "abs",
+        "value": "0.01"
+      },
+      "comparison": "within_tolerance"
+    },
+    "resources": {
+      "cpu": 2,
+      "mem_gb": 4,
+      "max_minutes": 15
+    },
+    "private_data": null
+  },
+  "published_output_check": "Table 1 of NBER 9873: 10.06% and 6.70% on 2,445 CVs per group, ratio 1.50. The public data has 2,435 per group: 9.65%, 6.45%, ratio 1.4968."
+}

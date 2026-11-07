@@ -1,0 +1,59 @@
+{
+  "expected": "REPRODUCED",
+  "origin": "rebuild",
+  "paper_says": {
+    "quote": "Thirty-six percent of replications had statistically significant results",
+    "where": "Abstract of the paper. The authors' own script prints 35/97",
+    "href": "https://doi.org/10.1126/science.aac4716"
+  },
+  "human_patches": [],
+  "spec": {
+    "version": 1,
+    "title": "When psychology studies were repeated, how many held up? The Reproducibility Project said 36%",
+    "statement": "The Open Science Collaboration (Science, 2015) repeated 100 published psychology experiments. Of the 97 originals with significant results, 36% of the repeats were significant too. This recounts that share with our own small program on the project's public results table. It doesn't redo the experiments, and a mismatch ends as inconclusive.",
+    "source": {
+      "type": "paper",
+      "url": "https://doi.org/10.1126/science.aac4716",
+      "doi": "10.1126/science.aac4716",
+      "license": "Rebuild: MIT. Data: CC0, fetched from the project's OSF page, not redistributed.",
+      "authors": "Open Science Collaboration; rebuild by the RERUN project"
+    },
+    "artifact": {
+      "repo_url": "https://github.com/Maveri-Q/rerun-rebuilds",
+      "commit": "175eddea88cc8adab8dd20f2100b5b453d359244",
+      "data": [
+        {
+          "url": "https://osf.io/download/fgjvw/",
+          "sha256": "4d87a2636181d8e31230422854cf0fabeaecd2f1b47a59627482c05a2b56d54d",
+          "path": "rpp_data.csv"
+        }
+      ],
+      "runtime": "python3.11",
+      "setup": [],
+      "entrypoint": "python reproducibility-project-2015/rebuild.py rpp_data.csv > rerun_output.txt && cat rerun_output.txt",
+      "output": {
+        "path": "rerun_output.txt",
+        "extractor": {
+          "type": "regex",
+          "expr": "percent_significant_again (-?[0-9.]+)"
+        }
+      }
+    },
+    "metric": {
+      "name": "percent of repeated studies significant again",
+      "reported_value": "36",
+      "tolerance": {
+        "type": "abs",
+        "value": "0.5"
+      },
+      "comparison": "within_tolerance"
+    },
+    "resources": {
+      "cpu": 2,
+      "mem_gb": 4,
+      "max_minutes": 15
+    },
+    "private_data": null
+  },
+  "published_output_check": "The authors' output file prints 35/97, which is 36.08%. The rebuild counts 35 of 97, 36.0825%."
+}

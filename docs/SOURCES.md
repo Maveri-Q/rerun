@@ -22,6 +22,12 @@ replication's code against the number the original paper published.
 
 - `reinhart-rogoff`: -0.1, the "90 percent and above" column of the average row for advanced economies, 1946-2009, in the summary table of NBER w15639. The acknowledgement of the spreadsheet error is cited from Reuters (via Daily FT, 22 April 2013) and The Harvard Crimson (April 2013). Their own statement refused automated reading, so it was not read directly.
 
+- `red-cards`: median 1.31, range 0.89 to 2.93, 20 and 9, from the abstract of Silberzahn et al. (2018), [10.1177/2515245917747646](https://doi.org/10.1177/2515245917747646). Data: the project's table of team answers on OSF (project gvm2z), CC0. Rebuild in `Maveri-Q/rerun-rebuilds`.
+- `names-on-cvs`: ratio 1.50, Table 1 of NBER 9873 (10.06% and 6.70% on 2,445 per group). Published as Bertrand and Mullainathan (2004), [10.1257/0002828042002561](https://doi.org/10.1257/0002828042002561). Data: OpenIntro `resume.csv`, GPL-3, 2,435 per group.
+- `reproducibility-project`: 36%, the abstract of Open Science Collaboration (2015), [10.1126/science.aac4716](https://doi.org/10.1126/science.aac4716); 35/97 in the authors' own output. Data: OSF project ezcuj, CC0.
+- `looks-and-ratings`: 0.275, Table 3, column 1, of NBER 9853. Published as Hamermesh and Parker (2005), [10.1016/j.econedurev.2004.07.013](https://doi.org/10.1016/j.econedurev.2004.07.013). Data: R package AER, `TeachingRatings`, GPL.
+- `class-size`: 8.57, Table 6, panel B, column 1, of NBER 6051, read from the page image because the scan has no usable text. Published as Krueger (1999), [10.1162/003355399556052](https://doi.org/10.1162/003355399556052), whose table we couldn't read for free. Data: R package AER, `STAR`, GPL, which has reading and maths scores only. Third grade is outside the margin (5.68 against 5.32), and the claim's page says so.
+- Not posted: mortgage denials (Munnell et al. 1992). The public subset of the data gives a raw ratio near 3.06, against the paper's 2.7 on its full sample, and we have no way to reach its adjusted 1.6. Money and happiness, empty stadiums and the affairs data were skipped on request.
 - `card-krueger`: 2.76, Table 3, row 3, column iii, page 780, read from the page image because the digits are not in the PDF's text; the text on page 778 states the same 2.76. Crossref and OpenAlex list no DOI for the 1994 article, only for the 1993 working paper (10.3386/w4509), so the claim links the JSTOR page and shows no citation count.
 
 ## Setup changes

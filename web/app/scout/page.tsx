@@ -138,6 +138,51 @@ function Suggestion({ c, isOwner, onDone }: { c: ScoutCandidate; isOwner: boolea
   );
 }
 
+/** A claim the approver drafted, inside its 6-hour wait. Cancelling happens on the blockchain, so it works with the Lab off. */
+function OpeningSoon({ marketId, title, opensAt, isOwner, onDone }: { marketId: number; title: string; opensAt?: number; isOwner: boolean; onDone: () => void }) {
+  const wallet = useWallet();
+  const [asking, setAsking] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
+
+  const cancel = async () => {
+    setMessage(null);
+    setBusy(true);
+    try {
+      await wallet.call("cancel_draft", { market_id: marketId });
+      setMessage({ ok: true, text: `Claim ${marketId} is cancelled. It won't open.` });
+      setAsking(false);
+      onDone();
+    } catch (e) {
+      setMessage({ ok: false, text: explainError(e) });
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <li className="opening-soon">
+      <span className="mono">Claim {marketId}</span>
+      <span>{title}</span>
+      <span>{opensAt ? `Opens ${relativeTime(opensAt)}` : "Not open yet"}</span>
+      {isOwner && !message?.ok && (
+        <div className="opening-soon-cancel">
+          {asking ? (
+            <>
+              <p className="hint">Cancel claim {marketId}? It won&apos;t open for forecasts, and you can&apos;t bring it back. A new one would need its own approval.</p>
+              <button className="btn btn--small" disabled={busy} onClick={() => void cancel()}>{busy ? "Cancelling…" : `Cancel claim ${marketId}`}</button>{" "}
+              <button className="btn quiet btn--small" disabled={busy} onClick={() => setAsking(false)}>Keep it</button>
+            </>
+          ) : (
+            <button className="btn quiet btn--small" onClick={() => setAsking(true)}>Cancel this claim</button>
+          )}
+        </div>
+      )}
+      {message && <p className={`notice ${message.ok ? "notice--ok" : "notice--error"}`} role="status">{message.text}</p>}
+    </li>
+  );
+}
+
 export default function ScoutPage() {
   const wallet = useWallet();
   const scout = usePoll(() => lab.scout(), [], 30_000);
@@ -149,6 +194,19 @@ export default function ScoutPage() {
   const waiting = all.filter((c) => c.status === "waiting");
   const decisions = [...(scout.data?.decisions ?? [])].reverse().slice(0, 30);
   const isOwner = Boolean(wallet.accountId && wallet.accountId === config.data?.owner);
+  // The blockchain says what's still waiting, so the owner can cancel even when the scout's list is old or the Lab is off.
+  const drafts = usePoll(() => chain.markets({ state: "Draft" }, 100), [], 30_000);
+  const known = new Set(waiting.map((c) => c.marketId));
+  const opening = [
+    ...waiting
+      .filter((c) => c.marketId !== undefined && (!drafts.data || drafts.data.some((m) => m.id === c.marketId)))
+      .map((c) => ({ marketId: c.marketId!, title: c.draft?.question ?? c.title, opensAt: c.opensAt })),
+    ...(isOwner ? (drafts.data ?? []).filter((m) => !known.has(m.id) && m.creator !== wallet.accountId).map((m) => ({ marketId: m.id, title: m.spec.title, opensAt: undefined })) : []),
+  ];
+  const refreshWaiting = () => {
+    void scout.refresh();
+    void drafts.refresh();
+  };
 
   return (
     <>
@@ -180,19 +238,15 @@ export default function ScoutPage() {
         </ul>
       </section>
 
-      {waiting.length > 0 && (
+      {opening.length > 0 && (
         <section className="section">
           <div className="section-head">
             <h2>Opening soon</h2>
           </div>
-          <p className="hint">The approver passed these. Each stays closed for 6 hours, so a person can cancel it first.</p>
-          <ul className="feed">
-            {waiting.map((c) => (
-              <li key={c.id}>
-                <span className="mono">Claim {c.marketId}</span>
-                <span>{c.draft?.question ?? c.title}</span>
-                <span>Opens {c.opensAt ? relativeTime(c.opensAt) : "soon"}</span>
-              </li>
+          <p className="hint">The approver passed these. Each stays closed for 6 hours, so the site&apos;s owner can cancel it first.</p>
+          <ul className="opening-list">
+            {opening.map((o) => (
+              <OpeningSoon key={o.marketId} {...o} isOwner={isOwner} onDone={refreshWaiting} />
             ))}
           </ul>
         </section>

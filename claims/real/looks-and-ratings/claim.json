@@ -1,0 +1,59 @@
+{
+  "expected": "REPRODUCED",
+  "origin": "rebuild",
+  "paper_says": {
+    "quote": "Composite standardized beauty 0.275",
+    "where": "Table 3, column 1, of the working paper (NBER 9853)",
+    "href": "https://www.nber.org/papers/w9853"
+  },
+  "human_patches": [],
+  "spec": {
+    "version": 1,
+    "title": "Do better-looking professors get better student ratings? Hamermesh and Parker found 0.275 points on a 5-point scale",
+    "statement": "Hamermesh and Parker (Economics of Education Review, 2005) had people rate professors' looks at the University of Texas at Austin and compared that with students' ratings of 463 courses. One point more on their looks scale went with 0.275 points more on the 5-point course rating, with sex, minority status and other factors held equal. This runs our own small program on a public copy of the authors' data. The rebuild isn't the authors' code, so a mismatch ends as inconclusive.",
+    "source": {
+      "type": "paper",
+      "url": "https://doi.org/10.1016/j.econedurev.2004.07.013",
+      "doi": "10.1016/j.econedurev.2004.07.013",
+      "license": "Rebuild: MIT. Data: GPL (R package AER), fetched from Rdatasets, not redistributed.",
+      "authors": "D. S. Hamermesh, A. Parker; rebuild by the RERUN project"
+    },
+    "artifact": {
+      "repo_url": "https://github.com/Maveri-Q/rerun-rebuilds",
+      "commit": "175eddea88cc8adab8dd20f2100b5b453d359244",
+      "data": [
+        {
+          "url": "https://vincentarelbundock.github.io/Rdatasets/csv/AER/TeachingRatings.csv",
+          "sha256": "a7d1d8e2a73259faed98ed6abbb3d396b2399c68e59ce6cfc6de94c736c9f1f6",
+          "path": "TeachingRatings.csv"
+        }
+      ],
+      "runtime": "python3.11",
+      "setup": [],
+      "entrypoint": "python looks-and-ratings-2005/rebuild.py TeachingRatings.csv > rerun_output.txt && cat rerun_output.txt",
+      "output": {
+        "path": "rerun_output.txt",
+        "extractor": {
+          "type": "regex",
+          "expr": "looks_effect (-?[0-9.]+)"
+        }
+      }
+    },
+    "metric": {
+      "name": "course-rating points per point of the looks score",
+      "reported_value": "0.275",
+      "tolerance": {
+        "type": "abs",
+        "value": "0.005"
+      },
+      "comparison": "within_tolerance"
+    },
+    "resources": {
+      "cpu": 2,
+      "mem_gb": 4,
+      "max_minutes": 15
+    },
+    "private_data": null
+  },
+  "published_output_check": "Table 3, column 1, of NBER 9853: looks 0.275, female -0.239, minority -0.249, non-native -0.253, tenure track -0.136, lower division -0.046. The rebuild prints the same, with looks 0.2748."
+}

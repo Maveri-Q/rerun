@@ -3545,3 +3545,11 @@ a {
 .decision-log { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
 .decision-log b { font-weight: 500; margin-right: 10px; }
 .decision-log p { margin: 4px 0 0; }
+.opening-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 18px; }
+.opening-soon { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 6px 16px; align-items: baseline; }
+.opening-soon-cancel, .opening-soon .notice { grid-column: 1 / -1; }
+.opening-soon-cancel p { margin: 0 0 8px; }
+@media (max-width: 640px) { .opening-soon { grid-template-columns: minmax(0, 1fr); } }
+.fragile-chip { color: var(--ink-2, #bbb); }
+.fragile-note { max-width: 60ch; margin: 14px 0 0; padding-left: 12px; border-left: 2px solid currentColor; }
+.fragile-note b { font-weight: 500; }

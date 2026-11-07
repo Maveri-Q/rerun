@@ -69,13 +69,15 @@ impl Contract {
         id
     }
 
-    /// Creator deletes a Draft that was never funded; its storage deposit is refunded.
+    /// The creator or the owner deletes a Draft that was never funded. The storage deposit always goes
+    /// back to the creator. The owner can do this so a person can stop what the safe approver drafted.
     pub fn cancel_draft(&mut self, market_id: u64) {
-        let creator = env::predecessor_account_id();
+        let caller = env::predecessor_account_id();
         let before = self.flushed_usage();
         let m = self.market(market_id);
-        require!(m.creator == creator, "creator only");
+        require!(m.creator == caller || caller == self.config.owner, "creator or owner only");
         require!(m.state == State::Draft, "only drafts can be cancelled");
+        let creator = m.creator;
         self.markets.remove(&market_id);
         self.specs.remove(&market_id);
         emit("draft_cancelled", json!({ "market_id": market_id }));

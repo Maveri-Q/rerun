@@ -112,6 +112,7 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
         ) : (
           <p className="statement">{readableStatement(spec?.statement)}</p>
         )}
+        {origin?.fragile && <p className="fragile-note"><b>{"\u26A0"} Fragile.</b> {origin.fragile}</p>}
         {origin && (
           <div className="origin">
             <h2>{origin.why.heading}</h2>

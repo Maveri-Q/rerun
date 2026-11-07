@@ -529,6 +529,27 @@ fn drafts_can_be_cancelled_by_their_creator() {
 }
 
 #[test]
+fn the_owner_can_cancel_anyone_elses_draft() {
+    let mut c = contract();
+    paying("creator.testnet", T0);
+    let id = c.create_market(canonical(&sample_spec()), T0 + 3_600, WINDOW, Mode::Points);
+    let owner = c.get_config().owner.clone();
+    as_(owner.as_str(), T0);
+    c.cancel_draft(id);
+    assert!(c.get_market(id).is_none() && c.get_spec(id).is_none());
+}
+
+#[test]
+#[should_panic(expected = "creator or owner only")]
+fn nobody_else_can_cancel_a_draft() {
+    let mut c = contract();
+    paying("creator.testnet", T0);
+    let id = c.create_market(canonical(&sample_spec()), T0 + 3_600, WINDOW, Mode::Points);
+    as_("stranger.testnet", T0);
+    c.cancel_draft(id);
+}
+
+#[test]
 #[should_panic(expected = "not enough storage deposit")]
 fn creating_a_market_requires_storage_deposit() {
     let mut c = contract();

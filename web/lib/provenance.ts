@@ -34,6 +34,8 @@ export interface Provenance {
   numbers?: { value: string; label: string; detail: string }[];
   /** Outside sources for what the page says about the authors. */
   sources?: { label: string; href: string }[];
+  /** A result that holds up as a number but moves a lot with honest choices. Shown as "Fragile". */
+  fragile?: string;
   /** Posted with the result already known, so nobody forecast it. */
   settledShowcase?: boolean;
   /** Extra limits for this claim, added to the standard list. */
@@ -77,7 +79,7 @@ export const PROVENANCE: Record<string, Provenance> = {
   },
   "6450bf0ac8d633cb663e2c8ebeb33fde42b6dd75dcfeee3d3ecc3333a8d6eb1b": {
     name: "card-krueger",
-    order: 4,
+    order: 5,
     plain: { said: "The study said raising New Jersey's minimum wage didn't cost fast-food jobs.", unit: "jobs per store" },
     origin: "rebuild",
     question: "Does raising the minimum wage cost jobs?",
@@ -93,7 +95,7 @@ export const PROVENANCE: Record<string, Provenance> = {
   },
   "fa35d7e5ffd002b0b8496bed8020579611c19cef349d5ec4658021a5b04bf3d7": {
     name: "reinhart-rogoff",
-    order: 3,
+    order: 1,
     flagship: true,
     plain: { said: "The study said rich countries with very high government debt stop growing.", unit: "% growth a year" },
     origin: "critics",
@@ -181,6 +183,92 @@ export const PROVENANCE: Record<string, Provenance> = {
       heading: "Why not the authors' own code?",
       text: "The original analyses from 1986 and 1991 were written for SAS and GLIM, older statistics software the Lab can't run. SAS is also paid. This claim runs a rebuild in R by another researcher, published in a peer-reviewed journal.",
       link: { label: "See the rebuild, which includes the original code", href: "https://github.com/pboesu/replication_candy_1991" },
+    },
+  },
+  "6358604970557ec5362053d098a463da55a001913553b5e11490e153e155a823": {
+    name: "red-cards",
+    order: 2,
+    plain: { said: "The study gave 29 teams the same football data, and their middle answer was that dark-skinned players get red cards at 1.31 times the odds.", unit: "times the odds" },
+    origin: "rebuild",
+    question: "Do referees give dark-skinned footballers more red cards?",
+    citeDoi: "10.1177/2515245917747646",
+    settledShowcase: true,
+    fragile: "29 teams, same data, different answers: from 0.89 to 2.93 times the odds. 20 teams found an effect and 9 didn't. Our re-run confirms what the teams reported, not which answer is right.",
+    paperSays: { quote: "effect sizes ranged from 0.89 to 2.93 ( Mdn = 1.31) in odds-ratio units", where: "Abstract of the paper, which also says 20 teams found a significant effect and 9 did not", href: "https://doi.org/10.1177/2515245917747646" },
+    whyItMatters: "Reasonable researchers can take one data set and reach different answers. This study is the clearest proof of that.",
+    notChecked: ["The 29 teams' own analyses. We only recompute the summary from their published answers.", "Which team's method is the best one."],
+    why: {
+      heading: "Whose code is this?",
+      text: "Our own small program, run on the project's published table of each team's answer. It isn't the authors' code, and it doesn't redo the 29 analyses. It got a median of 1.31, with the same range and the same 20 and 9 as the paper. It's a settled showcase, so there was no forecasting.",
+      link: { label: "See the code", href: "https://github.com/Maveri-Q/rerun-rebuilds" },
+    },
+  },
+  "2a325a5acb04febe5efd5b805632cf8c44cab27f04b1a5cad7497defedaaf8cf": {
+    name: "names-on-cvs",
+    order: 3,
+    plain: { said: "The study said CVs with white-sounding names got 50% more callbacks than similar CVs with Black-sounding names.", unit: "times the callbacks" },
+    origin: "rebuild",
+    question: "Does the name on a CV change who gets a callback?",
+    citeDoi: "10.1257/0002828042002561",
+    settledShowcase: true,
+    paperSays: { quote: "All sent resumes: 10.06%, 6.70%, ratio 1.50", where: "Table 1, first row, of the working paper (NBER 9873)", href: "https://www.nber.org/papers/w9873" },
+    whyItMatters: "It's one of the best-known experiments on hiring, and it's still cited whenever people argue about anonymous CVs.",
+    notChecked: ["Whether the same gap exists today, or outside Boston and Chicago in 2001 and 2002.", "Whether the names signal only race, and not also class."],
+    why: {
+      heading: "Whose code is this?",
+      text: "Our own small program, run on a public copy of the experiment's data from OpenIntro. It isn't the authors' code. It got a ratio of 1.4968 against the paper's 1.50. The working paper's table has 2,445 CVs in each group and this data has 2,435, so the two percentages differ a little (9.65% and 6.45% here). It's a settled showcase, so there was no forecasting.",
+      link: { label: "See the code", href: "https://github.com/Maveri-Q/rerun-rebuilds" },
+    },
+  },
+  "90a002bd7f0b85c8e04421cea8fca462082b99eba380cb2ce19807bcaed030fb": {
+    name: "reproducibility-project",
+    order: 4,
+    plain: { said: "The study repeated about 100 psychology studies, and said only 36% got a significant result again.", unit: "% significant again" },
+    origin: "rebuild",
+    question: "How much psychology research holds up when it's repeated?",
+    citeDoi: "10.1126/science.aac4716",
+    settledShowcase: true,
+    paperSays: { quote: "Thirty-six percent of replications had statistically significant results", where: "Abstract of the paper. The authors' own script prints 35/97", href: "https://doi.org/10.1126/science.aac4716" },
+    whyItMatters: "This is the study that made the replication crisis front-page news, and it's why a site like this exists.",
+    notChecked: ["The 100 experiments themselves. We only recount the project's own results table.", "Whether statistical significance is the right test of a repeat. The paper gives other measures too."],
+    why: {
+      heading: "Whose code is this?",
+      text: "Our own small program, run on the project's public results table. It isn't the authors' code, and it doesn't redo the experiments. It counted 35 of 97, which is 36.08%, the same count the authors' own script prints. It's a settled showcase, so there was no forecasting.",
+      link: { label: "See the code", href: "https://github.com/Maveri-Q/rerun-rebuilds" },
+    },
+  },
+  "9dec5a93332271dd854ae721e75ba32855be56a09e8781adaa1407fec5f90597": {
+    name: "class-size",
+    order: 6,
+    plain: { said: "The study said first graders put in small classes scored about 8.6 percentile points higher.", unit: "percentile points" },
+    origin: "rebuild",
+    question: "Do small classes help young children learn?",
+    citeDoi: "10.1162/003355399556052",
+    settledShowcase: true,
+    paperSays: { quote: "Small Class 8.57 (1.97)", where: "Table 6, panel B, column 1, of the working paper (NBER 6051), read from the page image", href: "https://www.nber.org/papers/w6051" },
+    whyItMatters: "Tennessee's experiment is the study people reach for whenever schools argue about class sizes.",
+    notChecked: ["Whether the gain lasts, or what happens in other places.", "The published journal table, which isn't free to read. We used the working paper's."],
+    why: {
+      heading: "Whose code is this?",
+      text: "Our own small program, run on a public copy of the data, which has only reading and maths scores. It isn't the author's code, and it can't match exactly. It got 8.52 against 8.57 for first grade. The other grades are 4.93 against 4.82 in kindergarten, 5.95 against 5.93 in second grade, and 5.68 against 5.32 in third, which is outside the margin we used. We chose first grade because it's the largest gain. It's a settled showcase, so there was no forecasting.",
+      link: { label: "See the code", href: "https://github.com/Maveri-Q/rerun-rebuilds" },
+    },
+  },
+  "d0b259198cc3c2ace78fbff438c2e074547728ad977b6141efd77f63b76c31dd": {
+    name: "looks-and-ratings",
+    order: 7,
+    plain: { said: "The study said better-looking professors get higher student ratings.", unit: "rating points per point of looks" },
+    origin: "rebuild",
+    question: "Do better-looking professors get better student ratings?",
+    citeDoi: "10.1016/j.econedurev.2004.07.013",
+    settledShowcase: true,
+    paperSays: { quote: "Composite standardized beauty 0.275", where: "Table 3, column 1, of the working paper (NBER 9853)", href: "https://www.nber.org/papers/w9853" },
+    whyItMatters: "Student ratings can decide who gets hired and promoted, so it matters what else they pick up.",
+    notChecked: ["Whether better teaching and better looks go together for some other reason.", "Whether this holds beyond one university in the early 2000s."],
+    why: {
+      heading: "Whose code is this?",
+      text: "Our own small program, run on a public copy of the authors' data. It isn't the authors' code. It got 0.2748 against the paper's 0.275, and the other five numbers in that column match too. It's a settled showcase, so there was no forecasting.",
+      link: { label: "See the code", href: "https://github.com/Maveri-Q/rerun-rebuilds" },
     },
   },
 };

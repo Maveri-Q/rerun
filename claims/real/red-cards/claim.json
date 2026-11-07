@@ -1,0 +1,59 @@
+{
+  "expected": "REPRODUCED",
+  "origin": "rebuild",
+  "paper_says": {
+    "quote": "effect sizes ranged from 0.89 to 2.93 ( Mdn = 1.31) in odds-ratio units",
+    "where": "Abstract of the paper, which also says 20 teams found a significant effect and 9 did not",
+    "href": "https://doi.org/10.1177/2515245917747646"
+  },
+  "human_patches": [],
+  "spec": {
+    "version": 1,
+    "title": "Do referees give dark-skinned footballers more red cards? 29 teams, same data: a median of 1.31 times the odds",
+    "statement": "Silberzahn and colleagues (Advances in Methods and Practices in Psychological Science, 2018) gave 29 research teams the same football data and the same question. The answers ran from 0.89 to 2.93 times the odds, with a median of 1.31. Twenty teams found an effect and nine didn't. This runs our own small program on the project's published table of each team's answer. It doesn't redo the 29 analyses, and a mismatch ends as inconclusive.",
+    "source": {
+      "type": "paper",
+      "url": "https://doi.org/10.1177/2515245917747646",
+      "doi": "10.1177/2515245917747646",
+      "license": "Rebuild: MIT. Data: CC0, fetched from the project's OSF page, not redistributed.",
+      "authors": "R. Silberzahn, E. L. Uhlmann, D. P. Martin, B. A. Nosek and others; rebuild by the RERUN project"
+    },
+    "artifact": {
+      "repo_url": "https://github.com/Maveri-Q/rerun-rebuilds",
+      "commit": "175eddea88cc8adab8dd20f2100b5b453d359244",
+      "data": [
+        {
+          "url": "https://osf.io/download/fa743/",
+          "sha256": "203ffd998fe997b160ad5d4cb08b880aa6c326c97514e2361682aa41ece4ed09",
+          "path": "or.csv"
+        }
+      ],
+      "runtime": "python3.11",
+      "setup": [],
+      "entrypoint": "python red-cards-2018/rebuild.py or.csv > rerun_output.txt && cat rerun_output.txt",
+      "output": {
+        "path": "rerun_output.txt",
+        "extractor": {
+          "type": "regex",
+          "expr": "median_odds_ratio (-?[0-9.]+)"
+        }
+      }
+    },
+    "metric": {
+      "name": "median odds ratio across the 29 teams",
+      "reported_value": "1.31",
+      "tolerance": {
+        "type": "abs",
+        "value": "0.01"
+      },
+      "comparison": "within_tolerance"
+    },
+    "resources": {
+      "cpu": 2,
+      "mem_gb": 4,
+      "max_minutes": 15
+    },
+    "private_data": null
+  },
+  "published_output_check": "The rebuild prints 29 teams, lowest 0.89, highest 2.93, 20 finding an effect, 9 not, and a median of 1.31."
+}

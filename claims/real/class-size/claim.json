@@ -1,0 +1,59 @@
+{
+  "expected": "REPRODUCED",
+  "origin": "rebuild",
+  "paper_says": {
+    "quote": "Small Class 8.57 (1.97)",
+    "where": "Table 6, panel B, column 1, of the working paper (NBER 6051), read from the page image",
+    "href": "https://www.nber.org/papers/w6051"
+  },
+  "human_patches": [],
+  "spec": {
+    "version": 1,
+    "title": "Do small classes help young children learn? Tennessee's experiment found 8.57 percentile points in first grade",
+    "statement": "Krueger (Quarterly Journal of Economics, 1999) studied Tennessee's STAR experiment, which put thousands of young children into small or normal-size classes at random. First graders in small classes scored 8.57 percentile points higher, before other factors are held equal. This runs our own small program on a public copy of the data, which has reading and maths scores only, so it can't match exactly. The rebuild isn't the author's code, so a mismatch ends as inconclusive.",
+    "source": {
+      "type": "paper",
+      "url": "https://doi.org/10.1162/003355399556052",
+      "doi": "10.1162/003355399556052",
+      "license": "Rebuild: MIT. Data: GPL (R package AER), fetched from Rdatasets, not redistributed.",
+      "authors": "A. B. Krueger; rebuild by the RERUN project"
+    },
+    "artifact": {
+      "repo_url": "https://github.com/Maveri-Q/rerun-rebuilds",
+      "commit": "175eddea88cc8adab8dd20f2100b5b453d359244",
+      "data": [
+        {
+          "url": "https://vincentarelbundock.github.io/Rdatasets/csv/AER/STAR.csv",
+          "sha256": "0e8b179ea3d883730b25008ca1293c4c8f886aa8d5d299c03ab6ff05d0123ae6",
+          "path": "STAR.csv"
+        }
+      ],
+      "runtime": "python3.11",
+      "setup": [],
+      "entrypoint": "python class-size-1999/rebuild.py STAR.csv > rerun_output.txt && cat rerun_output.txt",
+      "output": {
+        "path": "rerun_output.txt",
+        "extractor": {
+          "type": "regex",
+          "expr": "first_grade_gap (-?[0-9.]+)"
+        }
+      }
+    },
+    "metric": {
+      "name": "percentile points gained in a small class, first grade",
+      "reported_value": "8.57",
+      "tolerance": {
+        "type": "abs",
+        "value": "0.25"
+      },
+      "comparison": "within_tolerance"
+    },
+    "resources": {
+      "cpu": 2,
+      "mem_gb": 4,
+      "max_minutes": 15
+    },
+    "private_data": null
+  },
+  "published_output_check": "Table 6, column 1, of NBER 6051, against the rebuild: kindergarten 4.82 and 4.93, first grade 8.57 and 8.52, second 5.93 and 5.95, third 5.32 and 5.68. The margin covers the first three, not the third. The QJE article's table wasn't readable for free."
+}

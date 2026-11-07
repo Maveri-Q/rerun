@@ -40,6 +40,7 @@ export function MarketTicker({ market }: { market: Market }) {
         <span className="ticker-title">
           <span className="ticker-name">
             {provenanceOf(s.spec_hash)?.flagship && <em className="start-here">Start here</em>}
+            {provenanceOf(s.spec_hash)?.fragile && <em className="start-here fragile-chip">Fragile</em>}
             {claimName(market)}
           </span>
           <span className="ticker-meta">
