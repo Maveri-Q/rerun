@@ -6,7 +6,7 @@ import { isListed } from "@/lib/provenance";
 export const revalidate = 300;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const pages = ["", "/how", "/facts", "/check", "/scout", "/lab", "/leaderboard", "/try", "/create"];
+  const pages = ["", "/how", "/facts", "/check", "/scout", "/lab", "/leaderboard", "/try", "/create", "/terms"];
   const markets = await chain.markets().catch(() => []);
   const claims = markets.filter(isListed).flatMap((m) => {
     const paths = [`/market/${m.id}`];

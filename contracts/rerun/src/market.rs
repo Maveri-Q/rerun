@@ -12,6 +12,17 @@ use crate::spec;
 use crate::types::*;
 use crate::*;
 
+/// Limits while money mode is in beta: 5 USDC a prediction, and 50 USDC in any one claim, with its prize
+/// pool counted. Points have no limit because they have no value.
+pub const MONEY_MAX_PREDICTION: u128 = 5_000_000;
+pub const MONEY_MAX_PER_CLAIM: u128 = 50_000_000;
+
+fn assert_money_room(m: &Market, adding: u128) {
+    if m.mode == Mode::Money {
+        require!(m.collateral.0 + adding <= MONEY_MAX_PER_CLAIM, "this claim has reached its limit of 50 USDC");
+    }
+}
+
 #[near]
 impl Contract {
     /// Registers a claim as a Draft market. Attach NEAR for storage (the spec is stored on-chain);
@@ -149,6 +160,7 @@ impl Contract {
         require!(m.state == State::Draft, "market already funded");
         require!(m.lock_time > now(), "lock_time has passed; create a new market");
         require!(liquidity >= self.params(m.mode).min_liquidity.0, "initial liquidity below minimum");
+        assert_money_room(&m, liquidity);
         let total = liquidity + m.creation_bond.0 + m.repro_fee.0;
         self.debit(m.mode, actor, total);
 
@@ -170,6 +182,8 @@ impl Contract {
         let mut m = self.market(market_id);
         assert_trading(&m);
         require!(amount > 0, "amount must be positive");
+        require!(m.mode != Mode::Money || amount <= MONEY_MAX_PREDICTION, "a prediction can be at most 5 USDC");
+        assert_money_room(&m, amount);
         self.debit(m.mode, actor, amount);
         let (fee_lp, fee_treasury) = self.split_fee(amount);
         let invest = amount - fee_lp - fee_treasury;
@@ -222,6 +236,7 @@ impl Contract {
         let mut m = self.market(market_id);
         assert_trading(&m);
         require!(amount > 0, "amount must be positive");
+        assert_money_room(&m, amount);
         self.debit(m.mode, actor, amount);
         let mut p = self.position(market_id, actor);
         let minted = self.provide_lp(&mut m, actor, &mut p, amount);
@@ -307,6 +322,7 @@ impl Contract {
                 "collateral": U128(collateral), "shares": U128(shares), "yes_price_ppm": yes_price(m) as u32,
             }),
         );
+        crate::accuracy::record_forecast(m.id, actor, yes_price(m) as u32);
         self.record_price(m);
     }
 }

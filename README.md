@@ -6,7 +6,7 @@
 
 **A forecasting market on whether published research results reproduce, settled by an AI agent that actually re-runs the authors' code and data inside a TEE and posts a verifiable receipt on NEAR.**
 
-> Status: early build (NEAR Hackathon 2026, step 6 of 10: the full lifecycle, challenges and attack checks pass on testnet). The Lab does not run in a TEE yet and the site is not hosted yet. Sections marked _planned_ do not exist yet.
+> Status: running on NEAR testnet, on the hosted site at https://rerun-silk.vercel.app. The Lab doesn't run in a TEE yet, and it runs on one person's computer for now. Everything still to come is under [Coming next](#coming-next).
 
 **Deployed on testnet:** market contract [`rerun.rerun-43f5f2.testnet`](https://testnet.nearblocks.io/address/rerun.rerun-43f5f2.testnet), collateral token [`tusdc.rerun-43f5f2.testnet`](https://testnet.nearblocks.io/address/tusdc.rerun-43f5f2.testnet), Lab `rerun-lab-43f5f2.testnet` (registered without TEE attestation, testnet only).
 
@@ -66,6 +66,8 @@ _Planned:_ hosted site in points mode.
 - **The comparator runs on-chain too:** a receipt claiming REPRODUCED/NOT_REPRODUCED must carry a `measured_value` whose comparison with the spec's reported value and tolerance gives that same outcome, or it is rejected.
 - **Only approved Labs propose:** registered Lab account + approved codehash; revoking the codehash blocks it immediately. Receipts must match the market's spec hash, commit, data hashes, reported value and tolerance.
 - **Challenges:** anyone can bond and challenge during the window; the Lab's independent re-run must use a different model. Agreement keeps the result (bond forfeited); disagreement makes the market INVALID and rewards the challenger from the creation bond.
+- **Accuracy score:** every forecast stores the odds it moved a claim to, and `get_accuracy` works out that account's Brier score from what happened (0 is perfect, always saying 50% scores 0.25; inconclusive claims don't count). Scoring forecasters on their track record has precedent in Metaculus and Replication Markets. It's on the leaderboard and never touches a verdict.
+- **Money limits while in beta:** at most 5 USDC a prediction and 50 USDC in a claim, enforced by the contract, plus the owner's pause, which can't stop anyone collecting.
 - **Events:** NEP-297, standard `rerun`. Storage is charged to the caller and the excess refunded.
 
 ## The Lab (`lab/`)
@@ -93,6 +95,12 @@ The evidence file's hash sits inside the written report, and the report's hash i
 
 The demos show why this matters: the `reproduces` claim gets 0.93 with the authors' seed, but mostly 0.88 to 0.90 with other random splits, so it reproduces and is flagged as partly luck.
 
+## Other apps can use the verdicts
+
+**No one, not even us, can change a verdict or the payouts.** The contract has no method that alters a final result, and a result only becomes final through the receipt checks and the challenge window. One caveat, stated plainly: until the contract account's own key is removed, whoever holds it could deploy different code. That key is still there on testnet, because we're still building. See [Limitations](#limitations).
+
+`get_verdict(claim_id)` is a public view, so another contract can act on a verdict without trusting us for anything else. [`contracts/verdict-bet`](contracts/verdict-bet/src/lib.rs) is a tiny example: two sides bet NEAR on a claim, anyone calls `settle`, and the contract reads RERUN's verdict and pays the winners, with nobody telling it who won. It's a demonstration, not a product. `pnpm verdict-bet-demo 26` runs it on testnet and prints a link for each step.
+
 ## The web app (`web/`)
 
 Next.js, reading directly from the contract, with wallets through NEAR Connect. Claims with live odds and a run feed; a market page with the odds chart, trading, the live re-run, challenges and redemption; a guide and glossary; a paper-only check; a create wizard where the AI drafts a claim from a GitHub repo and you confirm it, with technical fields folded away (private files are encrypted in the browser before upload); receipts with a panel that recomputes the checks in your browser; the Lab's attestation details; portfolio; and a points leaderboard.
@@ -117,11 +125,20 @@ docs/               planned: ARCHITECTURE, MECHANISM, THREAT_MODEL, SOURCES, ADO
 
 - **NEAR AI Cloud** private inference, with model + gateway attestation and per-response signature verification.
 - **NEP-141** collateral and **NEP-297** events in the market contract (near-sdk 5.29).
-- _Planned:_ Shade Agents on Phala Cloud (TEE Lab), NEAR Intents funding.
+- See [Coming next](#coming-next) for Shade Agents and NEAR Intents funding.
 
 ## Limitations
 
 Reproduction is not replication: RERUN checks that the published code and data produce the published number, not that the science is true.
+
+The contract account's key isn't removed yet, so an upgrade is still possible on testnet, and we've used it: new features went in that way, and existing claims and receipts read back unchanged. The accuracy score only counts forecasts made after it was added. Verdict links go to the contract's history on the explorer rather than one transaction, because past verdict transactions aren't indexed by claim. Links after you sign something go to that exact transaction.
+
+## Coming next
+
+- The Lab runs inside secure hardware (Shade Agents on Phala Cloud).
+- The Lab agent pays for its own compute via NEAR Intents.
+- Gas-free forecasts through a relayer, with a daily limit per person.
+- A research reputation on claim pages, such as "3 of 4 checked results held up" for a paper's authors.
 
 ## Built with
 

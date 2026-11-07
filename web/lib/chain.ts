@@ -4,6 +4,13 @@ import type { ClaimNote, Config, Lab, Market, Mode, Position, Receipt, State, St
 
 const provider = new JsonRpcProvider({ url: RPC });
 
+export interface Accuracy {
+  account_id: string;
+  scored: number;
+  /** Millionths: 250000 is 0.25. Null until a forecast has been scored. */
+  brier_ppm: number | null;
+}
+
 async function view<T>(method: string, args: Record<string, unknown> = {}, contractId = CONTRACT): Promise<T> {
   let lastError: unknown;
   for (const delay of [0, 800, 2000, 5000]) {
@@ -34,6 +41,7 @@ export const chain = {
   balance: (account: string, mode: Mode) => view<string>("get_balance", { account_id: account, mode }),
   storageBalance: (account: string) => view<string>("storage_balance_of", { account_id: account }),
   leaderboard: (limit = 50) => view<{ account_id: string; points: string }[]>("get_points_leaderboard", { limit }),
+  accuracy: (accounts: string[]) => view<Accuracy[]>("get_accuracy_many", { accounts }),
   lab: (account: string) => view<Lab | null>("get_lab", { lab_account: account }),
   labs: () => view<[string, Lab][]>("list_labs"),
   codehashApproved: (codehash: string) => view<boolean>("is_codehash_approved", { codehash }),

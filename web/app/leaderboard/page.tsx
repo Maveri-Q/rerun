@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { RollingNumber } from "@/components/RollingNumber";
 import { usePoll } from "@/components/usePoll";
-import { chain } from "@/lib/chain";
+import { chain, type Accuracy } from "@/lib/chain";
 import { accountLink } from "@/lib/config";
 import { fmtUnits } from "@/lib/market";
 import { useWallet } from "@/lib/wallet";
@@ -11,7 +11,10 @@ import { useWallet } from "@/lib/wallet";
 const START = 1_000_000_000n;
 
 /** The project's own accounts and the automated demo's throwaway ones. */
-const OURS = /^rerun-judge-|rerun-43f5f2\.testnet$|rerun-lab-43f5f2\.testnet$|\.rerun-43f5f2\.testnet$/;
+const OURS = /^rerun-judge-|^rerun-bet-|rerun-43f5f2\.testnet$|rerun-lab-43f5f2\.testnet$|\.rerun-43f5f2\.testnet$/;
+
+const accuracyText = (a?: Accuracy) =>
+  a?.brier_ppm == null ? "" : `Accuracy ${(a.brier_ppm / 1_000_000).toFixed(3)} over ${a.scored} ${a.scored === 1 ? "claim" : "claims"}`;
 
 const short = (id: string) => (id.length > 20 ? `${id.slice(0, 17)}…` : id);
 const signed = (points: string) => {
@@ -23,6 +26,10 @@ export default function LeaderboardPage() {
   const board = usePoll(() => chain.leaderboard(), [], 30_000, "leaderboard");
   const wallet = useWallet();
   const rows = (board.data ?? []).filter((e) => !OURS.test(e.account_id));
+  const names = rows.map((e) => e.account_id).join(",");
+  // If the score can't be read, the points still show.
+  const scores = usePoll(() => (names ? chain.accuracy(names.split(",").slice(0, 50)) : Promise.resolve([])), [names], 60_000);
+  const scoreOf = (id: string) => scores.data?.find((a) => a.account_id === id);
   const top = rows.slice(0, 3);
   const rest = rows.slice(3);
   const highest = rows.length ? Number(fmtUnits(rows[0]!.points).replaceAll(",", "")) || 1 : 1;
@@ -48,6 +55,7 @@ export default function LeaderboardPage() {
                   {e.account_id === wallet.accountId && <span className="pod-you">You</span>}
                   <RollingNumber value={fmtUnits(e.points, 0)} className="pod-points" />
                   <span className="pod-change">{signed(e.points)} since the start</span>
+                  <span className="pod-accuracy">{accuracyText(scoreOf(e.account_id))}</span>
                 </div>
               </li>
             ))}
@@ -67,13 +75,17 @@ export default function LeaderboardPage() {
                 </a>
                 <span className="rank-points">{fmtUnits(e.points)}</span>
                 <span className="rank-change">{signed(e.points)}</span>
+                {scoreOf(e.account_id)?.brier_ppm != null && <span className="rank-accuracy">{accuracyText(scoreOf(e.account_id))}</span>}
                 <i className="rank-bar" style={{ transform: `scaleX(${Math.max(value / highest, 0.02)})` }} />
               </li>
             );
           })}
         </ol>
       )}
-      <p className="hint" style={{ marginTop: 24 }}>Points in open forecasts don&apos;t count until you collect them, so someone with many open forecasts may rank lower for now.</p>
+      <p className="hint" style={{ marginTop: 24 }}>
+        The accuracy score is stored on the blockchain: 0 is perfect, and always saying 50% scores 0.250, so lower is better. It compares the odds each forecast moved a claim to with what happened. Inconclusive claims don&apos;t count.
+      </p>
+      <p className="hint">Points in open forecasts don&apos;t count until you collect them, so someone with many open forecasts may rank lower for now.</p>
     </>
   );
 }

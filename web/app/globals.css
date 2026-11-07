@@ -3361,6 +3361,16 @@ a {
   line-height: 1.45;
 }
 .wallet-help p { margin: 4px 0 10px; color: var(--ink-2); }
+.tx-proof { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; }
+
+.verified-on-near { margin-top: 10px; font-size: 14px; color: var(--ink-2); }
+.verified-on-near a { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
+.share-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.prose-page { max-width: 62ch; }
+.prose-page h2 { margin-top: 32px; }
+.prose-page p, .prose-page li { line-height: 1.6; }
+.rank-accuracy { grid-column: 2 / -1; font-family: var(--font-mono, monospace); font-size: 13px; color: var(--ink-2); white-space: nowrap; }
+.pod-accuracy { display: block; font-size: 13px; opacity: 0.75; margin-top: 2px; }
 
 /* ---------- The number line ---------- */
 .line { margin: 22px 0 8px; max-width: 640px; }

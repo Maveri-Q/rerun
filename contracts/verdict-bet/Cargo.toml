@@ -1,0 +1,19 @@
+[package]
+name = "verdict-bet"
+description = "A tiny example: a bet that settles itself from RERUN's on-chain verdict"
+version = "0.1.0"
+edition = "2024"
+resolver = "3"
+rust-version = "1.93"
+license = "MIT"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+near-sdk = { workspace = true }
+
+[dev-dependencies]
+near-sdk = { workspace = true, features = ["unit-testing"] }
+# near-sdk unit-testing -> near-crypto -> aws-lc-rs; prebuilt NASM objects let it build on Windows.
+aws-lc-sys = { version = "=0.39.1", features = ["prebuilt-nasm"] }

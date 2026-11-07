@@ -1,5 +1,5 @@
 [workspace]
-members = ["rerun", "mock-ft"]
+members = ["rerun", "mock-ft", "verdict-bet"]
 resolver = "3"
 
 [workspace.dependencies]

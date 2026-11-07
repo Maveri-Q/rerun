@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useState } from "react";
 import { AnyChainPanel } from "@/components/AnyChainPanel";
 import { PointsStack } from "@/components/PointsStack";
+import { VerifiedOnNear } from "@/components/VerifiedOnNear";
+import { REAL_MONEY } from "@/lib/config";
 import { RollingNumber } from "@/components/RollingNumber";
 import { Stamp } from "@/components/Stamp";
 import { usePoll } from "@/components/usePoll";
@@ -39,8 +41,8 @@ export default function PortfolioPage() {
           return market && position ? { market, position } : null;
         }),
       );
-      const [points, money] = await Promise.all([chain.balance(account, "points"), chain.balance(account, "money")]);
-      return { rows: rows.filter((r): r is NonNullable<typeof r> => r !== null).reverse(), points, money };
+      const [points, money, accuracy] = await Promise.all([chain.balance(account, "points"), chain.balance(account, "money"), chain.accuracy([account]).catch(() => [])]);
+      return { rows: rows.filter((r): r is NonNullable<typeof r> => r !== null).reverse(), points, money, accuracy: accuracy[0] };
     },
     [account],
     20_000,
@@ -69,7 +71,7 @@ export default function PortfolioPage() {
     setMessage(null);
     try {
       await wallet.call("withdraw", {}, { deposit: "1", tgas: 100 });
-      setMessage({ ok: true, text: "Withdrew your tUSDC to your wallet." });
+      setMessage({ ok: true, text: `Withdrew your ${REAL_MONEY ? "USDC" : "tUSDC"} to your wallet.` });
       void data.refresh();
     } catch (e) {
       setMessage({ ok: false, text: explainError(e) });
@@ -89,9 +91,16 @@ export default function PortfolioPage() {
         </div>
         <div className="figure">
           <b>{d ? <RollingNumber value={fmtUnits(d.money)} /> : "…"}</b>
-          <span>test USDC ready to withdraw</span>
+          <span>{REAL_MONEY ? "USDC" : "test USDC"} ready to withdraw</span>
         </div>
+        {d?.accuracy?.brier_ppm != null && (
+          <div className="figure">
+            <b>{(d.accuracy.brier_ppm / 1_000_000).toFixed(3)}</b>
+            <span>accuracy score over {d.accuracy.scored} {d.accuracy.scored === 1 ? "claim" : "claims"}. Lower is better</span>
+          </div>
+        )}
       </div>
+      <VerifiedOnNear account={account} label="See all your forecasts and payouts" />
       {d && BigInt(d.money) > 0n && (
         <button style={{ marginTop: 16 }} disabled={busy} onClick={() => void withdraw()}>
           Withdraw {fmtUnits(d.money)} tUSDC

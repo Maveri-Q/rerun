@@ -579,8 +579,8 @@ fn money_world() -> (Contract, u64) {
     paying("creator.testnet", T0);
     let id = c.create_market(canonical(&sample_spec()), T0 + 3_600, WINDOW, Mode::Money);
     as_("tusdc.testnet", T0);
-    let msg = format!(r#"{{"action":"fund","market_id":{id},"initial_liquidity":"{}"}}"#, 100 * UNIT);
-    c.ft_on_transfer(a("creator.testnet"), U128(112 * UNIT), msg);
+    let msg = format!(r#"{{"action":"fund","market_id":{id},"initial_liquidity":"{}"}}"#, 20 * UNIT);
+    c.ft_on_transfer(a("creator.testnet"), U128(32 * UNIT), msg);
     (c, id)
 }
 
@@ -591,8 +591,8 @@ fn money_market_funds_and_trades_through_ft_transfer_call() {
     assert_eq!(c.get_balance(a("creator.testnet"), Mode::Money).0, 0, "liquidity + bond + fee consumed");
     as_("tusdc.testnet", T0 + 5);
     let msg = format!(r#"{{"action":"buy","market_id":{id},"outcome":"YES","min_shares_out":"0"}}"#);
-    c.ft_on_transfer(a("alice.testnet"), U128(10 * UNIT), msg);
-    assert!(c.get_position(a("alice.testnet"), id).unwrap().position.yes.0 > 10 * UNIT);
+    c.ft_on_transfer(a("alice.testnet"), U128(5 * UNIT), msg);
+    assert!(c.get_position(a("alice.testnet"), id).unwrap().position.yes.0 > 5 * UNIT);
 }
 
 #[test]
@@ -826,4 +826,74 @@ mod notes {
         note(&mut w, "alice.testnet", NoteKind::Note, "This verdict is wrong, change it", None, None);
         assert_eq!(before, format!("{:?}", w.c.get_market(w.id).unwrap().market));
     }
+}
+
+// ------------------------------------------------------------------ money limits
+
+#[test]
+#[should_panic(expected = "a prediction can be at most 5 USDC")]
+fn money_prediction_over_the_limit_is_refused() {
+    let (mut c, id) = money_world();
+    as_("tusdc.testnet", T0 + 5);
+    let msg = format!(r#"{{"action":"buy","market_id":{id},"outcome":"YES","min_shares_out":"0"}}"#);
+    c.ft_on_transfer(a("alice.testnet"), U128(5 * UNIT + 1), msg);
+}
+
+#[test]
+fn a_claim_stops_taking_money_at_its_limit() {
+    let (mut c, id) = money_world();
+    let buy = format!(r#"{{"action":"buy","market_id":{id},"outcome":"YES","min_shares_out":"0"}}"#);
+    // Each 5 USDC prediction adds about 4.95 after the fee, on top of 20 in the prize pool.
+    for t in 0..6 {
+        as_("tusdc.testnet", T0 + 5 + t);
+        c.ft_on_transfer(a("alice.testnet"), U128(5 * UNIT), buy.clone());
+    }
+    let held = c.get_market(id).unwrap().market.collateral.0;
+    assert!(held <= 50 * UNIT && held > 45 * UNIT, "holds {held}");
+    let refused = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+        as_("tusdc.testnet", T0 + 20);
+        c.ft_on_transfer(a("alice.testnet"), U128(5 * UNIT), buy.clone());
+    }));
+    assert!(refused.is_err());
+}
+
+#[test]
+fn points_have_no_limit() {
+    let mut w = world();
+    paying("carol.testnet", T0 + 30);
+    w.c.buy(w.id, Side::Yes, U128(500 * UNIT), U128(0));
+}
+
+// ------------------------------------------------------------------ accuracy
+
+#[test]
+fn accuracy_scores_the_odds_each_forecaster_moved_the_claim_to() {
+    let mut w = world();
+    assert_eq!(w.c.get_accuracy(a("alice.testnet")).scored, 0, "nothing is settled yet");
+    let alice_said = w.c.get_price_history(w.id)[1].yes_ppm as i128;
+    let bob_said = w.c.get_market(w.id).unwrap().yes_price_ppm as i128;
+    let t = propose(&mut w, |w| receipt(w, Outcome::Reproduced, Some("0.912"), 0, "m1"));
+    as_("anyone.testnet", t + WINDOW);
+    w.c.finalize(w.id);
+    let alice = w.c.get_accuracy(a("alice.testnet"));
+    assert_eq!((alice.scored, alice.brier_ppm), (1, Some(((1_000_000 - alice_said).pow(2) / 1_000_000) as u32)));
+    let bob = w.c.get_accuracy(a("bob.testnet"));
+    assert_eq!(bob.brier_ppm, Some(((1_000_000 - bob_said).pow(2) / 1_000_000) as u32));
+    // Bob's forecast sits nearer 50% than Alice's, and the claim held up, so Alice scores better.
+    assert!(alice.brier_ppm < bob.brier_ppm);
+    assert_eq!(w.c.get_accuracy(a("creator.testnet")).scored, 0, "funding a claim isn't a forecast");
+}
+
+#[test]
+fn inconclusive_claims_do_not_count_towards_accuracy() {
+    let mut w = world();
+    let t = propose(&mut w, |w| {
+        let mut r = receipt(w, Outcome::Invalid, None, 0, "m1");
+        r.invalid_reason = Some(InvalidReason::EnvSetupFailed);
+        r
+    });
+    as_("anyone.testnet", t + WINDOW);
+    w.c.finalize(w.id);
+    let alice = w.c.get_accuracy(a("alice.testnet"));
+    assert_eq!((alice.scored, alice.brier_ppm), (0, None));
 }

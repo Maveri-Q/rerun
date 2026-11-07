@@ -3,7 +3,7 @@
 import { Account, JsonRpcProvider, type KeyPairString } from "near-api-js";
 import { NearProvider, useNearWallet } from "near-connect-hooks";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { CONTRACT, NETWORK, RPC } from "./config";
+import { CONTRACT, NETWORK, RPC, txLink } from "./config";
 import type { Wallet } from "./wallet";
 
 /**
@@ -50,6 +50,33 @@ function WalletHelp({ wait, blocked, onClose }: { wait: WalletWait; blocked: boo
   );
 }
 
+/** What a wallet returns differs a little from one wallet to the next, so this reads it carefully. */
+interface SentTransaction {
+  transaction?: { hash?: string };
+  transaction_outcome?: { id?: string };
+  status?: { Failure?: unknown };
+}
+
+function hashOf(sent: SentTransaction | undefined): string {
+  if (sent?.status?.Failure) throw new Error(JSON.stringify(sent.status.Failure));
+  return sent?.transaction?.hash ?? sent?.transaction_outcome?.id ?? "";
+}
+
+/** After anything someone signs: the real transaction, on the public explorer. */
+function TransactionProof({ hash, onClose }: { hash: string; onClose: () => void }) {
+  if (!hash) return null;
+  return (
+    <aside className="wallet-help tx-proof" role="status">
+      <span>
+        <b>{"\u2713"} Verified on NEAR.</b> <a href={txLink(hash)} target="_blank" rel="noreferrer">See this transaction</a>
+      </span>
+      <button className="quiet btn--small" onClick={onClose}>
+        Hide this
+      </button>
+    </aside>
+  );
+}
+
 function Inner({ onChange }: { onChange: (wallet: Wallet) => void }) {
   const near = useNearWallet();
   const latest = useRef(near);
@@ -57,6 +84,7 @@ function Inner({ onChange }: { onChange: (wallet: Wallet) => void }) {
   const [test, setTest] = useState<Account | null>(null);
   const [wait, setWait] = useState<WalletWait>(null);
   const [blocked, setBlocked] = useState(false);
+  const [lastTx, setLastTx] = useState("");
   useEffect(() => void testAccount().then(setTest), []);
 
   // The wallet code runs in a sandbox and asks this page to open its window, so this is where a block shows.
@@ -93,14 +121,15 @@ function Inner({ onChange }: { onChange: (wallet: Wallet) => void }) {
     async (method, args, opts = {}) => {
       const contractId = opts.contractId ?? CONTRACT;
       const gas = BigInt(opts.tgas ?? 100) * 10n ** 12n;
+      setLastTx("");
       if (test) {
-        await test.callFunction({ contractId, methodName: method, args, deposit: BigInt(opts.deposit ?? "0"), gas });
+        setLastTx(hashOf((await test.callFunctionRaw({ contractId, methodName: method, args, deposit: BigInt(opts.deposit ?? "0"), gas })) as SentTransaction));
         return;
       }
       setBlocked(false);
       setWait("sign");
       try {
-        await latest.current.callFunction({ contractId, method, args, deposit: opts.deposit ?? "0", gas: gas.toString() });
+        setLastTx(hashOf((await latest.current.callFunctionRaw({ contractId, method, args, deposit: opts.deposit ?? "0", gas: gas.toString() })) as SentTransaction));
       } finally {
         setWait(null);
       }
@@ -123,7 +152,12 @@ function Inner({ onChange }: { onChange: (wallet: Wallet) => void }) {
     [test?.accountId, near.signedAccountId, near.loading, call],
   );
   useEffect(() => onChange(value), [value, onChange]);
-  return <WalletHelp wait={wait} blocked={blocked} onClose={() => setWait(null)} />;
+  return (
+    <>
+      <WalletHelp wait={wait} blocked={blocked} onClose={() => setWait(null)} />
+      {!wait && <TransactionProof hash={lastTx} onClose={() => setLastTx("")} />}
+    </>
+  );
 }
 
 /**

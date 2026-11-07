@@ -15,6 +15,8 @@ import { PrintedReceipt } from "@/components/PrintedReceipt";
 import { TradePanel } from "@/components/TradePanel";
 import { usePoll } from "@/components/usePoll";
 import { ClaimNotes } from "@/components/ClaimNotes";
+import { ShareClaim } from "@/components/ShareClaim";
+import { VerifiedOnNear } from "@/components/VerifiedOnNear";
 import { VerifiedPanel } from "@/components/VerifiedPanel";
 import { chain } from "@/lib/chain";
 import { Hint } from "@/components/Hint";
@@ -96,6 +98,7 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
         <span className="page-no">Claim {m.id}</span>
         {isPractice(m) && <p className="notice">{DEMO_LABEL}.</p>}
         <h1 className="market-title">{claimName(m)}</h1>
+        <ShareClaim path={`/market/${m.id}`} question={claimName(m)} />
         {origin && (
           <p className="origin-chips">
                         {origin.flagship && <span className="chip chip--REPRODUCED">Start here</span>}
@@ -197,6 +200,7 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
                 {latestReceipt.outcome === "REPRODUCED" && <p className="hint" style={{ maxWidth: "38ch" }}>{CHECK_OUT_NOTE}</p>}
                 {latestReceipt.outcome === "INVALID" && <p className="hint"><Hint term="inconclusive">What does Inconclusive mean?</Hint></p>}
                 <p className="hint">This slip is the Lab&apos;s <Hint term="receipt">receipt</Hint>.</p>
+                <VerifiedOnNear />
                 {evidence.data?.robustness.status === "sensitive" && <p className="hint fragile" style={{ maxWidth: "38ch" }}>{"\u26A0"} Fragile: the number changed when the random seed changed.</p>}
                 <p style={{ marginTop: 14 }}>
                   <Link className="btn quiet btn--small" href={`/receipt/${m.id}/${latestReceipt.run_index}`}>See the full receipt</Link>

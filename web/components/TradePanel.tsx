@@ -3,7 +3,8 @@
 import { nearToYocto } from "near-api-js";
 import { useState } from "react";
 import { chain } from "@/lib/chain";
-import { FT } from "@/lib/config";
+import Link from "next/link";
+import { FT, REAL_MONEY } from "@/lib/config";
 import { fmtUnits, modeUnit, parseUnits, quoteBuy, quoteSell, relativeTime, type Config, type Market, type Position, type Side } from "@/lib/market";
 import { explainError, useWallet } from "@/lib/wallet";
 import { usePoll } from "./usePoll";
@@ -144,12 +145,12 @@ export function TradePanel({ market, config, position, contract, onDone }: { mar
         </button>
       </div>
       <label className="field">
-        <span>{action === "buy" ? (market.mode === "points" ? "How many points?" : "How much test USDC?") : `How many ${side} shares to sell?`}</span>
+        <span>{action === "buy" ? (market.mode === "points" ? "How many points?" : REAL_MONEY ? "How much USDC? At most 5." : "How much test USDC? At most 5.") : `How many ${side} shares to sell?`}</span>
         <input inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value)} aria-invalid={parsed === null} />
       </label>
       {action === "buy" && (
         <div className="call-amounts" role="group" aria-label="Quick amounts">
-          {["10", "50", "100"].map((a) => (
+          {(market.mode === "money" ? ["1", "2", "5"] : ["10", "50", "100"]).map((a) => (
             <button key={a} className="quiet btn--small" aria-pressed={amount === a} onClick={() => setAmount(a)}>
               {a}
             </button>
@@ -184,8 +185,13 @@ export function TradePanel({ market, config, position, contract, onDone }: { mar
         You have {funds.data ? fmtUnits(market.mode === "money" ? available : internal) : "…"} {unit}
         {position && (BigInt(position.yes) > 0n || BigInt(position.no) > 0n) ? `, and you've already forecast: ${fmtUnits(position.yes)} YES, ${fmtUnits(position.no)} NO` : ""}.
       </p>
-      {market.mode === "money" && <p className="hint">This is test USDC with no real value. Real money is a decision for later, pending legal review.</p>}
-      {market.mode === "money" && (
+      {market.mode === "money" && !REAL_MONEY && <p className="hint">This is test USDC with no real value.</p>}
+      {market.mode === "money" && REAL_MONEY && (
+        <p className="notice" role="note">
+          Beta: real funds at your own risk, small amounts only. At most 5 USDC a prediction and 50 USDC in a claim. <Link href="/terms">Read the terms</Link>.
+        </p>
+      )}
+      {market.mode === "money" && !REAL_MONEY && (
         <button
           className="quiet w-full"
           style={{ marginTop: 8 }}

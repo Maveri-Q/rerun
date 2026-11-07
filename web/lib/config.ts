@@ -7,3 +7,6 @@ export const LAB_URL = (process.env.NEXT_PUBLIC_LAB_URL || (process.env.NODE_ENV
 export const EXPLORER = NETWORK === "mainnet" ? "https://nearblocks.io" : "https://testnet.nearblocks.io";
 
 export const accountLink = (id: string) => `${EXPLORER}/address/${id}`;
+export const txLink = (hash: string) => `${EXPLORER}/txns/${hash}`;
+/** On mainnet the money is real. Copy that calls it a test token, and the free test tokens, depend on this. */
+export const REAL_MONEY = NETWORK === "mainnet";

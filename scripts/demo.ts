@@ -19,8 +19,8 @@ import { EventHub, saveAttestation } from "../lab/orchestrator/src/lab/store.ts"
 const UNIT = 1_000_000n;
 const LOCK_IN_SECS = 75;
 const CHALLENGE_WINDOW_SECS = 60;
-const LIQUIDITY = 50n * UNIT;
-const TRADE = 10n * UNIT;
+const LIQUIDITY = 20n * UNIT;
+const TRADE = 5n * UNIT;
 
 const chain = testnetChain();
 const ownerId = need("TESTNET_OWNER_ACCOUNT");

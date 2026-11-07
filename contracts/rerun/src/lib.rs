@@ -8,6 +8,7 @@ use near_sdk::json_types::U128;
 use near_sdk::store::{IterableMap, IterableSet, LookupMap, LookupSet};
 use near_sdk::{env, near, require, AccountId, BorshStorageKey, NearToken, PanicOnDefault, Promise};
 
+pub mod accuracy;
 pub mod events;
 pub mod fpmm;
 mod ft;

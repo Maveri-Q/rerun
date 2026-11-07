@@ -13,6 +13,7 @@ RERUN: NEAR Hackathon 2026 entry. The full spec is the human's build plan (`RERU
 - `pnpm deploy:testnet` (idempotent; `pnpm deploy` is pnpm's own command), `pnpm demo [names] [--resume]` (end to end on testnet), `pnpm lab:watch` (Lab loop)
 - `pnpm repair-benchmark [names]` (real AI repair on `claims/benchmark`, writes `docs/REPAIR_BENCHMARK.md`; no claim about AI repair until it covers 5 papers), `pnpm scout` (one scan by the scout agent: reads metadata, drafts with the AI, never runs code or posts; review at `/scout`), `pnpm post-real` (posts `claims/real` to testnet, idempotent), `pnpm web` (site on :3000), `pnpm site-snapshot` (copies write-ups and the scout log for finished claims into `web/public`, so the hosted site shows them with no Lab; rerun after new verdicts), `pnpm seed` (open markets with odds), `pnpm facts` (writes `web/lib/facts.json`: AI entries for settled published claims plus citation counts; signs nothing). `ROLLING_DEMOS=1 pnpm lab:watch` also posts short demo claims hourly and powers "Try it now" (signs with the owner key). `pnpm lab:watch` also serves the Lab's API on :8787
 - `pnpm judge-demo [--skip-live]` (Node only), `pnpm challenge-demo`, `pnpm attack-demo` (both refuse to run while a Lab is up, because it would race them for markets)
+- `pnpm verdict-bet-demo [id]` (deploys `contracts/verdict-bet` on testnet with faucet accounts; shows another contract settling itself from `get_verdict`), `pnpm real-usage` (real accounts and forecasts, with our own counted apart; signs nothing)
 - `pnpm test:contracts` (cargo unit + property tests), `pnpm build:contracts` (testnet wasm into `contracts/target/near/`)
 - Mainnet contract build: `cd contracts/rerun && cargo near build non-reproducible-wasm --no-abi --no-default-features` (drops `register_lab_local`)
 
@@ -47,6 +48,7 @@ RERUN: NEAR Hackathon 2026 entry. The full spec is the human's build plan (`RERU
 - NEAR Intents in `web/lib/intents.ts` only asks for dry quotes, so nothing can move. Real deposits wait for the real-money decision.
 - Open claims in `claims/benchmark` carry `not_before`, so the repair benchmark can't run them before forecasting closes.
 - Demo scripts must not count a transaction failing for the wrong reason as an attack blocked: `Scoreboard.blocked` requires the exact rejection text, and retries only passing network errors.
+- Money limits (5 USDC a prediction, 50 a claim, prize pool included) are constants in `contracts/rerun/src/market.rs`. The accuracy score (`accuracy.rs`) uses its own storage keys, so it needs no migration; it only counts forecasts made after it was deployed. `REAL_MONEY` in `web/lib/config.ts` switches the test-token copy and the beta notice.
 - Secrets only in `.env` / `.env.testnet` (gitignored). Check history for keys before any push.
 
 ## Verified facts (2026-11-03)

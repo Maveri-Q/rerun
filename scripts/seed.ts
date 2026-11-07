@@ -27,7 +27,7 @@ const days = daysArg > 0 ? Number(process.argv[daysArg + 1]) : 7;
 const SEEDS: { name: DemoName; money: boolean; trades: [who: "creator" | "trader", side: "YES" | "NO", units: bigint][] }[] = [
   { name: "reproduces", money: false, trades: [["trader", "YES", 12n], ["creator", "NO", 4n], ["trader", "YES", 8n]] },
   { name: "misreported", money: false, trades: [["trader", "NO", 14n], ["creator", "YES", 3n], ["trader", "NO", 6n]] },
-  { name: "repairable", money: true, trades: [["trader", "YES", 6n], ["creator", "NO", 5n], ["trader", "NO", 2n]] },
+  { name: "repairable", money: true, trades: [["trader", "YES", 5n], ["creator", "NO", 5n], ["trader", "NO", 2n]] },
   { name: "private", money: false, trades: [["creator", "YES", 5n], ["trader", "YES", 4n], ["creator", "NO", 2n]] },
   { name: "broken", money: false, trades: [["trader", "NO", 5n], ["creator", "YES", 6n], ["trader", "NO", 3n]] },
 ];
@@ -55,8 +55,10 @@ async function main() {
     const ftCall = (a: typeof creator, amount: bigint, msg: unknown) =>
       chain.call(a, "ft_transfer_call", { receiver_id: chain.contractId, amount: String(amount), msg: JSON.stringify(msg) }, { yocto: 1n, tgas: 200 }, ftId);
     if (seed.money) {
-      const total = LIQUIDITY + BigInt(info.creation_bond) + BigInt(info.repro_fee);
-      await ftCall(creator, total, { action: "fund", market_id: id, initial_liquidity: String(LIQUIDITY) });
+      // A money claim holds at most 50 USDC, so its prize pool leaves room for forecasts.
+      const liquidity = 20n * UNIT;
+      const total = liquidity + BigInt(info.creation_bond) + BigInt(info.repro_fee);
+      await ftCall(creator, total, { action: "fund", market_id: id, initial_liquidity: String(liquidity) });
     } else {
       await chain.call(creator, "fund_market", { market_id: id, initial_liquidity: String(LIQUIDITY) }, { deposit: "0.02" });
     }
