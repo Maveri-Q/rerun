@@ -1,0 +1,7 @@
+female -0.239
+minority -0.249
+non_native -0.253
+tenure_track -0.136
+lower_division -0.046
+one_credit 0.687
+looks_effect 0.2748

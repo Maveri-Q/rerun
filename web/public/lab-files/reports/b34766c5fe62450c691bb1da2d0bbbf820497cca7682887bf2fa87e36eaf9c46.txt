@@ -1,0 +1,5 @@
+AI-written report (z-ai/glm-5.3-flash). The outcome was decided by deterministic code, not by this text.
+
+We ran a small rebuild program on a public copy of the Bertrand and Mullainathan (2004) resume experiment data to test the claimed callback ratio between white-sounding and Black-sounding names. The program measured 1.4968 callbacks for white-sounding names per callback for Black-sounding names, against the reported value of 1.50 with an absolute tolerance of 0.01. The difference is within tolerance, so the outcome is marked REPRODUCED. No environment patches and no repair attempts were needed, and the run completed in about one second. Robustness checks across five extra runs moved the result by more than 0.01. Since the rebuild is not the authors' original code, a mismatch would have ended as inconclusive; this is a reproduction of the number from the shared data, not a verification of the underlying science.
+
+Evidence file sha256: 713b179444c774ed267d04f2399b8aa9b7de6adb95dc657e133aa96a45e3a8c0

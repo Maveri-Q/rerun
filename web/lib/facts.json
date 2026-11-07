@@ -20,6 +20,41 @@
       "result": "Running the critics' corrected code on the authors' data produced average growth of 2.168 percent a year for the high-debt group, instead of the -0.1 percent reported in the paper. The check means the original figure does not reproduce when the identified problems are fixed, using the critics' code rather than the authors'. It does not show whether the sample was fair or complete, whether high debt slows growth or slow growth raises debt, or whether the critics' choices about years and weights were the only fair ones.",
       "model": "z-ai/glm-5.3-flash",
       "writtenAt": "2026-11-06T05:05:57.214Z"
+    },
+    "9dec5a93332271dd854ae721e75ba32855be56a09e8781adaa1407fec5f90597": {
+      "summary": "An independent rerun of Tennessee's STAR class-size experiment, using a public copy of the data, reproduced the reported first-grade gain from small classes, so the numbers check out.",
+      "background": "The study asked whether putting young children in smaller classes helps them learn. Tennessee's STAR experiment assigned thousands of young children at random to small or normal-size classes, which is why the results are considered strong evidence. Krueger reported that first graders in small classes scored higher on tests than peers in regular classes.",
+      "result": "The rerun was an independent rebuild, meaning it was not the original author's code, and used a public copy of the data with reading and maths scores only, so it could not match the original exactly. The rebuild found a first-grade gain of 8.5152 percentile points, compared with the 8.57 reported, and the verdict was that the numbers check out. This only shows the same data and method give the same number; it does not confirm the sample was fair, that the method was right for the question, or that the gain lasts or holds elsewhere.",
+      "model": "z-ai/glm-5.3-flash",
+      "writtenAt": "2026-11-07T06:32:11.157Z"
+    },
+    "d0b259198cc3c2ace78fbff438c2e074547728ad977b6141efd77f63b76c31dd": {
+      "summary": "A check ran its own small program on the authors' public data and got the same beauty-rating link the paper reported: better-looking professors drew higher student course ratings.",
+      "background": "Do better-looking professors get better ratings from their students? The paper had people rate professors' looks at the University of Texas at Austin and compared those looks with students' ratings of 463 courses. The headline finding was that looks and ratings move together, with other factors held equal.",
+      "result": "The check rebuilt the analysis independently from the shared data and measured one extra point on the looks scale going with 0.2748 extra points on the course rating — matching the paper's reported 0.275. A result that checks out only means the same data gave the same number; it does not show the finding holds on new data or beyond this one university, or that looks cause better ratings.",
+      "model": "z-ai/glm-5.3-flash",
+      "writtenAt": "2026-11-07T06:32:23.956Z"
+    },
+    "90a002bd7f0b85c8e04421cea8fca462082b99eba380cb2ce19807bcaed030fb": {
+      "summary": "When independent researchers repeated 100 published psychology experiments, they counted how many repeats still showed a statistically significant result and got 36 percent, matching the paper.",
+      "background": "The Open Science Collaboration repeated 100 published psychology experiments to see how many would produce significant results a second time. This analysis does not redo any experiments; it recounts the share of repeats that were statistically significant — a result unlikely to be due to chance — using the project's public results table. Of the 97 original experiments with significant results, the paper reports that 36 percent of the repeats were significant too.",
+      "result": "An independent rebuild of the counting program, run on the project's public results table, found that about 36 percent of the repeats were statistically significant, matching the paper's figure. This checks that the project's own numbers can be reproduced, not that the 100 experiments themselves hold up. A mismatch here would only mean the recount was inconclusive, and the paper reports other measures of replication that were not checked.",
+      "model": "z-ai/glm-5.3-flash",
+      "writtenAt": "2026-11-07T06:32:42.008Z"
+    },
+    "2a325a5acb04febe5efd5b805632cf8c44cab27f04b1a5cad7497defedaaf8cf": {
+      "summary": "The study asked whether putting a white-sounding or Black-sounding name on a CV changes the chance of a job callback, and an independent rebuild of the numbers found callbacks came at a ratio of 1.50 to 1, matching the paper.",
+      "background": "The experiment mailed about 5,000 fictitious CVs to real job advertisements in Boston and Chicago, randomly assigning names that sound white or Black. Because the names were assigned at random, any difference in callback rates can be tied to the name itself rather than to CV quality. The callback ratio has been widely cited as evidence of hiring discrimination, which is why checking it matters.",
+      "result": "A small independent program was run on a public copy of the experiment's data, computing the ratio of callbacks for white-sounding names to Black-sounding names. It produced 1.4968, matching the published 1.50, though the public data holds slightly fewer CVs than the working paper's table. Because the rebuild is not the authors' own code, this only confirms the same number comes from the same data; it does not show the result holds today, in other places, or that names signal race rather than class.",
+      "model": "z-ai/glm-5.3-flash",
+      "writtenAt": "2026-11-07T06:32:53.756Z"
+    },
+    "6358604970557ec5362053d098a463da55a001913553b5e11490e153e155a823": {
+      "summary": "Recomputing the median of the answers that 29 research teams gave about dark-skinned footballers and red cards gives 1.31, matching the number published in the paper.",
+      "background": "Silberzahn and colleagues asked 29 research teams to answer the same question with the same data: are footballers with dark skin more likely to be shown red cards by referees? The teams' answers varied widely, from 0.89 to 2.93 times the odds, with a typical answer of 1.31. This shows how much researchers' choices can affect the result even when the data and question are identical.",
+      "result": "A small independent program was run on the project's published table listing each team's answer, and it recalculated the median, giving 1.31 — the same number the paper reports. This confirms only that the same published numbers give the same median; it does not redo the 29 analyses, check whether the data were sound, or say whether the original findings hold, so a mismatch would only have ended as inconclusive.",
+      "model": "z-ai/glm-5.3-flash",
+      "writtenAt": "2026-11-07T06:33:00.308Z"
     }
   },
   "citedBy": {
@@ -28,6 +63,11 @@
     "f63ef50e89f8221d51bde13cebd576b5b89b56f82842ae5fb33321418db60774": 302,
     "c4a9b60c770317e5f7ec3aacbac1513bd2f133958bb226d29762fa2a39ae86d1": 1,
     "19ef61085d1bfae1011de7c8c5006c243a97c56f2066c7bbea8d1179e60c8a0f": 1,
-    "fa35d7e5ffd002b0b8496bed8020579611c19cef349d5ec4658021a5b04bf3d7": 3177
+    "fa35d7e5ffd002b0b8496bed8020579611c19cef349d5ec4658021a5b04bf3d7": 3177,
+    "6358604970557ec5362053d098a463da55a001913553b5e11490e153e155a823": 773,
+    "2a325a5acb04febe5efd5b805632cf8c44cab27f04b1a5cad7497defedaaf8cf": 5025,
+    "90a002bd7f0b85c8e04421cea8fca462082b99eba380cb2ce19807bcaed030fb": 8484,
+    "9dec5a93332271dd854ae721e75ba32855be56a09e8781adaa1407fec5f90597": 1116,
+    "d0b259198cc3c2ace78fbff438c2e074547728ad977b6141efd77f63b76c31dd": 382
   }
 }

@@ -1,6 +1,9 @@
+import { pageMeta } from "@/lib/meta";
 import Link from "next/link";
 import { ChallengeStory, ClaimSources, SelfCheck, VerdictFan, WhoDoesWhat, WordPrinter } from "@/components/HowExtras";
 import { Machine } from "@/components/Machine";
+
+export const metadata = pageMeta("How it works", "How a claim becomes a forecast, a re-run, a public receipt and a payout, and what each word on this site means.", "/how");
 
 export default function HowPage() {
   return (

@@ -1,0 +1,5 @@
+grade k children 5786 paper 4.82 rebuild 4.93
+grade 1 children 6379 paper 8.57 rebuild 8.52
+grade 2 children 6049 paper 5.93 rebuild 5.95
+grade 3 children 5967 paper 5.32 rebuild 5.68
+first_grade_gap 8.5152

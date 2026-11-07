@@ -1,0 +1,5 @@
+AI-written report (z-ai/glm-5.3-flash). The outcome was decided by deterministic code, not by this text.
+
+A script was run on a public copy of the Tennessee STAR data to check the claim that first graders in small classes scored 8.57 percentile points higher. The reported value was 8.57; the rerun measured 8.5152, within the allowed tolerance of 0.25, so the check was labelled REPRODUCED. The data copy has reading and maths scores only, and the rebuild is not the original author's code, so exact matching was not expected and a mismatch would only have ended as inconclusive. The run took about one second with no environment patches or repair attempts. Across five extra runs the result moved by more than 0.25, so the estimate was not stable across runs. Reproduction here means the number recomputed from the public data fell within tolerance; it does not establish whether the underlying scientific claim is true or false.
+
+Evidence file sha256: db80a694824589c55028836c431578775af95caf215af27f2889a188954f1b14

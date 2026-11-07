@@ -1,0 +1,5 @@
+AI-written report (z-ai/glm-5.3-flash). The outcome was decided by deterministic code, not by this text.
+
+An independent R replication by Boersch-Supan, published in ReScience C, was re-run to reproduce a timing model of spruce budworm life stages from Kemp, Dennis and Beckwith (1986). The rebuild ran in about 3 seconds. To make it work, a human patched the environment entrypoint: the script runs its own lines up to the model fit and then skips the table formatting afterward, which requires the kableExtra package. The target quantity was the spread value (b squared) of a logit model, reported in the original paper as 1.559, with a relative tolerance of 5%. The rebuild produced 1.411882, which differs from the reported value by roughly 9%. Because this is an independent rebuild, the mismatch could stem from the rebuild's own choices rather than the paper. No repair attempts were made, and the outcome was judged INVALID (REBUILD_MISMATCH). This does not establish whether the original finding is right or wrong.
+
+Evidence file sha256: 0fc345e6d85fd58a07fc7540f20f53064292324cb31abae3dd7d8bca6ba45ed3

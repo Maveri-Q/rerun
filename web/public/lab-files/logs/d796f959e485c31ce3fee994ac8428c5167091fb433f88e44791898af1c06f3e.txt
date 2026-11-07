@@ -1,0 +1,3 @@
+white cvs 2435 called_back_percent 9.65
+black cvs 2435 called_back_percent 6.45
+callback_ratio 1.4968

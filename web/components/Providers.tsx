@@ -1,11 +1,17 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
+import { NO_WALLET, WalletContext } from "@/lib/wallet";
 
-// The wallet connector needs `window`, so it never renders on the server.
-const WalletProvider = dynamic(() => import("@/lib/wallet").then((m) => m.WalletProvider), { ssr: false });
+const WalletConnector = dynamic(() => import("@/lib/wallet-connector").then((m) => m.WalletConnector), { ssr: false });
 
 export function Providers({ children }: { children: ReactNode }) {
-  return <WalletProvider>{children}</WalletProvider>;
+  const [wallet, setWallet] = useState(NO_WALLET);
+  return (
+    <WalletContext.Provider value={wallet}>
+      {children}
+      <WalletConnector onChange={setWallet} />
+    </WalletContext.Provider>
+  );
 }

@@ -1,0 +1,4 @@
+teams 29
+lowest 0.89 highest 2.93
+found_an_effect 20 did_not 9
+median_odds_ratio 1.31

@@ -1,6 +1,6 @@
 "use client";
 
-import { APP_NAME } from "@rerun/shared/browser";
+import { APP_NAME, BRAND } from "@rerun/shared/browser";
 import { motion, useReducedMotion } from "motion/react";
 import Link from "next/link";
 
@@ -26,6 +26,7 @@ export function BigFoot() {
           </span>
         ))}
       </motion.div>
+      <p className="bigfoot-tagline">{BRAND.tagline}</p>
     </footer>
   );
 }

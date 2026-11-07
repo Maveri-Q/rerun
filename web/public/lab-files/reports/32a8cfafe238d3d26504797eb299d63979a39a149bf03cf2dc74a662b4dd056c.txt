@@ -1,0 +1,5 @@
+AI-written report (z-ai/glm-5.3-flash). The outcome was decided by deterministic code, not by this text.
+
+A short program re-read the Reproducibility Project's public results table and counted the share of repeats that were significant again. The Open Science Collaboration's 2015 Science paper reported that, of 97 originals with significant results, 36% of the repeats were significant too. Our measured value was 36.08%, within the 0.5 tolerance of the reported 36%, so the claim is reproduced. No environment patches or repairs were needed, and the value stayed within tolerance over three extra runs. Runtime was about one second. Note this is a recomputation of the project's published numbers, not a redo of the original experiments; a mismatch would have counted only as inconclusive.
+
+Evidence file sha256: 0a116a25ed7a01952c9ef32c92aaf9f624ff58c84bc58b5d9cc33df50940e3cb

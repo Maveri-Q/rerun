@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import { SeedContext } from "./seed-context";
 
 const CACHE_PREFIX = "rerun.cache.";
 
@@ -29,10 +30,13 @@ export function answerText(value: unknown): string {
 /**
  * Loads data and refreshes it on an interval. `refresh()` reloads straight after a transaction.
  * It doesn't re-render when the answer is unchanged, and pauses while the tab is hidden, so polling
- * can't make a phone lag. With `cacheKey`, the last answer shows at once while a fresh one loads.
+ * can't make a phone lag. With `cacheKey`, the last answer shows at once while a fresh one loads, and
+ * an answer the server already read (see Seed) is in the first HTML, for people and tools with no JavaScript.
  */
 export function usePoll<T>(load: () => Promise<T>, deps: unknown[], intervalMs = 0, cacheKey?: string) {
-  const [data, setData] = useState<T | undefined>(undefined);
+  const seeded = useContext(SeedContext);
+  const seed = cacheKey ? (seeded[cacheKey] as T | undefined) : undefined;
+  const [data, setData] = useState<T | undefined>(seed);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const latest = useRef(load);
@@ -61,7 +65,7 @@ export function usePoll<T>(load: () => Promise<T>, deps: unknown[], intervalMs =
     seen.current = null;
     if (cacheKey) {
       const cached = readCache<T>(cacheKey);
-      if (cached !== undefined) setData(cached);
+      if (cached !== undefined && seed === undefined) setData(cached);
     }
     void refresh();
     if (!intervalMs) return;

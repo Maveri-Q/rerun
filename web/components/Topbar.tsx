@@ -31,7 +31,7 @@ export function Topbar() {
   return (
     <header className="topbar">
       <Link href="/" className="brand">
-        <Logo />
+        <Logo size={21} />
         {APP_NAME}
       </Link>
       <nav ref={nav} className="nav" aria-label="Main">

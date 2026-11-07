@@ -90,3 +90,17 @@ describe("what gets listed", () => {
     expect(claimName({ spec: { spec_hash: "unknown", title: "[DEMO] A sample model" } })).toBe("A sample model");
   });
 });
+
+describe("the sentence on a claim with a posted result", () => {
+  const hash = Object.entries(PROVENANCE).find(([, p]) => p.name === "budworm-spread")![0];
+  const claim = (state: string, outcome: string | null = null) => ({ state, outcome, spec: { spec_hash: hash } });
+
+  it("never says it will re-run a claim that has already run", () => {
+    expect(resultSentence(claim("Proposed"), "INVALID")).toContain("We couldn't get a fair re-run");
+    expect(resultSentence(claim("Proposed"), "INVALID")).toContain("can still be challenged");
+    expect(resultSentence(claim("Proposed"))).toContain("has posted its result");
+    expect(resultSentence(claim("Proposed"))).not.toContain("when forecasting closes");
+    expect(resultSentence(claim("Open"))).toContain("when forecasting closes");
+    expect(resultSentence(claim("Final", "REPRODUCED"))).not.toContain("challenged");
+  });
+});

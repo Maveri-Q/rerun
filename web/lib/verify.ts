@@ -1,7 +1,7 @@
 import { parseDecimal, withinTolerance, type ToleranceKind } from "@rerun/shared/browser";
 import { chain } from "./chain";
 import { evidenceHashIn, lab, type AttestationRecord } from "./lab";
-import type { Market, Receipt } from "./market";
+import { patchAuthors, type Market, type Receipt } from "./market";
 import { sha256Hex } from "./seal";
 
 /**
@@ -73,10 +73,15 @@ export async function verifyReceipt(market: Market, r: Receipt): Promise<Verific
   }
 
   const allowed = r.patches.every((p) => ["ENV", "PATH", "DEPENDENCY"].includes(p.kind));
+  // The chain records who made each change in the receipt's excerpt. One with no author there is the AI's.
+  const authors = patchAuthors(r.patches_diff_excerpt ?? "");
+  const changedBy = (by: string) => authors.filter((a) => a.by === by).map((a) => a.file);
+  const madeBy = [["a person", changedBy("human")], ["the Lab's setup step", changedBy("system")], ["the AI", changedBy("ai")]] as const;
+  const changes = madeBy.filter(([, files]) => files.length > 0).map(([who, files]) => `By ${who}: ${files.join(", ")}.`).join(" ");
   add(
-    "The AI only fixed setup problems",
+    "Only setup was changed, never the science",
     allowed ? "pass" : "fail",
-    r.patches.length === 0 ? "No fixes were needed." : `Changed: ${r.patches.map((p) => p.file).join(", ")}. The exact change is on the receipt.`,
+    r.patches.length === 0 ? "No fixes were needed." : `${changes || `Changed: ${r.patches.map((p) => p.file).join(", ")}.`} The exact change is on the receipt.`,
   );
 
   if (r.measured_value !== null) {

@@ -21,6 +21,7 @@
     "post-real": "pnpm --filter @rerun/scripts post-real",
     "facts": "pnpm --filter @rerun/scripts facts",
     "site-snapshot": "pnpm --filter @rerun/scripts site-snapshot",
+    "brand": "pnpm --filter @rerun/scripts brand",
     "scout:account": "pnpm --filter @rerun/scripts scout:account",
     "settle-claim": "pnpm --filter @rerun/scripts settle-claim",
     "verify-claim": "pnpm --filter @rerun/scripts verify-claim",

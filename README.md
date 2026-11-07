@@ -1,4 +1,8 @@
+<p><img src="web/public/brand/mark.svg" width="96" height="96" alt="RERUN logo: two ticks, the paper's claim and our re-run"></p>
+
 # RERUN
+
+*Checked twice.*
 
 **A forecasting market on whether published research results reproduce, settled by an AI agent that actually re-runs the authors' code and data inside a TEE and posts a verifiable receipt on NEAR.**
 

@@ -1,0 +1,5 @@
+AI-written report (z-ai/glm-5.3-flash). The outcome was decided by deterministic code, not by this text.
+
+An independent rebuild of the Hamermesh and Parker (2005) analysis was run on a public copy of their University of Texas at Austin data, comparing professors' looks scores with student course ratings for 463 courses. The program computed course-rating points per point of the looks score, controlling for sex, minority status, and other factors. The reported value was 0.275 and the rebuild measured 0.2748, within the 0.005 absolute tolerance, so the outcome was classed as reproduced. Runtime was one second with no environment patches or repair attempts. In five extra runs the result moved by more than 0.005, so the measured figure is not stable across runs. Because this is a rebuild rather than the authors' code, it confirms the computation can be reproduced on the shared data, not that the original claim itself is true.
+
+Evidence file sha256: 59e6449454c0ecc9f1716d4a341e13b5a5bbc58196b5a894a8f8877db0eb6e89

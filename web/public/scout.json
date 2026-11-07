@@ -1,7 +1,7 @@
 {
-  "lastScanAt": "2026-11-06T06:31:04.696Z",
+  "lastScanAt": "2026-11-07T02:55:22.667Z",
   "draftsByDay": {
-    "2026-11-06": 6
+    "2026-11-07": 2
   },
   "candidates": {
     "rescience:10.5281_zenodo.20613595": {
@@ -196,7 +196,7 @@
       "reasons": [
         "Passed the checks, and waiting for the AI budget."
       ],
-      "checkedAt": "2026-11-06T06:31:04.696Z",
+      "checkedAt": "2026-11-07T02:55:22.667Z",
       "license": "CC-BY-4.0",
       "runtime": "r4.4"
     },
@@ -225,7 +225,7 @@
       "reasons": [
         "Passed the checks, and waiting for the AI budget."
       ],
-      "checkedAt": "2026-11-06T06:31:04.696Z",
+      "checkedAt": "2026-11-07T02:55:22.667Z",
       "license": "BSD-3-Clause",
       "runtime": "python3.11"
     },
@@ -649,7 +649,7 @@
       "title": "Think Less, Locally: Local Preference Learning for Reasoning Compression",
       "paperUrl": "https://arxiv.org/abs/2611.04814",
       "doi": "10.48550/arXiv.2611.04814",
-      "upvotes": 56,
+      "upvotes": 60,
       "abstract": "Large reasoning models achieve strong performance on challenging tasks, but their long chain-of-thought often incurs substantial inference costs by continuing to deliberate after sufficient information has been obtained. Existing reasoning compression methods primarily operate on reasoning trajectories, paying less attention to the local decision of whether further reasoning is necessary given the current state. We propose LoCo, a local preference learning method for reasoning compression. LoCo detects candidate overthinking states from the model's own traces, freezes the corresponding reasoning prefixes, regenerates shorter verified continuations from the same states, and trains on the resulting state-conditioned preference pairs with DPO. This formulation teaches the model when to continue reasoning and when to conclude, rather than simply encouraging shorter trajectories overall. We construct training data entirely from self-generated mathematical traces and evaluate LoCo on five mathematical and three code generation benchmarks. LoCo reduces completion length by 41.7\\%--45.4\\% on mathematics and 23.4\\%--36.3\\% on code, while maintaining or improving accuracy and achieving the best AUC across all code benchmarks. LoCo consistently improves the accuracy-efficiency trade-off on mathematics and transfers effectively to code generation despite math-only training, demonstrating the cross-domain generality of local preference learning for reasoning compression. The code and model will be publicly released at https://github.com/MuyaoYuan/LoCo.",
       "repoUrl": "https://github.com/MuyaoYuan/LoCo",
       "needsDataCheck": true,
@@ -657,7 +657,7 @@
       "reasons": [
         "Passed the checks, and waiting for the AI budget."
       ],
-      "checkedAt": "2026-11-06T06:31:04.696Z",
+      "checkedAt": "2026-11-07T02:55:22.667Z",
       "license": "MIT",
       "runtime": "python3.11"
     },
@@ -724,11 +724,15 @@
       "paperUrl": "https://doi.org/10.1016/S0140-6736(20)31142-9",
       "repoUrl": "https://github.com/dylouie/lancet-meta-analysis-verification",
       "needsDataCheck": true,
-      "status": "retry",
+      "status": "rejected",
       "reasons": [
-        "Passed the checks, and waiting for the AI budget."
+        "Open licence: GPL-3.0.",
+        "Mostly R (100% of the code).",
+        "No sign it needs a graphics card.",
+        "Small enough to re-run.",
+        "The AI picked 0.35, but the paper doesn't state that number near \"pooled RR/aOR estimates\"."
       ],
-      "checkedAt": "2026-11-06T06:31:04.696Z",
+      "checkedAt": "2026-11-07T02:55:22.667Z",
       "license": "GPL-3.0",
       "runtime": "r4.4"
     },
@@ -739,11 +743,15 @@
       "paperUrl": "https://doi.org/10.1111/j.1467-9280.2008.02157.x",
       "repoUrl": "https://github.com/dogunbamowo/payne2008_rescue",
       "needsDataCheck": true,
-      "status": "retry",
+      "status": "rejected",
       "reasons": [
-        "Passed the checks, and waiting for the AI budget."
+        "Open licence: MIT.",
+        "Mostly Python (100% of the code).",
+        "No sign it needs a graphics card.",
+        "Small enough to re-run.",
+        "The AI couldn't find one clear number to check, and how to produce it."
       ],
-      "checkedAt": "2026-11-06T06:31:04.696Z",
+      "checkedAt": "2026-11-07T02:55:22.667Z",
       "license": "MIT",
       "runtime": "python3.11"
     },
@@ -753,7 +761,7 @@
       "title": "Identically Trained Language Models Break on Different Jailbreaks",
       "paperUrl": "https://arxiv.org/abs/2610.34074",
       "doi": "10.48550/arXiv.2610.34074",
-      "upvotes": 0,
+      "upvotes": 1,
       "abstract": "Jailbreak benchmarks test one checkpoint and treat which jailbreaks break it as a property of its pretraining data and safety training. We ask whether another pretraining run of the same data, given the same safety training, would break on the same jailbreaks. For each of 25 pretraining data recipes, we take 1B base models from 3 pretraining seeds and give each the same safety post-training with 2 post-training seeds, for 150 models in all. We then collect 20 responses from every model to a shared set of jailbreak prompts and correlate the per-prompt non-refusal rates between every pair of models. On average, two post-trained copies of the same pretraining run have per-prompt non-refusal rates that correlate at 0.984. A different pretraining seed lowers the correlation to 0.811, and a different data recipe lowers it only slightly further, to 0.779. These results indicate that which jailbreaks break a checkpoint depends much more on its pretraining run than on its data, a pattern that holds in all 25 data recipes and at 150M and 300M parameters. In practice, the best of 91 attack templates found on one checkpoint stays the best after a new pretraining seed in only 27% of model pairs, against 67% after a new post-training seed. Each pretraining run also leaves a fingerprint: across 3,211 prompts, a model's per-prompt non-refusal rates identify its pretraining run among all 75 runs every time, and a random subset of 50 prompts still does so 98% of the time.",
       "repoUrl": "https://github.com/cerulean-works/castor",
       "needsDataCheck": true,
@@ -761,7 +769,7 @@
       "reasons": [
         "Passed the checks, and waiting for the AI budget."
       ],
-      "checkedAt": "2026-11-06T06:31:04.696Z",
+      "checkedAt": "2026-11-07T02:55:22.667Z",
       "license": "Apache-2.0",
       "runtime": "python3.11"
     },
@@ -799,6 +807,42 @@
       ],
       "checkedAt": "2026-11-06T06:31:04.696Z",
       "license": "Apache-2.0",
+      "runtime": "python3.11"
+    },
+    "arxiv:2611.04277": {
+      "id": "arxiv:2611.04277",
+      "source": "Hugging Face Papers",
+      "title": "Harness-S: Learning from Sibling Harnesses for Generalizable Agent Training",
+      "paperUrl": "https://arxiv.org/abs/2611.04277",
+      "doi": "10.48550/arXiv.2611.04277",
+      "upvotes": 55,
+      "abstract": "Harness evolution from a common base exhibits Locality, Complementarity, and Nonstationarity: variants repair different failures, and their utility changes as the policy learns. Rather than seeking a universally superior harness, we introduce Harness-S to selectively rescue failures of a base execution system through sibling harnesses and transfer the resulting capabilities into a single policy that remains effective under the original harness. Directional Harness Evolution develops specialized sibling harnesses along distinct repair directions, forming a reusable Sibling Harness Pool that remains fixed during policy training. Complementary Harness Rescue Training invokes this pool only when all initial attempts under the base harness fail. The same policy generates fresh rollouts under selected auxiliary harnesses, and these trajectories replace the failed group for reinforcement learning. An Adaptive Harness Router selects the Top-k variants using Harness Behavior Profiles and voting across multiple LLMs. Policy-aware profile re-anchoring refreshes this evidence as the policy learns. Across AppWorld, SWE-Gym, and DBBench, the trained policy substantially outperforms policy-only training when returned to the original base harness. Behavioral analyses and held-out cases support the transfer of harness-elicited behaviors into the policy itself. Reusing the router for Rank-1 inference provides additional gains at the same executor rollout count.",
+      "repoUrl": "https://github.com/DeepExperience/Harness-S",
+      "needsDataCheck": true,
+      "status": "retry",
+      "reasons": [
+        "Passed the checks, and waiting for the AI budget."
+      ],
+      "checkedAt": "2026-11-07T02:55:22.667Z",
+      "license": "Apache-2.0",
+      "runtime": "python3.11"
+    },
+    "arxiv:2611.00883": {
+      "id": "arxiv:2611.00883",
+      "source": "Hugging Face Papers",
+      "title": "Random Is Almost Enough? Stable and Low-Cost Benchmark Compression via BestRand",
+      "paperUrl": "https://arxiv.org/abs/2611.00883",
+      "doi": "10.48550/arXiv.2611.00883",
+      "upvotes": 50,
+      "abstract": "Benchmark compression reduces the often prohibitive time and cost of model evaluation by evaluating models on a small benchmark subset that closely matches full-benchmark results. To quantify estimation error, we derive an accurate analytical approximation to the error distribution when estimating full-benchmark scores from a subset, showing that most subsets yield small errors, while a few produce much larger errors, resulting in a long-tailed distribution. This means random sampling alone can achieve surprisingly strong performance with high probability, but remains unstable due to rare large errors. We further show that this instability is inherent to modern foundation models and persists even as more models are evaluated. Based on these findings, we introduce BestRand, a stable and low-cost benchmark compression method that preserves the efficiency of random sampling while substantially reducing its high-error tail. We validate BestRand on 70+ text, multimodal, and agent benchmarks, and further extend it to VLA evaluation. Compared with competitive methods, BestRand reduces high-error risk by 50.2% and estimation error by 16.4% on average, while requiring only 51.3% of the construction cost. It further reduces OOD estimation error by 21.8% on average across score-range, model-family, and temporal shifts. Together, our theory provides practical guidance for understanding and predicting the accuracy and reliability of benchmark compression, while BestRand enables stable and accurate compression at low cost. The code and data are publicly available onhttps://github.com/George-Ling3/BestRand.",
+      "repoUrl": "https://github.com/George-Ling3/BestRand",
+      "needsDataCheck": true,
+      "status": "retry",
+      "reasons": [
+        "Passed the checks, and waiting for the AI budget."
+      ],
+      "checkedAt": "2026-11-07T02:55:22.667Z",
+      "license": "MIT",
       "runtime": "python3.11"
     }
   }

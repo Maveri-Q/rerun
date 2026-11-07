@@ -2,31 +2,9 @@
 
 import { Account, JsonRpcProvider, type KeyPairString } from "near-api-js";
 import { NearProvider, useNearWallet } from "near-connect-hooks";
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { CONTRACT, NETWORK, RPC } from "./config";
-
-export interface CallOptions {
-  /** yoctoNEAR, as a string. */
-  deposit?: string;
-  tgas?: number;
-  contractId?: string;
-}
-
-export interface Wallet {
-  accountId: string;
-  loading: boolean;
-  signIn: () => void;
-  signOut: () => void;
-  call: (method: string, args: Record<string, unknown>, opts?: CallOptions) => Promise<void>;
-}
-
-const WalletContext = createContext<Wallet | null>(null);
-
-export const useWallet = (): Wallet => {
-  const wallet = useContext(WalletContext);
-  if (!wallet) throw new Error("useWallet needs WalletProvider");
-  return wallet;
-};
+import type { Wallet } from "./wallet";
 
 /**
  * Automated browser tests cannot click through a wallet's own window, so on a local dev server
@@ -72,8 +50,10 @@ function WalletHelp({ wait, blocked, onClose }: { wait: WalletWait; blocked: boo
   );
 }
 
-function Inner({ children }: { children: ReactNode }) {
+function Inner({ onChange }: { onChange: (wallet: Wallet) => void }) {
   const near = useNearWallet();
+  const latest = useRef(near);
+  latest.current = near;
   const [test, setTest] = useState<Account | null>(null);
   const [wait, setWait] = useState<WalletWait>(null);
   const [blocked, setBlocked] = useState(false);
@@ -120,12 +100,12 @@ function Inner({ children }: { children: ReactNode }) {
       setBlocked(false);
       setWait("sign");
       try {
-        await near.callFunction({ contractId, method, args, deposit: opts.deposit ?? "0", gas: gas.toString() });
+        await latest.current.callFunction({ contractId, method, args, deposit: opts.deposit ?? "0", gas: gas.toString() });
       } finally {
         setWait(null);
       }
     },
-    [near, test],
+    [test],
   );
 
   const value = useMemo<Wallet>(
@@ -135,35 +115,26 @@ function Inner({ children }: { children: ReactNode }) {
       signIn: () => {
         setBlocked(false);
         setWait("connect");
-        void near.signIn();
+        void latest.current.signIn();
       },
-      signOut: () => void near.signOut(),
+      signOut: () => void latest.current.signOut(),
       call,
     }),
-    [near, test, call],
+    [test?.accountId, near.signedAccountId, near.loading, call],
   );
-  return (
-    <WalletContext.Provider value={value}>
-      {children}
-      <WalletHelp wait={wait} blocked={blocked} onClose={() => setWait(null)} />
-    </WalletContext.Provider>
-  );
+  useEffect(() => onChange(value), [value, onChange]);
+  return <WalletHelp wait={wait} blocked={blocked} onClose={() => setWait(null)} />;
 }
 
-export function WalletProvider({ children }: { children: ReactNode }) {
+/**
+ * The wallet connector needs `window`, so it loads only in the browser. It sits beside the pages rather
+ * than around them, so the pages themselves still render on the server, and tells them who's connected.
+ */
+export function WalletConnector({ onChange }: { onChange: (wallet: Wallet) => void }) {
   return (
     <NearProvider config={{ network: NETWORK }}>
-      <Inner>{children}</Inner>
+      <Inner onChange={onChange} />
     </NearProvider>
   );
 }
 
-/** Turns wallet and contract failures into a sentence someone can act on. */
-export function explainError(e: unknown): string {
-  const text = e instanceof Error ? e.message : String(e);
-  const panic = /Smart contract panicked: ([^"\\]+)/.exec(text);
-  if (panic) return panic[1]!;
-  if (/reject|cancel|denied|closed/i.test(text)) return "You cancelled this in your wallet. Nothing was sent.";
-  if (/fetch|network/i.test(text)) return "The network did not answer. Check your connection and try again.";
-  return text.slice(0, 220);
-}

@@ -1,0 +1,5 @@
+AI-written report (z-ai/glm-5.3-flash). The outcome was decided by deterministic code, not by this text.
+
+A short program was run against the project's published table listing each of the 29 teams' odds-ratio answers. The program computed the median of those 29 values and compared it with the reported figure of 1.31. The measured median was 1.31, matching the reported value within the absolute tolerance of 0.01. No environment patches or repair attempts were needed. Three additional runs all stayed within the 0.01 tolerance. The result is classified as REPRODUCED. Note this only verifies that our computation of the median from the published table matches the reported median; it does not rerun the 29 teams' original analyses, and it does not establish whether referees truly give dark-skinned footballers more red cards.
+
+Evidence file sha256: e0a046fc2429b5203ea0199f5130e017fe4410f4b2c4a29fdb05cd1d30fe1a53

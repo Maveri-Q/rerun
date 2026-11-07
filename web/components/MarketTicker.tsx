@@ -21,6 +21,9 @@ export function MarketTicker({ market }: { market: Market }) {
   const [held, setHeld] = useState<PricePoint | null>(null);
   const reduce = useReducedMotion();
   const history = usePoll(() => chain.priceHistory(market.id), [market.id]);
+  // A posted result is only on the receipt until the claim is final.
+  const posted = market.state === "Proposed" || market.state === "Challenged";
+  const receipts = usePoll(() => (posted ? chain.receipts(market.id) : Promise.resolve([])), [market.id, posted], 0, posted ? `receipts.${market.id}` : undefined);
   const points = history.data ?? [];
 
   const s = market.spec;
@@ -44,7 +47,7 @@ export function MarketTicker({ market }: { market: Market }) {
             {claimName(market)}
           </span>
           <span className="ticker-meta">
-            {isPractice(market) ? DEMO_LABEL : resultSentence(market) ?? countsIf(s.reported_value, s.tolerance_kind, s.tolerance_value)}
+            {isPractice(market) ? DEMO_LABEL : resultSentence(market, receipts.data?.at(-1)?.outcome) ?? countsIf(s.reported_value, s.tolerance_kind, s.tolerance_value)}
           </span>
         </span>
         {!open && (

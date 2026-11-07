@@ -1,0 +1,5 @@
+AI-written report (z-ai/glm-5.3-flash). The outcome was decided by deterministic code, not by this text.
+
+Researchers re-ran an original 2009 script, unchanged, on published data from a study of water loss in Canadian boreal forests after fire. The script calculates how much yearly forest water loss is explained by average temperature, measured by an R-squared value. The study's authors had recorded a value of 0.1495 in a 2008 output file. Running the script took about two seconds and produced the same value, 0.1495, matching the reported figure within the allowed tolerance of 0.0005. No changes to the computing environment or the script were needed, and no repair attempts were made. Three additional runs gave results that stayed within the same tolerance. This means the numerical result could be reproduced; it does not verify the underlying science.
+
+Evidence file sha256: c34ad2f6bc361d4f08d8528cadc7d76531b1bcdeafab84765d8694e4b7165af1

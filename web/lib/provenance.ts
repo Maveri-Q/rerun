@@ -289,11 +289,16 @@ const RERUN_SAID: Record<string, string> = {
 };
 
 /** "The study said X. We reran it: ✓ same result." Null when we have no plain wording for the claim. */
-export function resultSentence(m: { state: string; outcome?: string | null; spec: { spec_hash: string } }): string | null {
+export function resultSentence(m: { state: string; outcome?: string | null; spec: { spec_hash: string } }, posted?: string | null): string | null {
   const said = provenanceOf(m.spec.spec_hash)?.plain?.said;
   if (!said) return null;
-  const rerun = m.outcome ? RERUN_SAID[m.outcome] : null;
-  return `${said} ${rerun ?? "We'll re-run it when forecasting closes."}`;
+  // A market's own outcome only appears once it's final. Until then the latest receipt has the result.
+  const outcome = m.outcome ?? posted;
+  const rerun = outcome ? RERUN_SAID[outcome] : null;
+  if (rerun) return `${said} ${rerun}${m.outcome ? "" : " This can still be challenged."}`;
+  if (m.state === "Running") return `${said} The Lab is re-running it now.`;
+  if (m.state === "Proposed" || m.state === "Challenged") return `${said} The Lab has posted its result.`;
+  return `${said} We'll re-run it when forecasting closes.`;
 }
 
 /** A claim's name for readers: the question if it has one, otherwise its title without the label. */

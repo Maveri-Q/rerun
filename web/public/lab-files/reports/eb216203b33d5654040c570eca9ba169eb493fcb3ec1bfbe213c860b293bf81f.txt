@@ -1,0 +1,5 @@
+AI-written report (z-ai/glm-5.3-flash). The outcome was decided by deterministic code, not by this text.
+
+This ran Boersch-Supan's independent R replication of Candy's 1991 spruce budworm phenology paper, published in ReScience C. The script fit Candy's cumulative logit model to the published stage-count data. A human-made dependency patch installed the required packages by hand, bypassing the repository's renv setup; no other repairs were needed. The reported slope of -0.0457 came back as -0.045599, within the 1% relative tolerance, so the outcome was reproduced. Runtime was about 6 seconds, and three extra runs all stayed within 0.01 of the value. Reproduction checks that a number can be recovered from the original data and code; it does not by itself confirm the underlying scientific claim.
+
+Evidence file sha256: 2bfa3415f7217f95a12b7e1f423a9d09d47180fabd927fab42efcd5a9c5ac82c

@@ -92,8 +92,8 @@ a:hover {
 }
 
 .brand {
-  font: 600 19px/1 var(--font-funnel-display), sans-serif;
-  letter-spacing: -0.01em;
+  font: 700 21px/1 var(--font-wordmark), sans-serif;
+  letter-spacing: -0.02em;
   color: var(--ink);
   text-decoration: none;
   display: inline-flex;
@@ -1922,8 +1922,8 @@ main > h1:first-child {
   justify-content: space-between;
   max-width: 1320px;
   margin: 0 auto 0.04em;
-  font: 500 clamp(80px, 25vw, 360px) / 1 var(--font-funnel-display), sans-serif;
-  letter-spacing: -0.04em;
+  font: 700 clamp(80px, 25vw, 360px) / 1 var(--font-wordmark), sans-serif;
+  letter-spacing: -0.02em;
   color: var(--ink);
 }
 
@@ -3553,3 +3553,6 @@ a {
 .fragile-chip { color: var(--ink-2, #bbb); }
 .fragile-note { max-width: 60ch; margin: 14px 0 0; padding-left: 12px; border-left: 2px solid currentColor; }
 .fragile-note b { font-weight: 500; }
+.brand svg { flex: none; }
+.bigfoot-tagline { max-width: 1320px; margin: 0 auto 28px; font: 700 clamp(18px, 2.4vw, 30px) / 1.2 var(--font-wordmark), sans-serif; letter-spacing: -0.02em; color: var(--mint); }
+.noscript-note { margin: 0; padding: 10px 16px; font-size: 14px; background: var(--paper); color: var(--paper-ink); }

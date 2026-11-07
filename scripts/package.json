@@ -12,6 +12,7 @@
     "post-real": "tsx post-real.ts",
     "facts": "tsx facts.ts",
     "site-snapshot": "tsx site-snapshot.ts",
+    "brand": "tsx brand-assets.ts",
     "scout:account": "tsx scout-account.ts",
     "settle-claim": "tsx settle-claim.ts",
     "verify-claim": "tsx verify-claim.ts",
@@ -23,7 +24,8 @@
   "dependencies": {
     "@rerun/shared": "workspace:*",
     "dotenv": "18.0.9",
-    "near-api-js": "7.4.0"
+    "near-api-js": "7.4.0",
+    "sharp": "0.35.5"
   },
   "devDependencies": {
     "@types/node": "26.6.6",

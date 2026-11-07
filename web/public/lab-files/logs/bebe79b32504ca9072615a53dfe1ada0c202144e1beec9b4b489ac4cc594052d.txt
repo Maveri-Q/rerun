@@ -1,0 +1,3 @@
+significant_originals 97
+significant_again 35
+percent_significant_again 36.0825

@@ -1,0 +1,5 @@
+AI-written report (z-ai/glm-5.3-flash). The outcome was decided by deterministic code, not by this text.
+
+This run recreated the key analysis of Henderson et al. (Nature Neuroscience, 2019), which models how alpha-synuclein spreads through the mouse brain's wiring, using the independent Python rebuild by Bourdenx and Paul rather than the original authors' own public code. The team pinned older package versions manually since the repository lists none, and two patches were made: a small wrapper restores a pandas feature removed in newer versions so Pipeline.py runs unchanged, and another skips optional robustness checks of 150 shuffled repeats that take over fifteen minutes after the main result prints. With these patches, the correlation between predicted and measured pathology at three months was 0.69605, matching the reported 0.696 within the 0.005 tolerance. Three additional runs stayed within tolerance, and the run took about thirty seconds.
+
+Evidence file sha256: ee80262d45267a03276c8ce8f8d52c6a2aa9c073aeeccccfbf9650be10223f9a
