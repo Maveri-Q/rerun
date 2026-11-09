@@ -1,0 +1,59 @@
+{
+  "expected": "REPRODUCED",
+  "origin": "rebuild",
+  "paper_says": {
+    "quote": "difference (2) - (1) 0.068 (0.002)",
+    "where": "Table 3 (continued), married women, 1980 PUMS, 254,654 observations, column 2, of the working paper (NBER 5778), read from the page image",
+    "href": "https://www.nber.org/papers/w5778"
+  },
+  "human_patches": [],
+  "spec": {
+    "version": 1,
+    "title": "Do parents of two boys or two girls go on to have a third child more often? A 1980 US census study found 6.8 points more",
+    "statement": "Angrist and Evans (American Economic Review, 1998) looked at married women aged 21 to 35 in the 1980 US census with two or more children. When the first two children were both boys or both girls, 41.4% went on to have another child, against 34.6% when they were one boy and one girl: 6.8 percentage points more. This runs our own small program on a public copy of the paper's 254,654 women. The rebuild isn't the authors' code, so a mismatch ends as inconclusive.",
+    "source": {
+      "type": "paper",
+      "url": "https://doi.org/10.3386/w5778",
+      "doi": "10.3386/w5778",
+      "license": "Rebuild: MIT. Data: GPL (R package AER), fetched from Rdatasets, not redistributed.",
+      "authors": "J. D. Angrist and W. N. Evans; rebuild by the RERUN project"
+    },
+    "artifact": {
+      "repo_url": "https://github.com/Maveri-Q/rerun-rebuilds",
+      "commit": "6b8ba2d5f26fdf4837a71dfffb43b175586424d3",
+      "data": [
+        {
+          "url": "https://vincentarelbundock.github.io/Rdatasets/csv/AER/Fertility.csv",
+          "sha256": "ca9be592b79dddbc2f49ff80f45d0dbe31aac4afb57ff88dec57376c3f3e3452",
+          "path": "Fertility.csv"
+        }
+      ],
+      "runtime": "python3.11",
+      "setup": [],
+      "entrypoint": "python third-child-1998/rebuild.py Fertility.csv > rerun_output.txt && cat rerun_output.txt",
+      "output": {
+        "path": "rerun_output.txt",
+        "extractor": {
+          "type": "regex",
+          "expr": "same_sex_difference (-?[0-9.]+)"
+        }
+      }
+    },
+    "metric": {
+      "name": "extra share having another child when the first two are the same sex",
+      "reported_value": "0.068",
+      "tolerance": {
+        "type": "abs",
+        "value": "0.005"
+      },
+      "comparison": "within_tolerance"
+    },
+    "resources": {
+      "cpu": 2,
+      "mem_gb": 4,
+      "max_minutes": 15
+    },
+    "private_data": null
+  },
+  "published_output_check": "Not run on the real data: this is an open claim. Table 2 of NBER 5778 gives the same 254,654 married women as the public data's row count. Tested only on made-up data with a known answer."
+}

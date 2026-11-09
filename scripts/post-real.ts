@@ -4,6 +4,7 @@
  * and every forecast on these is a real one.
  *
  *   pnpm post-real [--days 2] [--dry]
+ *   pnpm post-real --names third-child --lock 2026-11-12T14:00:00Z --challenge-hours 6
  */
 import { specHash, specJson } from "@rerun/shared";
 import { loadReal } from "../lab/orchestrator/src/demo/real.ts";
@@ -11,10 +12,10 @@ import { need, testnetChain } from "../lab/orchestrator/src/lab/setup.ts";
 
 const UNIT = 1_000_000n;
 const LIQUIDITY = 40n * UNIT;
-const CHALLENGE_WINDOW_SECS = 24 * 3600;
+
 
 /** The flagship goes first, so it has the lowest id of the set. */
-const NAMES = ["wildfire-water", "parkinsons-spread", "budworm-timing", "budworm-spread"];
+const DEFAULT_NAMES = ["wildfire-water", "parkinsons-spread", "budworm-timing", "budworm-spread"];
 
 const arg = (flag: string) => {
   const i = process.argv.indexOf(flag);
@@ -22,13 +23,17 @@ const arg = (flag: string) => {
 };
 const days = Number(arg("--days") ?? 2);
 const dry = process.argv.includes("--dry");
+const NAMES = arg("--names")?.split(",") ?? DEFAULT_NAMES;
+const CHALLENGE_WINDOW_SECS = Math.round(Number(arg("--challenge-hours") ?? 24) * 3600);
+const lockArg = arg("--lock");
 
 const chain = testnetChain();
 const ownerId = need("TESTNET_OWNER_ACCOUNT");
 const owner = chain.account(ownerId, need("TESTNET_OWNER_PRIVATE_KEY"));
 
 async function main() {
-  const lockTime = Math.floor(Date.now() / 1000) + days * 86_400;
+  const lockTime = lockArg ? Math.floor(Date.parse(lockArg) / 1000) : Math.floor(Date.now() / 1000) + days * 86_400;
+  if (!Number.isFinite(lockTime) || lockTime * 1000 < Date.now() + 3600_000) throw new Error(`--lock must be a time at least an hour away: ${lockArg}`);
   const existing = await chain.view<{ id: number; spec: { spec_hash: string } }[]>("list_markets", { limit: 200 });
   const onChain = new Map(existing.map((m) => [m.spec.spec_hash, m.id]));
   const config = await chain.view<{ points: { creation_bond: string; repro_fee: string } }>("get_config");

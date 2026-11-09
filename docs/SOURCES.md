@@ -53,6 +53,17 @@ values from the papers.
 Note that `budworm-spread` was picked knowing the replication's author had already reported a 9%
 difference, so that the site shows what a real mismatch looks like. It is not a blind test.
 
+## Open claims for the hackathon (posted Nov 9, never run by us)
+
+| Claim | Paper | Number | Data | Forecasting closes |
+|---|---|---|---|---|
+| 37 `third-child` | Angrist and Evans (1998), AER 88; free copy NBER w5778, Table 3 (continued), married women, 1980 | 0.068, margin 0.005 | R package AER `Fertility` via Rdatasets, 254,654 rows (the paper's Table 2 count) | Nov 12, 15:00 Lagos |
+| 38 `affairs` | Fair (1978), JPE 86; the author's free copy, Table 3, PT data, second set of estimates | -2.28, margin 0.05 | R package AER `Affairs` via Rdatasets, 601 rows (the paper's sample) | Nov 16, 14:00 Lagos |
+
+Both are our own rebuilds in `rebuilds/` (public commit `6b8ba2d` of Maveri-Q/rerun-rebuilds), tested only on made-up data with a planted answer, never on the real data. Margins are our judgment: about twice the rounding of the printed figure plus a little for a different optimiser. Each has a 6-hour challenge window.
+
+Considered and dropped: Hamermesh and Biddle (1994) on looks and pay, because the public copy is one of the three surveys the paper pools; a 2026 paper on home advantage in African football, because its paper isn't published or readable yet.
+
 ## Checked but not used yet
 
 - Barnett, "Estimating trends and seasonality in coronary heart disease" (ReScience C): the replication runs in SAS, which is paid software the Lab doesn't have.

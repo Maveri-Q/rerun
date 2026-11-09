@@ -1,0 +1,59 @@
+{
+  "expected": "REPRODUCED",
+  "origin": "rebuild",
+  "paper_says": {
+    "quote": "Marital happiness ... z8 ... -2.28 -5.61",
+    "where": "Table 3, PT data, second set of estimates, read from the page image of the author's free copy",
+    "href": "https://fairmodel.econ.yale.edu/rayfair/pdf/1978A200.PDF"
+  },
+  "human_patches": [],
+  "spec": {
+    "version": 1,
+    "title": "Do happier marriages mean fewer affairs? A 1969 survey of 601 readers found a coefficient of -2.28",
+    "statement": "Fair (Journal of Political Economy, 1978) studied 601 married readers of Psychology Today who answered a 1969 survey. He fitted a model of how many affairs each had in the past year, with their own rating of their marriage from very unhappy (1) to very happy (5), plus occupation, age, years married and religiousness. Each step happier came with fewer affairs: a coefficient of -2.28. This refits the same model with our own small program on a public copy of the same 601 answers. The rebuild isn't the author's code, so a mismatch ends as inconclusive.",
+    "source": {
+      "type": "paper",
+      "url": "https://doi.org/10.1086/260646",
+      "doi": "10.1086/260646",
+      "license": "Rebuild: MIT. Data: GPL (R package AER), fetched from Rdatasets, not redistributed.",
+      "authors": "R. C. Fair; rebuild by the RERUN project"
+    },
+    "artifact": {
+      "repo_url": "https://github.com/Maveri-Q/rerun-rebuilds",
+      "commit": "6b8ba2d5f26fdf4837a71dfffb43b175586424d3",
+      "data": [
+        {
+          "url": "https://vincentarelbundock.github.io/Rdatasets/csv/AER/Affairs.csv",
+          "sha256": "68fbf471924508e2b86c913b7ade8adf291498517bb12bbd8e5318fe04482a0b",
+          "path": "Affairs.csv"
+        }
+      ],
+      "runtime": "python3.11",
+      "setup": [],
+      "entrypoint": "python affairs-1978/rebuild.py Affairs.csv > rerun_output.txt && cat rerun_output.txt",
+      "output": {
+        "path": "rerun_output.txt",
+        "extractor": {
+          "type": "regex",
+          "expr": "marriage_rating_coefficient (-?[0-9.]+)"
+        }
+      }
+    },
+    "metric": {
+      "name": "change in affairs a year for each step happier in marriage (tobit coefficient)",
+      "reported_value": "-2.28",
+      "tolerance": {
+        "type": "abs",
+        "value": "0.05"
+      },
+      "comparison": "within_tolerance"
+    },
+    "resources": {
+      "cpu": 2,
+      "mem_gb": 4,
+      "max_minutes": 15
+    },
+    "private_data": null
+  },
+  "published_output_check": "Not run on the real data: this is an open claim. The public data has 601 rows, the paper's sample size. Tested only on made-up data with a known answer."
+}

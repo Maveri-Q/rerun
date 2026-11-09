@@ -271,6 +271,38 @@ export const PROVENANCE: Record<string, Provenance> = {
       link: { label: "See the code", href: "https://github.com/Maveri-Q/rerun-rebuilds" },
     },
   },
+  "3a87812133ada0a5f6a7b1cf3ad2a15907d1945b8fdbe683e392903c02a9e5c3": {
+    name: "third-child",
+    order: -2,
+    plain: { said: "The study said parents whose first two children were both boys or both girls were 6.8 points more likely to have a third.", unit: "share of families, 0 to 1" },
+    origin: "rebuild",
+    question: "Do parents of two boys or two girls try for a third child more often?",
+    citeDoi: "10.3386/w5778",
+    paperSays: { quote: "difference (2) - (1) 0.068 (0.002)", where: "Table 3 (continued), married women, 1980 census, of the working paper (NBER 5778), read from the page image", href: "https://www.nber.org/papers/w5778" },
+    whyItMatters: "Economists use this nudge to a bigger family as a natural experiment, to measure how children change their parents' working lives.",
+    notChecked: ["Why parents do it. The study only counts births.", "Whether it still holds today. The data are from 1980."],
+    why: {
+      heading: "Whose code is this?",
+      text: "Our own small program, run on a public copy of the paper's data: the same 254,654 married women. It isn't the authors' code. Nobody has run it on the real data yet, us included. It was tested only on made-up data with a known answer, and the Lab runs it once forecasting closes.",
+      link: { label: "See the code", href: "https://github.com/Maveri-Q/rerun-rebuilds/tree/main/third-child-1998" },
+    },
+  },
+  "54627c1f8e08c7254bd35014e11f39bf9026e7a455b69158bfd89b159898b95a": {
+    name: "affairs",
+    order: -1,
+    plain: { said: "The study said people happier in their marriage had fewer affairs, by 2.28 on its scale for each step happier.", unit: "affairs scale per step of marriage happiness" },
+    origin: "rebuild",
+    question: "Do happier marriages mean fewer affairs?",
+    citeDoi: "10.1086/260646",
+    paperSays: { quote: "Marital happiness ... -2.28 -5.61", where: "Table 3, Psychology Today data, second set of estimates, read from the page image of the author's free copy", href: "https://fairmodel.econ.yale.edu/rayfair/pdf/1978A200.PDF" },
+    whyItMatters: "It's one of the most reused data sets in economics teaching, so its numbers get copied into textbooks again and again.",
+    notChecked: ["Whether magazine readers who answered a survey stand for everyone.", "Whether the answers were honest."],
+    why: {
+      heading: "Whose code is this?",
+      text: "Our own small program, which fits the paper's model on a public copy of the same 601 answers. It isn't the author's code. Nobody has run it on the real data yet, us included. It was tested only on made-up data with a known answer, and the Lab runs it once forecasting closes.",
+      link: { label: "See the code", href: "https://github.com/Maveri-Q/rerun-rebuilds/tree/main/affairs-1978" },
+    },
+  },
 };
 
 export const provenanceOf = (specHash: string): Provenance | undefined => PROVENANCE[specHash];
