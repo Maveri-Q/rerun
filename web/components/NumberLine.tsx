@@ -32,7 +32,7 @@ export function NumberLine({ reported, kind, margin, measured, tone, noNumber = 
   const p = linePositions(r, width, m);
   const align = (x: number) => (x > 72 ? "is-end" : x < 28 ? "is-start" : "");
   const seen = { once: true, amount: 0.6 };
-  const summary = bare ? (m === null ? noNumber : "Where the study landed, and where our re-run landed.") : m === null ? `The paper says ${reported}. ${noNumber}.` : `The paper says ${reported}. The Lab got ${measured}.`;
+  const summary = bare ? (m === null ? noNumber : "Where the study landed, and where the Lab's rerun landed.") : m === null ? `The paper says ${reported}. ${noNumber}.` : `The paper says ${reported}. The Lab got ${measured}.`;
   return (
     <div className={`line line--${tone ?? "waiting"}`} role="img" aria-label={summary}>
       <div className="line-marks line-marks--top">
@@ -48,7 +48,7 @@ export function NumberLine({ reported, kind, margin, measured, tone, noNumber = 
       <div className="line-marks line-marks--bottom">
         {p.lab !== null ? (
           <motion.span className={`line-mark line-mark--lab ${align(p.lab)}`} style={{ left: `${p.lab}%` }} initial={reduce ? false : { opacity: 0 }} whileInView={{ opacity: 1 }} viewport={seen} transition={{ duration: 0.3, delay: 1.5 }}>
-            {bare ? "Our re-run" : <><b>{measured}</b> {unit ? `${unit}, the Lab` : "the Lab"}</>}
+            {bare ? "The Lab's rerun" : <><b>{measured}</b> {unit ? `${unit}, the Lab` : "the Lab"}</>}
           </motion.span>
         ) : (
           <span className="line-waiting">{noNumber}</span>

@@ -30,7 +30,7 @@ import { useWallet } from "@/lib/wallet";
 const SEQUENCE: { state: State; label: string }[] = [
   { state: "Open", label: "People forecast" },
   { state: "Locked", label: "Forecasting ends" },
-  { state: "Running", label: "The Lab re-runs it" },
+  { state: "Running", label: "The Lab reruns it" },
   { state: "Proposed", label: "Verdict posted, open to challenge" },
   { state: "Final", label: "Winners collect" },
 ];
@@ -268,7 +268,7 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
 
         <section className="section">
           <div className="section-head">
-            <h2>What the Lab re-runs</h2>
+            <h2>What the Lab reruns</h2>
           </div>
           {spec ? (
             <dl className="defs">

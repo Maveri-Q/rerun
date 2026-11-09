@@ -45,7 +45,7 @@ export function loadReal(name: string): RealClaim {
     humanPatches: file.human_patches ?? [],
     origin: file.origin ?? "authors",
     noDoi: file.no_doi,
-    mockResponder: (req) => (req.purpose === "report" ? `MOCK report: "${spec.title}" was re-run. See the receipt for the numbers.` : undefined),
+    mockResponder: (req) => (req.purpose === "report" ? `MOCK report: "${spec.title}" was rerun. See the receipt for the numbers.` : undefined),
   };
 }
 

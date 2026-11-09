@@ -42,7 +42,7 @@ export interface Provenance {
   notChecked?: string[];
 }
 
-/** True of every claim, because the Lab only re-runs code. */
+/** True of every claim, because the Lab only reruns code. */
 export const NEVER_CHECKED = [
   "Whether the sample was fair or large enough.",
   "Whether test data leaked into training or tuning.",
@@ -50,7 +50,7 @@ export const NEVER_CHECKED = [
   "Whether the study's method was the right one for its question.",
 ];
 
-/** The price comes from forecasters and the verdict comes from the re-run. Neither touches the other. */
+/** The price comes from forecasters and the verdict comes from the rerun. Neither touches the other. */
 export const PRICE_RULE = "The forecast price never changes the verdict.";
 
 export const ORIGIN_LABEL: Record<CodeOrigin, string> = {
@@ -193,7 +193,7 @@ export const PROVENANCE: Record<string, Provenance> = {
     question: "Do referees give dark-skinned footballers more red cards?",
     citeDoi: "10.1177/2515245917747646",
     settledShowcase: true,
-    fragile: "29 teams, same data, different answers: from 0.89 to 2.93 times the odds. 20 teams found an effect and 9 didn't. Our re-run confirms what the teams reported, not which answer is right.",
+    fragile: "29 teams, same data, different answers: from 0.89 to 2.93 times the odds. 20 teams found an effect and 9 didn't. The Lab's rerun confirms what the teams reported, not which answer is right.",
     paperSays: { quote: "effect sizes ranged from 0.89 to 2.93 ( Mdn = 1.31) in odds-ratio units", where: "Abstract of the paper, which also says 20 teams found a significant effect and 9 did not", href: "https://doi.org/10.1177/2515245917747646" },
     whyItMatters: "Reasonable researchers can take one data set and reach different answers. This study is the clearest proof of that.",
     notChecked: ["The 29 teams' own analyses. We only recompute the summary from their published answers.", "Which team's method is the best one."],
@@ -282,13 +282,13 @@ export function isListed(m: { state: string; spec: { spec_hash: string; title: s
 }
 
 const RERUN_SAID: Record<string, string> = {
-  REPRODUCED: "We reran it: \u2713 same result.",
-  NOT_REPRODUCED: "We reran it: \u2717 different result.",
-  BROKEN: "We reran it: the code didn't finish.",
-  INVALID: "We couldn't get a fair re-run, so there's no verdict.",
+  REPRODUCED: "The Lab reran it: \u2713 same result.",
+  NOT_REPRODUCED: "The Lab reran it: \u2717 different result.",
+  BROKEN: "The Lab reran it: the code didn't finish.",
+  INVALID: "The Lab couldn't get a fair rerun, so there's no verdict.",
 };
 
-/** "The study said X. We reran it: ✓ same result." Null when we have no plain wording for the claim. */
+/** "The study said X. The Lab reran it: ✓ same result." Null when we have no plain wording for the claim. */
 export function resultSentence(m: { state: string; outcome?: string | null; spec: { spec_hash: string } }, posted?: string | null): string | null {
   const said = provenanceOf(m.spec.spec_hash)?.plain?.said;
   if (!said) return null;
@@ -296,9 +296,9 @@ export function resultSentence(m: { state: string; outcome?: string | null; spec
   const outcome = m.outcome ?? posted;
   const rerun = outcome ? RERUN_SAID[outcome] : null;
   if (rerun) return `${said} ${rerun}${m.outcome ? "" : " This can still be challenged."}`;
-  if (m.state === "Running") return `${said} The Lab is re-running it now.`;
+  if (m.state === "Running") return `${said} The Lab is rerunning it now.`;
   if (m.state === "Proposed" || m.state === "Challenged") return `${said} The Lab has posted its result.`;
-  return `${said} We'll re-run it when forecasting closes.`;
+  return `${said} The Lab will rerun it when forecasting closes.`;
 }
 
 /** A claim's name for readers: the question if it has one, otherwise its title without the label. */

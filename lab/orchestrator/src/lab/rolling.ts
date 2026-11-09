@@ -1,5 +1,5 @@
 /**
- * Keeps a short demo claim available, so a visitor can predict, watch the re-run and collect within
+ * Keeps a short demo claim available, so a visitor can predict, watch the rerun and collect within
  * minutes. It posts on a schedule and when someone presses "Try it now". Demo claims only: a published
  * paper's open claim must never be run before its forecasting closes.
  */

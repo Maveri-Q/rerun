@@ -42,7 +42,7 @@ const rolling =
               return lists.flat();
             },
             post: async (name, lockTime) => {
-              const created = await chain.call(owner, "create_market", { spec_json: specJson(loadDemo(name, labKeys).spec), lock_time: lockTime, challenge_window: 60, mode: "points" }, { deposit: "0.1" });
+              const created = await chain.call(owner, "create_market", { spec_json: specJson(loadDemo(name, labKeys).spec), lock_time: lockTime, challenge_window: Number(process.env.ROLLING_CHALLENGE_SECS || 180), mode: "points" }, { deposit: "0.1" });
               const id = Number(created.value);
               await chain.call(owner, "fund_market", { market_id: id, initial_liquidity: "40000000" }, { deposit: "0.02" });
               return id;

@@ -227,7 +227,7 @@ ${table}
 async function main() {
   const wanted = process.argv.slice(2);
   const names = readdirSync(CASES).filter((f) => f.endsWith(".json")).map((f) => f.slice(0, -5)).filter((n) => !wanted.length || wanted.includes(n));
-  // Keep earlier results when only some papers are re-run.
+  // Keep earlier results when only some papers are rerun.
   const previous: Row[] = existsSync(JSON_OUT) ? (JSON.parse(readFileSync(JSON_OUT, "utf8")) as { rows: Row[] }).rows : [];
   const rows = new Map(previous.map((r) => [r.name, r]));
   mkdirSync(path.dirname(DOC_OUT), { recursive: true });

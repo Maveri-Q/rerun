@@ -34,7 +34,7 @@ Write plainly, like a good science journalist. Use everyday words and explain an
 Reply with one JSON object:
 "summary": one sentence stating the question and the result.
 "background": two or three sentences on what the study looked at and why it matters.
-"result": two or three sentences on what was re-run and what came out, including what this doesn't show.`;
+"result": two or three sentences on what was rerun and what came out, including what this doesn't show.`;
 
 const FACT_FORMAT = {
   type: "json_schema",

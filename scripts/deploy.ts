@@ -1,5 +1,5 @@
 /**
- * Deploys tUSDC and the market contract to testnet and configures them. Safe to re-run: finished
+ * Deploys tUSDC and the market contract to testnet and configures them. Safe to rerun: finished
  * steps are skipped. Build the wasm first with `pnpm build:contracts`.
  *
  *   pnpm deploy:testnet

@@ -4,7 +4,7 @@ import { factsSeed } from "@/lib/seed";
 import FactsClient from "./FactsClient";
 
 export const revalidate = 60;
-export const metadata = pageMeta("Verified facts", "Published results the Lab has re-run, with what each one means and what wasn't checked.", "/facts");
+export const metadata = pageMeta("Verified facts", "Published results the Lab has rerun, with what each one means and what wasn't checked.", "/facts");
 
 export default async function Page() {
   return (

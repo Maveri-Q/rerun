@@ -3,7 +3,7 @@
  *
  *   MOCK_LLM=1 pnpm lab:run all      # scripted LLM, no credits
  *   pnpm lab:run repairable          # real NEAR AI private model (spends a little credit)
- *   pnpm lab:run reproduces --rerun  # as an independent second run, with the re-run model
+ *   pnpm lab:run reproduces --rerun  # as an independent second run, with the rerun model
  *   MOCK_LLM=1 pnpm lab:run real     # published papers from claims/real, cloned from GitHub
  */
 import { mkdirSync, writeFileSync } from "node:fs";

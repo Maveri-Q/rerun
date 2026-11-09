@@ -56,7 +56,7 @@ const MARGIN_FORMAT = {
   json_schema: { name: "margin_pick", strict: true, schema: { type: "object", properties: { margin: { type: "string" } }, required: ["margin"], additionalProperties: false } },
 };
 
-/** Asks one AI how close a re-run must get. Each model answers alone, and never sees the other's answer. */
+/** Asks one AI how close a rerun must get. Each model answers alone, and never sees the other's answer. */
 export function marginWithModel(model: PrivateModel) {
   return async (draft: NonNullable<Candidate["draft"]>): Promise<string> => {
     const reply = await model.ask(
@@ -65,7 +65,7 @@ export function marginWithModel(model: PrivateModel) {
         {
           role: "system",
           content:
-            'A paper reports one number. Say how close a re-run must get for it to count as the same result, allowing only for the rounding in how the number is printed. Reply with one JSON object and nothing else: {"margin": "..."}, as a plain decimal such as "0.05".',
+            'A paper reports one number. Say how close a rerun must get for it to count as the same result, allowing only for the rounding in how the number is printed. Reply with one JSON object and nothing else: {"margin": "..."}, as a plain decimal such as "0.05".',
         },
         { role: "user", content: `The quantity: ${draft.metric_name}\nThe printed number: ${draft.reported_value}` },
       ],

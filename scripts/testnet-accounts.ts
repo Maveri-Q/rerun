@@ -50,7 +50,7 @@ async function faucetCreate(accountId: string, key: KeyPair): Promise<void> {
 
 async function main() {
   if (existsSync(OUT) && !process.argv.includes("--force")) {
-    console.error(`${OUT} already exists. Re-run with --force to create a new set of accounts.`);
+    console.error(`${OUT} already exists. Run again with --force to create a new set of accounts.`);
     process.exitCode = 1;
     return;
   }

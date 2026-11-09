@@ -1,5 +1,5 @@
 /**
- * Re-runs a claim on your own computer and compares it with the receipt on NEAR, so you don't have
+ * Reruns a claim on your own computer and compares it with the receipt on NEAR, so you don't have
  * to trust the Lab or its secure hardware. Reads the chain only: no wallet, no keys, no spending.
  * It needs Docker and `pnpm sandbox:build`. The AI step is scripted here, so a claim that needs AI
  * repair stops instead of guessing.

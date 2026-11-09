@@ -6,7 +6,7 @@
  *
  * It makes a throwaway testnet account from the public faucet, claims free points, makes a forecast
  * on a live claim, re-checks a finished receipt itself, and tries some attacks. If a Lab is reachable
- * (NEXT_PUBLIC_LAB_URL, or a local `pnpm lab:watch`), it also opens a claim and watches it get re-run.
+ * (NEXT_PUBLIC_LAB_URL, or a local `pnpm lab:watch`), it also opens a claim and watches it get rerun.
  * Add --skip-live to leave that part out.
  */
 import { APP_NAME } from "@rerun/shared";
@@ -65,7 +65,7 @@ async function verifyReceipt(chain: Chain, board: Scoreboard, m: MarketInfo) {
 async function liveRun(chain: Chain, board: Scoreboard, judge: ReturnType<Chain["account"]>) {
   const health = await fetch(`${LAB_URL}/health`, { signal: AbortSignal.timeout(4000) }).catch(() => null);
   if (!health?.ok) {
-    return board.skip("Open a claim and watch the Lab re-run it", `no Lab reachable at ${LAB_URL}. The receipts checked above came from real runs.`);
+    return board.skip("Open a claim and watch the Lab rerun it", `no Lab reachable at ${LAB_URL}. The receipts checked above came from real runs.`);
   }
   // A demo claim from the repo. The Lab recognises it and has its code and data.
   const vectors = JSON.parse(readFileSync(path.resolve(import.meta.dirname, "../contracts/rerun/test-vectors/lab-output.json"), "utf8")) as { name: string; spec_json: string }[];
@@ -91,8 +91,8 @@ async function liveRun(chain: Chain, board: Scoreboard, judge: ReturnType<Chain[
     lastSeen = events.length;
     m = await getMarket(chain, id);
   }
-  if (m.state !== "Proposed") return board.add("The Lab re-runs your claim", false, "PASS", `still ${m.state} after ${LIVE_TIMEOUT_MS / 60000} minutes`);
-  board.add("The Lab re-runs your claim and posts a receipt", true, "PASS");
+  if (m.state !== "Proposed") return board.add("The Lab reruns your claim", false, "PASS", `still ${m.state} after ${LIVE_TIMEOUT_MS / 60000} minutes`);
+  board.add("The Lab reruns your claim and posts a receipt", true, "PASS");
   await verifyReceipt(chain, board, m);
 
   await sleep(Math.max((m.challenge_deadline! - Math.floor(Date.now() / 1000) + 2) * 1000, 0));
@@ -151,8 +151,8 @@ async function main() {
   await board.blocked("Approving your own Lab", "owner only", () => chain.call(judge, "approve_codehash", { codehash: "a".repeat(64) }));
   await board.blocked("Pausing the contract", "owner only", () => chain.call(judge, "pause", {}));
 
-  console.log("\nOpen a claim and watch it get re-run:");
-  if (process.argv.includes("--skip-live")) board.skip("Open a claim and watch the Lab re-run it", "--skip-live");
+  console.log("\nOpen a claim and watch it get rerun:");
+  if (process.argv.includes("--skip-live")) board.skip("Open a claim and watch the Lab rerun it", "--skip-live");
   else await liveRun(chain, board, judge);
 
   board.finish();

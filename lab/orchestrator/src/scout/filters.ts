@@ -70,8 +70,8 @@ export function checkRepo(facts: RepoFacts): FilterResult {
   if (gpu) failures.push(`Depends on ${gpu}, which usually needs a graphics card. The Lab only has CPUs.`);
   else passes.push("No sign it needs a graphics card.");
 
-  if (facts.sizeKb > MAX_REPO_KB) failures.push(`The repository is ${Math.round(facts.sizeKb / 1024)} MB, too big to re-run quickly.`);
-  else passes.push("Small enough to re-run.");
+  if (facts.sizeKb > MAX_REPO_KB) failures.push(`The repository is ${Math.round(facts.sizeKb / 1024)} MB, too big to rerun quickly.`);
+  else passes.push("Small enough to rerun.");
 
   if (facts.archived) passes.push("Archived on GitHub, so it won't change.");
 

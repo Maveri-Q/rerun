@@ -31,6 +31,8 @@ interface ClaimFile {
   /** The scripted re-implementation used with MOCK_LLM=1. */
   mock_reimplementation?: string;
   title: string;
+  /** Earlier titles. Claims already on testnet pin them in their hashes, so they must still be recognised. */
+  previous_titles?: string[];
   statement: string;
   metric: ClaimSpec["metric"];
   entrypoint: string;
@@ -46,6 +48,7 @@ export interface DemoClaim {
   spec: ClaimSpec;
   expected: Outcome;
   expectedPatches: number;
+  previousTitles?: string[];
   resolver: ArtifactResolver;
   mockResponder: (req: ChatRequest) => string | undefined;
   /** The fixture's methods section, for the re-implementation check. */
@@ -119,9 +122,10 @@ function syntheticReadmissions(): Buffer {
   return Buffer.from(`${rows.join("\n")}\n`);
 }
 
-export function loadDemo(name: DemoName, labKeys: LabKeys, root = DEMO_ROOT): DemoClaim {
+export function loadDemo(name: DemoName, labKeys: LabKeys, root = DEMO_ROOT, title?: string): DemoClaim {
   const dir = path.join(root, name);
   const claim = JSON.parse(readFileSync(path.join(dir, "claim.json"), "utf8")) as ClaimFile;
+  if (title) claim.title = title;
   const { commit, bundle } = buildRepo(path.join(dir, "repo"));
 
   const files = new Map<string, Uint8Array>();
@@ -184,12 +188,13 @@ export function loadDemo(name: DemoName, labKeys: LabKeys, root = DEMO_ROOT): De
     spec,
     expected: claim.expected,
     expectedPatches: claim.expected_patches ?? 0,
+    previousTitles: claim.previous_titles,
     resolver,
     methods: claim.methods ? readFileSync(path.join(root, "_data", claim.methods), "utf8") : undefined,
     mockResponder: (req) => {
       if (req.purpose === "repair") return claim.mock_llm?.repair;
       if (req.purpose === "reimplement") return readFileSync(path.join(root, "_data", claim.mock_reimplementation ?? "mock-reimplementation.md"), "utf8");
-      if (req.purpose === "report") return `MOCK report: the claim "${claim.title}" was re-run. See the receipt for the outcome.`;
+      if (req.purpose === "report") return `MOCK report: the claim "${claim.title}" was rerun. See the receipt for the outcome.`;
       return undefined;
     },
   };
@@ -202,6 +207,10 @@ export function demoForSpec(spec: ClaimSpec, labKeys: LabKeys): DemoClaim | unde
     for (const name of DEMO_NAMES) {
       const demo = loadDemo(name, labKeys, root);
       if (specHash(demo.spec) === specHash(spec)) return demo;
+      for (const title of demo.previousTitles ?? []) {
+        const earlier = loadDemo(name, labKeys, root, title);
+        if (specHash(earlier.spec) === specHash(spec)) return earlier;
+      }
     }
   }
   return undefined;

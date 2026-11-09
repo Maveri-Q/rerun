@@ -9,7 +9,7 @@ import { DockerSandbox, sandboxImage } from "../sandbox/docker.ts";
 
 /**
  * The Lab's loop (build plan §5.2): watch the contract for markets past their lock time,
- * re-run them one at a time, and post the receipt. Challenged markets get an independent second
+ * rerun them one at a time, and post the receipt. Challenged markets get an independent second
  * run with a different model.
  */
 

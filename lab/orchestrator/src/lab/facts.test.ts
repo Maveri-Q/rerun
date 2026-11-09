@@ -27,7 +27,7 @@ function modelReplying(...replies: object[]): PrivateModel & { calls: number } {
   };
 }
 
-const good = { summary: "The re-run got 0.69605221, close to the paper's 0.696.", background: "The study looked at mice.", result: "The same code gave the same number." };
+const good = { summary: "The rerun got 0.69605221, close to the paper's 0.696.", background: "The study looked at mice.", result: "The same code gave the same number." };
 
 describe("factProblem", () => {
   it("accepts numbers from the facts", () => expect(factProblem(good.summary, input)).toBeNull());

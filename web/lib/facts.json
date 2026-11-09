@@ -1,9 +1,9 @@
 {
   "entries": {
     "53d87974c67eef8008149ef40f0448812042bff87db91a0683551e921a3b2e75": {
-      "summary": "The re-run confirmed the reported correlation: the authors' R code, run on their published mouse-brain data, produced a correlation of about 0.696 between predicted and measured spread of alpha-synuclein, matching the published number.",
+      "summary": "The rerun confirmed the reported correlation: the authors' R code, run on their published mouse-brain data, produced a correlation of about 0.696 between predicted and measured spread of alpha-synuclein, matching the published number.",
       "background": "Alpha-synuclein is the protein that builds up in the brains of people with Parkinson's disease. The study modelled how this protein would travel along the brain's physical connections in mice, aiming to see if wiring alone can explain where the protein ends up. Getting the model's predictions to line up with actual lab measurements would support the idea that brain connectivity shapes the spread.",
-      "result": "The check re-ran the authors' own R code, with software packages pinned to the date the code was written, on their published data. The measured correlation was 0.69605221 against a reported 0.696, so the number checks out. This only confirms that the same code and data reproduce the same figure; it does not verify that the model is correct, that the data were suitable, or that mouse results apply to humans.",
+      "result": "The check reran the authors' own R code, with software packages pinned to the date the code was written, on their published data. The measured correlation was 0.69605221 against a reported 0.696, so the number checks out. This only confirms that the same code and data reproduce the same figure; it does not verify that the model is correct, that the data were suitable, or that mouse results apply to humans.",
       "model": "z-ai/glm-5.3-flash",
       "writtenAt": "2026-11-05T12:02:10.837Z"
     },
@@ -15,8 +15,8 @@
       "writtenAt": "2026-11-06T05:05:44.971Z"
     },
     "fa35d7e5ffd002b0b8496bed8020579611c19cef349d5ec4658021a5b04bf3d7": {
-      "summary": "A well-known claim that rich countries with public debt above 90 percent of GDP saw growth fall to -0.1 percent a year was re-run with corrected code and data, and the growth figure came out at 2.168 percent instead.",
-      "background": "Reinhart and Rogoff reported in a 2010 economics paper that rich countries with public debt above 90 percent of GDP grew by -0.1 percent a year on average, a figure widely cited in arguments for austerity. Herndon, Ash and Pollin later identified problems in the calculation, including a coding error, excluded years and unusual weighting. This re-run uses the critics' published code on the authors' own working spreadsheet to see what the corrected numbers show.",
+      "summary": "A well-known claim that rich countries with public debt above 90 percent of GDP saw growth fall to -0.1 percent a year was rerun with corrected code and data, and the growth figure came out at 2.168 percent instead.",
+      "background": "Reinhart and Rogoff reported in a 2010 economics paper that rich countries with public debt above 90 percent of GDP grew by -0.1 percent a year on average, a figure widely cited in arguments for austerity. Herndon, Ash and Pollin later identified problems in the calculation, including a coding error, excluded years and unusual weighting. This rerun uses the critics' published code on the authors' own working spreadsheet to see what the corrected numbers show.",
       "result": "Running the critics' corrected code on the authors' data produced average growth of 2.168 percent a year for the high-debt group, instead of the -0.1 percent reported in the paper. The check means the original figure does not reproduce when the identified problems are fixed, using the critics' code rather than the authors'. It does not show whether the sample was fair or complete, whether high debt slows growth or slow growth raises debt, or whether the critics' choices about years and weights were the only fair ones.",
       "model": "z-ai/glm-5.3-flash",
       "writtenAt": "2026-11-06T05:05:57.214Z"

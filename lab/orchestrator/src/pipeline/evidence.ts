@@ -5,7 +5,7 @@ import { extractMetric, MAX_OUTPUT_BYTES } from "./extract.ts";
 import type { PrivateModel } from "./model.ts";
 
 /**
- * Extra evidence, on top of the normal re-run. None of this can change a market's outcome:
+ * Extra evidence, on top of the normal rerun. None of this can change a market's outcome:
  * it runs after the verdict is fixed, and any failure here only marks that check incomplete.
  */
 
@@ -117,7 +117,7 @@ export async function runRobustness(args: {
   };
 
   for (const offset of SEED_OFFSETS) {
-    emit(`re-running with a different random seed (${offset} of ${SEED_OFFSETS.length})`);
+    emit(`rerunning with a different random seed (${offset} of ${SEED_OFFSETS.length})`);
     runs.push({ kind: "seed", label: `Seed shifted by ${offset}`, value: await once(`${prefix}; export RERUN_SEED_OFFSET=${offset}; ${entrypoint}`) });
   }
 
@@ -125,7 +125,7 @@ export async function runRobustness(args: {
   for (let i = 0; i < RESAMPLES && csvs.length > 0; i++) {
     const swapped = csvs.map(([path, bytes]) => [path, resampleCsv(bytes, 1000 + i)] as const);
     if (swapped.some(([, b]) => b === null)) break;
-    emit(`re-running on a resampled copy of the data (${i + 1} of ${RESAMPLES})`);
+    emit(`rerunning on a resampled copy of the data (${i + 1} of ${RESAMPLES})`);
     for (const [path, bytes] of swapped) await sandbox.writeFile(path, bytes!);
     runs.push({ kind: "resample", label: `Resampled data ${i + 1}`, value: await once(entrypoint) });
   }

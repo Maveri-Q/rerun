@@ -339,7 +339,7 @@ function FullForm() {
     <div className="create-grid">
       <div>
       <h1 className="page-title">Put a result under the microscope</h1>
-      <p className="lede prose">Have a published result you want tested? Answer these four questions. People can then forecast whether it holds up, and the Lab will re-run it to find out.</p>
+      <p className="lede prose">Have a published result you want tested? Answer these four questions. People can then forecast whether it holds up, and the Lab will rerun it to find out.</p>
       <div style={{ marginTop: 16 }}>
         <button className="quiet" onClick={fillExample}>
           Fill in an example
@@ -391,7 +391,7 @@ function FullForm() {
             <Field label="The number in the paper" hint="As a decimal: write 93% as 0.93.">
               <input className="mono" value={reported} onChange={(e) => setReported(e.target.value.trim())} />
             </Field>
-            <Field label="How close is close enough?" hint="Re-runs rarely match exactly, so allow a small margin. It can&apos;t change once the claim opens.">
+            <Field label="How close is close enough?" hint="A rerun rarely matches exactly, so allow a small margin. It can&apos;t change once the claim opens.">
               <input className="mono" value={tolerance} onChange={(e) => setTolerance(e.target.value.trim())} placeholder="0.02" />
             </Field>
           </div>
@@ -540,7 +540,7 @@ function FullForm() {
           <Field label={`Starting pool, in ${unit}`} hint={params ? `You put this in so people can start forecasting. At least ${fmtUnits(params.min_liquidity, 0)}. A bigger pool makes the odds harder to move.` : undefined}>
             <input className="mono" value={liquidity} onChange={(e) => setLiquidity(e.target.value)} />
           </Field>
-          <Field label="How many days can people forecast?" hint="After that, the Lab re-runs the code.">
+          <Field label="How many days can people forecast?" hint="After that, the Lab reruns the code.">
             <input className="mono" inputMode="decimal" value={lockDays} onChange={(e) => setLockDays(e.target.value)} />
           </Field>
         </div>

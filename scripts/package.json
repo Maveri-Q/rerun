@@ -20,7 +20,11 @@
     "upgrade-contract": "tsx upgrade-contract.ts",
     "challenge-demo": "tsx challenge-demo.ts",
     "attack-demo": "tsx attack-demo.ts",
-    "judge-demo": "tsx judge-demo.ts"
+    "judge-demo": "tsx judge-demo.ts",
+    "real-usage": "tsx real-usage.ts",
+    "finalize-claims": "tsx finalize-claims.ts",
+    "money-demo": "tsx money-demo.ts",
+    "readme-results": "tsx readme-results.ts"
   },
   "dependencies": {
     "@rerun/shared": "workspace:*",

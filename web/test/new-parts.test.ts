@@ -62,7 +62,7 @@ describe("what gets listed", () => {
     const hash = (name: string) => Object.entries(PROVENANCE).find(([, p]) => p.name === name)![0];
     const claim = (state: string, title: string, spec_hash = "x") => ({ state, spec: { title, spec_hash } });
     expect(isListed(claim("Open", "A paper's claim"))).toBe(true);
-    expect(isListed(claim("Open", "Demo: our practice dataset says something. Will the re-run agree?"))).toBe(false);
+    expect(isListed(claim("Open", "Demo: our practice dataset says something. Will the rerun agree?"))).toBe(false);
     expect(isListed(claim("Final", "[TEST] Pipeline check"))).toBe(false);
     expect(isListed(claim("Open", "Rebuild", hash("parkinsons-spread")))).toBe(false);
     expect(isListed(claim("Final", "Rebuild", hash("parkinsons-spread")))).toBe(true);
@@ -70,8 +70,8 @@ describe("what gets listed", () => {
 
   it("says each result in one sentence", () => {
     const debt = Object.entries(PROVENANCE).find(([, p]) => p.name === "reinhart-rogoff")![0];
-    expect(resultSentence({ state: "Final", outcome: "NOT_REPRODUCED", spec: { spec_hash: debt } })).toMatch(/^The study said .*We reran it: ✗ different result\.$/);
-    expect(resultSentence({ state: "Open", outcome: null, spec: { spec_hash: debt } })).toMatch(/We'll re-run it when forecasting closes\.$/);
+    expect(resultSentence({ state: "Final", outcome: "NOT_REPRODUCED", spec: { spec_hash: debt } })).toMatch(/^The study said .*The Lab reran it: ✗ different result\.$/);
+    expect(resultSentence({ state: "Open", outcome: null, spec: { spec_hash: debt } })).toMatch(/The Lab will rerun it when forecasting closes\.$/);
     expect(resultSentence({ state: "Open", spec: { spec_hash: "unknown" } })).toBeNull();
   });
 
@@ -95,8 +95,8 @@ describe("the sentence on a claim with a posted result", () => {
   const hash = Object.entries(PROVENANCE).find(([, p]) => p.name === "budworm-spread")![0];
   const claim = (state: string, outcome: string | null = null) => ({ state, outcome, spec: { spec_hash: hash } });
 
-  it("never says it will re-run a claim that has already run", () => {
-    expect(resultSentence(claim("Proposed"), "INVALID")).toContain("We couldn't get a fair re-run");
+  it("never says it will rerun a claim that has already run", () => {
+    expect(resultSentence(claim("Proposed"), "INVALID")).toContain("The Lab couldn't get a fair rerun");
     expect(resultSentence(claim("Proposed"), "INVALID")).toContain("can still be challenged");
     expect(resultSentence(claim("Proposed"))).toContain("has posted its result");
     expect(resultSentence(claim("Proposed"))).not.toContain("when forecasting closes");

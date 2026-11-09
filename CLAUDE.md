@@ -22,7 +22,7 @@ RERUN: NEAR Hackathon 2026 entry. The full spec is the human's build plan (`RERU
 - pnpm 12 workspace; TypeScript runs directly via `tsx`/`vitest` (`.ts` import specifiers, no build step).
 - Pin exact dependency versions. pnpm enforces a minimum release age; prefer an older release to excluding a fresh one.
 - Every LLM call goes through `LlmClient` in `lab/orchestrator/src/nearai/client.ts` (token/call/daily caps, spend log, `MOCK_LLM=1`).
-- Only NEAR-hosted private models (`owned_by: "nearai"` in `/v1/models`). Default `z-ai/glm-5.3-flash`; re-runs use a different one.
+- Only NEAR-hosted private models (`owned_by: "nearai"` in `/v1/models`). Default `z-ai/glm-5.3-flash`; reruns use a different one.
 - The deterministic comparator decides outcomes, never the LLM. It exists twice and must stay identical: `contracts/rerun/src/math.rs` and `packages/shared/src/decimal.ts`.
 - ClaimSpec metric values are decimal strings (`"0.912"`), never JSON floats; the contract rejects floats and non-canonical JSON.
 - Contracts: Cargo workspace in `contracts/`, scaffolded with `cargo near new`, Rust pinned to 1.93.0 by `contracts/rust-toolchain.toml`, near-sdk 5.29.1. Unit tests use near-sdk's mocked chain (`testing_env!`).
@@ -60,7 +60,7 @@ RERUN: NEAR Hackathon 2026 entry. The full spec is the human's build plan (`RERU
 - NEAR Connect's testnet list offers Meteor, Intear, Ledger, Nightly, Ethereum wallets and NEAR CLI; NEAR Mobile, HOT and MyNearWallet are not listed on testnet. Recheck on mainnet.
 - zod 4 runs later refinements even after an earlier one fails, so a refinement must not throw on invalid input.
 - In heredoc Python and printf, `\n` and `\r` can become real control characters. Use a Write-tool file for scripts that contain them.
-- `/v1/models` has no TEE flag; `owned_by: "nearai"` plus a passing attestation is what counts. `Qwen/Qwen3.8-27B` (re-run model) attests fine.
+- `/v1/models` has no TEE flag; `owned_by: "nearai"` plus a passing attestation is what counts. `Qwen/Qwen3.8-27B` (rerun model) attests fine.
 - jose's default JWKS timeout (5 s) is too short on this network; use `timeoutDuration`.
 - If `docker` is not found in a session started before the install, its binary is in `C:\Program Files\Docker\Docker\resources\bin`.
 - Testnet RPC `https://test.rpc.fastnear.com`; faucet `POST https://helper.nearprotocol.com/account {newAccountId, newAccountPublicKey}`.

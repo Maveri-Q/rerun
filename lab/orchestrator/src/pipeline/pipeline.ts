@@ -409,7 +409,7 @@ export async function reproduce(input: RunInput, deps: RunDeps): Promise<RunResu
   }
   const evidence: Evidence = {
     version: 1,
-    note: "Extra evidence. It does not settle the market: only the normal re-run does. The re-implementation is experimental, and a difference does not mean the paper is wrong.",
+    note: "Extra evidence. It does not settle the market: only the normal rerun does. The re-implementation is experimental, and a difference does not mean the paper is wrong.",
     robustness,
     reimplementation,
   };

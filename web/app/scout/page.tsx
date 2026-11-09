@@ -120,7 +120,7 @@ function Suggestion({ c, isOwner, onDone }: { c: ScoutCandidate; isOwner: boolea
             Allowed margin
             <input className="mono" value={margin} onChange={(e) => setMargin(e.target.value)} />
           </label>
-          <p>{range ? `A re-run counts if it gets ${range}.` : "Enter a number, such as 0.01."}</p>
+          <p>{range ? `A rerun counts if it gets ${range}.` : "Enter a number, such as 0.01."}</p>
           <label className="suggestion-check">
             <input type="checkbox" checked={checked} onChange={(e) => setChecked(e.target.checked)} />
             <span>I checked {d.reported_value} against the paper. The AI drafted it from the repository, and it can be wrong.</span>
@@ -211,13 +211,13 @@ export default function ScoutPage() {
   return (
     <>
       <h1 className="page-title">The scout finds. A person decides.</h1>
-      <p className="lede">Twice a day, an AI agent looks for published research with code and data anyone can re-run, and drafts a claim for each paper that passes its checks. Nothing goes live until a person approves it.</p>
+      <p className="lede">Twice a day, an AI agent looks for published research with code and data anyone can rerun, and drafts a claim for each paper that passes its checks. Nothing goes live until a person approves it.</p>
       <p className="hint">{scout.data?.lastScanAt ? `Last scan: ${new Date(scout.data.lastScanAt).toLocaleString()}. ` : ""}It reads replication code on everyday topics from GitHub, the journal ReScience C and Hugging Face Papers. It never runs anyone&apos;s code.</p>
 
       {all.length > 0 && (
         <section className="section">
           <div className="section-head">
-            <h2 className="big-head">Most papers can&apos;t be re-run</h2>
+            <h2 className="big-head">Most papers can&apos;t be rerun</h2>
           </div>
           <p className="lede">Of the {all.length} papers read so far, here&apos;s where each one stopped. Being turned down says nothing about the research. It means the Lab can&apos;t test it fairly, so the scout moves on.</p>
           <ScoutSieve candidates={all} />

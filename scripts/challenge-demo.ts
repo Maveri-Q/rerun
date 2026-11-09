@@ -1,6 +1,6 @@
 /**
  * The challenge path on testnet, with real runs: the Lab posts a result, someone challenges it,
- * and the Lab re-runs it independently with a different AI model. The runs agree, so the result
+ * and the Lab reruns it independently with a different AI model. The runs agree, so the result
  * stands and the challenger loses the deposit. Needs Docker and the owner's accounts.
  *
  *   pnpm challenge-demo
