@@ -83,4 +83,48 @@ describe("RollingDemos", () => {
     await demos.tick();
     expect(finalized).toEqual([1]);
   });
+
+  it("collects its share of a demo once it's final, so the liquidity comes back", async () => {
+    const collected: number[] = [];
+    const demos = new RollingDemos(
+      { list: async () => [demo({ id: 4, state: "Proposed", challenge_deadline: NOW - 1 })], post: async () => 1, finalize: async () => {}, collect: async (id) => void collected.push(id), now: () => NOW * 1000 },
+      { windowSecs: 300, everySecs: 3600, maxPerDay: 3 },
+    );
+    await demos.tick();
+    expect(collected).toEqual([4]);
+  });
+
+  it("tops up the points before a demo when they run low, and clears the warning", async () => {
+    let points = 78.74;
+    const warned: (string | null)[] = [];
+    const demos = new RollingDemos(
+      { list: async () => [], post: async () => 9, finalize: async () => {}, balance: async () => points, topUp: async (n) => void (points += n), warn: (m) => warned.push(m), now: () => NOW * 1000 },
+      { windowSecs: 300, everySecs: 3600, maxPerDay: 3, lowPoints: 1_000, topUpPoints: 5_000 },
+    );
+    expect(await demos.tryNow()).toBe(9);
+    expect(points).toBeCloseTo(5_078.74);
+    expect(warned.at(-1)).toBeNull();
+  });
+
+  it("warns and posts nothing when the top-up fails and the points can't pay for a demo", async () => {
+    const warned: (string | null)[] = [];
+    let posted = 0;
+    const demos = new RollingDemos(
+      {
+        list: async () => [],
+        post: async () => ++posted,
+        finalize: async () => {},
+        balance: async () => 78.74,
+        topUp: async () => {
+          throw new Error("owner only");
+        },
+        warn: (m) => warned.push(m),
+        now: () => NOW * 1000,
+      },
+      { windowSecs: 300, everySecs: 3600, maxPerDay: 3 },
+    );
+    await expect(demos.tryNow()).rejects.toThrow("not enough points");
+    expect(posted).toBe(0);
+    expect(warned.at(-1)).toMatch(/demo points are low: 78.74 left.*New demos are paused/);
+  });
 });

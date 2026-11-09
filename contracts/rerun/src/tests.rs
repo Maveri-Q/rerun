@@ -920,3 +920,32 @@ fn only_the_owner_registers_an_attested_lab() {
     as_("mallory.testnet", T0);
     w.c.register_lab_attested(a("tee-lab.testnet"), CODEHASH.into(), LAB_KEY.into(), "e".repeat(64));
 }
+
+// ------------------------------------------------------------------ points top-up for demo claims
+
+#[test]
+fn the_owner_can_top_up_points_for_demo_claims() {
+    let mut w = world();
+    as_("owner.testnet", T0);
+    // On testnet the owner is also the treasury, which the leaderboard leaves out.
+    let before = w.c.get_balance(a("treasury.testnet"), Mode::Points).0;
+    let after = w.c.grant_points(a("treasury.testnet"), U128(crate::MAX_POINTS_GRANT)).0;
+    assert_eq!(after, before + crate::MAX_POINTS_GRANT);
+    assert!(w.c.get_points_leaderboard(None).iter().all(|e| e.account_id != a("treasury.testnet")), "a system account never ranks");
+}
+
+#[test]
+#[should_panic(expected = "owner only")]
+fn nobody_else_can_grant_points() {
+    let mut w = world();
+    as_("alice.testnet", T0);
+    w.c.grant_points(a("alice.testnet"), U128(1));
+}
+
+#[test]
+#[should_panic(expected = "grant must be between 1 and 5,000 points")]
+fn a_grant_is_capped() {
+    let mut w = world();
+    as_("owner.testnet", T0);
+    w.c.grant_points(a("owner.testnet"), U128(crate::MAX_POINTS_GRANT + 1));
+}

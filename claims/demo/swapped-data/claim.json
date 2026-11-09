@@ -1,7 +1,7 @@
 {
   "expected": "INVALID",
   "swap_data": true,
-  "title": "Demo: our practice dataset says Mondays get 15% more coffee orders. Will the re-run agree?",
+  "title": "Demo: our practice dataset says Mondays get 15% more coffee orders. Will the Lab's rerun agree?",
   "statement": "Made-up practice data, not real research. A short script compares a pretend cafe's coffee orders on Mondays and other days.",
   "metric": {
     "name": "% more coffee orders on Mondays",
@@ -28,5 +28,8 @@
       "file": "coffee.csv",
       "path": "data/coffee.csv"
     }
+  ],
+  "previous_titles": [
+    "Demo: our practice dataset says Mondays get 15% more coffee orders. Will the re-run agree?"
   ]
 }

@@ -2,7 +2,7 @@
   "methods": "methods-ice-cream.md",
   "mock_reimplementation": "mock-ice-cream.md",
   "expected": "REPRODUCED",
-  "title": "Demo: our practice dataset says sunny days sell 20% more ice cream. Will the re-run agree?",
+  "title": "Demo: our practice dataset says sunny days sell 20% more ice cream. Will the Lab's rerun agree?",
   "statement": "Made-up practice data, not real research. A short script compares the ice cream a pretend shop sold on sunny and cloudy days.",
   "metric": {
     "name": "% more ice cream sold on sunny days",
@@ -29,5 +29,8 @@
       "file": "ice_cream.csv",
       "path": "data/ice_cream.csv"
     }
+  ],
+  "previous_titles": [
+    "Demo: our practice dataset says sunny days sell 20% more ice cream. Will the re-run agree?"
   ]
 }

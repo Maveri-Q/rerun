@@ -30,7 +30,12 @@ const labKeys = { publicKey: need("LAB_ENC_PUBLIC_KEY"), privateKey: need("LAB_E
 const network = new LabResolver();
 const chain = testnetChain();
 
+/** Warnings the operator should see, shown in the Lab's /health and its log. */
+const warnings = new Map<string, string>();
+
 /** Off by default, because it signs transactions with the owner's key: ROLLING_DEMOS=1 turns it on. */
+const owner = process.env.ROLLING_DEMOS === "1" ? chain.account(need("TESTNET_OWNER_ACCOUNT"), need("TESTNET_OWNER_PRIVATE_KEY")) : undefined;
+const ownerPoints = async () => Number(await chain.view<string>("get_balance", { account_id: owner!.accountId, mode: "points" })) / 1e6;
 const rolling =
   process.env.ROLLING_DEMOS === "1"
     ? (() => {
@@ -48,9 +53,18 @@ const rolling =
               return id;
             },
             finalize: async (id) => void (await chain.call(owner, "finalize", { market_id: id })),
+            collect: async (id) => void (await chain.call(owner, "redeem", { market_id: id }, { deposit: "0.02", tgas: 100 })),
+            balance: ownerPoints,
+            topUp: async (points) => void (await chain.call(owner, "grant_points", { account_id: owner.accountId, amount: String(Math.round(points * 1e6)) })),
+            warn: (m) => (m ? warnings.set("demo_points", m) : warnings.delete("demo_points")),
             log: (m) => console.log(m),
           },
-          { windowSecs: Number(process.env.ROLLING_WINDOW_SECS || 300), everySecs: Number(process.env.ROLLING_EVERY_MINUTES || 60) * 60, maxPerDay: Number(process.env.ROLLING_MAX_PER_DAY || 48) },
+          {
+            windowSecs: Number(process.env.ROLLING_WINDOW_SECS || 300),
+            everySecs: Number(process.env.ROLLING_EVERY_MINUTES || 60) * 60,
+            maxPerDay: Number(process.env.ROLLING_MAX_PER_DAY || 48),
+            lowPoints: Number(process.env.ROLLING_LOW_POINTS || 1_000),
+          },
         );
       })()
     : undefined;
@@ -76,7 +90,17 @@ startLabServer(port, {
   modelId,
   dryRunEnabled: process.env.LAB_ENABLE_DRY_RUN === "1",
   resolverFor: (spec) => demoForSpec(spec, labKeys)?.resolver ?? network,
-  info: { network: "testnet", account: need("TESTNET_LAB_ACCOUNT"), codehash: need("LAB_CODEHASH"), model: modelId, mock_llm: process.env.MOCK_LLM === "1", tee: process.env.LAB_TEE === "dstack" },
+  info: {
+    network: "testnet",
+    account: need("TESTNET_LAB_ACCOUNT"),
+    codehash: need("LAB_CODEHASH"),
+    model: modelId,
+    mock_llm: process.env.MOCK_LLM === "1",
+    tee: process.env.LAB_TEE === "dstack",
+    get warnings() {
+      return [...warnings.values()];
+    },
+  },
 });
 
 const worker = testnetWorker({
@@ -139,7 +163,20 @@ scoutNow().catch((e: Error) => console.error(`scout failed: ${e.message}`));
 setInterval(() => scoutNow().catch((e: Error) => console.error(`scout failed: ${e.message}`)), SCOUT_EVERY_MS);
 
 if (rolling) {
-  const roll = () => rolling.tick().catch((e: Error) => console.error(`demo claims: ${e.message}`));
+  // Collects the owner's share of demos that finished before this start, so their liquidity comes back.
+  void (async () => {
+    const finals = await chain.view<RollingMarket[]>("list_markets", { state: "Final", limit: 100 });
+    for (const m of finals.filter((m) => /^(\[DEMO\]|Demo:)/.test(m.spec.title))) {
+      const p = await chain.view<Record<string, unknown> | null>("get_position", { account_id: owner!.accountId, market_id: m.id });
+      const pos = (p?.position ?? p) as { yes?: string; no?: string; lp?: string } | null;
+      if (pos && [pos.yes, pos.no, pos.lp].some((v) => v && v !== "0")) await rolling.collect(m.id);
+    }
+    console.log(`demo account: ${(await ownerPoints()).toFixed(2)} points after collecting finished demos`);
+  })().catch((e: Error) => console.error(`collecting finished demos: ${e.message}`));
+  const roll = () => rolling.tick().catch((e: Error) => {
+    console.error(`demo claims: ${e.message}`);
+    if (/insufficient points|not enough points/.test(e.message)) warnings.set("demo_points", `New demos are paused: ${e.message}`);
+  });
   void roll();
   setInterval(roll, 60_000);
 }

@@ -1,7 +1,7 @@
 {
   "methods": "methods-pizza.md",
   "expected": "INVALID",
-  "title": "Demo: our practice dataset says pizza arrives 10 minutes faster at night. Will the re-run agree?",
+  "title": "Demo: our practice dataset says pizza arrives 10 minutes faster at night. Will the Lab's rerun agree?",
   "statement": "Made-up practice data, not real research. A short script compares the delivery times of a pretend pizza shop by day and by night.",
   "metric": {
     "name": "minutes faster at night",
@@ -31,5 +31,8 @@
   ],
   "mock_llm": {
     "repair": "{\"give_up\": true, \"reason\": \"pizza_sums is a package that was never published, and it holds the calculation itself. Replacing it would change the result being tested.\", \"edits\": []}"
-  }
+  },
+  "previous_titles": [
+    "Demo: our practice dataset says pizza arrives 10 minutes faster at night. Will the re-run agree?"
+  ]
 }

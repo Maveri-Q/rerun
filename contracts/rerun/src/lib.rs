@@ -30,6 +30,8 @@ pub const PRICE_HISTORY_LEN: usize = 200;
 pub const ACC_SCALE: u128 = 1_000_000_000_000_000_000;
 pub const BPS: u128 = 10_000;
 pub const MAX_LIST: u32 = 100;
+/// The most points `grant_points` gives in one call: 5,000 points, at 6 decimals.
+pub const MAX_POINTS_GRANT: u128 = 5_000 * 1_000_000;
 
 #[derive(BorshStorageKey)]
 #[near]
@@ -276,6 +278,17 @@ impl Contract {
         self.settle_storage(&account, before, env::attached_deposit());
         emit("points_claimed", json!({ "account_id": account, "amount": U128(amount) }));
         U128(self.balance_of(Mode::Points, &account))
+    }
+
+    /// Owner only, points only: tops up an account that funds demo claims, such as the owner's own.
+    /// Points have no value, and fee-receiving system accounts are left off the leaderboard, so this
+    /// can't buy a ranking. Capped per call so a mistyped amount stays small. Money can never be granted.
+    pub fn grant_points(&mut self, account_id: AccountId, amount: U128) -> U128 {
+        self.assert_owner();
+        require!(amount.0 > 0 && amount.0 <= MAX_POINTS_GRANT, "grant must be between 1 and 5,000 points");
+        self.credit(Mode::Points, &account_id, amount.0);
+        emit("points_granted", json!({ "account_id": account_id, "amount": amount }));
+        U128(self.balance_of(Mode::Points, &account_id))
     }
 
     // ---------------------------------------------------------------- views

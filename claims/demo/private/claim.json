@@ -1,6 +1,6 @@
 {
   "expected": "REPRODUCED",
-  "title": "Demo: a made-up gym's private records say weekly visitors stay 40% longer. Will the re-run agree?",
+  "title": "Demo: a made-up gym's private records say weekly visitors stay 40% longer. Will the Lab's rerun agree?",
   "statement": "Made-up practice data, not real research. The pretend gym's records are invented, and they're sealed so only the Lab can read them. Only the result and fingerprints come out.",
   "metric": {
     "name": "% longer membership for weekly visitors",
@@ -25,5 +25,8 @@
   "data": [],
   "private": {
     "path": "private/gym.csv"
-  }
+  },
+  "previous_titles": [
+    "Demo: a made-up gym's private records say weekly visitors stay 40% longer. Will the re-run agree?"
+  ]
 }

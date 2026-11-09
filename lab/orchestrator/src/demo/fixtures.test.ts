@@ -10,9 +10,16 @@ const OLD = path.resolve(import.meta.dirname, "../../../../claims/demo/_old");
 describe("demo claims", () => {
   it.each(DEMO_NAMES)("%s says it's made up, as a plain question", (name) => {
     const { spec } = loadDemo(name, keys);
-    expect(spec.title).toMatch(/^Demo: .*Will the re-run agree\?$/);
+    expect(spec.title).toMatch(/^Demo: .*Will the Lab's rerun agree\?$/);
     expect(spec.statement).toContain("Made-up practice data, not real research.");
   });
+
+  it("still recognises a demo posted under its earlier title", () => {
+    // Claims 34 and 35 on testnet, posted as "Will the re-run agree?".
+    const posted = loadDemo("reproduces", keys, undefined, loadDemo("reproduces", keys).previousTitles![0]);
+    expect(specHash(posted.spec)).toBe("cdcc0543ecdf7cfe48d709675b9dfcbb5a1f0c137d8d18c20bdc94959d083295");
+    expect(demoForSpec(posted.spec, keys)?.spec.title).toContain("re-run agree");
+  }, 60_000);
 
   it("gives a forecaster no hint which ones are wrong", () => {
     expect(loadDemo("misreported", keys).spec.statement).toBe(loadDemo("reproduces", keys).spec.statement);

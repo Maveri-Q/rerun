@@ -3,7 +3,7 @@
   "mock_reimplementation": "mock-dog-walks.md",
   "expected": "REPRODUCED",
   "expected_patches": 1,
-  "title": "Demo: our practice dataset says dog owners walk 30% more each day. Will the re-run agree?",
+  "title": "Demo: our practice dataset says dog owners walk 30% more each day. Will the Lab's rerun agree?",
   "statement": "Made-up practice data, not real research. A short script compares the daily steps of pretend people with and without a dog.",
   "metric": {
     "name": "% more steps for dog owners",
@@ -33,5 +33,8 @@
   ],
   "mock_llm": {
     "repair": "{\"give_up\": false, \"reason\": \"The script reads from a folder on its writer's laptop. The file is at data/dog_walks.csv in the repo.\", \"edits\": [{\"file\": \"reproduce.py\", \"kind\": \"PATH\", \"justification\": \"Point the laptop path at the repository's data file. The sums are unchanged.\", \"search\": \"DATA = \\\"/home/sam/laptop/dog_walks.csv\\\"\", \"replace\": \"DATA = \\\"data/dog_walks.csv\\\"\"}]}"
-  }
+  },
+  "previous_titles": [
+    "Demo: our practice dataset says dog owners walk 30% more each day. Will the re-run agree?"
+  ]
 }
