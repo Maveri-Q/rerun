@@ -897,3 +897,26 @@ fn inconclusive_claims_do_not_count_towards_accuracy() {
     let alice = w.c.get_accuracy(a("alice.testnet"));
     assert_eq!((alice.scored, alice.brier_ppm), (0, None));
 }
+
+// ------------------------------------------------------------------ Labs in secure hardware
+
+#[test]
+fn an_attested_lab_can_propose_and_its_attestation_is_on_record() {
+    let mut w = world();
+    as_("owner.testnet", T0);
+    w.c.register_lab_attested(a("tee-lab.testnet"), CODEHASH.into(), LAB_KEY.into(), "e".repeat(64));
+    assert_eq!(w.c.get_lab_attestation(a("tee-lab.testnet")), Some("e".repeat(64)));
+    assert!(!w.c.get_lab(a("tee-lab.testnet")).unwrap().local);
+    assert_eq!(w.c.get_lab_attestation(a("lab.testnet")), None, "a local Lab has no attestation");
+    as_("owner.testnet", T0);
+    w.c.remove_lab(a("tee-lab.testnet"));
+    assert_eq!(w.c.get_lab_attestation(a("tee-lab.testnet")), None);
+}
+
+#[test]
+#[should_panic(expected = "owner only")]
+fn only_the_owner_registers_an_attested_lab() {
+    let mut w = world();
+    as_("mallory.testnet", T0);
+    w.c.register_lab_attested(a("tee-lab.testnet"), CODEHASH.into(), LAB_KEY.into(), "e".repeat(64));
+}

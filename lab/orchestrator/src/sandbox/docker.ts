@@ -13,7 +13,7 @@ export interface DockerLimits {
 }
 
 export function sandboxImage(runtime: "python3.11" | "r4.4"): string {
-  return `rerun-sandbox:${runtime}`;
+  return `rerun-sandbox:${runtime}`; // tee-start.ts tags the pinned images with these names
 }
 
 const docker = () => process.env.DOCKER_BIN || "docker";

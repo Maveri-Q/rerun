@@ -1,0 +1,33 @@
+# The Lab on Phala Cloud (dstack CVM). This file's sha256 is the Lab's codehash: the hardware quote
+# commits to it, and the owner registers it on NEAR. So every image is pinned by digest here, never by an
+# environment variable, and only settings that can't change what the code does come from secrets.
+# Fill the three digests from the Images workflow, then deploy (docs/PHALA.md).
+services:
+  lab:
+    image: ghcr.io/maveri-q/rerun-lab@sha256:LAB_DIGEST
+    restart: unless-stopped
+    ports:
+      - "8787:8787"
+    volumes:
+      # The guest agent: keys that only this code can derive, and quotes over the Lab's public keys.
+      - /var/run/dstack.sock:/var/run/dstack.sock
+      # The CVM's own Docker, to start one sandbox container per run, network off while research code runs.
+      - /var/run/docker.sock:/var/run/docker.sock
+      - lab-data:/app/lab/orchestrator/.data
+    environment:
+      NEAR_NETWORK: testnet
+      SANDBOX_IMAGE_PYTHON: ghcr.io/maveri-q/rerun-sandbox-python@sha256:PYTHON_DIGEST
+      SANDBOX_IMAGE_R: ghcr.io/maveri-q/rerun-sandbox-r@sha256:R_DIGEST
+      TEE_CREATE_ACCOUNT: "1"
+      # Encrypted secrets, set in the Phala dashboard:
+      TEE_LAB_ACCOUNT: ${TEE_LAB_ACCOUNT}
+      TESTNET_CONTRACT_ACCOUNT: ${TESTNET_CONTRACT_ACCOUNT}
+      NEARAI_CLOUD_API_KEY: ${NEARAI_CLOUD_API_KEY}
+      LAB_PUBLIC_URL: ${LAB_PUBLIC_URL}
+      # Testnet only, for the hourly demo claims: the owner key that posts them. Leave empty to turn them off.
+      ROLLING_DEMOS: ${ROLLING_DEMOS}
+      TESTNET_OWNER_ACCOUNT: ${TESTNET_OWNER_ACCOUNT}
+      TESTNET_OWNER_PRIVATE_KEY: ${TESTNET_OWNER_PRIVATE_KEY}
+
+volumes:
+  lab-data:

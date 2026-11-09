@@ -11,7 +11,8 @@
     "lab:watch": "tsx scripts/watch.ts",
     "scout": "tsx scripts/scout.ts",
     "repair-benchmark": "tsx scripts/repair-benchmark.ts",
-    "export:vectors": "tsx scripts/export-vectors.ts"
+    "export:vectors": "tsx scripts/export-vectors.ts",
+    "lab:tee": "tsx scripts/tee-start.ts"
   },
   "dependencies": {
     "@phala/dcap-qvl": "0.7.0",

@@ -217,7 +217,7 @@ async function verifyQuote(
   return out;
 }
 
-function parseTd(quoteBytes: Buffer) {
+export function parseTd(quoteBytes: Buffer) {
   const quote = Quote.parse(quoteBytes);
   const td = quote.report.asTd10() ?? quote.report.asTd15()?.base ?? quote.report.asTd15Ex()?.base.base;
   if (!td) throw new Error(`not a TDX quote (report type ${quote.report.type})`);
@@ -247,7 +247,7 @@ function isNetworkError(e: unknown): boolean {
   return /fetch failed|ENOTFOUND|EAI_AGAIN|ECONNRESET|ETIMEDOUT|ECONNREFUSED|socket hang up|timeout|aborted/i.test(text);
 }
 
-async function dcapVerify(quote: Buffer): Promise<{ status: string }> {
+export async function dcapVerify(quote: Buffer): Promise<{ status: string }> {
   const verified = await withNetworkRetry(() => getCollateralAndVerify(quote, process.env.PCCS_URL || PHALA_PCCS_URL));
   return { status: verified.status };
 }

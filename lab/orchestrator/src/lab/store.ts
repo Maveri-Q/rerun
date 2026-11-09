@@ -30,6 +30,12 @@ export function latestAttestation(): Buffer | null {
   return existsSync(file) ? readFileSync(file) : null;
 }
 
+/** The secure hardware's quote for this Lab, with its public keys. Only written inside a CVM. */
+export function teeAttestation(): Buffer | null {
+  const file = path.join(DATA_DIR, "tee", "attestation.json");
+  return existsSync(file) ? readFileSync(file) : null;
+}
+
 export function saveSealed(bytes: Buffer): string {
   const dir = path.join(DATA_DIR, "sealed");
   mkdirSync(dir, { recursive: true });

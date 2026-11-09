@@ -6,10 +6,10 @@ Points mode for every claim, plus one money claim for the video. Worked out on 2
 
 | What | NEAR | Comes back? |
 |---|---|---|
-| Contract code (499 KB of storage) | 5.0 | Only if the contract account is deleted later |
+| Contract code (505 KB of storage) | 5.1 | Only if the contract account is deleted later |
 | Contract and Lab accounts, created under your account | 0.2 | Mostly locked as their storage |
 | About 6 points claims, with their receipts | 0.5 | No, it pays for their storage |
-| Gas: posting, runs, settling | 0.3 | No |
+| Gas: posting, runs, settling | 0.2 | No |
 | Gas-free relayer for points mode | 1.0 | What it doesn't spend stays in its account |
 | **Total** | **7.0** | |
 
@@ -42,7 +42,7 @@ NEAR for 20 USDC is about 20 USDC's worth plus a little for the swap. At the tim
 
 ## One thing mainnet waits on
 
-The mainnet contract can't register a Lab without its secure-hardware attestation, by design: the owner-only shortcut is testnet-only. So the Lab has to be running on Phala before mainnet claims can be settled. That's why Phala comes first.
+The mainnet contract can't register a Lab without its secure-hardware attestation, by design: the owner-only shortcut is testnet-only, and mainnet has only `register_lab_attested`. So the Lab has to be running on Phala before mainnet claims can be settled. That's why Phala comes first (docs/PHALA.md).
 
 ## Before deploying
 

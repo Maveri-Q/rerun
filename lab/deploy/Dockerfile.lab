@@ -1,0 +1,26 @@
+# The Lab, as it runs inside a Phala Cloud CVM. Build from the repo root:
+#   docker build -f lab/deploy/Dockerfile.lab -t rerun-lab .
+# It holds no secrets: the Lab's keys are derived inside the CVM at start (scripts/tee-start.ts).
+# Research code never runs in this container. The Lab starts each run in a sandbox container through
+# the CVM's Docker socket, with no environment passed in and the network off.
+FROM node:22.22.2-bookworm
+
+# The full image already has git (the demo claims are small git repos made at start), so nothing
+# comes from apt. The docker CLI starts the sandbox containers.
+COPY --from=docker:27.5.1-cli /usr/local/bin/docker /usr/local/bin/docker
+RUN corepack enable && corepack prepare pnpm@12.16.1 --activate
+
+WORKDIR /app
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.base.json ./
+COPY packages/shared/package.json packages/shared/
+COPY lab/orchestrator/package.json lab/orchestrator/
+RUN pnpm install --frozen-lockfile --filter @rerun/orchestrator...
+
+COPY packages/shared packages/shared
+COPY lab/orchestrator lab/orchestrator
+COPY claims claims
+
+ENV NODE_ENV=production NEAR_NETWORK=testnet LAB_PORT=8787
+EXPOSE 8787
+WORKDIR /app/lab/orchestrator
+CMD ["pnpm", "lab:tee"]

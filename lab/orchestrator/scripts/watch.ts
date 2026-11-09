@@ -76,7 +76,7 @@ startLabServer(port, {
   modelId,
   dryRunEnabled: process.env.LAB_ENABLE_DRY_RUN === "1",
   resolverFor: (spec) => demoForSpec(spec, labKeys)?.resolver ?? network,
-  info: { network: "testnet", account: need("TESTNET_LAB_ACCOUNT"), codehash: need("LAB_CODEHASH"), model: modelId, mock_llm: process.env.MOCK_LLM === "1", tee: false },
+  info: { network: "testnet", account: need("TESTNET_LAB_ACCOUNT"), codehash: need("LAB_CODEHASH"), model: modelId, mock_llm: process.env.MOCK_LLM === "1", tee: process.env.LAB_TEE === "dstack" },
 });
 
 const worker = testnetWorker({

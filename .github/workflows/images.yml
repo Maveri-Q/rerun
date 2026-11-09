@@ -1,0 +1,47 @@
+# Builds the Lab image and both sandbox images and pushes them to GitHub's container registry, so a
+# Phala Cloud CVM can pull them by digest. Run it by hand (Actions > Images > Run workflow). The digests
+# it prints go into lab/deploy/docker-compose.phala.yml, and the compose hash then fixes them.
+# GITHUB_TOKEN is provided by Actions; no other secret is needed, and none goes into an image.
+name: Images
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    strategy:
+      matrix:
+        include:
+          - name: rerun-lab
+            file: lab/deploy/Dockerfile.lab
+            context: .
+          - name: rerun-sandbox-python
+            file: lab/sandbox/python.Dockerfile
+            context: lab/sandbox
+          - name: rerun-sandbox-r
+            file: lab/sandbox/r.Dockerfile
+            context: lab/sandbox
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - id: push
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ matrix.context }}
+          file: ${{ matrix.file }}
+          platforms: linux/amd64
+          push: true
+          provenance: false
+          tags: ghcr.io/maveri-q/${{ matrix.name }}:${{ github.sha }}
+      - name: Digest
+        run: echo "ghcr.io/maveri-q/${{ matrix.name }}@${{ steps.push.outputs.digest }}" | tee -a "$GITHUB_STEP_SUMMARY"

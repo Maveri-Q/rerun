@@ -8,7 +8,7 @@ import { NearAiModel } from "../pipeline/model.ts";
 import { reproduce, type ArtifactResolver } from "../pipeline/pipeline.ts";
 import { DockerSandbox, sandboxImage } from "../sandbox/docker.ts";
 import { draftClaim } from "./draft.ts";
-import { latestAttestation, readHashed, readMethods, saveMethods, saveSealed, type EventHub } from "./store.ts";
+import { latestAttestation, teeAttestation, readHashed, readMethods, saveMethods, saveSealed, type EventHub } from "./store.ts";
 
 /**
  * The Lab's public HTTP surface: live run streams (SSE), reports, logs, attestation records, AI
@@ -58,6 +58,7 @@ export function startLabServer(port: number, opts: ServerOptions) {
       if (parts[0] === "runs" && parts[2] === "stream" && parts[1]) return stream(req, res, parts[1]);
       if (parts[0] === "runs" && parts[1]) return json(res, 200, opts.hub.history(parts[1]));
       if (url.pathname === "/attestations/latest") return bytes(res, latestAttestation(), "application/json");
+      if (url.pathname === "/tee/attestation") return bytes(res, teeAttestation(), "application/json");
       if (parts[0] === "attestations" && parts[1]) return bytes(res, readHashed("attestations", parts[1]), "application/json");
       if (parts[0] === "reports" && parts[1]) return bytes(res, readHashed("reports", parts[1]), "text/plain; charset=utf-8");
       if (parts[0] === "evidence" && parts[1]) return bytes(res, readHashed("evidences", parts[1]), "application/json");
