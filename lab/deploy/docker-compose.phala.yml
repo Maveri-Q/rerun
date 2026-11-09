@@ -1,10 +1,10 @@
 # The Lab on Phala Cloud (dstack CVM). This file's sha256 is the Lab's codehash: the hardware quote
 # commits to it, and the owner registers it on NEAR. So every image is pinned by digest here, never by an
 # environment variable, and only settings that can't change what the code does come from secrets.
-# Fill the three digests from the Images workflow, then deploy (docs/PHALA.md).
+# Digests from the Images workflow, run #1 on commit e18100e. Deploy steps: docs/PHALA.md.
 services:
   lab:
-    image: ghcr.io/maveri-q/rerun-lab@sha256:LAB_DIGEST
+    image: ghcr.io/maveri-q/rerun-lab@sha256:8b364b046815c323c775ff524bd75c0db291b10cdf2630ca5fdc2470aa725484
     restart: unless-stopped
     ports:
       - "8787:8787"
@@ -16,8 +16,8 @@ services:
       - lab-data:/app/lab/orchestrator/.data
     environment:
       NEAR_NETWORK: testnet
-      SANDBOX_IMAGE_PYTHON: ghcr.io/maveri-q/rerun-sandbox-python@sha256:PYTHON_DIGEST
-      SANDBOX_IMAGE_R: ghcr.io/maveri-q/rerun-sandbox-r@sha256:R_DIGEST
+      SANDBOX_IMAGE_PYTHON: ghcr.io/maveri-q/rerun-sandbox-python@sha256:8ecd9bc04a83addb6acc1b45ee0b2854eddbde692c914576b8290172680c584c
+      SANDBOX_IMAGE_R: ghcr.io/maveri-q/rerun-sandbox-r@sha256:d97bec581cc8d27f3f1cfe9a5a1d7d2598949f2660fe9572a7955fa5ed74a409
       TEE_CREATE_ACCOUNT: "1"
       # The machine has 2 vCPUs and 4 GB: leave 1 GB for the Lab and Docker.
       SANDBOX_MAX_CPUS: "2"

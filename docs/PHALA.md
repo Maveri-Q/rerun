@@ -32,9 +32,9 @@ There's no test run on Nov 11 in this budget. The first start on Nov 12 is the t
 
 Nothing here is paid until step 5, and I'll ask before that.
 
-1. **Images.** On GitHub, open the `rerun` repo → **Actions** → **Images** → **Run workflow** (branch `main`). It takes about 15 minutes and prints three image digests in its summary. Send them to me, or I read them.
-2. **Make the images pullable.** On GitHub, your profile → **Packages**. For each of `rerun-lab`, `rerun-sandbox-python` and `rerun-sandbox-r`: **Package settings** → **Change visibility** → **Public**. (They contain only the code that goes public on Nov 12, and no secrets.)
-3. I fill the digests into `lab/deploy/docker-compose.phala.yml` and push it.
+1. **Images.** Done Nov 9: the Images workflow (run #1, commit `e18100e`) built all three.
+2. **Make the images pullable.** Done Nov 9: all three packages are public, and each pulls anonymously by digest.
+3. Done: the digests are in `lab/deploy/docker-compose.phala.yml`. Rebuilding an image changes its digest, so the compose file (and the codehash) changes with it.
 4. **Phala account.** Sign in at https://cloud.phala.network, add your card under billing, and complete their verification.
 5. **Deploy** (paid from here). CVMs page → **Deploy** (top right) → paste `lab/deploy/docker-compose.phala.yml` → KMS provider **Phala** → instance `tdx.medium` (2 vCPU, 4 GB), default 20 GB disk → under **Encrypted Secrets**, add:
 
