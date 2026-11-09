@@ -78,3 +78,26 @@ has only reading and maths scores. It can't match exactly, and the third grade i
 | Third | 5.68 | 5.32 | 5,967 | 6,109 |
 
     python class-size-1999/rebuild.py STAR.csv
+
+## third-child-1998
+
+Recomputes one figure in Table 3 (continued) of Angrist and Evans (1998), "Children and Their Parents'
+Labor Supply": among married women in the 1980 US census with two or more children, how much more often
+those whose first two children were the same sex had another child. The paper's figure is 0.068. Data:
+R package AER, Fertility, the paper's 254,654 married women.
+
+    python third-child-1998/rebuild.py Fertility.csv
+
+This is an open claim: nobody, us included, has run it on the real data. The Lab runs it when forecasting
+closes. It was tested only on made-up data with a known answer.
+
+## affairs-1978
+
+Refits one model in Table 3 of Fair (1978), "A Theory of Extramarital Affairs": a tobit of the number of
+affairs in the past year on occupation, marriage rating, age, years married and religiousness, for the
+Psychology Today sample. The paper's marriage rating coefficient is -2.28. Data: R package AER, Affairs,
+the paper's 601 readers.
+
+    python affairs-1978/rebuild.py Affairs.csv
+
+Also an open claim, never run on the real data by us, and tested only on made-up data with a known answer.
