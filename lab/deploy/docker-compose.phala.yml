@@ -19,6 +19,9 @@ services:
       SANDBOX_IMAGE_PYTHON: ghcr.io/maveri-q/rerun-sandbox-python@sha256:PYTHON_DIGEST
       SANDBOX_IMAGE_R: ghcr.io/maveri-q/rerun-sandbox-r@sha256:R_DIGEST
       TEE_CREATE_ACCOUNT: "1"
+      # The machine has 2 vCPUs and 4 GB: leave 1 GB for the Lab and Docker.
+      SANDBOX_MAX_CPUS: "2"
+      SANDBOX_MAX_MEM_GB: "3"
       # Encrypted secrets, set in the Phala dashboard:
       TEE_LAB_ACCOUNT: ${TEE_LAB_ACCOUNT}
       TESTNET_CONTRACT_ACCOUNT: ${TESTNET_CONTRACT_ACCOUNT}

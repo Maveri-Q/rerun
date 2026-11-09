@@ -19,6 +19,18 @@ export function sandboxImage(runtime: "python3.11" | "r4.4"): string {
 const docker = () => process.env.DOCKER_BIN || "docker";
 
 /**
+ * What this machine can actually give a sandbox. A claim asks for its CPUs and memory, but on a small
+ * machine (the Lab's CVM has 4 GB) a 4 GB sandbox would leave nothing for the Lab, so the host caps it
+ * with SANDBOX_MAX_CPUS / SANDBOX_MAX_MEM_GB. Unset, the claim gets what it asks for.
+ */
+export function hostLimits(cpus: number, memGb: number, env: NodeJS.ProcessEnv = process.env): { cpus: number; memGb: number; capped: boolean } {
+  const maxCpus = Number(env.SANDBOX_MAX_CPUS) || Infinity;
+  const maxMem = Number(env.SANDBOX_MAX_MEM_GB) || Infinity;
+  const out = { cpus: Math.min(cpus, maxCpus), memGb: Math.min(memGb, maxMem) };
+  return { ...out, capped: out.cpus < cpus || out.memGb < memGb };
+}
+
+/**
  * One named volume per run; every phase is a fresh, throwaway container that mounts only that
  * volume. No environment variables or host paths are passed in, so research code has no way to
  * see the orchestrator's keys. The research code itself runs with `--network none`.
@@ -26,7 +38,13 @@ const docker = () => process.env.DOCKER_BIN || "docker";
 export class DockerSandbox implements Sandbox {
   private readonly volume = `rerun-${randomBytes(8).toString("hex")}`;
 
-  constructor(private readonly limits: DockerLimits) {}
+  private readonly limits: DockerLimits;
+
+  constructor(asked: DockerLimits) {
+    const { cpus, memGb, capped } = hostLimits(asked.cpus, asked.memGb);
+    if (capped) console.log(`sandbox: the claim asks for ${asked.cpus} CPUs and ${asked.memGb} GB; this machine gives ${cpus} and ${memGb} GB`);
+    this.limits = { ...asked, cpus, memGb };
+  }
 
   private baseArgs(network: boolean, cwd: string): string[] {
     return [

@@ -22,7 +22,11 @@ The Lab runs in an Intel TDX confidential VM (a dstack CVM) on Phala Cloud. Its 
 
 ## What it costs
 
-Phala bills by the hour. Check the prices in the dashboard before choosing; when I read their price list on Nov 9, a 4 vCPU / 8 GB instance (`tdx.large` there) was $0.232 an hour, about **$45 for Nov 11 to Nov 18**, and the size below it half that. Reruns of R papers want the larger one. Ask for 40 GB of disk: the sandbox images are several GB.
+Plan: `tdx.medium`, 2 vCPU and 4 GB, at $0.116 an hour on Phala's price list (read Nov 9), from Nov 12 to the end of judging on Nov 18. Nov 12, 08:00 Lagos to Nov 19, 00:00 UTC is 161 hours, about **$18.70**, inside $20 of credit. The default 20 GB disk is enough: the three images come to about 6 GB. Check the hourly price in the dashboard before deploying, because their docs and their API label the sizes differently.
+
+A claim's sandbox is capped at 3 GB of memory and 2 CPUs on this machine (`SANDBOX_MAX_MEM_GB`, `SANDBOX_MAX_CPUS` in the compose file), so a big run can't starve the Lab. Most claims ask for 4 GB. If a run fails for lack of memory (exit code 137 in the Lab's log), I'll tell you, and we size up to `tdx.large` ($0.232 an hour). That changes only the machine, not the codehash.
+
+There's no test run on Nov 11 in this budget. The first start on Nov 12 is the test: deploy by 08:00 Lagos, register by 10:00, and claim 37 locks at 15:00 Lagos.
 
 ## What you click
 
@@ -32,7 +36,7 @@ Nothing here is paid until step 5, and I'll ask before that.
 2. **Make the images pullable.** On GitHub, your profile → **Packages**. For each of `rerun-lab`, `rerun-sandbox-python` and `rerun-sandbox-r`: **Package settings** → **Change visibility** → **Public**. (They contain only the code that goes public on Nov 12, and no secrets.)
 3. I fill the digests into `lab/deploy/docker-compose.phala.yml` and push it.
 4. **Phala account.** Sign in at https://cloud.phala.network, add your card under billing, and complete their verification.
-5. **Deploy** (paid from here). CVMs page → **Deploy** (top right) → paste `lab/deploy/docker-compose.phala.yml` → KMS provider **Phala** → instance with 4 vCPU / 8 GB, 40 GB disk → under **Encrypted Secrets**, add:
+5. **Deploy** (paid from here). CVMs page → **Deploy** (top right) → paste `lab/deploy/docker-compose.phala.yml` → KMS provider **Phala** → instance `tdx.medium` (2 vCPU, 4 GB), default 20 GB disk → under **Encrypted Secrets**, add:
 
    | Secret | Value |
    |---|---|

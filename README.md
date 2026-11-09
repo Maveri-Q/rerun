@@ -6,7 +6,7 @@
 
 **A forecasting market on whether published research holds up. People predict the result, then the Lab, an AI agent, reruns the authors' code and data and posts a receipt on NEAR that anyone can check.**
 
-Other truth markets ask AIs what's true. RERUN reruns the evidence.
+Other truth markets ask AIs what's true. Here, the Lab reruns the evidence.
 
 **Live site:** https://rerun-silk.vercel.app (NEAR testnet, free points) · **Video:** _link coming_
 
