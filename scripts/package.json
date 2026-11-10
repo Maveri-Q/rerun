@@ -14,6 +14,8 @@
     "site-snapshot": "tsx site-snapshot.ts",
     "brand": "tsx brand-assets.ts",
     "scout:account": "tsx scout-account.ts",
+    "relayer:account": "tsx relayer-account.ts",
+    "relay:check": "tsx relay-check.ts",
     "verdict-bet-demo": "tsx verdict-bet-demo.ts",
     "settle-claim": "tsx settle-claim.ts",
     "verify-claim": "tsx verify-claim.ts",

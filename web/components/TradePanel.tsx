@@ -79,13 +79,13 @@ export function TradePanel({ market, config, position, contract, onDone }: { mar
     const minOut = (quote.out * BigInt(Math.round((100 - slippage) * 100))) / 10_000n;
     if (action === "sell") {
       return run("Selling…", `Sold ${amount} ${side} shares.`, () =>
-        wallet.call("sell", { market_id: market.id, outcome: side, shares: parsed.toString(), min_collateral_out: minOut.toString() }, { deposit: STORAGE_NEAR() }),
+        wallet.call("sell", { market_id: market.id, outcome: side, shares: parsed.toString(), min_collateral_out: minOut.toString() }, { deposit: STORAGE_NEAR(), gasFree: market.mode === "points" }),
       );
     }
     const label = `Bought ${side} with ${amount} ${unit}. Forecasting ends ${relativeTime(market.lock_time)}, then the Lab reruns the claim. If ${side} wins, collect from this page or your Portfolio.`;
     if (market.mode === "points") {
       return run("Buying…", label, () =>
-        wallet.call("buy", { market_id: market.id, outcome: side, amount: parsed.toString(), min_shares_out: minOut.toString() }, { deposit: STORAGE_NEAR() }),
+        wallet.call("buy", { market_id: market.id, outcome: side, amount: parsed.toString(), min_shares_out: minOut.toString() }, { deposit: STORAGE_NEAR(), gasFree: true }),
       );
     }
     return run("Buying…", label, async () => {
@@ -126,7 +126,7 @@ export function TradePanel({ market, config, position, contract, onDone }: { mar
           className="w-full"
           style={{ marginBottom: 14 }}
           disabled={busy !== null}
-          onClick={() => void run("Claiming…", "1,000 points added. Now make your call.", () => wallet.call("claim_points", {}, { deposit: STORAGE_NEAR() }))}
+          onClick={() => void run("Claiming…", "1,000 points added. Now make your call.", () => wallet.call("claim_points", {}, { deposit: STORAGE_NEAR(), gasFree: true }))}
         >
           First, claim your 1,000 free points
         </button>

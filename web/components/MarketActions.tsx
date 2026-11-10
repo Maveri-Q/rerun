@@ -152,7 +152,7 @@ export function MarketActions({ market, config, position, onDone }: { market: Ma
           <p className="hint">
             {market.outcome === "INVALID" ? "This claim is invalid, so each YES and NO share pays back half." : `Winning ${market.outcome === "REPRODUCED" ? "YES" : "NO"} shares pay 1 ${unit} each.`} Anything you added to the prize pool comes back too.
           </p>
-          <button style={{ marginTop: 12 }} disabled={busy} onClick={() => void run("Collected. It's in your balance.", () => wallet.call("redeem", { market_id: market.id }, { deposit: STORAGE() }))}>
+          <button style={{ marginTop: 12 }} disabled={busy} onClick={() => void run("Collected. It's in your balance.", () => wallet.call("redeem", { market_id: market.id }, { deposit: STORAGE(), gasFree: market.mode === "points" }))}>
             Collect
           </button>
         </>

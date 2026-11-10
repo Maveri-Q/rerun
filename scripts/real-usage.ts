@@ -8,7 +8,7 @@
  */
 import { testnetChain } from "../lab/orchestrator/src/lab/setup.ts";
 
-const OURS = /^rerun-|\.rerun-43f5f2\.testnet$/;
+const OURS = /^rerun-|^relay-check-|\.rerun-43f5f2\.testnet$/;
 
 async function main() {
   const chain = testnetChain();

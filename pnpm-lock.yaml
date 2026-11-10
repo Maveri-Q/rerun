@@ -258,6 +258,9 @@ importers:
       '@rerun/shared':
         specifier: workspace:*
         version: link:../packages/shared
+      borsh:
+        specifier: 2.0.0
+        version: 2.0.0
       dotenv:
         specifier: 18.0.9
         version: 18.0.9

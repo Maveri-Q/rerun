@@ -1,6 +1,6 @@
 "use client";
 
-import { Account, JsonRpcProvider, type KeyPairString } from "near-api-js";
+import { Account, actions, encodeSignedDelegate, JsonRpcProvider, type KeyPairString } from "near-api-js";
 import { NearProvider, useNearWallet } from "near-connect-hooks";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { CONTRACT, NETWORK, RPC, txLink } from "./config";
@@ -62,13 +62,41 @@ function hashOf(sent: SentTransaction | undefined): string {
   return sent?.transaction?.hash ?? sent?.transaction_outcome?.id ?? "";
 }
 
+/** Whether this site's relayer is set up, asked once per page load. */
+let relayOn: Promise<boolean> | null = null;
+const relayEnabled = () =>
+  (relayOn ??= fetch("/api/relay")
+    .then((r) => (r.ok ? (r.json() as Promise<{ enabled: boolean }>) : { enabled: false }))
+    .then((r) => r.enabled)
+    .catch(() => false));
+
+function toBase64(bytes: Uint8Array): string {
+  let s = "";
+  for (const b of bytes) s += String.fromCharCode(b);
+  return btoa(s);
+}
+
+/**
+ * Sends a signed delegate action to the relayer. Returns null when nothing was sent, so the caller can make
+ * the ordinary call instead; throws when the call went out and failed.
+ */
+async function sendRelayed(signedDelegate: string): Promise<string | null> {
+  const res = await fetch("/api/relay", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ signedDelegate }) }).catch(() => null);
+  if (!res) return null;
+  const out = (await res.json().catch(() => ({ submitted: false }))) as { submitted: boolean; hash?: string; failure?: string };
+  if (!out.submitted) return null;
+  if (out.failure) throw new Error(out.failure);
+  return out.hash ?? "";
+}
+
 /** After anything someone signs: the real transaction, on the public explorer. */
-function TransactionProof({ hash, onClose }: { hash: string; onClose: () => void }) {
+function TransactionProof({ hash, gasFree, onClose }: { hash: string; gasFree: boolean; onClose: () => void }) {
   if (!hash) return null;
   return (
     <aside className="wallet-help tx-proof" role="status">
       <span>
-        <b>{"\u2713"} Verified on NEAR.</b> <a href={txLink(hash)} target="_blank" rel="noreferrer">See this transaction</a>
+        <b>{"\u2713"} Verified on NEAR.</b> {gasFree && "Gas paid by RERUN. "}
+        <a href={txLink(hash)} target="_blank" rel="noreferrer">See this transaction</a>
       </span>
       <button className="quiet btn--small" onClick={onClose}>
         Hide this
@@ -85,6 +113,7 @@ function Inner({ onChange }: { onChange: (wallet: Wallet) => void }) {
   const [wait, setWait] = useState<WalletWait>(null);
   const [blocked, setBlocked] = useState(false);
   const [lastTx, setLastTx] = useState("");
+  const [gasFree, setGasFree] = useState(false);
   useEffect(() => void testAccount().then(setTest), []);
 
   // The wallet code runs in a sandbox and asks this page to open its window, so this is where a block shows.
@@ -122,6 +151,40 @@ function Inner({ onChange }: { onChange: (wallet: Wallet) => void }) {
       const contractId = opts.contractId ?? CONTRACT;
       const gas = BigInt(opts.tgas ?? 100) * 10n ** 12n;
       setLastTx("");
+      setGasFree(false);
+      // Gas-free: the wallet signs a delegate action and RERUN's relayer submits it and pays.
+      if (opts.gasFree && contractId === CONTRACT && (await relayEnabled())) {
+        let signed: string | null = null;
+        if (test) {
+          const meta = await test.createSignedMetaTransaction({ receiverId: contractId, actions: [actions.functionCall(method, args, gas, 0n)] });
+          signed = toBase64(encodeSignedDelegate(meta.signedDelegate));
+        } else {
+          const wallet = await latest.current.connector.wallet().catch(() => null);
+          if (wallet?.manifest.features?.signDelegateActions) {
+            setBlocked(false);
+            setWait("sign");
+            try {
+              const out = await wallet.signDelegateActions({
+                delegateActions: [{ receiverId: contractId, actions: [{ type: "FunctionCall", params: { methodName: method, args, gas: gas.toString(), deposit: "0" } }] }],
+              });
+              signed = out.signedDelegateActions[0] ?? null;
+            } catch (e) {
+              // Someone saying no in their wallet is an answer; a wallet that can't do this falls back below.
+              if (/reject|cancel|denied|closed/i.test(String((e as Error)?.message ?? e))) throw e;
+            } finally {
+              setWait(null);
+            }
+          }
+        }
+        if (signed) {
+          const hash = await sendRelayed(signed);
+          if (hash !== null) {
+            setGasFree(true);
+            setLastTx(hash);
+            return;
+          }
+        }
+      }
       if (test) {
         setLastTx(hashOf((await test.callFunctionRaw({ contractId, methodName: method, args, deposit: BigInt(opts.deposit ?? "0"), gas })) as SentTransaction));
         return;
@@ -155,7 +218,7 @@ function Inner({ onChange }: { onChange: (wallet: Wallet) => void }) {
   return (
     <>
       <WalletHelp wait={wait} blocked={blocked} onClose={() => setWait(null)} />
-      {!wait && <TransactionProof hash={lastTx} onClose={() => setLastTx("")} />}
+      {!wait && <TransactionProof hash={lastTx} gasFree={gasFree} onClose={() => setLastTx("")} />}
     </>
   );
 }

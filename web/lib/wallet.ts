@@ -7,6 +7,8 @@ export interface CallOptions {
   deposit?: string;
   tgas?: number;
   contractId?: string;
+  /** Points-mode calls RERUN's relayer may pay for. Falls back to an ordinary signed call when it can't. */
+  gasFree?: boolean;
 }
 
 export interface Wallet {
