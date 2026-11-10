@@ -1,6 +1,6 @@
 /**
  * Decimal strings and the reproduction comparator. This must stay identical to
- * contracts/rerun/src/math.rs: the contract re-runs the comparison on every receipt and
+ * contracts/rerun/src/math.rs: the contract repeats the comparison on every receipt and
  * rejects one whose outcome disagrees. Both sides are tested with the same vectors.
  */
 
