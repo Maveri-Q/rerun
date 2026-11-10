@@ -1,7 +1,7 @@
 {
-  "lastScanAt": "2026-11-10T14:55:27.544Z",
+  "lastScanAt": "2026-11-10T23:24:46.199Z",
   "draftsByDay": {
-    "2026-11-10": 4
+    "2026-11-10": 6
   },
   "candidates": {
     "rescience:10.5281_zenodo.20613595": {
@@ -223,9 +223,9 @@
       "repoUrl": "https://github.com/theoboraud/JaegerESN",
       "status": "retry",
       "reasons": [
-        "Passed the checks, and waiting for the AI budget."
+        "The AI draft failed: NEARAI_CLOUD_API_KEY is not set (or use MOCK_LLM=1)"
       ],
-      "checkedAt": "2026-11-10T14:55:27.544Z",
+      "checkedAt": "2026-11-10T23:24:46.199Z",
       "license": "BSD-3-Clause",
       "runtime": "python3.11"
     },
@@ -866,7 +866,7 @@
       "reasons": [
         "Passed the checks, and waiting for the AI budget."
       ],
-      "checkedAt": "2026-11-10T14:55:27.544Z",
+      "checkedAt": "2026-11-10T23:24:46.199Z",
       "license": "MIT",
       "runtime": "python3.11"
     },
@@ -929,15 +929,15 @@
       "title": "FlyHash for LLM Agent Memory: An Empirical Validation and a New Application",
       "paperUrl": "https://arxiv.org/abs/2611.05791",
       "doi": "10.48550/arXiv.2611.05791",
-      "upvotes": 3,
+      "upvotes": 5,
       "abstract": "Large language model (LLM) agents increasingly rely on external memory stores to retain information across conversations, typically via dense vector embeddings searched with approximate nearest-neighbor methods. The fruit fly's olfactory circuit computes a locality-sensitive hash of sensory input using a strikingly different mechanism - sparse random projection followed by winner-take-all competition - and prior work (Dasgupta et al., 2017) showed this scheme, dubbed FlyHash, preserves neighbor structure better per bit than conventional random-hyperplane hashing (SimHash) on several benchmarks. We apply FlyHash, to our knowledge for the first time, to LLM agent memory retrieval, and ask three questions a practitioner actually needs answered: does the quality advantage hold under a correctly matched-bit protocol (it does, robustly, across 10 seeds and four datasets spanning two modalities, with one specific, previously undocumented comparison pitfall identified and corrected along the way); does that advantage translate into real memory and latency savings, including against the dense-vector indexing (HNSW) practitioners default to today (no: at equal bits FlyHash's codes are larger and slower to compare than SimHash's, and HNSW dominates both hash methods at ordinary scale; a sparse-set comparison we introduce recovers most but not all of a naive latency gap, leaving hashing's practical case narrower and more specific than the quality result alone implies); and does the advantage survive genuine, non-circular agent-memory relevance labels rather than the nearest-neighbor-by-embedding proxy this literature otherwise relies on (it does). We report all three answers precisely, including the two that narrow rather than flatter the headline result, and release our implementation, a working agent-memory demo, and a full account of the methodological pitfalls we found and corrected.",
       "repoUrl": "https://github.com/mohanji/flyhash-agent-memory",
       "needsDataCheck": true,
       "status": "retry",
       "reasons": [
-        "Passed the checks, and waiting for the AI budget."
+        "The AI draft failed: NEARAI_CLOUD_API_KEY is not set (or use MOCK_LLM=1)"
       ],
-      "checkedAt": "2026-11-10T14:55:27.544Z",
+      "checkedAt": "2026-11-10T23:24:46.199Z",
       "license": "MIT",
       "runtime": "python3.11"
     },
@@ -975,6 +975,100 @@
       ],
       "checkedAt": "2026-11-10T14:55:27.544Z",
       "license": "Apache-2.0",
+      "runtime": "python3.11"
+    },
+    "arxiv:2611.12806": {
+      "id": "arxiv:2611.12806",
+      "source": "Hugging Face Papers",
+      "title": "Learning Heterogeneous Tactile Representation for General Dexterous Manipulation",
+      "paperUrl": "https://arxiv.org/abs/2611.12806",
+      "doi": "10.48550/arXiv.2611.12806",
+      "upvotes": 92,
+      "abstract": "Tactile sensing is an indispensable modality for contact-rich dexterous manipulation, a capability that hints at the ultimate frontiers of embodied intelligence. However, commercially available tactile sensors are still at a relatively early stage of development, with each type of sensor offering irreplaceable strengths alongside its own drawbacks. A key challenge is thus to free tactile understanding from sensor-specific physics, so that embodied models can effectively leverage heterogeneous tactile data. To this end, we develop LingBot-Touch, a tactile foundation model characterized by the following properties. (i) Our model yields a unified representation across different tactile sensors (i.e., piezoresistive, magnetic, and visuotactile sensors), and is easily extensible to new sensor types. (ii) The resulting tactile tokens are plug-and-play: they can be seamlessly integrated into policy models across paradigms, from diffusion policy to vision-language-action (VLA) models such as π_{0.5} and LingBot-VLA, consistently enhancing manipulation dexterity. (iii) Extensive experiments, spanning simulation and real-robot deployments across multiple hardware platforms, demonstrate that our tactile representation substantially benefits complex manipulation tasks while maintaining strong computational efficiency. We believe the findings in this work demonstrate the potential of leveraging cross-sensor data to scale tactile learning, and offer encouraging insights for the design of future hardware and embodied models.",
+      "repoUrl": "https://github.com/Robbyant/lingbot-touch",
+      "needsDataCheck": true,
+      "status": "retry",
+      "reasons": [
+        "Passed the checks, and waiting for the AI budget."
+      ],
+      "checkedAt": "2026-11-10T23:24:46.199Z",
+      "license": "Apache-2.0",
+      "runtime": "python3.11"
+    },
+    "arxiv:2611.12762": {
+      "id": "arxiv:2611.12762",
+      "source": "Hugging Face Papers",
+      "title": "Sage-Taiyi: A Metacognitive Architecture for Scientific Discovery",
+      "paperUrl": "https://arxiv.org/abs/2611.12762",
+      "doi": "10.48550/arXiv.2611.12762",
+      "upvotes": 51,
+      "abstract": "We introduce Sage-Taiyi, a metacognition-inspired architecture that uses accumulated scientific understanding to guide what to investigate next and how to investigate it. Through explicit monitoring and control, the system revises its understanding of evidence, assumptions, and unresolved questions, then uses these assessments to adapt research targets and select reusable reasoning methods. On Taiyi-Bench, an AI co-scientist ideation benchmark comprising 265 tasks from 50 papers across ten disciplines, Sage-Taiyi ranks first on all eight metrics of historical rediscovery and open-ended ideation, achieving an Overall score of 54.0 compared with 47.9 for the strongest baseline, AI Scientist-v2. It also performs well on two external scientific ideation benchmarks. Five expert-guided collaborations further connect its proposals to experimental and computational validation across chemistry, materials science, and engineering. In chemistry, reaction-condition optimization raises the yield of cobalt-catalyzed carbonylation from trace amounts to 84% and photocatalytic allylic amination from 13% to 69%. These results support metacognitive regulation as an approach to scientific ideation and its progression toward practical validation.",
+      "repoUrl": "https://github.com/Alpha-Innovator/Sage-Taiyi",
+      "needsDataCheck": true,
+      "status": "rejected",
+      "reasons": [
+        "GitHub can't identify an open licence.",
+        "Mostly none. The Lab only runs Python and R."
+      ],
+      "checkedAt": "2026-11-10T23:24:46.199Z",
+      "license": null,
+      "runtime": null
+    },
+    "arxiv:2611.10771": {
+      "id": "arxiv:2611.10771",
+      "source": "Hugging Face Papers",
+      "title": "WorldFoundry: Towards Unified Infrastructure for World Intelligence",
+      "paperUrl": "https://arxiv.org/abs/2611.10771",
+      "doi": "10.48550/arXiv.2611.10771",
+      "upvotes": 53,
+      "abstract": "Visual generative models increasingly blur the line between synthesizing observations and simulating environments. Yet visual plausibility alone does not constitute successful world modeling: compelling outputs may lack persistent state, physical dynamics, or causally consistent responses to interactions. We define a generative world model as a predictive dynamical system that maintains a persistent, history-conditioned representation of an environment, updates that representation in response to actions or interventions, and generates temporally coherent trajectories that reflect outcomes under observed and counterfactual interventions. From this definition, we derive an intelligence-oriented framework spanning perceptual grounding, persistent state modeling, controllable transformation, dynamics-aware prediction, and closed-loop interaction. We present WorldFoundry, open-source infrastructure for reproducible inference and evaluation across video, 3D and 4D, embodied action, and interactive world systems. WorldFoundry unifies model and benchmark discovery, runtime and asset preparation, execution orchestration, artifact management, and interactive visualization, while modality-specific adapters preserve native inputs, execution semantics, output representations, and evaluation protocols. Explicit manifests, durable artifact contracts, and evidence-aware scorecards separate execution readiness from evaluative claims, making each claim traceable to its supporting artifacts. The catalog contains 270 model entries, 74 benchmarks, and 62 registered metric entries, with readiness and execution evidence recorded separately. WorldFoundry enables reproducible comparison of persistent, controllable dynamics across heterogeneous systems, advancing the field from perceptual synthesis toward measurable world intelligence.",
+      "repoUrl": "https://github.com/OpenEnvision/WorldFoundry",
+      "needsDataCheck": true,
+      "status": "rejected",
+      "reasons": [
+        "Depends on pytorch, which usually needs a graphics card. The Lab only has CPUs.",
+        "The repository is 288 MB, too big to rerun quickly."
+      ],
+      "checkedAt": "2026-11-10T23:24:46.199Z",
+      "license": "Apache-2.0",
+      "runtime": "python3.11"
+    },
+    "arxiv:2611.03953": {
+      "id": "arxiv:2611.03953",
+      "source": "Hugging Face Papers",
+      "title": "P^2-MOPD: Accelerating Multi-Teacher On-Policy Distillation via Parameter Priors",
+      "paperUrl": "https://arxiv.org/abs/2611.03953",
+      "doi": "10.48550/arXiv.2611.03953",
+      "upvotes": 51,
+      "abstract": "Multi-teacher on-policy distillation consolidates expert capabilities by supervising student-generated trajectories, whereas task arithmetic offers a training-free alternative through linear parameter combinations. We view the linear combination of student and expert parameters as a single differentiable model and propose P^2-MOPD, which jointly optimizes the mixing coefficients and the student weights under the same on-policy distillation objective. Unlike task arithmetic, which stays within the span of the frozen student and expert parameters for any choice of merging coefficients, P^2-MOPD keeps the student trainable, so the experts act as parameter priors without confining it to this span. Across four domains at 1.7B and 4B scales, P^2-MOPD achieves faster and more balanced recovery than MOPD from the same initialization, surpassing its final average recovery in half the training steps. At the end of training, our 1.7B model reaches 94.7% average recovery, versus 80.9% for MOPD.",
+      "repoUrl": "https://github.com/SinuoWang/P2-MOPD",
+      "needsDataCheck": true,
+      "status": "rejected",
+      "reasons": [
+        "GitHub can't identify an open licence.",
+        "Mostly none. The Lab only runs Python and R."
+      ],
+      "checkedAt": "2026-11-10T23:24:46.199Z",
+      "license": null,
+      "runtime": null
+    },
+    "arxiv:2611.08264": {
+      "id": "arxiv:2611.08264",
+      "source": "Hugging Face Papers",
+      "title": "SplatAnything: Gaussian Spacing Normalization for Feed-forward 3DGS across Arbitrary Scenes",
+      "paperUrl": "https://arxiv.org/abs/2611.08264",
+      "doi": "10.48550/arXiv.2611.08264",
+      "upvotes": 68,
+      "abstract": "We identify a key limitation of existing feed-forward 3DGS methods: Gaussian attributes are typically predicted in a radial-distance-normalized space that canonicalizes a global radial statistic of the reconstructed geometry, while the spacing between neighboring Gaussian centers can still vary substantially across scene scales and camera configurations. This mismatch induces systematic shifts in Gaussian-scale targets, leading to ambiguous supervision. To address this, we propose SplatAnything with Gaussian Spacing Normalization (GSNorm), which canonicalizes a robust scene-level statistic of Gaussian spacing to provide a more consistent spatial reference for Gaussian prediction. To rigorously assess our method, we further establish a systematic benchmark spanning diverse datasets, input sparsity levels, and challenging extrapolated viewpoints. Extensive experiments demonstrate that SplatAnything achieves state-of-the-art performance, with particularly strong gains under substantial variations in scene scale and viewpoint.",
+      "repoUrl": "https://github.com/zju3dv/SplatAnything",
+      "needsDataCheck": true,
+      "status": "rejected",
+      "reasons": [
+        "Depends on PyTorch, which usually needs a graphics card. The Lab only has CPUs.",
+        "The repository is 434 MB, too big to rerun quickly."
+      ],
+      "checkedAt": "2026-11-10T23:24:46.199Z",
+      "license": "NOASSERTION",
       "runtime": "python3.11"
     }
   }
