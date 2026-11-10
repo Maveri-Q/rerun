@@ -1,7 +1,7 @@
 {
-  "lastScanAt": "2026-11-10T12:55:25.436Z",
+  "lastScanAt": "2026-11-10T14:55:27.544Z",
   "draftsByDay": {
-    "2026-11-10": 2
+    "2026-11-10": 4
   },
   "candidates": {
     "rescience:10.5281_zenodo.20613595": {
@@ -194,9 +194,9 @@
       "repoUrl": "https://github.com/pboesu/replication_candy_1991",
       "status": "retry",
       "reasons": [
-        "Passed the checks, and waiting for the AI budget."
+        "The AI draft failed: NEARAI_CLOUD_API_KEY is not set (or use MOCK_LLM=1)"
       ],
-      "checkedAt": "2026-11-10T12:55:25.436Z",
+      "checkedAt": "2026-11-10T14:55:27.544Z",
       "license": "CC-BY-4.0",
       "runtime": "r4.4"
     },
@@ -225,7 +225,7 @@
       "reasons": [
         "Passed the checks, and waiting for the AI budget."
       ],
-      "checkedAt": "2026-11-10T12:55:25.436Z",
+      "checkedAt": "2026-11-10T14:55:27.544Z",
       "license": "BSD-3-Clause",
       "runtime": "python3.11"
     },
@@ -847,9 +847,9 @@
       "needsDataCheck": true,
       "status": "retry",
       "reasons": [
-        "Passed the checks, and waiting for the AI budget."
+        "The AI draft failed: NEARAI_CLOUD_API_KEY is not set (or use MOCK_LLM=1)"
       ],
-      "checkedAt": "2026-11-10T12:55:25.436Z",
+      "checkedAt": "2026-11-10T14:55:27.544Z",
       "license": "MIT",
       "runtime": "python3.11"
     },
@@ -866,7 +866,7 @@
       "reasons": [
         "Passed the checks, and waiting for the AI budget."
       ],
-      "checkedAt": "2026-11-10T12:55:25.436Z",
+      "checkedAt": "2026-11-10T14:55:27.544Z",
       "license": "MIT",
       "runtime": "python3.11"
     },
@@ -903,6 +903,78 @@
       ],
       "checkedAt": "2026-11-10T12:55:25.436Z",
       "license": "BSD-3-Clause",
+      "runtime": "python3.11"
+    },
+    "arxiv:2611.09113": {
+      "id": "arxiv:2611.09113",
+      "source": "Hugging Face Papers",
+      "title": "Authorization Drift in LLM Agents: Evaluating Boundary Compliance in Multi-Step Tool Use",
+      "paperUrl": "https://arxiv.org/abs/2611.09113",
+      "doi": "10.48550/arXiv.2611.09113",
+      "upvotes": 6,
+      "abstract": "LLM agents can exceed their authorization boundaries while pursuing user goals without an adversary. We formalize this phenomenon as authorization drift across data, tool, scope, and time, and introduce the Authorization Drift Benchmark (ADB): 648 samples across seven domains, each pairing a sufficient compliant path with an attractive unauthorized shortcut. To ensure executable tasks, tempting shortcuts, and feasible compliant paths, Staged Execution-Reflective Synthesis (SERS) grounds benchmark validation in real agent rollouts rather than LLM self-critique. Across 13 LLMs and three frameworks (25,207 trajectories), greater capability accompanies greater drift, with frontier-capable models exhibiting drift rates of 0.43 to 0.61. Yet 86.18% of tasks admit an observed clean-success trajectory, showing that drift is avoidable. Drift is persistent and dominated by early data over-collection; apparent improvements under agentic scaffolds coincide with collapsing clean-completion performance. To understand potential harms to individuals and society, we map drift points to legal provisions across four jurisdictions, connecting overreach to privacy and information-security concerns. Data minimisation is the most frequently implicated provision, and 93.5% of legally grounded drifting runs map to multiple jurisdictions, making the potential consequences of authorization drift more interpretable.",
+      "repoUrl": "https://github.com/ZJR-FZD/AgentDrift",
+      "needsDataCheck": true,
+      "status": "rejected",
+      "reasons": [
+        "Depends on torch, which usually needs a graphics card. The Lab only has CPUs."
+      ],
+      "checkedAt": "2026-11-10T14:55:27.544Z",
+      "license": "MIT",
+      "runtime": "python3.11"
+    },
+    "arxiv:2611.05791": {
+      "id": "arxiv:2611.05791",
+      "source": "Hugging Face Papers",
+      "title": "FlyHash for LLM Agent Memory: An Empirical Validation and a New Application",
+      "paperUrl": "https://arxiv.org/abs/2611.05791",
+      "doi": "10.48550/arXiv.2611.05791",
+      "upvotes": 3,
+      "abstract": "Large language model (LLM) agents increasingly rely on external memory stores to retain information across conversations, typically via dense vector embeddings searched with approximate nearest-neighbor methods. The fruit fly's olfactory circuit computes a locality-sensitive hash of sensory input using a strikingly different mechanism - sparse random projection followed by winner-take-all competition - and prior work (Dasgupta et al., 2017) showed this scheme, dubbed FlyHash, preserves neighbor structure better per bit than conventional random-hyperplane hashing (SimHash) on several benchmarks. We apply FlyHash, to our knowledge for the first time, to LLM agent memory retrieval, and ask three questions a practitioner actually needs answered: does the quality advantage hold under a correctly matched-bit protocol (it does, robustly, across 10 seeds and four datasets spanning two modalities, with one specific, previously undocumented comparison pitfall identified and corrected along the way); does that advantage translate into real memory and latency savings, including against the dense-vector indexing (HNSW) practitioners default to today (no: at equal bits FlyHash's codes are larger and slower to compare than SimHash's, and HNSW dominates both hash methods at ordinary scale; a sparse-set comparison we introduce recovers most but not all of a naive latency gap, leaving hashing's practical case narrower and more specific than the quality result alone implies); and does the advantage survive genuine, non-circular agent-memory relevance labels rather than the nearest-neighbor-by-embedding proxy this literature otherwise relies on (it does). We report all three answers precisely, including the two that narrow rather than flatter the headline result, and release our implementation, a working agent-memory demo, and a full account of the methodological pitfalls we found and corrected.",
+      "repoUrl": "https://github.com/mohanji/flyhash-agent-memory",
+      "needsDataCheck": true,
+      "status": "retry",
+      "reasons": [
+        "Passed the checks, and waiting for the AI budget."
+      ],
+      "checkedAt": "2026-11-10T14:55:27.544Z",
+      "license": "MIT",
+      "runtime": "python3.11"
+    },
+    "arxiv:2611.04434": {
+      "id": "arxiv:2611.04434",
+      "source": "Hugging Face Papers",
+      "title": "Sketchpad: certified exact arithmetic with a small vision-language model",
+      "paperUrl": "https://arxiv.org/abs/2611.04434",
+      "doi": "10.48550/arXiv.2611.04434",
+      "upvotes": 3,
+      "abstract": "Language models are accurate on most long-arithmetic problems, but their accuracy is estimated on samples and carries no guarantee for an unseen input; tool use is exact but moves the computation outside the network. We show that exactness at all input lengths becomes a finite, checkable property of a network when each of its steps reads only a bounded view of an external working memory. In Sketchpad, Qwen3.5-0.8B with a low-rank adapter executes arithmetic procedures on a rendered sheet. Each forward pass reads a three-cell view and emits one step: a digit, a carry or borrow, and the next operation. A fixed runtime moves the view and writes no digit of a result. We prove in Lean that the model is then exact on all inputs of any length if and only if it is exact on the finite set of views the runtime presents, that no finite test suffices when steps also read earlier steps, and that the guarantee tolerates bounded numerical perturbation and extends to compositions of procedures. All 2,446 views pass on the deployment device, a laptop GPU running the model in a web browser. The certified model performs signed addition and subtraction, long multiplication and division, square roots and greatest common divisors at arbitrary length. It solved 200 of 200 pre-registered problems in the browser, and 220 of 220 sums of up to 1,000 digits and products of up to 20 digits, of which GPT-6.1 Sol, the strongest of ten other models, solved 217. A symbolic runtime built on these procedures solves, expands and factors polynomials with every number computed by the model, and a multiplicative gate on the adapter recovers the base model exactly when the sheet is not in use.",
+      "repoUrl": "https://github.com/NeoVand/sketchpad",
+      "needsDataCheck": true,
+      "status": "rejected",
+      "reasons": [
+        "Mostly TypeScript. The Lab only runs Python and R."
+      ],
+      "checkedAt": "2026-11-10T14:55:27.544Z",
+      "license": "Apache-2.0",
+      "runtime": null
+    },
+    "arxiv:2611.09195": {
+      "id": "arxiv:2611.09195",
+      "source": "Hugging Face Papers",
+      "title": "InstantHMR : Real-Time Human Mesh Recovery on Your Phone",
+      "paperUrl": "https://arxiv.org/abs/2611.09195",
+      "doi": "10.48550/arXiv.2611.09195",
+      "upvotes": 2,
+      "abstract": "Real-time 3D human mesh recovery from a single image on mobile devices is a challenging problem with many applications, including robotics, biomechanics, AR/VR, and exergames. Current state-of-the-art models are either too slow to run efficiently on mobile devices or sacrifice accuracy for speed. We present InstantHMR, a family of open-source single-image regressors suited for mobile inference, based on the Momentum Human Rig (MHR) parametric model and trained exclusively on publicly available annotations from the SAM 3D Body dataset. Our approach achieves remarkable performance on a Samsung Galaxy S23 NPU, recovering a 6,890-vertex body mesh in 5.5 ms per person, and 0.98 ms on an NVIDIA RTX 4070 GPU. This speed surpasses all existing methods we evaluated. On mobile, it is 12x faster than the single mobile-compatible method that slightly outperforms ours in accuracy, while achieving competitive accuracy with 40.0 mm PA-MPJPE on 3DPW, 48.8 mm on EMDB and 41.7 mm on RICH. To ensure fair comparisons, we re-evaluate 11 state-of-the-art methods under a unified protocol aligned with the closest MHR-based competitors, including Meta's official MHR-to-SMPL conversion, and report their reproduction results. Additionally, we measure latency across eight different targets, ranging from desktop TensorRT to two phone NPUs. Code and models are available at https://github.com/Naturalpad-studio/InstantHMR.",
+      "repoUrl": "https://github.com/Naturalpad-studio/InstantHMR",
+      "needsDataCheck": true,
+      "status": "rejected",
+      "reasons": [
+        "Depends on torch, which usually needs a graphics card. The Lab only has CPUs."
+      ],
+      "checkedAt": "2026-11-10T14:55:27.544Z",
+      "license": "Apache-2.0",
       "runtime": "python3.11"
     }
   }
