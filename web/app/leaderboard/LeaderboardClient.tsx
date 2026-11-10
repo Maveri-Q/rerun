@@ -1,0 +1,91 @@
+"use client";
+
+import Link from "next/link";
+import { RollingNumber } from "@/components/RollingNumber";
+import { usePoll } from "@/components/usePoll";
+import { chain, type Accuracy } from "@/lib/chain";
+import { accountLink } from "@/lib/config";
+import { fmtUnits } from "@/lib/market";
+import { useWallet } from "@/lib/wallet";
+
+const START = 1_000_000_000n;
+
+/** The project's own accounts and the automated demo's throwaway ones. */
+const OURS = /^rerun-judge-|^rerun-bet-|^rerun-scout-|rerun-43f5f2\.testnet$|rerun-lab-43f5f2\.testnet$|\.rerun-43f5f2\.testnet$/;
+
+const accuracyText = (a?: Accuracy) =>
+  a?.brier_ppm == null ? "" : `Accuracy ${(a.brier_ppm / 1_000_000).toFixed(3)} over ${a.scored} ${a.scored === 1 ? "claim" : "claims"}`;
+
+const short = (id: string) => (id.length > 20 ? `${id.slice(0, 17)}…` : id);
+const signed = (points: string) => {
+  const change = BigInt(points) - START;
+  return `${change >= 0n ? "+" : ""}${fmtUnits(change)}`;
+};
+
+export default function LeaderboardPage() {
+  const board = usePoll(() => chain.leaderboard(), [], 30_000, "leaderboard");
+  const wallet = useWallet();
+  const rows = (board.data ?? []).filter((e) => !OURS.test(e.account_id));
+  const names = rows.map((e) => e.account_id).join(",");
+  // If the score can't be read, the points still show.
+  const scores = usePoll(() => (names ? chain.accuracy(names.split(",").slice(0, 50)) : Promise.resolve([])), [names], 60_000, "accuracy");
+  const scoreOf = (id: string) => scores.data?.find((a) => a.account_id === id);
+  const top = rows.slice(0, 3);
+  const rest = rows.slice(3);
+  const highest = rows.length ? Number(fmtUnits(rows[0]!.points).replaceAll(",", "")) || 1 : 1;
+  return (
+    <>
+      <h1 className="page-title">Best forecasters</h1>
+      <p className="lede">Everyone starts with 1,000 free points. Points can&apos;t be bought or transferred, so the only way up this list is forecasting well.</p>
+
+      {board.error && !board.data && <p className="notice notice--error">Unable to load the leaderboard. This page keeps trying.</p>}
+      {board.loading && !board.data && <p className="empty">Adding up everyone&apos;s points…</p>}
+      {board.data && rows.length === 0 && <p className="empty">Nobody&apos;s on the board yet. <Link href="/#claims">Make a forecast</Link> to be first.</p>}
+
+      {top.length > 0 && (
+        <div className="podium">
+          <ol className="podium-list">
+            {top.map((e, i) => (
+              <li key={e.account_id} className={`pod pod--${i + 1}`} style={{ "--i": i } as React.CSSProperties}>
+                <div className="pod-paper">
+                  <span className="pod-rank">{i + 1}</span>
+                  <a className="pod-name" href={accountLink(e.account_id)} title={e.account_id}>
+                    {short(e.account_id)}
+                  </a>
+                  {e.account_id === wallet.accountId && <span className="pod-you">You</span>}
+                  <RollingNumber value={fmtUnits(e.points, 0)} className="pod-points" />
+                  <span className="pod-change">{signed(e.points)} since the start</span>
+                  <span className="pod-accuracy">{accuracyText(scoreOf(e.account_id))}</span>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </div>
+      )}
+
+      {rest.length > 0 && (
+        <ol className="ranks" start={4}>
+          {rest.map((e, i) => {
+            const value = Number(fmtUnits(e.points).replaceAll(",", "")) || 0;
+            return (
+              <li key={e.account_id} className={e.account_id === wallet.accountId ? "rank rank--you" : "rank"}>
+                <span className="rank-no">{i + 4}</span>
+                <a href={accountLink(e.account_id)} className="break">
+                  {e.account_id}
+                </a>
+                <span className="rank-points">{fmtUnits(e.points)}</span>
+                <span className="rank-change">{signed(e.points)}</span>
+                {scoreOf(e.account_id)?.brier_ppm != null && <span className="rank-accuracy">{accuracyText(scoreOf(e.account_id))}</span>}
+                <i className="rank-bar" style={{ transform: `scaleX(${Math.max(value / highest, 0.02)})` }} />
+              </li>
+            );
+          })}
+        </ol>
+      )}
+      <p className="hint" style={{ marginTop: 24 }}>
+        The accuracy score is stored on the blockchain: 0 is perfect, and always saying 50% scores 0.250, so lower is better. It compares the odds each forecast moved a claim to with what happened. Inconclusive claims don&apos;t count.
+      </p>
+      <p className="hint">Points in open forecasts don&apos;t count until you collect them, so someone with many open forecasts may rank lower for now.</p>
+    </>
+  );
+}

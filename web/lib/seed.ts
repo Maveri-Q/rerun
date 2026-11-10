@@ -1,3 +1,5 @@
+import { readFile } from "node:fs/promises";
+import path from "node:path";
 import { chain } from "./chain";
 import type { Market } from "./market";
 import { isListed, provenanceOf } from "./provenance";
@@ -35,4 +37,23 @@ export async function factsSeed() {
 export async function claimSeed(id: number) {
   const [market, config, spec, receipts] = await Promise.all([attempt(() => chain.market(id)), attempt(() => chain.config()), attempt(() => chain.spec(id)), attempt(() => chain.receipts(id))]);
   return clean({ [`market.${id}`]: market ?? undefined, config, [`spec.${id}`]: spec ?? undefined, [`receipts.${id}`]: receipts });
+}
+
+/** The same accounts the leaderboard leaves out: ours and the automated demo's. */
+const OURS = /^rerun-judge-|^rerun-bet-|^rerun-scout-|rerun-43f5f2\.testnet$|rerun-lab-43f5f2\.testnet$|\.rerun-43f5f2\.testnet$/;
+
+export async function leaderboardSeed() {
+  const leaderboard = await attempt(() => chain.leaderboard());
+  const names = (leaderboard ?? []).filter((e) => !OURS.test(e.account_id)).map((e) => e.account_id).slice(0, 50);
+  return clean({ leaderboard, accuracy: names.length ? await attempt(() => chain.accuracy(names)) : undefined });
+}
+
+/** The scout's log as last copied to the site (`pnpm site-snapshot`), and drafts read from the chain. */
+export async function scoutSeed() {
+  const scout = await attempt(async () => JSON.parse(await readFile(path.join(process.cwd(), "public", "scout.json"), "utf8")) as unknown);
+  return clean({ scout, drafts: await attempt(() => chain.markets({ state: "Draft" }, 100)) });
+}
+
+export async function trySeed() {
+  return clean({ markets: await attempt(() => chain.markets()) });
 }

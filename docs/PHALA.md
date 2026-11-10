@@ -22,7 +22,14 @@ The Lab runs in an Intel TDX confidential VM (a dstack CVM) on Phala Cloud. Its 
 
 ## What it costs
 
-Plan: `tdx.medium`, 2 vCPU and 4 GB, at $0.116 an hour on Phala's price list (read Nov 9), from Nov 12 to the end of judging on Nov 18. Nov 12, 08:00 Lagos to Nov 19, 00:00 UTC is 161 hours, about **$18.70**, inside $20 of credit. The default 20 GB disk is enough: the three images come to about 6 GB. Check the hourly price in the dashboard before deploying, because their docs and their API label the sizes differently.
+Plan: `tdx.medium`, 2 vCPU and 4 GB, at $0.116 an hour, running non-stop from Nov 12, 08:00 Lagos through judging. Phala gives $5 of credit (their docs saying $20 were out of date), and the rest goes on your card:
+
+| Runs until | Hours | Cost | On your card |
+|---|---|---|---|
+| Nov 19, 00:00 UTC (end of judging, Nov 18) | 161 | $18.70 | $13.70 |
+| Nov 19, 23:59 Lagos (end of Nov 19) | 184 | $21.30 | $16.30 |
+
+Deleting the CVM stops the charges at once. Turn off Auto-topup in Phala's billing page: with it on, Phala charges $20 whenever the balance drops below $5. Post-paid charges your card each time $5 of usage builds up, which keeps the Lab running past the credit. The default 20 GB disk is enough: the three images come to about 6 GB.
 
 A claim's sandbox is capped at 3 GB of memory and 2 CPUs on this machine (`SANDBOX_MAX_MEM_GB`, `SANDBOX_MAX_CPUS` in the compose file), so a big run can't starve the Lab. Most claims ask for 4 GB. If a run fails for lack of memory (exit code 137 in the Lab's log), I'll tell you, and we size up to `tdx.large` ($0.232 an hour). That changes only the machine, not the codehash.
 
