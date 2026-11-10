@@ -4,7 +4,7 @@
 
 *Checked twice.*
 
-**A forecasting market on whether published research holds up. People predict the result, then the Lab, an AI agent, reruns the authors' code and data and posts a receipt on NEAR that anyone can check.**
+**A forecasting market on whether published research holds up. People predict the result, then the Lab, an AI agent, reruns the result from public code and data and posts a receipt on NEAR that anyone can check.**
 
 Other truth markets trust an AI's opinion. We run the researchers' own code.
 
@@ -29,7 +29,7 @@ Published results, rerun from public code and data. The forecast price never cha
 | [Does a 1986 figure for a forest pest's timing hold up?](https://rerun-silk.vercel.app/market/23) | A 1986 study gave one number for how spread out a forest pest's development is. The Lab couldn't get a fair rerun, so there's no verdict. _Independent rebuild._ | [Receipt](https://rerun-silk.vercel.app/receipt/23/0) |
 | [Does the brain's wiring predict where Parkinson's spreads?](https://rerun-silk.vercel.app/market/24) | The study said the brain's wiring predicts where Parkinson's-like damage spreads in mice. The Lab reran it: ✓ same result. Paper 0.696, the Lab 0.6961. _Authors' own code._ | [Receipt](https://rerun-silk.vercel.app/receipt/24/0) |
 
-Most of these are settled showcases: posted with the result already known, marked as such on their pages, and with no forecasting. Open claims for new papers lock between Nov 12 and 17 and are rerun only after forecasting closes.
+Most of these are settled showcases: posted with the result already known, marked as such on their pages, and with no forecasting. Open claims for new papers ([37](https://rerun-silk.vercel.app/market/37), [38](https://rerun-silk.vercel.app/market/38)) lock on Nov 12 and Nov 16 and are rerun only after forecasting closes.
 
 ## How it works
 
@@ -45,18 +45,19 @@ Outcomes: ✓ holds up (YES wins), ✗ doesn't hold up or the code didn't finish
 
 **No one, not even us, can change a verdict or the payouts.** The contract has no method that alters a final result, and a result only becomes final through the receipt checks and the challenge window. One caveat, stated plainly: until the contract account's own key is removed, whoever holds it could deploy different code. That key is still there on testnet, because we're still building. Next: upgrades move to a multisig with a time delay.
 
-- **Check it yourself:** `pnpm verify-claim <id>` reruns a claim on your own computer and compares it with the receipt on NEAR.
-- **The model is private and attested:** the Lab thinks with NEAR AI Cloud private models. It verifies the model's secure-hardware attestation before a run, and every reply's signature after it.
+- **Check it yourself:** [`pnpm verify-claim <id>`](scripts/verify-claim.ts) reruns a claim on your own computer and compares it with the receipt on NEAR.
+- **The model is private and attested:** the Lab thinks with NEAR AI Cloud private models. It verifies the model's secure-hardware attestation before a run ([`attestation.ts`](lab/orchestrator/src/nearai/attestation.ts)), and every reply's signature after it ([`signature.ts`](lab/orchestrator/src/nearai/signature.ts)).
 - **Other apps can settle on it:** `get_verdict(claim_id)` is a public view. [`contracts/verdict-bet`](contracts/verdict-bet/src/lib.rs) is a tiny contract that settles its own bet from it, with nobody telling it who won. [It ran on testnet](https://testnet.nearblocks.io/txns/BqzmVEaGC8Uucg6ac3Fh5Wp1AofBpXwT3GhhsPVNhHaY).
-- **Forecasters have a track record:** an accuracy score (Brier) per account, stored on-chain. Metaculus and Replication Markets score forecasters the same way.
+- **Forecasting costs no gas in points mode:** the wallet signs a NEP-366 delegate action and RERUN's relayer submits it, paying the gas and any storage, within a daily limit per account ([`relay.ts`](web/lib/relay.ts)). A brand-new account claimed its points and forecast without spending any NEAR: [claim points](https://testnet.nearblocks.io/txns/G5waPhuqZgPQhhYCsbmC52coq8Jt8pmzgS1ttvinnrrx), [forecast](https://testnet.nearblocks.io/txns/3RKCC9bRJCWk9T2KPqmTxRojvHMLCzAAr1wr5wT8oAge) (`pnpm relay:check`). Wallets that can't sign one fall back to an ordinary transaction.
+- **Forecasters have a track record:** an accuracy score (Brier) per account, stored on-chain ([`accuracy.rs`](contracts/rerun/src/accuracy.rs), shown on the [leaderboard](https://rerun-silk.vercel.app/leaderboard)). Metaculus and Replication Markets score forecasters the same way.
 
 **Deployed on testnet:** market contract [`rerun.rerun-43f5f2.testnet`](https://testnet.nearblocks.io/address/rerun.rerun-43f5f2.testnet), Lab [`rerun-lab-43f5f2.testnet`](https://testnet.nearblocks.io/address/rerun-lab-43f5f2.testnet), test collateral [`tusdc.rerun-43f5f2.testnet`](https://testnet.nearblocks.io/address/tusdc.rerun-43f5f2.testnet).
 
 ## Coming next
 
-- The Lab runs inside secure hardware on Phala Cloud, with its code fingerprint registered on NEAR.
+- The Lab runs inside secure hardware on Phala Cloud, with its code fingerprint and attestation registered on NEAR. Built and tested ([`tee/`](lab/orchestrator/src/tee), [`docs/PHALA.md`](docs/PHALA.md)); it goes live on Nov 12.
+- Mainnet: points mode and one money claim, with the gas-free relayer ([`docs/MAINNET_COSTS.md`](docs/MAINNET_COSTS.md)).
 - The Lab agent pays for its own compute via NEAR Intents.
-- Gas-free forecasts through a relayer, with a daily limit per person.
 - A research reputation on claim pages, such as "3 of 4 checked results held up" for a paper's authors.
 - Upgrades move to a multisig with a time delay.
 
@@ -168,7 +169,8 @@ docs/               sources, mainnet costs, the repair benchmark, old claims
 
 - **NEAR AI Cloud** private inference, with model + gateway attestation and per-response signature verification.
 - **NEP-141** collateral and **NEP-297** events in the market contract (near-sdk 5.29).
-- See [Coming next](#coming-next) for Shade Agents and NEAR Intents funding.
+- **NEP-366** meta-transactions for gas-free forecasts, and **NEAR Connect** for wallets.
+- See [Coming next](#coming-next) for the Lab on Phala's secure hardware and NEAR Intents funding.
 
 ## Limitations
 
@@ -197,7 +199,7 @@ Building an AI encyclopedia with prediction markets? Use this to settle claims w
 Everything else: Contract tests need Rust (the pinned 1.93.0 toolchain installs itself) and, to build wasm, [cargo-near](https://github.com/near/cargo-near). The Lab needs Docker.
 
 1. `pnpm install`
-2. `pnpm test`: see all tests pass with no network, keys or Docker: about 350 TypeScript tests (comparator, private-data encryption, attestation checks against a recorded real NEAR AI report, repair guards, the reproduction pipeline, evidence checks, paper-only statistics against published tables, the Lab's HTTP server, browser sealing) and 88 contract tests (every market outcome, both challenge paths, attacks, stale refunds, points, money mode, FPMM property tests, and real Lab output replayed through the contract).
+2. `pnpm test`: see all tests pass with no network, keys or Docker: about 370 TypeScript tests (comparator, private-data encryption, attestation checks against a recorded real NEAR AI report, repair guards, the reproduction pipeline, evidence checks, paper-only statistics against published tables, the Lab's HTTP server, browser sealing) and 93 contract tests (every market outcome, both challenge paths, attacks, stale refunds, points, money mode, FPMM property tests, and real Lab output replayed through the contract).
 3. `pnpm nearai:hello`: see the NEAR AI Cloud attestation for the Lab's private model verified live:
    Intel TDX quote via DCAP, NVIDIA GPU evidence via NRAS (JWT verified against NVIDIA's keys), key + nonce binding in `report_data`, `MRCONFIGID` bound to the app compose, and the RTMR3 event-log replay, for both the gateway and the model TEE. Each line prints PASS/FAIL.
 4. Optional: put `NEARAI_CLOUD_API_KEY` in `.env` (copy `.env.example`) and run `pnpm nearai:hello` again: it also sends one tiny private chat completion and verifies its ECDSA response signature against the attested model key.
