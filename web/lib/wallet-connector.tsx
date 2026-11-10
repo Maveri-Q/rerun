@@ -4,7 +4,7 @@ import { Account, actions, encodeSignedDelegate, JsonRpcProvider, type KeyPairSt
 import { NearProvider, useNearWallet } from "near-connect-hooks";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { CONTRACT, NETWORK, RPC, txLink } from "./config";
-import type { Wallet } from "./wallet";
+import type { Transaction, Wallet } from "./wallet";
 
 /**
  * Automated browser tests cannot click through a wallet's own window, so on a local dev server
@@ -200,6 +200,43 @@ function Inner({ onChange }: { onChange: (wallet: Wallet) => void }) {
     [test],
   );
 
+  const send = useCallback<Wallet["send"]>(
+    async (transactions: Transaction[]) => {
+      setLastTx("");
+      setGasFree(false);
+      const gasOf = (tgas?: number) => BigInt(tgas ?? 30) * 10n ** 12n;
+      let sent: SentTransaction[];
+      if (test) {
+        sent = [];
+        for (const t of transactions) {
+          sent.push(
+            (await test.signAndSendTransaction({
+              receiverId: t.receiverId,
+              actions: t.actions.map((a) => actions.functionCall(a.method, a.args, gasOf(a.tgas), BigInt(a.deposit ?? "0"))),
+            })) as SentTransaction,
+          );
+        }
+      } else {
+        setBlocked(false);
+        setWait("sign");
+        try {
+          sent = (await latest.current.signAndSendTransactions({
+            transactions: transactions.map((t) => ({
+              receiverId: t.receiverId,
+              actions: t.actions.map((a) => ({ type: "FunctionCall" as const, params: { methodName: a.method, args: a.args, gas: gasOf(a.tgas).toString(), deposit: a.deposit ?? "0" } })),
+            })),
+          })) as SentTransaction[];
+        } finally {
+          setWait(null);
+        }
+      }
+      const hashes = sent.map(hashOf);
+      setLastTx(hashes[hashes.length - 1] ?? "");
+      return hashes;
+    },
+    [test],
+  );
+
   const value = useMemo<Wallet>(
     () => ({
       accountId: test?.accountId ?? near.signedAccountId,
@@ -211,8 +248,9 @@ function Inner({ onChange }: { onChange: (wallet: Wallet) => void }) {
       },
       signOut: () => void latest.current.signOut(),
       call,
+      send,
     }),
-    [test?.accountId, near.signedAccountId, near.loading, call],
+    [test?.accountId, near.signedAccountId, near.loading, call, send],
   );
   useEffect(() => onChange(value), [value, onChange]);
   return (

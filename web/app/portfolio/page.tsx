@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { AnyChainPanel } from "@/components/AnyChainPanel";
+import { NearSwapPanel } from "@/components/NearSwapPanel";
 import { PointsStack } from "@/components/PointsStack";
 import { VerifiedOnNear } from "@/components/VerifiedOnNear";
 import { REAL_MONEY } from "@/lib/config";
@@ -61,6 +62,7 @@ export default function PortfolioPage() {
           </div>
           <PointsStack />
         </div>
+        <NearSwapPanel />
         <AnyChainPanel />
       </>
     );
@@ -166,6 +168,7 @@ export default function PortfolioPage() {
         )}
         <p className="hint">Profit or loss counts what you put in, what you took out, and today&apos;s value of your shares. Money you added to a prize pool isn&apos;t counted until you take it out.</p>
       </section>
+      <NearSwapPanel />
       <AnyChainPanel />
     </>
   );

@@ -6,7 +6,7 @@
 
 **A forecasting market on whether published research holds up. People predict the result, then the Lab, an AI agent, reruns the result from public code and data and posts a receipt on NEAR that anyone can check.**
 
-Other truth markets trust an AI's opinion. We run the researchers' own code.
+Other truth markets trust an AI's opinion. We rerun the research and post the receipt.
 
 **Live site:** https://rerun-silk.vercel.app (NEAR testnet, free points) · **Video:** _link coming_
 
@@ -35,7 +35,7 @@ Most of these are settled showcases: posted with the result already known, marke
 
 1. A published result becomes a claim: the exact code commit, data fingerprints, the paper's number and the allowed margin, all hashed on-chain.
 2. People forecast whether it holds up, with free points (or, on mainnet, a little USDC).
-3. When forecasting closes, the Lab fetches the pinned code and data, checks every fingerprint, and runs it in a sealed container with the internet cut off. An AI may fix setup problems, like a missing package. Code guards stop it touching numbers, analysis or data, and every change goes in the receipt.
+3. When forecasting closes, the Lab fetches the pinned code and data (the authors' own code where it's public, our open rebuild where it isn't), checks every fingerprint, and runs it in a sealed container with the internet cut off. An AI may fix setup problems, like a missing package. Code guards stop it touching numbers, analysis or data, and every change goes in the receipt.
 4. Plain code reads the number and compares it. The AI never decides a verdict, and the contract re-checks the comparison itself.
 5. The receipt goes on NEAR. Anyone can challenge it for a while, which makes the Lab rerun it independently with a different AI. Then winners collect.
 
@@ -174,7 +174,7 @@ docs/               sources, mainnet costs, the repair benchmark, old claims
 
 ## Limitations
 
-Reproduction is not replication: RERUN checks that the published code and data produce the published number, not that the science is true.
+Reproduction is not replication: RERUN checks that the published code and data produce the published number, not that the science is true. Where the authors' code is public the Lab runs it; where it isn't, it runs our open rebuild ([`rebuilds/`](rebuilds)), and each claim says which.
 
 The contract account's key isn't removed yet, so an upgrade is still possible on testnet, and we've used it: new features went in that way, and existing claims and receipts read back unchanged. The accuracy score only counts forecasts made after it was added. Verdict links go to the contract's history on the explorer rather than one transaction, because past verdict transactions aren't indexed by claim. Links after you sign something go to that exact transaction.
 

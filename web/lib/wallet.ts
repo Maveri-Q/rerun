@@ -11,12 +11,27 @@ export interface CallOptions {
   gasFree?: boolean;
 }
 
+export interface FunctionCall {
+  method: string;
+  args: Record<string, unknown>;
+  /** yoctoNEAR, as a string. */
+  deposit?: string;
+  tgas?: number;
+}
+
+export interface Transaction {
+  receiverId: string;
+  actions: FunctionCall[];
+}
+
 export interface Wallet {
   accountId: string;
   loading: boolean;
   signIn: () => void;
   signOut: () => void;
   call: (method: string, args: Record<string, unknown>, opts?: CallOptions) => Promise<void>;
+  /** Several transactions, approved together. Returns each transaction's hash, in order. */
+  send: (transactions: Transaction[]) => Promise<string[]>;
 }
 
 /** What pages see on the server, and in the browser until the connector has loaded. */
@@ -26,6 +41,7 @@ export const NO_WALLET: Wallet = {
   signIn: () => {},
   signOut: () => {},
   call: () => Promise.reject(new Error("Your wallet is still loading. Try again in a moment.")),
+  send: () => Promise.reject(new Error("Your wallet is still loading. Try again in a moment.")),
 };
 
 export const WalletContext = createContext<Wallet>(NO_WALLET);
