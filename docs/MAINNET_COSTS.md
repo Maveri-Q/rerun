@@ -1,51 +1,66 @@
-# What mainnet needs (Plan B)
+# What mainnet needs
 
-Points mode for every claim, plus one money claim for the video. Worked out on 2026-11-09 from the current build. Nothing has been spent, and no mainnet transaction has been sent: each one waits for a yes.
+Points mode for every claim, ONE money claim with a 5 USDC prize pool, and the gas-free relayer. Worked out on 2026-11-10 from the current mainnet build (`contracts/target/near/rerun-mainnet/rerun.wasm`, 507,750 bytes, sha256 `588aa60a…5f93`). Nothing has been spent, and no mainnet transaction has been sent: each one waits for your yes.
 
-## NEAR: 7.0
+`<you>.near` below is your mainnet account. Storage on NEAR costs 1 NEAR per 100 KB.
+
+## NEAR: 7.2
 
 | What | NEAR | Comes back? |
 |---|---|---|
-| Contract code (505 KB of storage) | 5.1 | Only if the contract account is deleted later |
-| Contract and Lab accounts, created under your account | 0.2 | Mostly locked as their storage |
-| About 6 points claims, with their receipts | 0.5 | No, it pays for their storage |
-| Gas: posting, runs, settling | 0.2 | No |
-| Gas-free relayer for points mode | 1.0 | What it doesn't spend stays in its account |
-| **Total** | **7.0** | |
+| Contract code (507,750 bytes of storage) | 5.08 | Only if the contract account is deleted later |
+| Contract account `rerun.<you>.near`, its state and margin | 0.22 | Mostly locked as storage |
+| Lab account `lab.<you>.near`, with the secure hardware's key as its only key | 0.30 | What it doesn't spend on gas stays in it |
+| Gas-free relayer account `relay.<you>.near` | 1.00 | What it doesn't spend stays in it |
+| About 5 points claims, with their receipts | 0.40 | No, it pays for their storage |
+| USDC registrations (the contract and a second forecasting account) | 0.01 | No |
+| Second forecasting account, for the money video (`fan.<you>.near`) | 0.10 | What it doesn't spend stays in it |
+| Your own gas: deploying, posting, settling, collecting | 0.09 | No |
+| **Total** | **7.20** | Up to 1.4 stays spendable in the Lab, relayer and second accounts |
 
-The contract is already built small (size-optimised, link-time optimised). Turning off its overflow checks would save only 17 KB, about 0.17 NEAR, so it isn't worth the risk.
+The contract is already built small (size- and link-time optimised). Turning off its overflow checks would save only about 17 KB, 0.17 NEAR, so it isn't worth the risk.
 
-## USDC: 20
+## USDC: 10
 
-Before the money claim opens, the owner lowers money mode's bond and fee with `set_mode_params` (one transaction): a 2 USDC bond and a 0.5 USDC Lab fee, instead of 10 and 2.
+The contract's default money settings ask for a 10 USDC prize pool, a 10 USDC bond and a 2 USDC Lab fee. Before the money claim opens, one owner transaction (`set_mode_params`) lowers them to a 5 USDC prize pool minimum, a 2 USDC bond, a 0.5 USDC Lab fee and a 1 USDC minimum challenge bond.
 
 | What | USDC | Comes back? |
 |---|---|---|
-| Starting prize pool | 12 | Yes, when the claim is final, give or take how the forecasts moved it |
-| Creation bond | 2 | Yes, unless the claim itself was at fault |
-| Lab fee | 0.5 | It goes to the Lab's fee account, which is yours |
-| Two forecasts for the video, one each way | 5 | The winning side gets the pot. With both accounts yours, it all comes back |
-| Spare | 0.5 | |
-| **Total** | **20** | **Nearly all of it**, once the claim is final and both accounts collect |
+| Prize pool (liquidity) | 5.00 | Yes, when the claim is final, give or take how the forecasts moved it |
+| Creation bond | 2.00 | Yes, unless the claim itself was at fault |
+| Lab fee | 0.50 | It goes to the Lab's fee account, which is yours |
+| Two forecasts for the video, 1 USDC each way, from your account and the second one | 2.00 | The winning side takes the pot. Both accounts are yours, so it comes back |
+| Spare | 0.50 | Yes, unused |
+| **Total** | **10.00** | **All but cents**: each forecast pays a 1% fee, 0.8% into the prize pool (yours) and 0.2% to the treasury (also yours) |
 
-The contract caps a prediction at 5 USDC and a claim at 50 USDC, with the prize pool counted. Fees: 1% of each forecast, 0.8% to the prize pool and 0.2% to the treasury, which is also yours.
+The contract caps a prediction at 5 USDC and a claim at 50 USDC, with the prize pool counted.
+
+## Phala for mainnet: about $1 more
+
+The mainnet contract registers a Lab only with its secure-hardware attestation (there's no owner shortcut on mainnet), and the testnet CVM is tied to testnet by its compose file. So mainnet needs its own CVM, from `lab/deploy/docker-compose.mainnet.yml` (same images, `NEAR_NETWORK=mainnet`, so its own codehash).
+
+It only has to run while mainnet claims are being rerun. Plan: lock the money claim and the mainnet points claims within one afternoon, start the mainnet CVM that morning, and delete it once they're settled. 8 hours on `tdx.medium` is $0.93. Keeping it running through judging instead would add about $17.
 
 ## Getting USDC onto your mainnet account
 
-USDC on NEAR is the token `17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1`. Its own mainnet metadata reads USDC with 6 decimals; compare the address with Circle's published list before funding.
+USDC on NEAR is the token `17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1` (6 decimals). Compare that address with Circle's published list before funding.
 
-1. Buy NEAR on an exchange and withdraw it to your mainnet account, choosing the NEAR network. Send about 0.1 first to check the address, then the rest.
-2. Swap NEAR for USDC with NEAR Intents, inside a NEAR wallet that offers swaps. Check that the token you receive has the address above.
-3. Or withdraw USDC straight to NEAR from an exchange that offers "USDC on NEAR" as a network, again checking the address.
+1. Buy about 8 NEAR on an exchange and withdraw it to `<you>.near`, choosing the NEAR network. Send about 0.1 first to check the address, then the rest.
+2. Then either withdraw 10 USDC from an exchange that offers "USDC on NEAR" as a network, or buy about 3 more NEAR and swap it for 10 USDC with NEAR Intents in a NEAR wallet that offers swaps. Either way, check the token's address matches the one above.
 
-NEAR for 20 USDC is about 20 USDC's worth plus a little for the swap. At the time you buy, add both totals in your wallet's currency.
+Prices move, so add both totals in your own currency when you buy.
 
-## One thing mainnet waits on
+## In order, each with your yes
 
-The mainnet contract can't register a Lab without its secure-hardware attestation, by design: the owner-only shortcut is testnet-only, and mainnet has only `register_lab_attested`. So the Lab has to be running on Phala before mainnet claims can be settled. That's why Phala comes first (docs/PHALA.md).
+1. Create `rerun.<you>.near` and deploy the mainnet build, calling `new` with you as owner, USDC as the token, you as treasury and Lab fee recipient.
+2. Start the mainnet CVM. On first start it prints its public key and stops; create `lab.<you>.near` with that key as its only key, then restart it. Check its attestation and register it (`register_lab_attested`).
+3. Create `relay.<you>.near`, fund it with 1 NEAR, and put its key in Vercel's server environment (`RELAYER_ACCOUNT`, `RELAYER_PRIVATE_KEY`), next to `NEXT_PUBLIC_NETWORK=mainnet`.
+4. `set_mode_params` for money mode, register the contract with USDC, post the points claims, then post and fund the money claim.
+5. The two forecasts for the video. After the verdict and its challenge window: finalize, then collect from both accounts.
 
 ## Before deploying
 
 - [x] Limits in the contract: 5 USDC a prediction, 50 USDC a claim. Unit-tested, and the money cycle ran on testnet.
-- [ ] Decide whether to remove the contract account's key after deploying. Next step instead: upgrades through a multisig with a time delay.
+- [x] Gas-free relayer: checked end to end on testnet (`pnpm relay:check`).
+- [ ] Decide whether to remove the contract account's key after deploying. The next step instead: upgrades through a multisig with a time delay.
 - [ ] You've read the Terms page. I wrote it in plain words; it isn't legal advice.

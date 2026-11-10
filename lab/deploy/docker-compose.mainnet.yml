@@ -1,0 +1,30 @@
+# The Lab on Phala Cloud for NEAR mainnet. Same images as docker-compose.phala.yml (testnet), so the same
+# code, but this file's sha256 is its own codehash, which the mainnet owner registers after checking the quote.
+# No owner key here and no hourly demos: mainnet claims are posted by hand. Costs and steps: docs/MAINNET_COSTS.md.
+services:
+  lab:
+    image: ghcr.io/maveri-q/rerun-lab@sha256:8b364b046815c323c775ff524bd75c0db291b10cdf2630ca5fdc2470aa725484
+    restart: unless-stopped
+    ports:
+      - "8787:8787"
+    volumes:
+      - /var/run/dstack.sock:/var/run/dstack.sock
+      - /var/run/docker.sock:/var/run/docker.sock
+      - lab-data:/app/lab/orchestrator/.data
+    environment:
+      NEAR_NETWORK: mainnet
+      # The Lab's settings keep their testnet names; these values point them at mainnet.
+      NEAR_TESTNET_RPC_URL: https://rpc.mainnet.fastnear.com
+      SANDBOX_IMAGE_PYTHON: ghcr.io/maveri-q/rerun-sandbox-python@sha256:8ecd9bc04a83addb6acc1b45ee0b2854eddbde692c914576b8290172680c584c
+      SANDBOX_IMAGE_R: ghcr.io/maveri-q/rerun-sandbox-r@sha256:d97bec581cc8d27f3f1cfe9a5a1d7d2598949f2660fe9572a7955fa5ed74a409
+      SANDBOX_MAX_CPUS: "2"
+      SANDBOX_MAX_MEM_GB: "3"
+      # Encrypted secrets, set in the Phala dashboard. The Lab account must exist with the key this CVM
+      # prints on its first start as its only key.
+      TEE_LAB_ACCOUNT: ${TEE_LAB_ACCOUNT}
+      TESTNET_CONTRACT_ACCOUNT: ${MAINNET_CONTRACT_ACCOUNT}
+      NEARAI_CLOUD_API_KEY: ${NEARAI_CLOUD_API_KEY}
+      LAB_PUBLIC_URL: ${LAB_PUBLIC_URL}
+
+volumes:
+  lab-data:
