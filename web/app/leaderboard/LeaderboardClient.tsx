@@ -11,7 +11,7 @@ import { useWallet } from "@/lib/wallet";
 const START = 1_000_000_000n;
 
 /** The project's own accounts and the automated demo's throwaway ones. */
-const OURS = /^rerun-judge-|^rerun-bet-|^rerun-scout-|^relay-check-|rerun-43f5f2\.testnet$|rerun-lab-43f5f2\.testnet$|\.rerun-43f5f2\.testnet$/;
+const OURS = /^rerun-judge-|^rerun-bet-|^rerun-scout-|^relay-check-|rerun-app.near$|rerun-43f5f2\.testnet$|rerun-lab-43f5f2\.testnet$|\.rerun-43f5f2\.testnet$/;
 
 const accuracyText = (a?: Accuracy) =>
   a?.brier_ppm == null ? "" : `Accuracy ${(a.brier_ppm / 1_000_000).toFixed(3)} over ${a.scored} ${a.scored === 1 ? "claim" : "claims"}`;

@@ -25,6 +25,7 @@
     "scout:account": "pnpm --filter @rerun/scripts scout:account",
     "relayer:account": "pnpm --filter @rerun/scripts relayer:account",
     "relay:check": "pnpm --filter @rerun/scripts relay:check",
+    "mainnet": "pnpm --filter @rerun/scripts mainnet",
     "verdict-bet-demo": "pnpm --filter @rerun/scripts verdict-bet-demo",
     "settle-claim": "pnpm --filter @rerun/scripts settle-claim",
     "verify-claim": "pnpm --filter @rerun/scripts verify-claim",

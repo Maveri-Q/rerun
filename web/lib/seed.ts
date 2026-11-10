@@ -40,7 +40,7 @@ export async function claimSeed(id: number) {
 }
 
 /** The same accounts the leaderboard leaves out: ours and the automated demo's. */
-const OURS = /^rerun-judge-|^rerun-bet-|^rerun-scout-|^relay-check-|rerun-43f5f2\.testnet$|rerun-lab-43f5f2\.testnet$|\.rerun-43f5f2\.testnet$/;
+const OURS = /^rerun-judge-|^rerun-bet-|^rerun-scout-|^relay-check-|rerun-app.near$|rerun-43f5f2\.testnet$|rerun-lab-43f5f2\.testnet$|\.rerun-43f5f2\.testnet$/;
 
 export async function leaderboardSeed() {
   const leaderboard = await attempt(() => chain.leaderboard());

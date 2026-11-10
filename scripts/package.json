@@ -16,6 +16,7 @@
     "scout:account": "tsx scout-account.ts",
     "relayer:account": "tsx relayer-account.ts",
     "relay:check": "tsx relay-check.ts",
+    "mainnet": "tsx mainnet.ts",
     "verdict-bet-demo": "tsx verdict-bet-demo.ts",
     "settle-claim": "tsx settle-claim.ts",
     "verify-claim": "tsx verify-claim.ts",

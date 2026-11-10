@@ -2,19 +2,28 @@
 
 Points mode for every claim, ONE money claim with a 5 USDC prize pool, and the gas-free relayer. Worked out on 2026-11-10 from the current mainnet build (`contracts/target/near/rerun-mainnet/rerun.wasm`, 507,750 bytes, sha256 `588aa60a…5f93`). Nothing has been spent, and no mainnet transaction has been sent: each one waits for your yes.
 
-`<you>.near` below is your mainnet account. Storage on NEAR costs 1 NEAR per 100 KB.
+## Accounts
+
+| Account | What it is |
+|---|---|
+| `949cfd9f7fc89f982907b1d634508fa002949e5b06509147c799e56ef6556bfd` | Funding address: send the NEAR you buy here, on the NEAR network. Its key is in `.env` (`MAINNET_OWNER_PRIVATE_KEY`). |
+| `rerun-app.near` | Home: owner, treasury and Lab fee recipient, same key. Created from the funding address, which moves its NEAR here. |
+| `market.rerun-app.near` | The contract |
+| `lab.rerun-app.near`, `relay.rerun-app.near`, `fan.rerun-app.near` | The Lab, the gas-free relayer, the second forecasting account |
+
+`pnpm mainnet <step>` prints each transaction and sends it only with `--send` (steps at the top of `scripts/mainnet.ts`). Storage on NEAR costs 1 NEAR per 100 KB.
 
 ## NEAR: 7.2
 
 | What | NEAR | Comes back? |
 |---|---|---|
 | Contract code (507,750 bytes of storage) | 5.08 | Only if the contract account is deleted later |
-| Contract account `rerun.<you>.near`, its state and margin | 0.22 | Mostly locked as storage |
-| Lab account `lab.<you>.near`, with the secure hardware's key as its only key | 0.30 | What it doesn't spend on gas stays in it |
-| Gas-free relayer account `relay.<you>.near` | 1.00 | What it doesn't spend stays in it |
+| Contract account `market.rerun-app.near`, its state and margin | 0.22 | Mostly locked as storage |
+| Lab account `lab.rerun-app.near`, with the secure hardware's key as its only key | 0.30 | What it doesn't spend on gas stays in it |
+| Gas-free relayer account `relay.rerun-app.near` | 1.00 | What it doesn't spend stays in it |
 | About 5 points claims, with their receipts | 0.40 | No, it pays for their storage |
 | USDC registrations (the contract and a second forecasting account) | 0.01 | No |
-| Second forecasting account, for the money video (`fan.<you>.near`) | 0.10 | What it doesn't spend stays in it |
+| Second forecasting account, for the money video (`fan.rerun-app.near`) | 0.10 | What it doesn't spend stays in it |
 | Your own gas: deploying, posting, settling, collecting | 0.09 | No |
 | **Total** | **7.20** | Up to 1.4 stays spendable in the Lab, relayer and second accounts |
 
@@ -43,18 +52,21 @@ It only has to run while mainnet claims are being rerun. Plan: lock the money cl
 
 ## Getting USDC onto your mainnet account
 
-USDC on NEAR is the token `17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1` (6 decimals). Compare that address with Circle's published list before funding.
+Buy **11 NEAR**: 7.2 for the table above, about 3 to swap for the 10 USDC (at today's price, 3 NEAR gets about 10.6 USDC, and at least 10.5), and a little for exchange and swap fees. Withdraw it to the funding address above on the NEAR network. Send about 0.2 first and check it arrives, then the rest.
 
-1. Buy about 8 NEAR on an exchange and withdraw it to `<you>.near`, choosing the NEAR network. Send about 0.1 first to check the address, then the rest.
-2. Then either withdraw 10 USDC from an exchange that offers "USDC on NEAR" as a network, or buy about 3 more NEAR and swap it for 10 USDC with NEAR Intents in a NEAR wallet that offers swaps. Either way, check the token's address matches the one above.
+Then swap on the site: import the owner key into a NEAR wallet (Meteor or Intear), connect it to the mainnet site, open **My forecasts**, and use **Swap NEAR for USDC**. Try 0.2 NEAR first. The USDC is Circle's token `17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1` (check it on https://developers.circle.com/stablecoins/usdc-contract-addresses, under NEAR).
 
-Prices move, so add both totals in your own currency when you buy.
+If the site's swap doesn't work for any reason, the same swap by hand:
+
+1. Open https://near-intents.org and connect the same wallet.
+2. Swap NEAR to USDC, both on NEAR. Before confirming, check that the USDC's contract is the address above.
+3. Confirm in the wallet. The USDC shows up in the wallet within a minute or two.
 
 ## In order, each with your yes
 
-1. Create `rerun.<you>.near` and deploy the mainnet build, calling `new` with you as owner, USDC as the token, you as treasury and Lab fee recipient.
-2. Start the mainnet CVM. On first start it prints its public key and stops; create `lab.<you>.near` with that key as its only key, then restart it. Check its attestation and register it (`register_lab_attested`).
-3. Create `relay.<you>.near`, fund it with 1 NEAR, and put its key in Vercel's server environment (`RELAYER_ACCOUNT`, `RELAYER_PRIVATE_KEY`), next to `NEXT_PUBLIC_NETWORK=mainnet`.
+1. `pnpm mainnet home`, then `pnpm mainnet contract`: create `market.rerun-app.near` and deploy the mainnet build, calling `new` with you as owner, USDC as the token, you as treasury and Lab fee recipient.
+2. Start the mainnet CVM. On first start it prints its public key and stops; create `lab.rerun-app.near` with that key as its only key, then restart it. Check its attestation and register it (`register_lab_attested`).
+3. Create `relay.rerun-app.near`, fund it with 1 NEAR, and put its key in Vercel's server environment (`RELAYER_ACCOUNT`, `RELAYER_PRIVATE_KEY`), next to `NEXT_PUBLIC_NETWORK=mainnet`.
 4. `set_mode_params` for money mode, register the contract with USDC, post the points claims, then post and fund the money claim.
 5. The two forecasts for the video. After the verdict and its challenge window: finalize, then collect from both accounts.
 
