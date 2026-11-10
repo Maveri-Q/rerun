@@ -1,7 +1,7 @@
 {
-  "lastScanAt": "2026-11-07T02:55:22.667Z",
+  "lastScanAt": "2026-11-10T12:55:25.436Z",
   "draftsByDay": {
-    "2026-11-07": 2
+    "2026-11-10": 2
   },
   "candidates": {
     "rescience:10.5281_zenodo.20613595": {
@@ -196,7 +196,7 @@
       "reasons": [
         "Passed the checks, and waiting for the AI budget."
       ],
-      "checkedAt": "2026-11-07T02:55:22.667Z",
+      "checkedAt": "2026-11-10T12:55:25.436Z",
       "license": "CC-BY-4.0",
       "runtime": "r4.4"
     },
@@ -225,7 +225,7 @@
       "reasons": [
         "Passed the checks, and waiting for the AI budget."
       ],
-      "checkedAt": "2026-11-07T02:55:22.667Z",
+      "checkedAt": "2026-11-10T12:55:25.436Z",
       "license": "BSD-3-Clause",
       "runtime": "python3.11"
     },
@@ -761,15 +761,19 @@
       "title": "Identically Trained Language Models Break on Different Jailbreaks",
       "paperUrl": "https://arxiv.org/abs/2610.34074",
       "doi": "10.48550/arXiv.2610.34074",
-      "upvotes": 1,
+      "upvotes": 4,
       "abstract": "Jailbreak benchmarks test one checkpoint and treat which jailbreaks break it as a property of its pretraining data and safety training. We ask whether another pretraining run of the same data, given the same safety training, would break on the same jailbreaks. For each of 25 pretraining data recipes, we take 1B base models from 3 pretraining seeds and give each the same safety post-training with 2 post-training seeds, for 150 models in all. We then collect 20 responses from every model to a shared set of jailbreak prompts and correlate the per-prompt non-refusal rates between every pair of models. On average, two post-trained copies of the same pretraining run have per-prompt non-refusal rates that correlate at 0.984. A different pretraining seed lowers the correlation to 0.811, and a different data recipe lowers it only slightly further, to 0.779. These results indicate that which jailbreaks break a checkpoint depends much more on its pretraining run than on its data, a pattern that holds in all 25 data recipes and at 150M and 300M parameters. In practice, the best of 91 attack templates found on one checkpoint stays the best after a new pretraining seed in only 27% of model pairs, against 67% after a new post-training seed. Each pretraining run also leaves a fingerprint: across 3,211 prompts, a model's per-prompt non-refusal rates identify its pretraining run among all 75 runs every time, and a random subset of 50 prompts still does so 98% of the time.",
       "repoUrl": "https://github.com/cerulean-works/castor",
       "needsDataCheck": true,
-      "status": "retry",
+      "status": "rejected",
       "reasons": [
-        "Passed the checks, and waiting for the AI budget."
+        "Open licence: Apache-2.0.",
+        "Mostly Python (100% of the code).",
+        "No sign it needs a graphics card.",
+        "Small enough to rerun.",
+        "The AI couldn't find one clear number to check, and how to produce it."
       ],
-      "checkedAt": "2026-11-07T02:55:22.667Z",
+      "checkedAt": "2026-11-10T12:55:25.436Z",
       "license": "Apache-2.0",
       "runtime": "python3.11"
     },
@@ -815,15 +819,19 @@
       "title": "Harness-S: Learning from Sibling Harnesses for Generalizable Agent Training",
       "paperUrl": "https://arxiv.org/abs/2611.04277",
       "doi": "10.48550/arXiv.2611.04277",
-      "upvotes": 55,
+      "upvotes": 67,
       "abstract": "Harness evolution from a common base exhibits Locality, Complementarity, and Nonstationarity: variants repair different failures, and their utility changes as the policy learns. Rather than seeking a universally superior harness, we introduce Harness-S to selectively rescue failures of a base execution system through sibling harnesses and transfer the resulting capabilities into a single policy that remains effective under the original harness. Directional Harness Evolution develops specialized sibling harnesses along distinct repair directions, forming a reusable Sibling Harness Pool that remains fixed during policy training. Complementary Harness Rescue Training invokes this pool only when all initial attempts under the base harness fail. The same policy generates fresh rollouts under selected auxiliary harnesses, and these trajectories replace the failed group for reinforcement learning. An Adaptive Harness Router selects the Top-k variants using Harness Behavior Profiles and voting across multiple LLMs. Policy-aware profile re-anchoring refreshes this evidence as the policy learns. Across AppWorld, SWE-Gym, and DBBench, the trained policy substantially outperforms policy-only training when returned to the original base harness. Behavioral analyses and held-out cases support the transfer of harness-elicited behaviors into the policy itself. Reusing the router for Rank-1 inference provides additional gains at the same executor rollout count.",
       "repoUrl": "https://github.com/DeepExperience/Harness-S",
       "needsDataCheck": true,
-      "status": "retry",
+      "status": "rejected",
       "reasons": [
-        "Passed the checks, and waiting for the AI budget."
+        "Open licence: Apache-2.0.",
+        "Mostly Python (100% of the code).",
+        "No sign it needs a graphics card.",
+        "Small enough to rerun.",
+        "The AI picked 67.56, but the paper doesn't state that number near \"Pass@3 under H0 on AppWorld\"."
       ],
-      "checkedAt": "2026-11-07T02:55:22.667Z",
+      "checkedAt": "2026-11-10T12:55:25.436Z",
       "license": "Apache-2.0",
       "runtime": "python3.11"
     },
@@ -833,7 +841,7 @@
       "title": "Random Is Almost Enough? Stable and Low-Cost Benchmark Compression via BestRand",
       "paperUrl": "https://arxiv.org/abs/2611.00883",
       "doi": "10.48550/arXiv.2611.00883",
-      "upvotes": 50,
+      "upvotes": 52,
       "abstract": "Benchmark compression reduces the often prohibitive time and cost of model evaluation by evaluating models on a small benchmark subset that closely matches full-benchmark results. To quantify estimation error, we derive an accurate analytical approximation to the error distribution when estimating full-benchmark scores from a subset, showing that most subsets yield small errors, while a few produce much larger errors, resulting in a long-tailed distribution. This means random sampling alone can achieve surprisingly strong performance with high probability, but remains unstable due to rare large errors. We further show that this instability is inherent to modern foundation models and persists even as more models are evaluated. Based on these findings, we introduce BestRand, a stable and low-cost benchmark compression method that preserves the efficiency of random sampling while substantially reducing its high-error tail. We validate BestRand on 70+ text, multimodal, and agent benchmarks, and further extend it to VLA evaluation. Compared with competitive methods, BestRand reduces high-error risk by 50.2% and estimation error by 16.4% on average, while requiring only 51.3% of the construction cost. It further reduces OOD estimation error by 21.8% on average across score-range, model-family, and temporal shifts. Together, our theory provides practical guidance for understanding and predicting the accuracy and reliability of benchmark compression, while BestRand enables stable and accurate compression at low cost. The code and data are publicly available onhttps://github.com/George-Ling3/BestRand.",
       "repoUrl": "https://github.com/George-Ling3/BestRand",
       "needsDataCheck": true,
@@ -841,8 +849,60 @@
       "reasons": [
         "Passed the checks, and waiting for the AI budget."
       ],
-      "checkedAt": "2026-11-07T02:55:22.667Z",
+      "checkedAt": "2026-11-10T12:55:25.436Z",
       "license": "MIT",
+      "runtime": "python3.11"
+    },
+    "everyday:gohsyi/tslda": {
+      "id": "everyday:gohsyi/tslda",
+      "source": "Replication code on GitHub",
+      "title": "Topic Modeling based Sentiment Analysis on Social Media for Stock Market Prediction",
+      "paperUrl": "https://doi.org/10.3115/v1/p15-1131",
+      "doi": "10.3115/v1/p15-1131",
+      "repoUrl": "https://github.com/gohsyi/tslda",
+      "needsDataCheck": true,
+      "upvotes": 50,
+      "status": "retry",
+      "reasons": [
+        "Passed the checks, and waiting for the AI budget."
+      ],
+      "checkedAt": "2026-11-10T12:55:25.436Z",
+      "license": "MIT",
+      "runtime": "python3.11"
+    },
+    "everyday:TrondVQ/UncertaintyQuantification-SleepApnea-1DCNN": {
+      "id": "everyday:TrondVQ/UncertaintyQuantification-SleepApnea-1DCNN",
+      "source": "Replication code on GitHub",
+      "title": "Obstructive sleep apnea event detection using explainable deep learning models for a portable monitor",
+      "paperUrl": "https://doi.org/10.3389/fnins.2023.1155900",
+      "doi": "10.3389/fnins.2023.1155900",
+      "repoUrl": "https://github.com/TrondVQ/UncertaintyQuantification-SleepApnea-1DCNN",
+      "needsDataCheck": true,
+      "upvotes": 35,
+      "status": "rejected",
+      "reasons": [
+        "No small public dataset in the repository, so the Lab would have nothing to run on."
+      ],
+      "checkedAt": "2026-11-10T12:55:25.436Z",
+      "license": "MIT",
+      "runtime": "python3.11"
+    },
+    "arxiv:2611.08175": {
+      "id": "arxiv:2611.08175",
+      "source": "Hugging Face Papers",
+      "title": "PCBRouteAgent: How Close Are LLM Agents to Becoming PCB Routing Engineers?",
+      "paperUrl": "https://arxiv.org/abs/2611.08175",
+      "doi": "10.48550/arXiv.2611.08175",
+      "upvotes": 37,
+      "abstract": "Automating printed circuit board (PCB) routing requires coordinating board-level connectivity decisions with geometric execution under strict design rules. Although recent agents can interact with native routing tools, reliable routing on complex boards remains challenging. We present PCBRouteAgent, a multimodal PCB routing agent inspired by how human engineers coordinate global strategy with local execution. A Global Routing Planner combines board images and structured electrical and geometric information to specify connection topology, routing order, corridors, and layer transitions. A Detailed Routing Executor realizes these guides through KiCad's native routing engine and performs bounded local recovery. Unresolved failures are returned as structured feedback, enabling targeted guide revisions while preserving accepted routes. We evaluate PCBRouteAgent on 247 synthetic and real-world boards from four PCBWorld-Bench test splits. It achieves clean-pass rates of 100%, 94.9%, 100%, and 40% on D2, D3-A, D3-B, and D3-C, respectively. On the three real-world subsets, PCBRouteAgent outperforms the best evaluated baseline in clean-pass rate by 13.9, 36, and 10 percentage points, respectively.",
+      "repoUrl": "https://github.com/chip-ai-agent/PCBRouteAgent",
+      "needsDataCheck": true,
+      "status": "rejected",
+      "reasons": [
+        "No small public dataset in the repository, so the Lab would have nothing to run on."
+      ],
+      "checkedAt": "2026-11-10T12:55:25.436Z",
+      "license": "BSD-3-Clause",
       "runtime": "python3.11"
     }
   }

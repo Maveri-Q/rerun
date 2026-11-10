@@ -31,7 +31,8 @@ jobs:
         env:
           NEARAI_CLOUD_API_KEY: ${{ secrets.NEARAI_CLOUD_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SCOUT_STATE_FILE: web/public/scout.json
+          # Absolute, because `pnpm scout` runs inside lab/orchestrator.
+          SCOUT_STATE_FILE: ${{ github.workspace }}/web/public/scout.json
         run: pnpm scout
       - name: Save the log
         run: |
