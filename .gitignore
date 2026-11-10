@@ -20,3 +20,6 @@ lab/orchestrator/.data/
 .next/
 next-env.d.ts
 *.tsbuildinfo
+
+# Recorded video clips
+clips/
