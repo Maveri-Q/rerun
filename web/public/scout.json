@@ -1,7 +1,7 @@
 {
-  "lastScanAt": "2026-11-10T23:24:46.199Z",
+  "lastScanAt": "2026-11-11T14:25:30.862Z",
   "draftsByDay": {
-    "2026-11-10": 6
+    "2026-11-11": 2
   },
   "candidates": {
     "rescience:10.5281_zenodo.20613595": {
@@ -864,9 +864,9 @@
       "upvotes": 50,
       "status": "retry",
       "reasons": [
-        "Passed the checks, and waiting for the AI budget."
+        "The AI draft failed: NEARAI_CLOUD_API_KEY is not set (or use MOCK_LLM=1)"
       ],
-      "checkedAt": "2026-11-10T23:24:46.199Z",
+      "checkedAt": "2026-11-11T14:25:30.862Z",
       "license": "MIT",
       "runtime": "python3.11"
     },
@@ -935,9 +935,9 @@
       "needsDataCheck": true,
       "status": "retry",
       "reasons": [
-        "The AI draft failed: NEARAI_CLOUD_API_KEY is not set (or use MOCK_LLM=1)"
+        "Passed the checks, and waiting for the AI budget."
       ],
-      "checkedAt": "2026-11-10T23:24:46.199Z",
+      "checkedAt": "2026-11-11T14:25:30.862Z",
       "license": "MIT",
       "runtime": "python3.11"
     },
@@ -983,15 +983,15 @@
       "title": "Learning Heterogeneous Tactile Representation for General Dexterous Manipulation",
       "paperUrl": "https://arxiv.org/abs/2611.12806",
       "doi": "10.48550/arXiv.2611.12806",
-      "upvotes": 92,
+      "upvotes": 97,
       "abstract": "Tactile sensing is an indispensable modality for contact-rich dexterous manipulation, a capability that hints at the ultimate frontiers of embodied intelligence. However, commercially available tactile sensors are still at a relatively early stage of development, with each type of sensor offering irreplaceable strengths alongside its own drawbacks. A key challenge is thus to free tactile understanding from sensor-specific physics, so that embodied models can effectively leverage heterogeneous tactile data. To this end, we develop LingBot-Touch, a tactile foundation model characterized by the following properties. (i) Our model yields a unified representation across different tactile sensors (i.e., piezoresistive, magnetic, and visuotactile sensors), and is easily extensible to new sensor types. (ii) The resulting tactile tokens are plug-and-play: they can be seamlessly integrated into policy models across paradigms, from diffusion policy to vision-language-action (VLA) models such as π_{0.5} and LingBot-VLA, consistently enhancing manipulation dexterity. (iii) Extensive experiments, spanning simulation and real-robot deployments across multiple hardware platforms, demonstrate that our tactile representation substantially benefits complex manipulation tasks while maintaining strong computational efficiency. We believe the findings in this work demonstrate the potential of leveraging cross-sensor data to scale tactile learning, and offer encouraging insights for the design of future hardware and embodied models.",
       "repoUrl": "https://github.com/Robbyant/lingbot-touch",
       "needsDataCheck": true,
       "status": "retry",
       "reasons": [
-        "Passed the checks, and waiting for the AI budget."
+        "The AI draft failed: NEARAI_CLOUD_API_KEY is not set (or use MOCK_LLM=1)"
       ],
-      "checkedAt": "2026-11-10T23:24:46.199Z",
+      "checkedAt": "2026-11-11T14:25:30.862Z",
       "license": "Apache-2.0",
       "runtime": "python3.11"
     },
@@ -1069,6 +1069,97 @@
       ],
       "checkedAt": "2026-11-10T23:24:46.199Z",
       "license": "NOASSERTION",
+      "runtime": "python3.11"
+    },
+    "arxiv:2611.14210": {
+      "id": "arxiv:2611.14210",
+      "source": "Hugging Face Papers",
+      "title": "Tree-Ising: Repairing Language Models with Bit-Level Ising Edits",
+      "paperUrl": "https://arxiv.org/abs/2611.14210",
+      "doi": "10.48550/arXiv.2611.14210",
+      "upvotes": 56,
+      "abstract": "Weight-space programming, introduced in recent MIT work by Takehi et al., enables a frontier LLM agent to read a network's weights and write a repair. Their GPT-6 Astra agent corrected the reasoning loops of Qwen3.5-0.8B without gradients, using 158 agent turns, 89.7 million tokens, and 50 forward-pass requests. Our method, Tree-Ising, casts this repair as a sparse discrete optimization problem over the model's own BF16 weights. Forward statistics define an objective that weakens a loop direction, strengthens a concluding direction, and preserves the layer's output on productive tokens. Within a state-tree representation, where lossless BF16 storage acts as a special case, the admissible edits are sign flips and exponent shifts that preserve all shared group exponents and mantissas. We decompose this objective exactly into independent QUBO (Ising) problems, one per output row, which we solve on a GPU using simulated annealing or quantum-inspired simulated bifurcation. On the agent's two layers, Tree-Ising achieves 54.6% on MATH-500, outperforming the agent's edit (51.7%) under the same evaluation protocol, while the base model scores 7.9% as reported. The simulated bifurcation solver yields a statistically indistinguishable repair at 55.1%. Both solvers outperform the agent edit across all five math benchmarks, with statistically significant improvements on MATH-500 and GSM8K after correcting for multiple comparisons. Our approach modifies 13% to 17% fewer weights and reduces BF16 bit flips by a factor of 2.2 to 2.3. It requires only four forward-pass requests and zero LLM tokens, with the annealing recipe costing about $0.90 in GPU time. On Qwen3.5-2B, with layers and dose selected using only the base model, the same recipe increases greedy GSM8K accuracy from 21.6% to 69.4%. As a proof of concept, we execute an eight-variable repair subproblem using QAOA on an IBM Heron processor.",
+      "repoUrl": "https://github.com/TheQuantumGOAT/Tree-Ising",
+      "needsDataCheck": true,
+      "status": "rejected",
+      "reasons": [
+        "GitHub can't identify an open licence.",
+        "Mostly none. The Lab only runs Python and R."
+      ],
+      "checkedAt": "2026-11-11T14:25:30.862Z",
+      "license": null,
+      "runtime": null
+    },
+    "arxiv:2611.14320": {
+      "id": "arxiv:2611.14320",
+      "source": "Hugging Face Papers",
+      "title": "Don't Just Trust Your Memory: Evidence-Linked Memory Reduces Memory-Induced Degradation in LLM Agents",
+      "paperUrl": "https://arxiv.org/abs/2611.14320",
+      "doi": "10.48550/arXiv.2611.14320",
+      "upvotes": 45,
+      "abstract": "External memory enables LLM agents to improve from experience by distilling trajectories of past tasks into concise lessons for new tasks. However, memory can also lead to memory-induced degradation, where an agent fails on tasks it would solve without memory, often because it follows a lesson that is incorrect, or misapplies or misreads a valid one. This is because lessons are inferred from trajectories labeled only with task success or failure, yet are typically provided without the trajectories they came from, leaving the agent no way to check them. To address this, we introduce WikiTrace, an evidence-linked memory system designed to let agents check each lesson against its original trajectory. Specifically, motivated by the finding that a trajectory often still holds the evidence needed to catch an erroneous lesson, WikiTrace stores each lesson as a concise insight linked to a summary of why its trajectory succeeded or failed and to the raw trajectory itself. Then, on a new task, the agent starts from all insights and, whenever one lacks details needed to act, conflicts with another, or comes from a failed task, descends through its links with terminal tools to fill in missing details or correct the insight before acting. We validate WikiTrace on five agentic benchmarks, showing that it consistently outperforms existing memory approaches and a baseline given the same insights alone, while also reducing memory-induced degradation. Our code is available at https://github.com/yukyeongleee/wikitrace",
+      "repoUrl": "https://github.com/yukyeongleee/wikitrace",
+      "needsDataCheck": true,
+      "status": "retry",
+      "reasons": [
+        "Passed the checks, and waiting for the AI budget."
+      ],
+      "checkedAt": "2026-11-11T14:25:30.862Z",
+      "license": "Apache-2.0",
+      "runtime": "python3.11"
+    },
+    "arxiv:2611.10866": {
+      "id": "arxiv:2611.10866",
+      "source": "Hugging Face Papers",
+      "title": "The Surprising Effectiveness of Deleting Weights in LLM Post-Training",
+      "paperUrl": "https://arxiv.org/abs/2611.10866",
+      "doi": "10.48550/arXiv.2611.10866",
+      "upvotes": 7,
+      "abstract": "How little of a pretrained large language model (LLM) has to change for it to acquire new capabilities? We find that zeroing fewer than 0.05% of its weights, with no other modification, matches full fine-tuning (FFT) at scale across three LLM post-training regimes: reinforcement learning with verifiable rewards, supervised fine-tuning, and on-policy distillation. Our method, Deletion Tuning, learns a binary mask over the gate projection of transformer blocks. Two practical advantages follow: the trained mask is hundreds to thousands of times smaller than the corresponding FFT checkpoint, and Deletion Tuning forgets far less, which addresses a central challenge in continual learning. Under reinforcement learning, its prior-task accuracy stays near the base level while FFT, LoRA, and random sparse fine-tuning lose up to 5.4 points. To understand why masking alone suffices, we analyze the geometry of the learned weight changes under reinforcement learning using stable rank, spectrum drift, and principal-weight overlap. Compared with LoRA and random sparse fine-tuning, Deletion Tuning is closest to FFT across the three measures.",
+      "repoUrl": "https://github.com/agentic-learning-ai-lab/deleting-weights",
+      "needsDataCheck": true,
+      "status": "rejected",
+      "reasons": [
+        "Depends on CUDA, which usually needs a graphics card. The Lab only has CPUs."
+      ],
+      "checkedAt": "2026-11-11T14:25:30.862Z",
+      "license": "MIT",
+      "runtime": "python3.11"
+    },
+    "arxiv:2611.13572": {
+      "id": "arxiv:2611.13572",
+      "source": "Hugging Face Papers",
+      "title": "Market-Conditioned JEPA: Learning from Unpredictable Market Shocks",
+      "paperUrl": "https://arxiv.org/abs/2611.13572",
+      "doi": "10.48550/arXiv.2611.13572",
+      "upvotes": 4,
+      "abstract": "Much of the variation in financial time series is driven by market-wide shocks that cannot be predicted from an asset's own history. Per-asset self-supervised learning treats this variation as irreducible noise. Under a latent factor model, we show that conditioning prediction on the realized market factor makes the asset's market exposure necessary for optimal prediction, while reducing the noise against which the asset-specific component is learned. Building on this insight, we introduce Market-Conditioned JEPA (MC-JEPA), a joint-embedding predictive architecture for financial time series. During training, we construct a leave-one-out market condition for each asset from the future target embeddings of other assets and incorporate it through factor loadings derived from the asset's own representation. On 11 years of minute-level Chinese A-share data, MC-JEPA improves over per-asset JEPA across nine targets spanning returns, market exposure, risk, and liquidity, with the strongest and most statistically significant gains in exposure, risk, and liquidity. It achieves the best RankIC on all liquidity targets and on return horizons from two hours to five days, outperforming time-series foundation models and self-supervised baselines, and delivers the best portfolio performance in a historical backtest. Ablations show that the return and exposure gains require the condition to be aligned with the realized market movement. After restoring the volatility scale removed by normalization, the predictor's factor loadings rank stocks by market beta nearly as well as a supervised probe, without labels. A synthetic factor-model study with known parameters shows that conditioning improves the recovery of both market exposure and the asset-specific component.",
+      "repoUrl": "https://github.com/OpenFinMind/MC-JEPA",
+      "needsDataCheck": true,
+      "status": "rejected",
+      "reasons": [
+        "Depends on CUDA, which usually needs a graphics card. The Lab only has CPUs."
+      ],
+      "checkedAt": "2026-11-11T14:25:30.862Z",
+      "license": "Apache-2.0",
+      "runtime": "python3.11"
+    },
+    "arxiv:2611.14083": {
+      "id": "arxiv:2611.14083",
+      "source": "Hugging Face Papers",
+      "title": "Sable: A Small-Field Sumcheck Argument for Bit-Exact Inference of Large Language Models",
+      "paperUrl": "https://arxiv.org/abs/2611.14083",
+      "doi": "10.48550/arXiv.2611.14083",
+      "upvotes": 1,
+      "abstract": "We present Sable, an argument system and single-GPU prover for the statement that a committed, integer-quantized transformer produced a given token sequence from a given prompt, bit for bit. Sable fixes an integer function F_O with no floating-point step, in which every rounding, normalization, softmax and sampling decision is determined by its inputs, and proves it with a constraint system whose relations provably never wrap modulo the 31-bit KoalaBear prime. The proof batches zerochecks and LogUp-GKR lookups into one sumcheck per domain, and commits to every witness tensor and weight in one multilinear commitment built from Reed-Solomon codes, BLAKE3 Merkle trees and a mixed-length BaseFold opening. The prover streams the model layer by layer on one GPU. On one NVIDIA RTX PRO 6000 Blackwell GPU, Sable proves all 64 layers of Qwen2.5-32B in 92.5 s for 4,096 tokens and 398 s for 16,384 tokens, and covers Qwen3-32B and the mixture-of-experts Qwen3-30B-A3B (4,096 tokens in 121.8 and 84.7 s). A proof costs 41 to 50 times the serving time, or 6.4 cents per 4,096-token request at public GPU prices, and 40 to 64 times less time per parameter and token than zkLLM. On WikiText-2, F_O's greedy token matches the BF16 model's at 86.3% of positions; on Qwen3, F_O is within 1.6 points of BF16 on MMLU and 1.7 points on GSM8K. A verifier with a compiled core checks a proof on one CPU core in 19 to 56 s. In the random-oracle model, the interactive proof has round-by-round soundness error 2^-103. The proof is not zero-knowledge, so the system targets open-weight models. Code: https://github.com/moonmath-ai/Sable",
+      "repoUrl": "https://github.com/moonmath-ai/Sable",
+      "needsDataCheck": true,
+      "status": "rejected",
+      "reasons": [
+        "Depends on CUDA, which usually needs a graphics card. The Lab only has CPUs."
+      ],
+      "checkedAt": "2026-11-11T14:25:30.862Z",
+      "license": "MIT",
       "runtime": "python3.11"
     }
   }
