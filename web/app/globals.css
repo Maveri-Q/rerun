@@ -3266,54 +3266,165 @@ a {
 }
 
 /*
- * The verdict stamp: a rubber stamp hitting the paper as the receipt finishes printing. Each verdict
- * has its own ink. The mask leaves the small gaps a real stamp leaves where the ink didn't take.
+ * The verdict as a two-pass press run. The pale first impression is the paper's claim; the inked second
+ * pass is the Lab's rerun. Holds up: the second pass lands on the first, "in register", and the two
+ * crosshairs meet. Doesn't hold up: it lands off by an amount that grows with the miss. Inconclusive:
+ * the ink smears. Ink overprints (multiply), so where the passes overlap you see both.
  */
-.receipt-verdict strong.ink-stamp {
+.receipt-verdict .register {
   --ink-color: #1a6b43;
-  display: inline-block;
-  margin: 8px 0 2px 2px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  /* Room for the crosshair to land off-register without leaving the paper. */
+  margin: 10px 18px 2px 2px;
+}
+.receipt-verdict .register--bad {
+  --ink-color: #a8261d;
+}
+.receipt-verdict .register--unsure {
+  --ink-color: #8a5a00;
+}
+.receipt-verdict .register-pass {
+  display: grid;
+  min-width: 0;
+  rotate: -2deg;
+}
+.register-ghost,
+.receipt-verdict .register-ink {
+  grid-area: 1 / 1;
+  display: block;
+  margin: 0;
   padding: 7px 10px 8px;
-  max-width: 100%;
-  border: 3px solid var(--ink-color);
+  border: 3px solid;
   border-radius: 5px;
-  color: var(--ink-color);
-  font-size: 27px;
-  line-height: 1.02;
+  font: 600 27px/1.02 var(--font-funnel-display), sans-serif;
   letter-spacing: 0.01em;
   text-wrap: balance;
-  transform: rotate(-3deg);
+}
+.receipt-verdict .register-ghost {
+  display: block;
+  color: #c9cdd0;
+  border-color: #c9cdd0;
+}
+.receipt-verdict .register-ink {
+  color: var(--ink-color);
+  border-color: var(--ink-color);
+  mix-blend-mode: multiply;
+  translate: var(--dx) var(--dy);
   -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='120'%3E%3Cfilter id='i'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -3.4 2.75'/%3E%3C/filter%3E%3Crect width='260' height='120' filter='url(%23i)'/%3E%3C/svg%3E");
   mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='120'%3E%3Cfilter id='i'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -3.4 2.75'/%3E%3C/filter%3E%3Crect width='260' height='120' filter='url(%23i)'/%3E%3C/svg%3E");
 }
-.receipt-verdict strong.ink-stamp--bad {
-  --ink-color: #a8261d;
-  transform: rotate(2.5deg);
+.register--bad .register-ink {
+  rotate: 1.5deg;
 }
-.receipt-verdict strong.ink-stamp--unsure {
-  --ink-color: #8a5a00;
-  transform: rotate(-1.5deg);
+.register--unsure .register-ink {
+  filter: blur(0.5px);
+  text-shadow: 2px 0 0 color-mix(in srgb, var(--ink-color) 45%, transparent), 4px 0 0 color-mix(in srgb, var(--ink-color) 18%, transparent);
+}
+.register-mark {
+  flex: none;
+  width: 26px;
+  height: 26px;
+  overflow: visible;
+}
+.register-mark g {
+  fill: none;
+  stroke-width: 1.4;
+}
+.register-mark-paper {
+  stroke: #b9bec2;
+}
+.register-mark-ink {
+  stroke: var(--ink-color);
+  mix-blend-mode: multiply;
+  translate: var(--dx) var(--dy);
 }
 
-/* It lands just after the paper stops, and the paper takes the hit. */
-.receipt-paper--print .ink-stamp {
-  animation: stamp-land 240ms cubic-bezier(0.3, 0, 0.2, 1) 1600ms both;
+/* The paper's impression appears as the feed stops; the Lab's pass drops, then settles in or slips out. */
+.receipt-paper--print .register-ghost {
+  animation: register-ghost 280ms ease-out 1550ms both;
+}
+.receipt-paper--print .register-ink,
+.receipt-paper--print .register-mark-ink {
+  animation: register-in 900ms cubic-bezier(0.3, 0, 0.2, 1) 1900ms both;
+}
+.receipt-paper--print .register--bad .register-ink,
+.receipt-paper--print .register--bad .register-mark-ink {
+  animation-name: register-out;
+}
+.receipt-paper--print .register--unsure .register-ink {
+  animation-name: register-smear;
+}
+.receipt-paper--print .register-mark-paper {
+  animation: register-ghost 280ms ease-out 1650ms both;
 }
 .receipt-paper--print .receipt-verdict {
-  animation: stamp-thunk 200ms ease-out 1790ms;
+  animation: stamp-thunk 200ms ease-out 2080ms;
 }
 
-@keyframes stamp-land {
+@keyframes register-ghost {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+/* Lands a little off, holds, then slides into register. */
+@keyframes register-in {
   0% {
     opacity: 0;
-    scale: 2.1;
+    scale: 1.6;
+    translate: 6px -16px;
   }
-  70% {
+  22% {
     opacity: 1;
-    scale: 0.97;
+    scale: 0.98;
+    translate: 6px -4px;
+  }
+  27%,
+  55% {
+    scale: 1;
+    translate: 6px -4px;
   }
   100% {
+    translate: 0 0;
+  }
+}
+/* Lands close, holds, then slips to where its number really fell. */
+@keyframes register-out {
+  0% {
+    opacity: 0;
+    scale: 1.6;
+    translate: 2px -16px;
+  }
+  22% {
     opacity: 1;
+    scale: 0.98;
+    translate: 2px -2px;
+  }
+  27%,
+  55% {
+    scale: 1;
+    translate: 2px -2px;
+  }
+  100% {
+    translate: var(--dx) var(--dy);
+  }
+}
+@keyframes register-smear {
+  0% {
+    opacity: 0;
+    scale: 1.6;
+    translate: 0 -16px;
+  }
+  22% {
+    opacity: 1;
+    scale: 0.98;
+    translate: 0 0;
+  }
+  27% {
     scale: 1;
   }
 }
@@ -3331,14 +3442,18 @@ a {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .receipt-paper--print .ink-stamp,
+  .receipt-paper--print .register-ghost,
+  .receipt-paper--print .register-ink,
+  .receipt-paper--print .register-mark-ink,
+  .receipt-paper--print .register-mark-paper,
   .receipt-paper--print .receipt-verdict {
     animation: none;
   }
 }
 
 @media (max-width: 420px) {
-  .receipt-verdict strong.ink-stamp {
+  .register-ghost,
+  .receipt-verdict .register-ink {
     font-size: 23px;
   }
 }

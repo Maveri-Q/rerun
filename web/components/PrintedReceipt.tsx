@@ -2,6 +2,7 @@
 
 import { APP_NAME } from "@rerun/shared/browser";
 import Link from "next/link";
+import type { CSSProperties } from "react";
 import { verdictWords, type Outcome } from "@/lib/market";
 
 /** Bars taken from the claim's real fingerprint, so every receipt's barcode is its own. */
@@ -21,6 +22,55 @@ function Barcode({ hash }: { hash: string }) {
         <rect key={b.x} x={b.x} y={0} width={b.w} height={34} fill="currentColor" />
       ))}
     </svg>
+  );
+}
+
+const number = (s: string) => [...s.replace(/,/g, "").matchAll(/-?\d+(?:\.\d+)?/g)].map((m) => Number(m[0]));
+
+/**
+ * How far out of register the Lab's impression lands, in pixels: none when its number falls inside the
+ * allowed range, and further the further it misses, measured in widths of that range. A range or number
+ * that can't be read gets a middling offset, so a miss still looks like a miss.
+ */
+export function misregister(range: string, measured: string | null): number {
+  const [lo, hi] = number(range);
+  const [got] = measured ? number(measured) : [];
+  if (lo === undefined || hi === undefined || got === undefined) return 9;
+  const [a, b] = lo <= hi ? [lo, hi] : [hi, lo];
+  if (got >= a && got <= b) return 0;
+  const width = Math.max(b - a, Math.abs(b) * 1e-6, 1e-9);
+  const out = (got < a ? a - got : got - b) / width;
+  return Math.round(Math.min(14, 4 + 3 * Math.log2(1 + out)));
+}
+
+/**
+ * The verdict, printed like a two-pass press run. The pale first impression is what the paper claimed;
+ * the Lab's rerun is the second pass of ink. When the result holds up, the second pass lands exactly
+ * on the first ("in register"). When it doesn't, it lands off by an amount that grows with the miss, and
+ * the two crosshairs beside it don't meet. An inconclusive run smears.
+ */
+function RegisterStamp({ tone, text, miss }: { tone: "good" | "bad" | "unsure"; text: string; miss: number }) {
+  const off = tone === "good" ? 0 : tone === "bad" ? Math.max(miss, 4) : 0;
+  const style = { "--dx": `${off}px`, "--dy": `${-Math.round(off * 0.6)}px` } as CSSProperties;
+  const cross = (
+    <>
+      <circle cx="12" cy="12" r="6.5" />
+      <path d="M12 1v22M1 12h22" />
+    </>
+  );
+  return (
+    <span className={`register register--${tone}`} style={style}>
+      <span className="register-pass">
+        <span className="register-ghost" aria-hidden="true">
+          {text}
+        </span>
+        <strong className="register-ink">{text}</strong>
+      </span>
+      <svg className="register-mark" viewBox="0 0 24 24" aria-hidden="true">
+        <g className="register-mark-paper">{cross}</g>
+        {tone !== "unsure" && <g className="register-mark-ink">{cross}</g>}
+      </svg>
+    </span>
   );
 }
 
@@ -86,7 +136,7 @@ export function PrintedReceipt({
       </dl>
       <div className="receipt-verdict">
         <span>Verdict</span>
-        {words ? <strong className={`ink-stamp ink-stamp--${words.tone}`}>{`${words.mark} ${words.words.toUpperCase()}`}</strong> : <strong>NOT CHECKED YET</strong>}
+        {words ? <RegisterStamp tone={words.tone} text={`${words.mark} ${words.words.toUpperCase()}`} miss={misregister(range, measured)} /> : <strong>NOT CHECKED YET</strong>}
         {words?.tone === "unsure" && <span className="receipt-reason">{words.reason}</span>}
       </div>
       {hash && <Barcode hash={hash} />}
