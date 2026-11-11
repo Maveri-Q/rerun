@@ -19,8 +19,8 @@ services:
       SANDBOX_IMAGE_PYTHON: ghcr.io/maveri-q/rerun-sandbox-python@sha256:8ecd9bc04a83addb6acc1b45ee0b2854eddbde692c914576b8290172680c584c
       SANDBOX_IMAGE_R: ghcr.io/maveri-q/rerun-sandbox-r@sha256:d97bec581cc8d27f3f1cfe9a5a1d7d2598949f2660fe9572a7955fa5ed74a409
       TEE_CREATE_ACCOUNT: "1"
-      # The machine has 2 vCPUs and 4 GB: leave 1 GB for the Lab and Docker.
-      SANDBOX_MAX_CPUS: "2"
+      # tdx.medium is sold as 2 vCPUs, but Docker inside sees 1 and refuses more. 4 GB: leave 1 GB for the Lab.
+      SANDBOX_MAX_CPUS: "1"
       SANDBOX_MAX_MEM_GB: "3"
       # Encrypted secrets, set in the Phala dashboard:
       TEE_LAB_ACCOUNT: ${TEE_LAB_ACCOUNT}
