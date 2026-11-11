@@ -55,7 +55,8 @@ export default function LabPage() {
   const attestation = usePoll(() => lab.latestAttestation(), [], 60_000);
 
   const report = attestation.data?.reports[0];
-  const entry = labs.data?.[0];
+  // The Lab that's answering now, so an older registered Lab doesn't decide what this page says.
+  const entry = labs.data?.find(([id]) => id === health.data?.account) ?? labs.data?.[0];
   const local = entry?.[1].local ?? true;
   const online = Boolean(health.data);
   const real = markets.data?.filter(isListed);
@@ -92,11 +93,11 @@ export default function LabPage() {
         </div>
       </div>
 
-      {local && (
-        <p className="notice" style={{ maxWidth: "66ch", marginTop: 32 }}>
-          This practice Lab runs on an ordinary computer for now, so receipts show a note rather than a pass on that line. The AI it uses already runs on secure hardware, and the Lab moves there before launch.
-        </p>
-      )}
+      <p className="notice" style={{ maxWidth: "66ch", marginTop: 32 }}>
+        {local
+          ? "This practice Lab runs on an ordinary computer for now, so receipts show a note rather than a pass on that line. The AI it uses already runs on secure hardware."
+          : "The Lab runs inside secure hardware on Phala Cloud. The contract checked the hardware's proof when it registered, so its receipts pass that line. Receipts from before 11 November came from an ordinary computer and still say so."}
+      </p>
 
       <section className="rules">
         <div>

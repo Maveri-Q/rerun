@@ -114,7 +114,7 @@ export function SelfCheck() {
         ))}
       </ul>
       <p className="notice" style={{ marginTop: 20, maxWidth: "66ch" }}>
-        Where it stands today: everything runs on NEAR&apos;s test network with free points. The AI already runs on secure hardware. The Lab itself runs on an ordinary computer for now, and each receipt says so.
+        Where it stands today: everything runs on NEAR&apos;s test network with free points. The AI runs on secure hardware, and since 11 November so does the Lab, on Phala Cloud. Receipts from before then came from an ordinary computer and say so.
       </p>
     </>
   );

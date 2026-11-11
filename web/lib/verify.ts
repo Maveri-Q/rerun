@@ -40,7 +40,7 @@ export async function verifyReceipt(market: Market, r: Receipt): Promise<Verific
   );
 
   if (!registered) add("The Lab runs on secure hardware", "fail", `${r.lab_account} is not registered with the contract.`);
-  else if (registered.local) add("The Lab runs on secure hardware", "warn", "Not yet. This practice Lab runs on an ordinary computer. It moves to secure hardware before launch.");
+  else if (registered.local) add("The Lab runs on secure hardware", "warn", "No. This run came from the practice Lab on an ordinary computer, before the Lab moved to secure hardware.");
   else add("The Lab runs on secure hardware", "pass", "The contract checked the hardware's proof when this Lab registered.");
 
   if (!attestation) {

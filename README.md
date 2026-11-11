@@ -55,7 +55,7 @@ Outcomes: ✓ holds up (YES wins), ✗ doesn't hold up or the code didn't finish
 
 ## Coming next
 
-- The Lab runs inside secure hardware on Phala Cloud, with its code fingerprint and attestation registered on NEAR. Built and tested ([`tee/`](lab/orchestrator/src/tee), [`docs/PHALA.md`](docs/PHALA.md)); it goes live on Nov 12.
+- The Lab runs inside secure hardware on Phala Cloud, with its code fingerprint and attestation registered on NEAR. Live on testnet since Nov 11 ([`tee/`](lab/orchestrator/src/tee), [`docs/PHALA.md`](docs/PHALA.md)): [registration](https://testnet.nearblocks.io/txns/7F3KFtmWgVF2gCqH7tndKReovNkKojhm1AWFCnXUhcYM).
 - Mainnet: points mode and one money claim, with the gas-free relayer ([`docs/MAINNET_COSTS.md`](docs/MAINNET_COSTS.md)).
 - The Lab agent pays for its own compute via NEAR Intents.
 - A research reputation on claim pages, such as "3 of 4 checked results held up" for a paper's authors.
