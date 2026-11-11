@@ -32,7 +32,7 @@ describe("keys made inside the secure hardware", () => {
         asked[req.url!] = JSON.parse(body);
         const answers: Record<string, unknown> = {
           "/GetKey": { key: appKey.toString("hex"), signature_chain: [] },
-          "/Info": { app_id: "0xaa", compose_hash: "0x" + "c".repeat(64) },
+          "/Info": { app_id: "0xaa", compose_hash: "0x" + "c".repeat(64), tcb_info: JSON.stringify({ app_compose: '{"docker_compose_file":"x"}' }) },
           "/GetQuote": { quote: "0x0102", event_log: "[]" },
         };
         res.end(JSON.stringify(answers[req.url!]));
@@ -44,7 +44,7 @@ describe("keys made inside the secure hardware", () => {
       const { keys, attestation } = await teeIdentity(`http://127.0.0.1:${port}`, "lab.testnet");
       const expected = reportData("lab.testnet", keys).toString("hex");
       expect(asked["/GetQuote"]).toEqual({ report_data: expected });
-      expect(attestation).toMatchObject({ compose_hash: "c".repeat(64), quote: "0102", report_data: expected, near_public_key: keys.nearPublicKey });
+      expect(attestation).toMatchObject({ compose_hash: "c".repeat(64), quote: "0102", app_compose: '{"docker_compose_file":"x"}', report_data: expected, near_public_key: keys.nearPublicKey });
       expect(JSON.stringify(attestation)).not.toContain(keys.nearPrivateKey.slice(8));
       expect(JSON.stringify(attestation)).not.toContain(keys.encPrivateKey);
     } finally {

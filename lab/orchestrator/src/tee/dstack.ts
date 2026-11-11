@@ -94,7 +94,22 @@ export interface TeeInfo {
   app_id: string;
   compose_hash: string;
   instance_id?: string;
+  /** Older dstack put the compose file here. */
   app_compose?: string;
+  /** dstack 0.5.x: a JSON string that carries the compose file as `app_compose`. */
+  tcb_info?: string;
+}
+
+/** The compose file the CVM booted, wherever this dstack version puts it. */
+export function appComposeOf(info: TeeInfo): string | undefined {
+  if (info.app_compose) return info.app_compose;
+  if (!info.tcb_info) return undefined;
+  try {
+    const tcb = JSON.parse(info.tcb_info) as { app_compose?: unknown };
+    return typeof tcb.app_compose === "string" ? tcb.app_compose : undefined;
+  } catch {
+    return undefined;
+  }
 }
 
 export interface LabAttestation {
@@ -130,7 +145,7 @@ export async function teeIdentity(endpoint: string, labAccount: string): Promise
       quote: quote.quote.replace(/^0x/, ""),
       event_log: quote.event_log,
       vm_config: quote.vm_config,
-      app_compose: info.app_compose,
+      app_compose: appComposeOf(info),
     },
   };
 }
