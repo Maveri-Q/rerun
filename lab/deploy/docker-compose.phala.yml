@@ -1,7 +1,7 @@
 # The Lab on Phala Cloud (dstack CVM). This file's sha256 is the Lab's codehash: the hardware quote
 # commits to it, and the owner registers it on NEAR. So every image is pinned by digest here, never by an
 # environment variable, and only settings that can't change what the code does come from secrets.
-# Digests from the Images workflow, run #1 on commit e18100e. Deploy steps: docs/PHALA.md.
+# Digests from the Images workflow: sandboxes from run #1 (commit e18100e), the Lab from commit 4e973b3. Deploy steps: docs/PHALA.md.
 services:
   lab:
     image: ghcr.io/maveri-q/rerun-lab@sha256:4b36fe6bc98e2a8b8476ee680a5ddad12a92ec36c54f21c61b65665c665815c5
