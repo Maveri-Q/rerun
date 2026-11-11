@@ -10,11 +10,17 @@
  *   pnpm mainnet fan [--send]            creates the second forecasting account with 0.1 NEAR
  *   pnpm mainnet lab <ed25519:key> [--send]   creates the Lab account with the secure hardware's key as its only key
  *   pnpm mainnet setup [--send]          money settings for a 5 USDC claim; registers the contract and fan with USDC
+ *   pnpm mainnet post <demo> <points|money> <minutes open> <minutes to challenge> [--send]
+ *                                        opens a demo claim (made-up data) from the home account, as a draft
+ *   pnpm mainnet fund <claim id> [points|money] [--send]
+ *                                        funds it: 40 points, or 5 USDC prize pool + 2 bond + 0.5 Lab fee
  */
 import { createHash } from "node:crypto";
 import { appendFileSync, readFileSync } from "node:fs";
 import path from "node:path";
+import { specHash, specJson } from "@rerun/shared";
 import { Account, actions, JsonRpcProvider, KeyPair, nearToYocto, yoctoToNear, type KeyPairString } from "near-api-js";
+import { loadDemo, type DemoName } from "../lab/orchestrator/src/demo/fixtures.ts";
 import { loadEnv } from "../lab/orchestrator/src/env.ts";
 
 loadEnv();
@@ -67,16 +73,22 @@ async function balance(id: string): Promise<string> {
 const signer = (id: string) => new Account(id, provider, ownerKey().toString() as KeyPairString);
 
 /** Prints the plan; with --send, signs and sends it and prints the explorer link. */
-async function transaction(from: string, receiverId: string, plan: string[], acts: ReturnType<typeof actions.transfer>[]) {
+async function transaction(from: string, receiverId: string, plan: string[], acts: ReturnType<typeof actions.transfer>[]): Promise<unknown> {
   console.log(`\nFrom ${from} to ${receiverId}:`);
   for (const line of plan) console.log(`  - ${line}`);
   if (!send) {
     console.log("\nNothing signed. Add --send to sign this on mainnet.");
-    return;
+    return null;
   }
-  const out = (await signer(from).signAndSendTransaction({ receiverId, actions: acts })) as { transaction: { hash: string }; status: { Failure?: unknown } };
+  const out = (await signer(from).signAndSendTransaction({ receiverId, actions: acts })) as { transaction: { hash: string }; status: { Failure?: unknown; SuccessValue?: string } };
   if (out.status?.Failure) throw new Error(`failed: ${JSON.stringify(out.status.Failure)}`);
   console.log(`\nSent: https://nearblocks.io/txns/${out.transaction.hash}`);
+  const value = out.status?.SuccessValue ? Buffer.from(out.status.SuccessValue, "base64").toString() : "";
+  return value ? (JSON.parse(value) as unknown) : null;
+}
+
+async function view<T>(method: string, args: Record<string, unknown>, contractId = ACCOUNTS.contract): Promise<T> {
+  return (await provider.callFunction({ contractId, method, args })) as T;
 }
 
 /** A sub-account of the home account, with a key and some NEAR. */
@@ -119,10 +131,13 @@ async function main() {
       if (await exists(HOME)) return console.log(`${HOME} already exists.`);
       const funding = implicitOf(ownerKey());
       const keep = 0.05;
-      const have = Number(yoctoToNear((await provider.viewAccount({ accountId: funding })).amount, 3));
+      const have = (await exists(funding)) ? Number(yoctoToNear((await provider.viewAccount({ accountId: funding })).amount, 3)) : 0;
       const move = (have - keep).toFixed(2);
-      if (Number(move) < 1) throw new Error(`The funding address has ${have} NEAR. Send NEAR to ${funding} first.`);
-      await transaction(funding, "near", [`create ${HOME} through the near account's create_account, with the owner key`, `send it ${move} NEAR (keeping ${keep} for this account's own gas)`], [
+      if (Number(move) < 1) {
+        if (send) throw new Error(`The funding address has ${have} NEAR. Send NEAR to ${funding} first.`);
+        console.log(`(The funding address ${funding} has ${have} NEAR yet; the plan below uses everything but ${keep}.)`);
+      }
+      await transaction(funding, "near", [`create ${HOME} through the near account's create_account, with the owner key`, Number(move) > 0 ? `send it ${move} NEAR (keeping ${keep} for this account's own gas)` : `send it everything the funding address holds except ${keep} NEAR for its own gas`], [
         actions.functionCall("create_account", { new_account_id: HOME, new_public_key: ownerKey().getPublicKey().toString() }, 50n * TGAS, nearToYocto(move as `${number}`)),
       ]);
       return;
@@ -168,8 +183,58 @@ async function main() {
       ]);
       return;
     }
+    case "post": {
+      const [name, mode, open, challenge] = args as [DemoName, string, string, string];
+      if (!name || (mode !== "points" && mode !== "money") || !(Number(open) >= 5) || !(Number(challenge) >= 1)) {
+        throw new Error("Usage: pnpm mainnet post <demo> <points|money> <minutes open, 5 or more> <minutes to challenge>");
+      }
+      // A public demo's spec doesn't use the Lab's sealing key; only private-data demos do.
+      const spec = loadDemo(name, { publicKey: "", privateKey: "" } as never).spec;
+      if (spec.private_data) throw new Error("Private-data demos need the mainnet Lab's sealing key. Post a public one.");
+      const lockTime = Math.floor(Date.now() / 1000) + Math.round(Number(open) * 60);
+      const body = { spec_json: specJson(spec), lock_time: lockTime, challenge_window: Math.round(Number(challenge) * 60), mode };
+      const id = await transaction(
+        HOME,
+        ACCOUNTS.contract,
+        [
+          `create_market for the demo "${spec.title}" (fingerprint ${specHash(spec)})`,
+          `${mode} mode; forecasting closes ${open} minutes after sending, then ${challenge} minutes to challenge`,
+          "attach 0.1 NEAR for its storage (the unused part comes back)",
+        ],
+        [actions.functionCall("create_market", body, 100n * TGAS, nearToYocto("0.1"))],
+      );
+      if (id !== null) console.log(`Claim ${id} is a draft. Next: pnpm mainnet fund ${id}`);
+      return;
+    }
+    case "fund": {
+      const id = Number(args[0]);
+      if (!Number.isInteger(id)) throw new Error("Usage: pnpm mainnet fund <claim id> [points|money]");
+      const market = (await exists(ACCOUNTS.contract)) ? await view<{ mode: string } | null>("get_market", { market_id: id }) : { mode: args[1] ?? "money" };
+      if (!market) throw new Error(`There's no claim ${id}.`);
+      if (market.mode === "points") {
+        const points = (await exists(ACCOUNTS.contract)) ? BigInt(await view<string>("get_balance", { account_id: HOME, mode: "points" })) : 0n;
+        if (points < 100n * UNIT) {
+          await transaction(HOME, ACCOUNTS.contract, ["claim_points: the home account's 1,000 free points (0.02 NEAR attached for storage)"], [
+            actions.functionCall("claim_points", {}, 30n * TGAS, nearToYocto("0.02")),
+          ]);
+        }
+        await transaction(HOME, ACCOUNTS.contract, [`fund_market(${id}): 40 points of prize pool, plus the points bond and Lab fee`], [
+          actions.functionCall("fund_market", { market_id: id, initial_liquidity: (40n * UNIT).toString() }, 100n * TGAS, nearToYocto("0.02")),
+        ]);
+        return;
+      }
+      await transaction(HOME, USDC, [`ft_transfer_call 7.5 USDC to ${ACCOUNTS.contract}: 5 prize pool, 2 bond, 0.5 Lab fee, opening claim ${id}`], [
+        actions.functionCall(
+          "ft_transfer_call",
+          { receiver_id: ACCOUNTS.contract, amount: "7500000", msg: JSON.stringify({ action: "fund", market_id: id, initial_liquidity: (5n * UNIT).toString() }) },
+          150n * TGAS,
+          1n,
+        ),
+      ]);
+      return;
+    }
     default:
-      console.log("Steps: key, status, home, contract, relayer, fan, lab <key>, setup. See the top of scripts/mainnet.ts.");
+      console.log("Steps: key, status, home, contract, relayer, fan, lab <key>, setup, post, fund. See the top of scripts/mainnet.ts.");
   }
 }
 
