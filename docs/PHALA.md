@@ -43,20 +43,16 @@ Nothing here is paid until step 5, and I'll ask before that.
 2. **Make the images pullable.** Done Nov 9: all three packages are public, and each pulls anonymously by digest.
 3. Done: the digests are in `lab/deploy/docker-compose.phala.yml`. Rebuilding an image changes its digest, so the compose file (and the codehash) changes with it.
 4. **Phala account.** Sign in at https://cloud.phala.network, add your card under billing, and complete their verification.
-5. **Deploy** (paid from here). CVMs page → **Deploy** (top right) → paste `lab/deploy/docker-compose.phala.yml` → KMS provider **Phala** → instance `tdx.medium` (2 vCPU, 4 GB), default 20 GB disk → under **Encrypted Secrets**, add:
-
-   | Secret | Value |
-   |---|---|
-   | `TEE_LAB_ACCOUNT` | `rerun-tee-lab-43f5f2.testnet` (created from the faucet on first start, with the CVM's key as its only key) |
-   | `TESTNET_CONTRACT_ACCOUNT` | `rerun.rerun-43f5f2.testnet` |
-   | `NEARAI_CLOUD_API_KEY` | from your `.env` |
-   | `LAB_PUBLIC_URL` | leave empty for now; set it after step 6 |
-   | `ROLLING_DEMOS` | `1` to post the hourly demos from the CVM, empty to keep them on your PC |
-   | `TESTNET_OWNER_ACCOUNT`, `TESTNET_OWNER_PRIVATE_KEY` | from `.env.testnet`, only if `ROLLING_DEMOS` is `1` (testnet key, encrypted to the CVM) |
-
-   Click **Deploy**. It's running in 1 to 2 minutes.
-6. **Public URL.** The CVM page shows `https://<app-id>-8787.dstack-pha-<node>.phala.network`. Set `LAB_PUBLIC_URL` to it (Encrypted Secrets → update; the codehash doesn't change), and in Vercel set `NEXT_PUBLIC_LAB_URL` to it.
-7. I run `pnpm phala:register <url>` (signs nothing, prints every check), show you the output, then `--send` on testnet with your yes. The site's Lab page then shows the secure-hardware status, and your PC's Lab can stop.
+5. **Deploy** (paid from here). In https://cloud.phala.network:
+   1. Open **CVMs** in the left menu, then **Deploy** (top right). If it asks how, choose **Docker Compose**, then the **Advanced** tab.
+   2. Name: `rerun-lab-testnet`.
+   3. In the compose editor, delete what's there and paste all of `lab/deploy/docker-compose.phala.yml`. Its images are pinned by digest, so nothing else needs setting there.
+   4. KMS provider: **Phala**. Instance: **tdx.medium** (2 vCPU, 4 GB). Disk: leave the default 20 GB. Any region.
+   5. **Encrypted Secrets**: switch the input to **Text** and paste the whole of `.env.phala` from the repo (gitignored; six lines: the Lab account, the contract, the NEAR AI key, `ROLLING_DEMOS=1`, and the testnet owner account and key for the hourly demos). They're encrypted in your browser; only the CVM can read them. Changing one later means pasting all six again, and the CVM restarts.
+   6. Check the price shown is $0.116 an hour, then click **Deploy**. It takes 1 to 3 minutes to start.
+   7. Delete `.env.phala` afterwards.
+6. **Public URL.** On the CVM's page, under **Network** or **Endpoints**, copy the address ending in `-8787.dstack-pha-<node>.phala.network` (the Lab works it out by itself, so nothing to set in Phala). Open `<that address>/health`: it should say `"tee":true`. In Vercel, set `NEXT_PUBLIC_LAB_URL` to it and redeploy.
+7. I run `pnpm phala:register <url>` (signs nothing, prints every check), show you the output, then `--send` on testnet with your yes. The site's Lab page then shows the secure-hardware status. Then stop the Lab on your PC, so the two don't race for claims or both post the hourly demos.
 
 Mainnet uses the same image with `NEAR_NETWORK=mainnet` and its own compose file, so its own codehash, registered by the mainnet owner after the same check. Every mainnet transaction waits for your yes.
 

@@ -26,7 +26,8 @@ services:
       TEE_LAB_ACCOUNT: ${TEE_LAB_ACCOUNT}
       TESTNET_CONTRACT_ACCOUNT: ${TESTNET_CONTRACT_ACCOUNT}
       NEARAI_CLOUD_API_KEY: ${NEARAI_CLOUD_API_KEY}
-      LAB_PUBLIC_URL: ${LAB_PUBLIC_URL}
+      # Phala fills these in at boot, so the public URL needs no secret.
+      LAB_PUBLIC_URL: https://${DSTACK_APP_ID}-8787.${DSTACK_GATEWAY_DOMAIN}
       # Testnet only, for the hourly demo claims: the owner key that posts them. Leave empty to turn them off.
       ROLLING_DEMOS: ${ROLLING_DEMOS}
       TESTNET_OWNER_ACCOUNT: ${TESTNET_OWNER_ACCOUNT}

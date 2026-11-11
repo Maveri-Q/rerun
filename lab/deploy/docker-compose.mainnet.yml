@@ -24,7 +24,8 @@ services:
       TEE_LAB_ACCOUNT: ${TEE_LAB_ACCOUNT}
       TESTNET_CONTRACT_ACCOUNT: ${MAINNET_CONTRACT_ACCOUNT}
       NEARAI_CLOUD_API_KEY: ${NEARAI_CLOUD_API_KEY}
-      LAB_PUBLIC_URL: ${LAB_PUBLIC_URL}
+      # Phala fills these in at boot, so the public URL needs no secret.
+      LAB_PUBLIC_URL: https://${DSTACK_APP_ID}-8787.${DSTACK_GATEWAY_DOMAIN}
 
 volumes:
   lab-data:
