@@ -4,7 +4,7 @@
 # Digests from the Images workflow, run #1 on commit e18100e. Deploy steps: docs/PHALA.md.
 services:
   lab:
-    image: ghcr.io/maveri-q/rerun-lab@sha256:8b364b046815c323c775ff524bd75c0db291b10cdf2630ca5fdc2470aa725484
+    image: ghcr.io/maveri-q/rerun-lab@sha256:4b36fe6bc98e2a8b8476ee680a5ddad12a92ec36c54f21c61b65665c665815c5
     restart: unless-stopped
     ports:
       - "8787:8787"
