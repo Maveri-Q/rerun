@@ -9,7 +9,7 @@ import { RunTerminal } from "@/components/RunTerminal";
 import { ftTransferCall, prepareMoney } from "@/components/TradePanel";
 import { usePoll } from "@/components/usePoll";
 import { chain } from "@/lib/chain";
-import { CONTRACT } from "@/lib/config";
+import { CONTRACT, REAL_MONEY } from "@/lib/config";
 import { lab, useRunStream } from "@/lib/lab";
 import { fmtUnits, modeUnit, parseUnits, rangeText, type Mode } from "@/lib/market";
 import { sealForLab, sha256Hex } from "@/lib/seal";
@@ -534,7 +534,7 @@ function FullForm() {
           <Field label="What do people forecast with?">
             <select value={mode} onChange={(e) => setMode(e.target.value as Mode)}>
               <option value="points">Free points</option>
-              <option value="money">tUSDC, a test token</option>
+              <option value="money">{REAL_MONEY ? "USDC" : "tUSDC, a test token"}</option>
             </select>
           </Field>
           <Field label={`Starting pool, in ${unit}`} hint={params ? `You put this in so people can start forecasting. At least ${fmtUnits(params.min_liquidity, 0)}. A bigger pool makes the odds harder to move.` : undefined}>

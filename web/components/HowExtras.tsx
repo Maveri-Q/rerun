@@ -150,7 +150,7 @@ const WORDS = [
   { word: "Claim", text: "A research finding being tested, such as \"raising the minimum wage didn't cost jobs\"." },
   { word: "Allowed margin", text: "How close the Lab's number must get. If a paper says 2.76 jobs and the margin is 0.05, anything from 2.71 to 2.81 counts." },
   { word: "Forecast", text: "Your prediction. Buying YES means you expect the claim to hold up, and buying NO means you don't." },
-  { word: "Shares", text: "What a forecast buys. A winning share pays 1 point or 1 tUSDC, and a losing share pays nothing." },
+  { word: "Shares", text: "What a forecast buys. A winning share pays 1 point or 1 USDC, and a losing share pays nothing." },
   { word: "Chance", text: "The price of a YES share, which is what forecasters collectively think is likely. It moves as people buy." },
   { word: "Locks", text: "The moment forecasting stops and the Lab starts its work." },
   { word: "Receipt", text: "The Lab's permanent public record of what it ran and what it found." },

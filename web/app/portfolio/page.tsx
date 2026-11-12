@@ -105,7 +105,7 @@ export default function PortfolioPage() {
       <VerifiedOnNear account={account} label="See all your forecasts and payouts" />
       {d && BigInt(d.money) > 0n && (
         <button style={{ marginTop: 16 }} disabled={busy} onClick={() => void withdraw()}>
-          Withdraw {fmtUnits(d.money)} tUSDC
+          Withdraw {fmtUnits(d.money)} {REAL_MONEY ? "USDC" : "tUSDC"}
         </button>
       )}
       {message && <p className={`notice ${message.ok ? "notice--ok" : "notice--error"}`} role="status">{message.text}</p>}

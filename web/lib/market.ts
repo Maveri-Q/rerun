@@ -1,6 +1,7 @@
 /** Contract view types, plus the display and quote maths the UI needs. */
 
 import { parseDecimal } from "@rerun/shared/browser";
+import { REAL_MONEY } from "./config";
 
 export type Mode = "money" | "points";
 export type State = "Draft" | "Open" | "Locked" | "Running" | "Proposed" | "Challenged" | "Final";
@@ -229,7 +230,7 @@ export function parseUnits(input: string): bigint | null {
   return v > 0n ? v : null;
 }
 
-export const modeUnit = (mode: Mode) => (mode === "money" ? "tUSDC" : "points");
+export const modeUnit = (mode: Mode) => (mode === "money" ? (REAL_MONEY ? "USDC" : "tUSDC") : "points");
 
 export const yesPercent = (m: Pick<Market, "yes_price_ppm">) => m.yes_price_ppm / 10_000;
 
