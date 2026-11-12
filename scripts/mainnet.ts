@@ -81,6 +81,8 @@ async function balance(id: string): Promise<string> {
 
 const signer = (id: string, key: KeyPair = ownerKey()) => new Account(id, provider, key.toString() as KeyPairString);
 
+let lastHash = "";
+
 /** Prints the plan; with --send, signs and sends it and prints the explorer link. */
 async function transaction(from: string, receiverId: string, plan: string[], acts: ReturnType<typeof actions.transfer>[], key?: KeyPair): Promise<unknown> {
   console.log(`\nFrom ${from} to ${receiverId}:`);
@@ -91,6 +93,7 @@ async function transaction(from: string, receiverId: string, plan: string[], act
   }
   const out = (await signer(from, key).signAndSendTransaction({ receiverId, actions: acts })) as { transaction: { hash: string }; status: { Failure?: unknown; SuccessValue?: string } };
   if (out.status?.Failure) throw new Error(`failed: ${JSON.stringify(out.status.Failure)}`);
+  lastHash = out.transaction.hash;
   console.log(`\nSent: https://nearblocks.io/txns/${out.transaction.hash}`);
   const value = out.status?.SuccessValue ? Buffer.from(out.status.SuccessValue, "base64").toString() : "";
   return value ? (JSON.parse(value) as unknown) : null;
@@ -220,6 +223,9 @@ async function main() {
         actions.functionCall("near_deposit", {}, 30n * TGAS, BigInt(price.amountIn) + homeReg),
         actions.functionCall("ft_transfer", { receiver_id: deposit, amount: price.amountIn }, 50n * TGAS, 1n),
       ]);
+      // Tell 1Click the deposit is there, which speeds processing up (the site's panel does the same).
+      const txHash = lastHash;
+      if (txHash) await fetchRetry(`${ONECLICK}/deposit/submit`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ txHash, depositAddress: deposit, nearSenderAccount: HOME }) }).catch(() => null);
       console.log("\nWaiting for NEAR Intents to deliver the USDC…");
       for (let i = 0; i < 60; i++) {
         await new Promise((r) => setTimeout(r, 10_000));
