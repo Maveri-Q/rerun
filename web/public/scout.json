@@ -1,7 +1,7 @@
 {
-  "lastScanAt": "2026-11-12T00:46:00.429Z",
+  "lastScanAt": "2026-11-12T15:17:24.937Z",
   "draftsByDay": {
-    "2026-11-12": 2
+    "2026-11-12": 4
   },
   "candidates": {
     "rescience:10.5281_zenodo.20613595": {
@@ -935,9 +935,9 @@
       "needsDataCheck": true,
       "status": "retry",
       "reasons": [
-        "The AI draft failed: NEARAI_CLOUD_API_KEY is not set (or use MOCK_LLM=1)"
+        "Passed the checks, and waiting for the AI budget."
       ],
-      "checkedAt": "2026-11-12T00:46:00.429Z",
+      "checkedAt": "2026-11-12T15:17:24.937Z",
       "license": "MIT",
       "runtime": "python3.11"
     },
@@ -983,15 +983,15 @@
       "title": "Learning Heterogeneous Tactile Representation for General Dexterous Manipulation",
       "paperUrl": "https://arxiv.org/abs/2611.12806",
       "doi": "10.48550/arXiv.2611.12806",
-      "upvotes": 98,
+      "upvotes": 102,
       "abstract": "Tactile sensing is an indispensable modality for contact-rich dexterous manipulation, a capability that hints at the ultimate frontiers of embodied intelligence. However, commercially available tactile sensors are still at a relatively early stage of development, with each type of sensor offering irreplaceable strengths alongside its own drawbacks. A key challenge is thus to free tactile understanding from sensor-specific physics, so that embodied models can effectively leverage heterogeneous tactile data. To this end, we develop LingBot-Touch, a tactile foundation model characterized by the following properties. (i) Our model yields a unified representation across different tactile sensors (i.e., piezoresistive, magnetic, and visuotactile sensors), and is easily extensible to new sensor types. (ii) The resulting tactile tokens are plug-and-play: they can be seamlessly integrated into policy models across paradigms, from diffusion policy to vision-language-action (VLA) models such as π_{0.5} and LingBot-VLA, consistently enhancing manipulation dexterity. (iii) Extensive experiments, spanning simulation and real-robot deployments across multiple hardware platforms, demonstrate that our tactile representation substantially benefits complex manipulation tasks while maintaining strong computational efficiency. We believe the findings in this work demonstrate the potential of leveraging cross-sensor data to scale tactile learning, and offer encouraging insights for the design of future hardware and embodied models.",
       "repoUrl": "https://github.com/Robbyant/lingbot-touch",
       "needsDataCheck": true,
       "status": "retry",
       "reasons": [
-        "Passed the checks, and waiting for the AI budget."
+        "The AI draft failed: NEARAI_CLOUD_API_KEY is not set (or use MOCK_LLM=1)"
       ],
-      "checkedAt": "2026-11-12T00:46:00.429Z",
+      "checkedAt": "2026-11-12T15:17:24.937Z",
       "license": "Apache-2.0",
       "runtime": "python3.11"
     },
@@ -1096,15 +1096,15 @@
       "title": "Don't Just Trust Your Memory: Evidence-Linked Memory Reduces Memory-Induced Degradation in LLM Agents",
       "paperUrl": "https://arxiv.org/abs/2611.14320",
       "doi": "10.48550/arXiv.2611.14320",
-      "upvotes": 54,
+      "upvotes": 63,
       "abstract": "External memory enables LLM agents to improve from experience by distilling trajectories of past tasks into concise lessons for new tasks. However, memory can also lead to memory-induced degradation, where an agent fails on tasks it would solve without memory, often because it follows a lesson that is incorrect, or misapplies or misreads a valid one. This is because lessons are inferred from trajectories labeled only with task success or failure, yet are typically provided without the trajectories they came from, leaving the agent no way to check them. To address this, we introduce WikiTrace, an evidence-linked memory system designed to let agents check each lesson against its original trajectory. Specifically, motivated by the finding that a trajectory often still holds the evidence needed to catch an erroneous lesson, WikiTrace stores each lesson as a concise insight linked to a summary of why its trajectory succeeded or failed and to the raw trajectory itself. Then, on a new task, the agent starts from all insights and, whenever one lacks details needed to act, conflicts with another, or comes from a failed task, descends through its links with terminal tools to fill in missing details or correct the insight before acting. We validate WikiTrace on five agentic benchmarks, showing that it consistently outperforms existing memory approaches and a baseline given the same insights alone, while also reducing memory-induced degradation. Our code is available at https://github.com/yukyeongleee/wikitrace",
       "repoUrl": "https://github.com/yukyeongleee/wikitrace",
       "needsDataCheck": true,
       "status": "retry",
       "reasons": [
-        "The AI draft failed: NEARAI_CLOUD_API_KEY is not set (or use MOCK_LLM=1)"
+        "Passed the checks, and waiting for the AI budget."
       ],
-      "checkedAt": "2026-11-12T00:46:00.429Z",
+      "checkedAt": "2026-11-12T15:17:24.937Z",
       "license": "Apache-2.0",
       "runtime": "python3.11"
     },
@@ -1175,7 +1175,7 @@
       "reasons": [
         "Passed the checks, and waiting for the AI budget."
       ],
-      "checkedAt": "2026-11-12T00:46:00.429Z",
+      "checkedAt": "2026-11-12T15:17:24.937Z",
       "license": "CC0-1.0",
       "runtime": "r4.4"
     },
@@ -1185,15 +1185,15 @@
       "title": "World In-Context Learning for Agentic Robot Manipulation",
       "paperUrl": "https://arxiv.org/abs/2611.12885",
       "doi": "10.48550/arXiv.2611.12885",
-      "upvotes": 64,
+      "upvotes": 55,
       "abstract": "Trained action policies write manipulation skill into network weights, tying what is learned to the distribution it is learned from. In-context learning (ICL) avoids this coupling but has not matched trained policies, because a demonstration recorded in another scene carries no feedback from the world the robot currently faces. We observe that what an agent learns in context is semantic, recording task steps and object roles rather than visual appearance, so experience gathered in one world transfers to another. Based on this insight, we propose World In-Context Learning (WICL), a paradigm in which a frozen model starts from a demonstration, rehearses the task in a world such as a simulator, and writes the feedback into its context rather than its weights. We build RoboScript, a modular infrastructure that implements WICL for agentic manipulation. From a single demonstration, RoboScript learns each task through rehearsal in simulation, freezes the learned knowledge as a Task Memory, and deploys the frozen memory on new scenes with data isolation that ensures every deployment input is available on a real robot. On all 50 tasks of RoboTwin 2.0, RoboScript reaches 83.4% mean success across clean and randomized settings with one demonstration per task and no gradient updates, exceeding the strongest trained action policy by over 20 points. The method generalizes across visual distributions, improves through reflection, scales with the foundation model, and transfers to a physical dual-arm robot through cross-embodiment memory adaptation. With a world in the loop, a robot can learn a manipulation task in its context as well as it learns one in its weights. All code is available at https://github.com/ArcheOne-AI/RoboScript",
       "repoUrl": "https://github.com/ArcheOne-AI/RoboScript",
       "needsDataCheck": true,
       "status": "retry",
       "reasons": [
-        "Passed the checks, and waiting for the AI budget."
+        "The AI draft failed: NEARAI_CLOUD_API_KEY is not set (or use MOCK_LLM=1)"
       ],
-      "checkedAt": "2026-11-12T00:46:00.429Z",
+      "checkedAt": "2026-11-12T15:17:24.937Z",
       "license": "Apache-2.0",
       "runtime": "python3.11"
     },
@@ -1231,6 +1231,60 @@
       ],
       "checkedAt": "2026-11-12T00:46:00.429Z",
       "license": "Apache-2.0",
+      "runtime": "python3.11"
+    },
+    "arxiv:2611.13410": {
+      "id": "arxiv:2611.13410",
+      "source": "Hugging Face Papers",
+      "title": "SteerDistill: Quantizing LLM Agents via Closed-Loop Teacher Steering",
+      "paperUrl": "https://arxiv.org/abs/2611.13410",
+      "doi": "10.48550/arXiv.2611.13410",
+      "upvotes": 23,
+      "abstract": "Low-bit quantization reduces the inference cost of LLM agents but can compromise task success. Examining failed rollouts, we find that quantized agents overlook task requirements or environmental conditions, producing environment transitions that diverge from successful full-precision references. Correcting these behavioral divergences remains difficult: offline data may miss the student's failure contexts, while its own rollouts may provide few correct responses in those contexts. We introduce SteerDistill, a quantization-aware distillation method in which a full-precision teacher guides the student to revise failed responses and iteratively refines its guidance using feedback from student execution. This closed-loop teacher steering produces locally verified behavioral corrections. We internalize these corrections by training the student without guidance to match the steered student's predictions at corrected turns and the full-precision teacher's at other turns, enabling unassisted inference. Across five agentic benchmarks and three models, SteerDistill exceeds the strongest quantized baseline by 1.67--2.18 points in average score under W4A16 and stays within one point of BF16. On τ^2-Bench, it outperforms QeRL by 1.84 percentage points in success rate using 67% fewer training GPU hours and produces shorter successful trajectories than the quantized baselines.",
+      "repoUrl": "https://github.com/air-embodied-brain/SteerDistill",
+      "needsDataCheck": true,
+      "status": "retry",
+      "reasons": [
+        "Passed the checks, and waiting for the AI budget."
+      ],
+      "checkedAt": "2026-11-12T15:17:24.937Z",
+      "license": "MIT",
+      "runtime": "python3.11"
+    },
+    "arxiv:2611.12304": {
+      "id": "arxiv:2611.12304",
+      "source": "Hugging Face Papers",
+      "title": "Evolving Infra: Agent-Adaptive LLM Serving at Scale",
+      "paperUrl": "https://arxiv.org/abs/2611.12304",
+      "doi": "10.48550/arXiv.2611.12304",
+      "upvotes": 7,
+      "abstract": "Agentic workloads are a major source of LLM inference demand. Existing prefill--decode (PD) disaggregated serving systems offer limited flexibility for runtime adaptation of compute allocation and KV cache management, and rely on coarse signals that only partly capture the diverse and dynamic agent workload. These limitations lead to load imbalance between prefill and decode nodes and eviction of KV caches that agents will reuse. We present Evolving Infra, an agent-adaptive serving framework that adapts compute allocation to agent workloads and KV cache management to agent context management at runtime. We decouple compute allocation from key--value (KV) cache management, allowing nodes to switch efficiently between prefill and decode. Building on this design, an online planner matches the PD split to workload composition, while an agent-aware distributed KV manager guides cache eviction and transfer with signals from agent context management. Across coding, math, and computer-use tasks with GLM-5.2 and Kimi K2.6 on up to 256 GB300 GPUs, Evolving Infra reduces mean end-to-end request latency and P95 TTFT by up to 4.1x and 14x over Dynamo, NVIDIA's production framework.",
+      "repoUrl": "https://github.com/mit-han-lab/EvolvingInfra",
+      "needsDataCheck": true,
+      "status": "rejected",
+      "reasons": [
+        "Depends on pytorch, which usually needs a graphics card. The Lab only has CPUs."
+      ],
+      "checkedAt": "2026-11-12T15:17:24.937Z",
+      "license": "NOASSERTION",
+      "runtime": "python3.11"
+    },
+    "arxiv:2607.24999": {
+      "id": "arxiv:2607.24999",
+      "source": "Hugging Face Papers",
+      "title": "CogBattery: Human-Referenced Evaluation of Cognitive Task Behavior and Structure in Language Models",
+      "paperUrl": "https://arxiv.org/abs/2607.24999",
+      "doi": "10.48550/arXiv.2607.24999",
+      "upvotes": 2,
+      "abstract": "Human cognitive tasks let us compare language models with humans under controlled conditions. Yet a model can reproduce the direction of a human effect while making different errors. CogBattery evaluates 54 open-weight language models on text adaptations of 13 cognitive paradigms, comparing each with human data from its source study. Like humans, models respond more to n-back lures than to controls, yet they make far more false alarms on ordinary non-targets. Most models' reported confidence separates correct from incorrect answers less well than humans' does, and most always choose the same wager, including models that classify accurately. These patterns span many model families. Across tasks, model scores share two dimensions. The first is closely tied to scale, yet larger models are not consistently closer to humans. Predefined cognitive groupings show no reliable predictive advantage over random groupings of the same size. These results show that matching human effect directions does not establish human-like behavior. CogBattery provides condition-level human references for testing errors and confidence reports in new models.",
+      "repoUrl": "https://github.com/dengzhe-hou/CogBattery",
+      "needsDataCheck": true,
+      "status": "retry",
+      "reasons": [
+        "Passed the checks, and waiting for the AI budget."
+      ],
+      "checkedAt": "2026-11-12T15:17:24.937Z",
+      "license": "MIT",
       "runtime": "python3.11"
     }
   }
