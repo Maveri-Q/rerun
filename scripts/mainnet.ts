@@ -70,17 +70,17 @@ async function balance(id: string): Promise<string> {
   }
 }
 
-const signer = (id: string) => new Account(id, provider, ownerKey().toString() as KeyPairString);
+const signer = (id: string, key: KeyPair = ownerKey()) => new Account(id, provider, key.toString() as KeyPairString);
 
 /** Prints the plan; with --send, signs and sends it and prints the explorer link. */
-async function transaction(from: string, receiverId: string, plan: string[], acts: ReturnType<typeof actions.transfer>[]): Promise<unknown> {
+async function transaction(from: string, receiverId: string, plan: string[], acts: ReturnType<typeof actions.transfer>[], key?: KeyPair): Promise<unknown> {
   console.log(`\nFrom ${from} to ${receiverId}:`);
   for (const line of plan) console.log(`  - ${line}`);
   if (!send) {
     console.log("\nNothing signed. Add --send to sign this on mainnet.");
     return null;
   }
-  const out = (await signer(from).signAndSendTransaction({ receiverId, actions: acts })) as { transaction: { hash: string }; status: { Failure?: unknown; SuccessValue?: string } };
+  const out = (await signer(from, key).signAndSendTransaction({ receiverId, actions: acts })) as { transaction: { hash: string }; status: { Failure?: unknown; SuccessValue?: string } };
   if (out.status?.Failure) throw new Error(`failed: ${JSON.stringify(out.status.Failure)}`);
   console.log(`\nSent: https://nearblocks.io/txns/${out.transaction.hash}`);
   const value = out.status?.SuccessValue ? Buffer.from(out.status.SuccessValue, "base64").toString() : "";
@@ -143,24 +143,21 @@ async function main() {
       return;
     }
     case "contract": {
-      if (await exists(ACCOUNTS.contract)) return console.log(`${ACCOUNTS.contract} already exists.`);
       const wasm = readFileSync(WASM);
       const key = process.env.MAINNET_CONTRACT_PRIVATE_KEY ? KeyPair.fromString(process.env.MAINNET_CONTRACT_PRIVATE_KEY as KeyPairString) : KeyPair.fromRandom("ed25519");
       const init = { owner: HOME, collateral_token: USDC, treasury: HOME, lab_fee_recipient: HOME };
-      const plan = [
-        `create ${ACCOUNTS.contract} and send it 5.3 NEAR (5.08 is the code's storage)`,
-        `give it a key whose private half goes in .env as MAINNET_CONTRACT_PRIVATE_KEY (needed for upgrades until a multisig replaces it)`,
-        `deploy ${path.relative(root, WASM)}: ${wasm.length} bytes, sha256 ${createHash("sha256").update(wasm).digest("hex")}`,
-        `call new(${JSON.stringify(init)})`,
-      ];
-      if (send && !process.env.MAINNET_CONTRACT_PRIVATE_KEY) saveKey("MAINNET_CONTRACT_PRIVATE_KEY", key);
-      await transaction(HOME, ACCOUNTS.contract, plan, [
-        actions.createAccount(),
-        actions.transfer(nearToYocto("5.3")),
-        actions.addFullAccessKey(key.getPublicKey()),
-        actions.deployContract(wasm),
-        actions.functionCall("new", init, 100n * TGAS, 0n),
-      ]);
+      if (!(await exists(ACCOUNTS.contract))) {
+        if (send && !process.env.MAINNET_CONTRACT_PRIVATE_KEY) saveKey("MAINNET_CONTRACT_PRIVATE_KEY", key);
+        await transaction(HOME, ACCOUNTS.contract, [
+          `create ${ACCOUNTS.contract} and send it 5.3 NEAR (5.08 is the code's storage)`,
+          `give it a key whose private half goes in .env as MAINNET_CONTRACT_PRIVATE_KEY (needed for upgrades until a multisig replaces it)`,
+          `deploy ${path.relative(root, WASM)}: ${wasm.length} bytes, sha256 ${createHash("sha256").update(wasm).digest("hex")}`,
+        ], [actions.createAccount(), actions.transfer(nearToYocto("5.3")), actions.addFullAccessKey(key.getPublicKey()), actions.deployContract(wasm)]);
+      }
+      // new() is #[private]: only the contract account itself may call it, so it is signed with the contract's own key.
+      const initialised = await view("get_config", {}).then(() => true, () => false);
+      if (initialised) return console.log(`${ACCOUNTS.contract} is deployed and initialised.`);
+      await transaction(ACCOUNTS.contract, ACCOUNTS.contract, [`call new(${JSON.stringify(init)}), signed by the contract account itself`], [actions.functionCall("new", init, 100n * TGAS, 0n)], key);
       return;
     }
     case "relayer":
