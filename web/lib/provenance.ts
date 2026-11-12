@@ -333,7 +333,23 @@ export function resultSentence(m: { state: string; outcome?: string | null; spec
   return `${said} The Lab will retrace it when forecasting closes.`;
 }
 
+/** Just what the study said, in plain words, for lists that show the verdict beside it. */
+export const studySaid = (m: { spec: { spec_hash: string } }): string | null => provenanceOf(m.spec.spec_hash)?.plain?.said ?? null;
+
 /** A claim's name for readers: the question if it has one, otherwise its title without the label. */
 export function claimName(m: { spec: { spec_hash: string; title: string } }): string {
-  return provenanceOf(m.spec.spec_hash)?.question ?? m.spec.title.replace(/^\[(DEMO|TEST)\]\s*/, "");
+  return provenanceOf(m.spec.spec_hash)?.question ?? plainDemoTitle(m.spec.title.replace(/^\[(DEMO|TEST)\]\s*/, ""));
+}
+
+/**
+ * Demo titles on the blockchain end "Will the Lab's rerun agree?" and can't change (open claims pin their
+ * hashes), so readers see the site's wording instead: "Demo: our practice dataset says X." becomes
+ * "Practice data says X. Will the Lab agree?".
+ */
+export function plainDemoTitle(title: string): string {
+  if (!title.startsWith("Demo:")) return title;
+  return title
+    .replace(/^Demo:\s*our practice dataset says\s*/i, "Practice data says ")
+    .replace(/^Demo:\s*/, "")
+    .replace(/Will the (Lab's )?re-?run agree\?$/i, "Will the Lab agree?");
 }

@@ -83,11 +83,18 @@ function Suggestion({ c, isOwner, onDone }: { c: ScoutCandidate; isOwner: boolea
         <span>{c.runtime === "r4.4" ? "R" : "Python"}</span>
       </div>
       <h3>{d.question || d.title}</h3>
-      <p className="suggestion-score">
-        <b>{d.relatability} of 10</b> for relatability, {d.topic}. {d.relatability_why}
-        {c.attention && ` ${c.attention.label} (${c.attention.source}).`}
-      </p>
-      <p>{d.statement}</p>
+      <div className="suggestion-score">
+        <span className="relate" role="img" aria-label={`${d.relatability} of 10 for how much people would care`}>
+          {Array.from({ length: 10 }, (_, i) => (
+            <i key={i} className={i < d.relatability ? "on" : ""} />
+          ))}
+        </span>
+        <span>
+          <b>{d.relatability}/10</b> {d.topic}
+          {c.attention && `, ${c.attention.label}`}
+        </span>
+      </div>
+      <p className="suggestion-why">{d.relatability_why}</p>
       <dl className="receipt-lines">
         <div>
           <dt>Number to check</dt>
@@ -105,9 +112,10 @@ function Suggestion({ c, isOwner, onDone }: { c: ScoutCandidate; isOwner: boolea
       <p className="suggestion-links">
         <a href={c.paperUrl}>Read the paper</a> <a href={d.repo_url}>See the code</a>
       </p>
-      {d.notes && <p className="suggestion-note">AI note: {d.notes}</p>}
       <details>
-        <summary>Why the scout suggested this</summary>
+        <summary>The full claim and the scout&apos;s notes</summary>
+        <p>{d.statement}</p>
+        {d.notes && <p className="suggestion-note">AI note: {d.notes}</p>}
         <ul>
           {c.reasons.map((r) => (
             <li key={r}>{r}</li>
@@ -211,17 +219,39 @@ export default function ScoutPage() {
   return (
     <>
       <h1 className="page-title">The scout finds. A person decides.</h1>
-      <p className="lede">Twice a day, an AI agent looks for published research with code and data anyone can retrace, and drafts a claim for each paper that passes its checks. Nothing goes live until a person approves it.</p>
-      <p className="hint">{scout.data?.lastScanAt ? `Last scan: ${new Date(scout.data.lastScanAt).toLocaleString()}. ` : ""}It reads replication code on everyday topics from GitHub, the journal ReScience C and Hugging Face Papers. It never runs anyone&apos;s code.</p>
+      <p className="lede">Twice a day an AI goes looking for research that shares its code and data. Nothing goes live until a person says yes.</p>
+      <div className="scout-status">
+        {scout.data?.lastScanAt && (
+          <span className="scout-pill scout-pill--live">
+            <i aria-hidden="true" /> Last scan {relativeTime(Math.floor(Date.parse(scout.data.lastScanAt) / 1000))}
+          </span>
+        )}
+        {all.length > 0 && <span className="scout-pill">{all.length} papers read</span>}
+        <span className="scout-pill">Never runs anyone&apos;s code</span>
+      </div>
+      <ol className="scout-steps">
+        <li>
+          <b>Reads</b>
+          <span>Papers with open code, from GitHub, ReScience C and Hugging Face</span>
+        </li>
+        <li>
+          <b>Checks</b>
+          <span>Two AIs must pick the same number from the paper</span>
+        </li>
+        <li>
+          <b>Waits</b>
+          <span>A person approves it before anyone can forecast</span>
+        </li>
+      </ol>
 
       {all.length > 0 && (
         <section className="section">
           <div className="section-head">
             <h2 className="big-head">Most papers can&apos;t be retraced</h2>
           </div>
-          <p className="lede">Of the {all.length} papers read so far, here&apos;s where each one stopped. Being turned down says nothing about the research. It means the Lab can&apos;t test it fairly, so the scout moves on.</p>
+          <p className="lede">Each slip is a paper. A no isn&apos;t a judgement on the research, only that the Lab can&apos;t test it fairly.</p>
           <ScoutSieve candidates={all} />
-          <p className="hint">Interest only decides which paper a person reviews first. Citations and an AI&apos;s score of how much people would care put the widely known papers on top, and neither can touch a verdict.</p>
+          <p className="hint">Popularity only sets the order a person reviews in. It can&apos;t touch a verdict.</p>
         </section>
       )}
 
@@ -243,7 +273,7 @@ export default function ScoutPage() {
           <div className="section-head">
             <h2>Opening soon</h2>
           </div>
-          <p className="hint">The approver passed these. Each stays closed for 6 hours, so the site&apos;s owner can cancel it first.</p>
+          <p className="hint">Each waits 6 hours, so the owner can still cancel it.</p>
           <ul className="opening-list">
             {opening.map((o) => (
               <OpeningSoon key={o.marketId} {...o} isOwner={isOwner} onDone={refreshWaiting} />

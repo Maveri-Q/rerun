@@ -89,6 +89,12 @@ describe("what gets listed", () => {
   it("names a claim without its label", () => {
     expect(claimName({ spec: { spec_hash: "unknown", title: "[DEMO] A sample model" } })).toBe("A sample model");
   });
+
+  it("words demo titles the site's way, never 'rerun'", () => {
+    const title = "Demo: our practice dataset says sunny days sell 20% more ice cream. Will the Lab's rerun agree?";
+    expect(claimName({ spec: { spec_hash: "unknown", title } })).toBe("Practice data says sunny days sell 20% more ice cream. Will the Lab agree?");
+    expect(claimName({ spec: { spec_hash: "unknown", title: "Demo: our practice dataset says X. Will the re-run agree?" } })).toBe("Practice data says X. Will the Lab agree?");
+  });
 });
 
 describe("the sentence on a claim with a posted result", () => {

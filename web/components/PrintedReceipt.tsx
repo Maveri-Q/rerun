@@ -2,7 +2,7 @@
 
 import { APP_NAME } from "@rerun/shared/browser";
 import Link from "next/link";
-import { useId } from "react";
+import { PunchGlyph, type PunchTone } from "./PunchMark";
 import { verdictWords, type Outcome } from "@/lib/market";
 
 /** Bars taken from the claim's real fingerprint, so every receipt's barcode is its own. */
@@ -25,37 +25,15 @@ function Barcode({ hash }: { hash: string }) {
   );
 }
 
-/** The hole each verdict punches, drawn as a thick stroke in a 64 by 64 box. */
-const PUNCH: Record<"good" | "bad" | "unsure", string> = {
-  good: "M15 34 L27 46 L50 20",
-  bad: "M19 19 L45 45 M45 19 L19 45",
-  unsure: "M17 32 L47 32",
-};
-
 /**
  * The verdict, punched through the receipt like a ticket. The hole is shaped like the verdict: a tick
  * when the result holds up, a cross when it doesn't, a dash when there's no verdict. The punched-out
- * chip falls away, and the words print beside it in plain thermal black. Behind a tick, the stage's
- * mint light shows through.
+ * chip falls away, and the words print beside it in plain thermal black.
  */
-function Punch({ tone, words }: { tone: "good" | "bad" | "unsure"; words: string }) {
-  const d = PUNCH[tone];
-  const clip = `punch-${useId().replace(/:/g, "")}`;
+function Punch({ tone, words }: { tone: PunchTone; words: string }) {
   return (
-    <span className={`punch punch--${tone}`}>
-      <svg className="punch-hole" viewBox="0 0 64 64" aria-hidden="true">
-        <defs>
-          <mask id={clip} maskUnits="userSpaceOnUse" x="0" y="0" width="64" height="64">
-            <path d={d} className="punch-shape" />
-          </mask>
-        </defs>
-        <path className="punch-lip" d={d} />
-        <g mask={`url(#${clip})`} className="punch-cut">
-          <path className="punch-shadow" d={d} />
-          <path className="punch-void" d={d} />
-        </g>
-        <path className="punch-chip" d={d} />
-      </svg>
+    <span className="punch">
+      <PunchGlyph tone={tone} className="punch-hole" chip />
       <strong className="punch-words">{words}</strong>
     </span>
   );

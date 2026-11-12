@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Funnel_Display, Funnel_Sans, Geist_Mono, Space_Grotesk } from "next/font/google";
+import { Funnel_Display, Funnel_Sans, Geist_Mono, Unbounded } from "next/font/google";
 import { BigFoot } from "@/components/BigFoot";
 import { Providers } from "@/components/Providers";
 import { Topbar } from "@/components/Topbar";
@@ -10,7 +10,8 @@ import "./globals.css";
 const display = Funnel_Display({ subsets: ["latin"], variable: "--font-funnel-display", display: "swap" });
 const sans = Funnel_Sans({ subsets: ["latin"], variable: "--font-funnel-sans", display: "swap" });
 const mono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono", display: "swap" });
-const wordmark = Space_Grotesk({ subsets: ["latin"], weight: "700", variable: "--font-wordmark", display: "swap" });
+/** Headings and the wordmark. Funnel Display stays for what is printed on paper: receipts and the machine. */
+const headline = Unbounded({ subsets: ["latin"], variable: "--font-display", display: "swap" });
 
 export const metadata: Metadata = {
   metadataBase: new URL(BRAND.siteUrl),
@@ -34,7 +35,7 @@ const NO_SCRIPT_STYLE = '[style*="opacity:0"]{opacity:1!important;transform:none
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${display.variable} ${sans.variable} ${mono.variable} ${wordmark.variable}`}>
+    <html lang="en" className={`${display.variable} ${sans.variable} ${mono.variable} ${headline.variable}`}>
       <body>
         <style dangerouslySetInnerHTML={{ __html: BRAND_COLORS }} />
         <noscript>

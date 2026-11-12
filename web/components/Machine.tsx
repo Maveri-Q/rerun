@@ -527,7 +527,7 @@ export function Machine() {
               {intro ? (
                 <>
                   <h1>One claim goes in. A receipt comes out.</h1>
-                  <p>Many published results don&apos;t hold up, but checking takes months and nobody is paid to do it. So we built a machine that does. Scroll, and follow one claim all the way through. <span className="machine-hint" aria-hidden="true">↓</span></p>
+                  <p>Many published results don&apos;t hold up, but checking takes months and nobody is paid to do it. So we built a machine that retraces them on secure hardware, while people forecast the result. Scroll, and follow one claim all the way through. <span className="machine-hint" aria-hidden="true">↓</span></p>
                 </>
               ) : (
                 <>
