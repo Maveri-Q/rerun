@@ -11,8 +11,8 @@ const VERDICTS = [
 ];
 
 const SOURCES = [
-  { who: "Famous papers we picked", text: "Well-known results, rerun from public data, like the minimum wage study and the debt paper that shaped budget cuts." },
-  { who: "The scout", text: "An AI agent reads new research twice a day, checks that it can be rerun, and drafts a claim. It finds the paper's number, and a second AI must find the same one." },
+  { who: "Famous papers we picked", text: "Well-known results, retraced from public data, like the minimum wage study and the debt paper that shaped budget cuts." },
+  { who: "The scout", text: "An AI agent reads new research twice a day, checks that it can be retraced, and drafts a claim. It finds the paper's number, and a second AI must find the same one." },
   { who: "Anyone", text: "Suggest a paper, or fill in a claim yourself with the code, the data and the number." },
 ];
 
@@ -148,7 +148,7 @@ export function VerdictFan() {
 
 const WORDS = [
   { word: "Claim", text: "A research finding being tested, such as \"raising the minimum wage didn't cost jobs\"." },
-  { word: "Allowed margin", text: "How close the rerun must get. If a paper says 2.76 jobs and the margin is 0.05, anything from 2.71 to 2.81 counts." },
+  { word: "Allowed margin", text: "How close the Lab's number must get. If a paper says 2.76 jobs and the margin is 0.05, anything from 2.71 to 2.81 counts." },
   { word: "Forecast", text: "Your prediction. Buying YES means you expect the claim to hold up, and buying NO means you don't." },
   { word: "Shares", text: "What a forecast buys. A winning share pays 1 point or 1 tUSDC, and a losing share pays nothing." },
   { word: "Chance", text: "The price of a YES share, which is what forecasters collectively think is likely. It moves as people buy." },

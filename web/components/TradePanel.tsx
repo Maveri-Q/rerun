@@ -82,7 +82,7 @@ export function TradePanel({ market, config, position, contract, onDone }: { mar
         wallet.call("sell", { market_id: market.id, outcome: side, shares: parsed.toString(), min_collateral_out: minOut.toString() }, { deposit: STORAGE_NEAR(), gasFree: market.mode === "points" }),
       );
     }
-    const label = `Bought ${side} with ${amount} ${unit}. Forecasting ends ${relativeTime(market.lock_time)}, then the Lab reruns the claim. If ${side} wins, collect from this page or your Portfolio.`;
+    const label = `Bought ${side} with ${amount} ${unit}. Forecasting ends ${relativeTime(market.lock_time)}, then the Lab retraces the claim. If ${side} wins, collect from this page or your Portfolio.`;
     if (market.mode === "points") {
       return run("Buying…", label, () =>
         wallet.call("buy", { market_id: market.id, outcome: side, amount: parsed.toString(), min_shares_out: minOut.toString() }, { deposit: STORAGE_NEAR(), gasFree: true }),

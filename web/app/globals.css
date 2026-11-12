@@ -3266,104 +3266,90 @@ a {
 }
 
 /*
- * The verdict as a two-pass press run. The pale first impression is the paper's claim; the inked second
- * pass is the Lab's rerun. Holds up: the second pass lands on the first, "in register", and the two
- * crosshairs meet. Doesn't hold up: it lands off by an amount that grows with the miss. Inconclusive:
- * the ink smears. Ink overprints (multiply), so where the passes overlap you see both.
+ * The verdict, punched through the receipt like a ticket. The hole's shape is the verdict; the paper
+ * edge around it catches a little shade; the chip falls away when the receipt finishes printing.
+ * Through a tick, the stage's mint shows; through a cross, the black stage; through a dash, dark grey.
  */
-.receipt-verdict .register {
-  --ink-color: #1a6b43;
+.receipt-verdict .punch {
+  --hole: var(--black);
   display: flex;
   align-items: center;
   gap: 12px;
-  /* Room for the crosshair to land off-register without leaving the paper. */
-  margin: 10px 18px 2px 2px;
+  margin-top: 8px;
 }
-.receipt-verdict .register--bad {
-  --ink-color: #a8261d;
+.receipt-verdict .punch--good {
+  --hole: var(--mint);
 }
-.receipt-verdict .register--unsure {
-  --ink-color: #8a5a00;
+.receipt-verdict .punch--bad {
+  --hole: #1d1f1d;
 }
-.receipt-verdict .register-pass {
-  display: grid;
-  min-width: 0;
-  rotate: -2deg;
+.receipt-verdict .punch--unsure {
+  --hole: #3a3d3a;
 }
-.register-ghost,
-.receipt-verdict .register-ink {
-  grid-area: 1 / 1;
-  display: block;
-  margin: 0;
-  padding: 7px 10px 8px;
-  border: 3px solid;
-  border-radius: 5px;
-  font: 600 27px/1.02 var(--font-funnel-display), sans-serif;
-  letter-spacing: 0.01em;
-  text-wrap: balance;
-}
-.receipt-verdict .register-ghost {
-  display: block;
-  color: #c9cdd0;
-  border-color: #c9cdd0;
-}
-.receipt-verdict .register-ink {
-  color: var(--ink-color);
-  border-color: var(--ink-color);
-  mix-blend-mode: multiply;
-  translate: var(--dx) var(--dy);
-  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='120'%3E%3Cfilter id='i'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -3.4 2.75'/%3E%3C/filter%3E%3Crect width='260' height='120' filter='url(%23i)'/%3E%3C/svg%3E");
-  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='120'%3E%3Cfilter id='i'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -3.4 2.75'/%3E%3C/filter%3E%3Crect width='260' height='120' filter='url(%23i)'/%3E%3C/svg%3E");
-}
-.register--bad .register-ink {
-  rotate: 1.5deg;
-}
-.register--unsure .register-ink {
-  filter: blur(0.5px);
-  text-shadow: 2px 0 0 color-mix(in srgb, var(--ink-color) 45%, transparent), 4px 0 0 color-mix(in srgb, var(--ink-color) 18%, transparent);
-}
-.register-mark {
+.punch-hole {
   flex: none;
-  width: 26px;
-  height: 26px;
+  width: 64px;
+  height: 64px;
   overflow: visible;
 }
-.register-mark g {
+.punch-hole path {
   fill: none;
-  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
-.register-mark-paper {
-  stroke: #b9bec2;
+/* The hole's exact shape, as a mask, so the shadow and the light behind stay inside it. */
+.punch-shape {
+  stroke: #fff;
+  stroke-width: 12;
 }
-.register-mark-ink {
-  stroke: var(--ink-color);
-  mix-blend-mode: multiply;
-  translate: var(--dx) var(--dy);
+.punch-lip {
+  stroke: #e2dfd4;
+  stroke-width: 15.5;
+}
+.punch-shadow {
+  stroke: #000;
+  stroke-width: 12;
+}
+/* Light falls from the top left, so the hole's top-left wall is in shadow. */
+.punch-void {
+  stroke: var(--hole);
+  stroke-width: 12;
+  translate: 2.2px 2.6px;
+}
+.punch-chip {
+  stroke: var(--paper);
+  stroke-width: 12;
+  opacity: 0;
+}
+.receipt-verdict .punch-words {
+  display: block;
+  margin: 0;
+  font: 700 23px/1 var(--font-funnel-display), sans-serif;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  color: var(--paper-ink);
+  text-wrap: balance;
 }
 
-/* The paper's impression appears as the feed stops; the Lab's pass drops, then settles in or slips out. */
-.receipt-paper--print .register-ghost {
-  animation: register-ghost 280ms ease-out 1550ms both;
+/* As the feed stops: the punch bites (the paper takes the hit), the chip drops out, the words print. */
+.receipt-paper--print .punch-chip {
+  animation: punch-chip 760ms cubic-bezier(0.45, 0, 0.85, 0.4) 1600ms both;
 }
-.receipt-paper--print .register-ink,
-.receipt-paper--print .register-mark-ink {
-  animation: register-in 900ms cubic-bezier(0.3, 0, 0.2, 1) 1900ms both;
+.receipt-paper--print .punch-lip,
+.receipt-paper--print .punch-cut {
+  animation: punch-open 1ms linear 1600ms both;
 }
-.receipt-paper--print .register--bad .register-ink,
-.receipt-paper--print .register--bad .register-mark-ink {
-  animation-name: register-out;
-}
-.receipt-paper--print .register--unsure .register-ink {
-  animation-name: register-smear;
-}
-.receipt-paper--print .register-mark-paper {
-  animation: register-ghost 280ms ease-out 1650ms both;
+.receipt-paper--print .punch-words {
+  animation: punch-print 420ms steps(6, end) 1750ms both;
 }
 .receipt-paper--print .receipt-verdict {
-  animation: stamp-thunk 200ms ease-out 2080ms;
+  animation: stamp-thunk 200ms ease-out 1600ms;
+}
+.receipt-paper--print .punch--good .punch-void {
+  animation: punch-light 900ms ease-out 1900ms both;
 }
 
-@keyframes register-ghost {
+@keyframes punch-open {
   from {
     opacity: 0;
   }
@@ -3371,61 +3357,39 @@ a {
     opacity: 1;
   }
 }
-/* Lands a little off, holds, then slides into register. */
-@keyframes register-in {
+@keyframes punch-chip {
   0% {
-    opacity: 0;
-    scale: 1.6;
-    translate: 6px -16px;
-  }
-  22% {
     opacity: 1;
-    scale: 0.98;
-    translate: 6px -4px;
+    translate: 0 0;
+    rotate: 0deg;
+    filter: drop-shadow(0 0 0 rgb(0 0 0 / 0));
   }
-  27%,
-  55% {
-    scale: 1;
-    translate: 6px -4px;
+  12% {
+    opacity: 1;
+    translate: -1px -3px;
+    filter: drop-shadow(1px 2px 1px rgb(0 0 0 / 0.35));
   }
   100% {
-    translate: 0 0;
+    opacity: 0;
+    translate: 10px 90px;
+    rotate: 70deg;
+    filter: drop-shadow(2px 4px 2px rgb(0 0 0 / 0.3));
   }
 }
-/* Lands close, holds, then slips to where its number really fell. */
-@keyframes register-out {
-  0% {
-    opacity: 0;
-    scale: 1.6;
-    translate: 2px -16px;
+@keyframes punch-print {
+  from {
+    clip-path: inset(0 0 100% 0);
   }
-  22% {
-    opacity: 1;
-    scale: 0.98;
-    translate: 2px -2px;
-  }
-  27%,
-  55% {
-    scale: 1;
-    translate: 2px -2px;
-  }
-  100% {
-    translate: var(--dx) var(--dy);
+  to {
+    clip-path: inset(0 0 0 0);
   }
 }
-@keyframes register-smear {
-  0% {
-    opacity: 0;
-    scale: 1.6;
-    translate: 0 -16px;
+@keyframes punch-light {
+  from {
+    stroke: var(--black);
   }
-  22% {
-    opacity: 1;
-    scale: 0.98;
-    translate: 0 0;
-  }
-  27% {
-    scale: 1;
+  to {
+    stroke: var(--mint);
   }
 }
 
@@ -3442,19 +3406,19 @@ a {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .receipt-paper--print .register-ghost,
-  .receipt-paper--print .register-ink,
-  .receipt-paper--print .register-mark-ink,
-  .receipt-paper--print .register-mark-paper,
+  .receipt-paper--print .punch-chip,
+  .receipt-paper--print .punch-lip,
+  .receipt-paper--print .punch-cut,
+  .receipt-paper--print .punch-void,
+  .receipt-paper--print .punch-words,
   .receipt-paper--print .receipt-verdict {
     animation: none;
   }
 }
 
 @media (max-width: 420px) {
-  .register-ghost,
-  .receipt-verdict .register-ink {
-    font-size: 23px;
+  .receipt-verdict .punch-words {
+    font-size: 20px;
   }
 }
 

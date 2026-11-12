@@ -256,7 +256,7 @@ export function rangeText(reported: string, kind: string, value: string): string
 }
 
 const OUTCOME_MEANING: Record<Outcome, string> = {
-  REPRODUCED: "The Lab reran the code and data and got a number inside the claim's range. YES wins.",
+  REPRODUCED: "The Lab retraced the code and data and got a number inside the claim's range. YES wins.",
   NOT_REPRODUCED: "The code ran, but the number came out outside the claim's range. NO wins.",
   BROKEN: "The code ran past its time limit. NO wins.",
   INVALID: "The test couldn't be run fairly, for example because the data changed. Every share pays back half.",
@@ -275,7 +275,7 @@ const STATE_LABEL: Record<State, string> = {
   Draft: "Not open yet",
   Open: "Open for forecasts",
   Locked: "Forecasting has ended, waiting for the Lab",
-  Running: "The Lab is rerunning this",
+  Running: "The Lab is retracing this",
   Proposed: "Result posted, can still be challenged",
   Challenged: "Challenged, the Lab is checking again",
   Final: "Settled",

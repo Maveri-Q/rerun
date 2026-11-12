@@ -20,7 +20,7 @@ export default function TermsPage() {
       </ul>
 
       <h2>How results are decided</h2>
-      <p>The rule set when a claim is posted decides its result, by comparing the rerun&apos;s number with the allowed margin. Anyone can challenge a result during the challenge window. Once it&apos;s final, the contract has no way to change it, even for us. We can pause new forecasts, but a pause can&apos;t stop you collecting.</p>
+      <p>The rule set when a claim is posted decides its result, by comparing the Lab&apos;s number with the allowed margin. Anyone can challenge a result during the challenge window. Once it&apos;s final, the contract has no way to change it, even for us. We can pause new forecasts, but a pause can&apos;t stop you collecting.</p>
 
       <h2>What this isn&apos;t</h2>
       <p>Nothing here is financial, legal or scientific advice. A result says whether one number came out the same when the code and data were rerun. It doesn&apos;t say whether a study is right, or that its authors did anything wrong.</p>

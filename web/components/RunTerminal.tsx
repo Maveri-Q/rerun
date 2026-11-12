@@ -31,7 +31,7 @@ export function RunTerminal({ events, status, waitingText }: { events: StageEven
   const barText = status === "offline" ? "Lab not reachable" : finished ? "Run finished" : events.length ? "Running now" : status === "live" ? "Connected to the Lab" : "Connecting to the Lab";
 
   return (
-    <div className="terminal" ref={box} aria-live="polite" aria-label="Live rerun log" tabIndex={0}>
+    <div className="terminal" ref={box} aria-live="polite" aria-label="Live Lab log" tabIndex={0}>
       <div className="terminal-bar">
         <span>
           {status === "live" && !finished && <span className="live-dot" aria-hidden="true" />}

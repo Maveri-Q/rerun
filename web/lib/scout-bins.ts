@@ -1,6 +1,6 @@
 export const BINS: { label: string; why: string; test: RegExp }[] = [
   { label: "No code to run", why: "The paper doesn't point to a GitHub repository.", test: /doesn't link to a GitHub/i },
-  { label: "No licence", why: "Without an open licence, we can't rerun and publish it.", test: /licen[cs]e/i },
+  { label: "No licence", why: "Without an open licence, we can't retrace and publish it.", test: /licen[cs]e/i },
   { label: "Needs a graphics card", why: "The Lab only has ordinary processors.", test: /graphics card|gpu/i },
   { label: "Wrong language", why: "The Lab runs Python and R. MATLAB and C++ are out.", test: /^Mostly |only runs Python/i },
   { label: "Too big", why: "It wouldn't finish in a short, cheap run.", test: /too big/i },

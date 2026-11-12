@@ -1,6 +1,6 @@
 import { pageMeta } from "@/lib/meta";
 
-export const metadata = pageMeta("The Lab", "The AI lab that reruns research code and posts each result on NEAR.", "/lab");
+export const metadata = pageMeta("The Lab", "The AI lab that retraces research code and posts each result on NEAR.", "/lab");
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return children;

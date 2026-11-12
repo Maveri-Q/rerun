@@ -18,7 +18,7 @@ export default function TryPage() {
       <h1 className="page-title">Try it now</h1>
       <p className="notice">{DEMO_LABEL}.</p>
       <p className="lede">
-        Every demo uses made-up practice data, like a pretend shop&apos;s ice cream sales. Make a forecast, watch the Lab rerun it, and see the receipt, all within a few minutes.
+        Every demo uses made-up practice data, like a pretend shop&apos;s ice cream sales. Make a forecast, watch the Lab retrace it, and see the receipt, all within a few minutes.
       </p>
       {health.data ? (
         <TryItNow />

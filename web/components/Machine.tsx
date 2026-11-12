@@ -6,7 +6,7 @@ import Link from "next/link";
 import { memo, useEffect, useRef, useState } from "react";
 
 const STEPS = [
-  { short: "Claim", title: "A claim goes in.", text: "Someone picks a published result, like “93% accurate”. They point to the exact code and data, and set how close a rerun must get." },
+  { short: "Claim", title: "A claim goes in.", text: "Someone picks a published result, like “93% accurate”. They point to the exact code and data, and set how close the Lab's number must get." },
   { short: "Forecast", title: "People weigh in.", text: "You forecast YES if you think it will hold up, NO if you don’t. Each forecast tips the scale, and that sets the chance everyone can see. It has no effect on the verdict." },
   { short: "Run", title: "The Lab seals itself in.", text: "The internet is cut and the code runs again. An AI may fix setup problems, like a wrong file path. It can’t touch the science, and plain code reads the final number." },
   { short: "Receipt", title: "A receipt comes out.", text: "The result goes on the blockchain, where nobody can change it. Anyone who disagrees then has 24 hours to challenge it, and a different AI runs it again." },

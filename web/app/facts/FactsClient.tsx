@@ -51,11 +51,11 @@ export default function FactsPage() {
 
   return (
     <div className="facts-page">
-      <h1 className="page-title">The Lab reran the research. Here&apos;s what happened.</h1>
-      <p className="lede">What each study said, and whether the Lab&apos;s rerun agreed. Every result links to proof you can check yourself.</p>
+      <h1 className="page-title">The Lab retraced the research. Here&apos;s what it found.</h1>
+      <p className="lede">What each study said, and whether the Lab got the same answer. Every result links to proof you can check yourself.</p>
       {markets.data && checked.length > 0 && (
         <p className="tally">
-          <span><b>{checked.length}</b> rerun</span>
+          <span><b>{checked.length}</b> retraced</span>
           <span className="tally--good"><b>{held}</b> held up</span>
           <span className="tally--bad"><b>{fell}</b> didn&apos;t</span>
           {unsure > 0 && <span><b>{unsure}</b> no verdict</span>}

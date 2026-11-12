@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ChallengeStory, ClaimSources, SelfCheck, VerdictFan, WhoDoesWhat, WordPrinter } from "@/components/HowExtras";
 import { Machine } from "@/components/Machine";
 
-export const metadata = pageMeta("How it works", "How a claim becomes a forecast, a rerun, a public receipt and a payout, and what each word on this site means.", "/how");
+export const metadata = pageMeta("How it works", "How a claim becomes a forecast, the Lab's retrace, a public receipt and a payout, and what each word on this site means.", "/how");
 
 export default function HowPage() {
   return (
@@ -53,7 +53,7 @@ export default function HowPage() {
         </div>
         <div>
           <h2>What it can&apos;t tell you</h2>
-          <p>Whether the science is true. A study can reproduce and still reach a wrong conclusion. It also can&apos;t rerun a physical experiment like a drug trial, though it can re-check the analysis when the data and code are available.</p>
+          <p>Whether the science is true. A study can reproduce and still reach a wrong conclusion. It also can&apos;t repeat a physical experiment like a drug trial, though it can re-check the analysis when the data and code are available.</p>
           <p>
             Only have the paper? <Link href="/check">Check its printed numbers</Link> with no code at all.
           </p>

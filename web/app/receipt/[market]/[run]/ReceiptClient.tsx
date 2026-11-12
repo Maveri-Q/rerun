@@ -81,7 +81,7 @@ export default function ReceiptPage({ params }: { params: Promise<{ market: stri
 
       <section className="verify-yourself">
         <h2>Check this yourself</h2>
-        <p>You don&apos;t have to trust us or the <Hint term="hardware">secure hardware</Hint>. With Docker and Node installed, this reruns the claim on your own computer and compares the number:</p>
+        <p>You don&apos;t have to trust us or the <Hint term="hardware">secure hardware</Hint>. With Docker and Node installed, this retraces the claim on your own computer and compares the number:</p>
         <pre className="log">{`git clone <this repository> && cd ${APP_NAME.toLowerCase()} && pnpm install && pnpm sandbox:build\npnpm verify-claim ${m.id}`}</pre>
       </section>
 

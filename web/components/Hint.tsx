@@ -5,7 +5,7 @@ import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "re
 /** The words readers ask about, in the same terms as the list on /how. */
 export const HINTS = {
   receipt: "The Lab's permanent public record of what it ran and what it found.",
-  margin: "How close the rerun must get. If a paper says 2.76 jobs and the margin is 0.05, anything from 2.71 to 2.81 counts.",
+  margin: "How close the Lab's number must get. If a paper says 2.76 jobs and the margin is 0.05, anything from 2.71 to 2.81 counts.",
   hardware: "A protected part of a computer. It proves what code is running there, and keeps data hidden, even from whoever runs the computer. Engineers call it a TEE.",
   proof: "A signed note from the chip makers, Intel and NVIDIA, saying the AI really ran on secure hardware. Engineers call it an attestation.",
   inconclusive: "The test couldn't be run fairly: the software wouldn't run, the data was missing, or an independent rebuild disagreed. None of that counts against the paper, and every share pays back half.",

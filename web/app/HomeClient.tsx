@@ -56,7 +56,7 @@ export default function Home() {
         <div className="hero-copy">
           <h1>Will this research hold up?</h1>
           <p className="lede">
-            Many published results don&apos;t. Here you predict which ones will, then the Lab, an AI agent, reruns the code and data behind them and prints public proof.
+            Many published results don&apos;t. Here you predict which ones will, then the Lab, an AI agent, retraces the code and data behind them and prints public proof.
           </p>
           <div className="hero-actions">
             <a className="btn" href="#claims">
@@ -123,7 +123,7 @@ export default function Home() {
             </li>
             <li>
               <h3>The Lab checks it</h3>
-              <p>The Lab reruns the code with the internet cut off. You can watch it live.</p>
+              <p>The Lab retraces the study with the internet cut off. You can watch it live.</p>
             </li>
             <li>
               <h3>Winners collect</h3>

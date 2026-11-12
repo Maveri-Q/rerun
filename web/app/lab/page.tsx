@@ -68,7 +68,7 @@ export default function LabPage() {
       <div className="lab-hero">
         <div>
           <h1 className="page-title">The Lab works with the door shut.</h1>
-          <p className="lede">The Lab is an AI agent that reruns a claim&apos;s code and data in a locked box with the internet cut off. The AI can only fix setup problems. Plain code reads the number and decides the verdict.</p>
+          <p className="lede">The Lab is an AI agent that retraces a claim&apos;s code and data in a locked box with the internet cut off. The AI can only fix setup problems. Plain code reads the number and decides the verdict.</p>
           <p className={`lab-status ${online ? "is-online" : ""}`} role="status">
             <span className={online ? "live-dot" : "lab-dot"} />
             {online ? `Online, using ${health.data!.model}${health.data!.mock_llm ? " (scripted test AI)" : ""}` : "Offline right now. Finished results below still stand."}
