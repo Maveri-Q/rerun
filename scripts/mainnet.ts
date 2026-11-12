@@ -314,8 +314,37 @@ async function main() {
       ]);
       return;
     }
+    case "collect": {
+      // After a claim is final: the home account takes back its prize pool share, then withdraws its USDC.
+      const id = Number(args[0]);
+      if (!Number.isInteger(id)) throw new Error("Usage: pnpm mainnet collect <claim id> [--send]");
+      const m = await view<{ state: string; outcome: string | null } | null>("get_market", { market_id: id });
+      if (!m) throw new Error(`There's no claim ${id}.`);
+      const usdc = async () => Number(await view<string>("ft_balance_of", { account_id: HOME }, USDC)) / 1e6;
+      const inside = async () => Number(await view<string>("get_balance", { account_id: HOME, mode: "money" })) / 1e6;
+      const pos = await view<{ yes: string; no: string; lp: string } | null>("get_position", { account_id: HOME, market_id: id });
+      console.log(`Claim ${id}: ${m.state}${m.outcome ? `, ${m.outcome}` : ""}. ${HOME} holds ${await usdc()} USDC, ${await inside()} USDC inside RERUN, position ${JSON.stringify(pos)}.`);
+      const plan: string[] = [];
+      const acts: ReturnType<typeof actions.transfer>[] = [];
+      if (m.state !== "Final") {
+        plan.push(`finalize(${id})`);
+        acts.push(actions.functionCall("finalize", { market_id: id }, 50n * TGAS, 0n));
+      }
+      if (pos && [pos.yes, pos.no, pos.lp].some((v) => v !== "0")) {
+        plan.push(`redeem(${id}): its prize pool share and any winning shares`);
+        acts.push(actions.functionCall("redeem", { market_id: id }, 100n * TGAS, nearToYocto("0.01")));
+      }
+      if (acts.length) await transaction(HOME, ACCOUNTS.contract, plan, acts);
+      if (!send && acts.length) return;
+      await transaction(HOME, ACCOUNTS.contract, [`withdraw all of ${HOME}'s USDC inside RERUN to its wallet`], [actions.functionCall("withdraw", {}, 100n * TGAS, 1n)]);
+      if (send) {
+        await new Promise((r) => setTimeout(r, 3000));
+        console.log(`${HOME} now holds ${await usdc()} USDC.`);
+      }
+      return;
+    }
     default:
-      console.log("Steps: key, status, home, contract, relayer, fan, lab <key>, setup, post, fund. See the top of scripts/mainnet.ts.");
+      console.log("Steps: key, status, home, contract, relayer, fan, lab <key>, setup, post, fund, collect. See the top of scripts/mainnet.ts.");
   }
 }
 
