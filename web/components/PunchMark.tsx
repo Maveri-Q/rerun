@@ -37,28 +37,3 @@ export function PunchGlyph({ tone, className, chip = false }: { tone: PunchTone;
     </svg>
   );
 }
-
-/** A verdict on a small ticket for lists: the same punch as the receipt, on a stub of the same paper. */
-export function PunchTicket({ tone, label }: { tone: PunchTone; label: string }) {
-  return (
-    <span className="punch-ticket" role="img" aria-label={label}>
-      <PunchGlyph tone={tone} />
-    </span>
-  );
-}
-
-/** The forecast for an open claim, as a ring that fills with the chance it holds up. */
-export function ChanceGauge({ ppm }: { ppm: number }) {
-  const share = Math.min(1, Math.max(0, ppm / 1_000_000));
-  const r = 24;
-  const c = 2 * Math.PI * r;
-  return (
-    <span className="chance-gauge" role="img" aria-label={`${Math.round(share * 100)}% chance it holds up`}>
-      <svg viewBox="0 0 56 56" aria-hidden="true">
-        <circle cx="28" cy="28" r={r} className="chance-track" />
-        <circle cx="28" cy="28" r={r} className="chance-fill" strokeDasharray={`${c * share} ${c}`} transform="rotate(-90 28 28)" />
-      </svg>
-      <b aria-hidden="true">{Math.round(share * 100)}%</b>
-    </span>
-  );
-}

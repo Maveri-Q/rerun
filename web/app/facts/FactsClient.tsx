@@ -25,7 +25,7 @@ function FactCard({ market: m }: { market: Market }) {
         <h2>
           <Link href={`/facts/${m.id}`}>{p.question ?? m.spec.title}</Link>
         </h2>
-        <motion.span className={`fact-stamp fact-stamp--${words?.tone}`} initial={reduce ? false : { scale: 2.4, opacity: 0, rotate: 8 }} whileInView={{ scale: 1, opacity: 1, rotate: -4 }} viewport={{ once: true, amount: 0.8 }} transition={{ type: "spring", stiffness: 520, damping: 22, delay: 0.1 }}>
+        <motion.span className={`fact-stamp fact-stamp--${words?.tone}`} initial={reduce ? false : { scale: 1.8, opacity: 0, rotate: 8 }} whileInView={{ scale: 1, opacity: 1, rotate: -4 }} viewport={{ once: true, amount: 0.2 }} transition={{ type: "spring", stiffness: 520, damping: 22, delay: 0.1 }}>
           {words?.mark} {words?.words}
         </motion.span>
       </div>

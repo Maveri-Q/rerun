@@ -333,9 +333,6 @@ export function resultSentence(m: { state: string; outcome?: string | null; spec
   return `${said} The Lab will retrace it when forecasting closes.`;
 }
 
-/** Just what the study said, in plain words, for lists that show the verdict beside it. */
-export const studySaid = (m: { spec: { spec_hash: string } }): string | null => provenanceOf(m.spec.spec_hash)?.plain?.said ?? null;
-
 /** A claim's name for readers: the question if it has one, otherwise its title without the label. */
 export function claimName(m: { spec: { spec_hash: string; title: string } }): string {
   return provenanceOf(m.spec.spec_hash)?.question ?? plainDemoTitle(m.spec.title.replace(/^\[(DEMO|TEST)\]\s*/, ""));

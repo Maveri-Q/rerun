@@ -4,11 +4,11 @@ import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import Link from "next/link";
 import { useState } from "react";
 import { chain } from "@/lib/chain";
-import { countsIf, isPractice, modeUnit, relativeTime, stateLabel, verdictWords, type Market, type Outcome } from "@/lib/market";
-import { claimName, provenanceOf, studySaid } from "@/lib/provenance";
-import { ChanceGauge, PunchTicket } from "./PunchMark";
+import { countsIf, DEMO_LABEL, isPractice, modeUnit, relativeTime, stateLabel, type Market } from "@/lib/market";
+import { claimName, provenanceOf, resultSentence } from "@/lib/provenance";
 import { RollingNumber } from "./RollingNumber";
 import { ScrubChart, type PricePoint } from "./ScrubChart";
+import { Stamp } from "./Stamp";
 import { usePoll } from "./usePoll";
 
 const SPRING = { type: "spring", stiffness: 420, damping: 38, mass: 0.9 } as const;
@@ -37,39 +37,33 @@ export function MarketTicker({ market }: { market: Market }) {
       ? `Forecasting ends ${relativeTime(market.lock_time)}`
       : stateLabel(market.state);
 
-  // The verdict shows once there is one: final, or posted and still open to challenge.
-  const outcome = (market.outcome ?? receipts.data?.at(-1)?.outcome ?? null) as Outcome | null;
-  const verdict = verdictWords(outcome);
-  const status = verdict
-    ? market.outcome
-      ? "Final"
-      : "Can still be challenged"
-    : market.state === "Open"
-      ? `Forecasting ends ${relativeTime(market.lock_time)}`
-      : stateLabel(market.state);
-
   return (
-    <article className={`ticker ${open ? "ticker--open" : ""} ${verdict ? "ticker--done" : ""}`}>
+    <article className={`ticker ${open ? "ticker--open" : ""}`}>
       <button className="ticker-head" aria-expanded={open} onClick={() => setOpen(!open)}>
-        <span className="ticker-badge">
-          {verdict ? <PunchTicket tone={verdict.tone} label={verdict.words} /> : <ChanceGauge ppm={market.yes_price_ppm} />}
-        </span>
         <span className="ticker-title">
           <span className="ticker-name">
             {provenanceOf(s.spec_hash)?.flagship && <em className="start-here">Start here</em>}
             {provenanceOf(s.spec_hash)?.fragile && <em className="start-here fragile-chip">Fragile</em>}
             {claimName(market)}
           </span>
-          <span className="ticker-meta">{isPractice(market) ? `Claim ${market.id}, made-up practice data` : studySaid(market) ?? countsIf(s.reported_value, s.tolerance_kind, s.tolerance_value)}</span>
+          <span className="ticker-meta">
+            {isPractice(market) ? DEMO_LABEL : resultSentence(market, receipts.data?.at(-1)?.outcome) ?? countsIf(s.reported_value, s.tolerance_kind, s.tolerance_value)}
+          </span>
         </span>
-        {!open && !verdict && (
+        {!open && (
           <span className="ticker-spark">
             <ScrubChart points={points} height={40} compact />
           </span>
         )}
         <span className="ticker-value">
-          {verdict ? <b className={`verdict-word verdict-word--${verdict.tone}`}>{verdict.words}</b> : <b className="verdict-word">{market.state === "Open" ? "Open" : stateLabel(market.state)}</b>}
-          <small>{verdict ? status : market.state === "Open" ? status.replace("Forecasting ends ", "Ends ") : "The Lab is on it"}</small>
+          {market.outcome ? (
+            <Stamp outcome={market.outcome} />
+          ) : (
+            <>
+              <b>{(market.yes_price_ppm / 10_000).toFixed(0)}%</b>
+              <small>chance</small>
+            </>
+          )}
         </span>
       </button>
 

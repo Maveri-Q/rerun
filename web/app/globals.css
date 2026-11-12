@@ -430,11 +430,11 @@ h3 {
 
 .ticker-head {
   display: grid;
-  grid-template-columns: 60px minmax(0, 1fr) 150px minmax(118px, auto);
-  gap: 18px;
+  grid-template-columns: minmax(0, 1fr) 150px minmax(112px, auto);
+  gap: 20px;
   align-items: center;
   width: 100%;
-  padding: 16px 20px 16px 16px;
+  padding: 13px 18px;
   text-align: left;
   background: transparent;
   border: 0;
@@ -452,9 +452,8 @@ h3 {
   transform: none;
 }
 
-.ticker--open .ticker-head,
-.ticker--done .ticker-head {
-  grid-template-columns: 60px minmax(0, 1fr) minmax(118px, auto);
+.ticker--open .ticker-head {
+  grid-template-columns: minmax(0, 1fr) auto;
 }
 
 .ticker-title {
@@ -463,11 +462,11 @@ h3 {
 
 .ticker-name {
   display: block;
-  font-size: 17px;
-  line-height: 1.3;
-  font-weight: 600;
-  color: #fff;
-  text-wrap: balance;
+  font-size: 15.5px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .ticker--open .ticker-name {
@@ -475,113 +474,9 @@ h3 {
 }
 
 .ticker-meta {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  overflow: hidden;
-  margin-top: 4px;
-  font-size: 14.5px;
-  line-height: 1.45;
-  color: #b9beb9;
-}
-
-.ticker--open .ticker-meta {
-  -webkit-line-clamp: unset;
-}
-
-/* The left badge: a punched ticket once there is a verdict, a ring of the forecast while open */
-.ticker-badge {
-  display: grid;
-  place-items: center;
-}
-
-.punch-ticket {
-  --hole: #3a3d3a;
-  position: relative;
-  display: grid;
-  place-items: center;
-  width: 56px;
-  height: 56px;
-  background: var(--paper);
-  border-radius: 6px;
-  /* Ticket notches on both sides, cut by the stage colour */
-  -webkit-mask: radial-gradient(circle 5px at 0 50%, #0000 98%, #000) left / 51% 100% no-repeat,
-    radial-gradient(circle 5px at 100% 50%, #0000 98%, #000) right / 51% 100% no-repeat;
-  mask: radial-gradient(circle 5px at 0 50%, #0000 98%, #000) left / 51% 100% no-repeat,
-    radial-gradient(circle 5px at 100% 50%, #0000 98%, #000) right / 51% 100% no-repeat;
-  rotate: -3deg;
-  transition: rotate 220ms;
-}
-
-.ticker:nth-child(even) .punch-ticket {
-  rotate: 2.5deg;
-}
-
-.ticker:hover .punch-ticket {
-  rotate: 0deg;
-}
-
-.punch-ticket svg {
-  width: 42px;
-  height: 42px;
-  overflow: visible;
-}
-
-.chance-gauge {
-  position: relative;
-  display: grid;
-  place-items: center;
-  width: 56px;
-  height: 56px;
-}
-
-.chance-gauge svg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.chance-track,
-.chance-fill {
-  fill: none;
-  stroke-width: 5;
-}
-
-.chance-track {
-  stroke: var(--line-strong);
-}
-
-.chance-fill {
-  stroke: var(--mint);
-  stroke-linecap: round;
-}
-
-.chance-gauge b {
-  font: 700 13px/1 var(--font-display), sans-serif;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -0.03em;
-}
-
-.verdict-word {
-  color: var(--ink);
-}
-
-.ticker-value .verdict-word {
-  font: 600 15px/1.2 var(--font-display), sans-serif;
-  letter-spacing: -0.02em;
-}
-
-.verdict-word--good {
-  color: #4fd88b;
-}
-
-.verdict-word--bad {
-  color: #ff7a6e;
-}
-
-.verdict-word--unsure {
-  color: var(--ink-2);
+  display: block;
+  font-size: 13px;
+  color: var(--ink-3);
 }
 
 .ticker-spark {
@@ -601,9 +496,8 @@ h3 {
 
 .ticker-value small {
   display: block;
-  margin-top: 5px;
-  font-size: 13px;
-  color: #a3a8a3;
+  font-size: 12px;
+  color: var(--ink-3);
 }
 
 .ticker-body {
@@ -1479,42 +1373,19 @@ details > summary:hover {
     font-size: 13px;
   }
 
+  /* On a phone the title gets the full width; the chance or verdict sits on its own line below. */
   .ticker-head,
-  .ticker--open .ticker-head,
-  .ticker--done .ticker-head {
-    grid-template-columns: 48px minmax(0, 1fr);
-    gap: 4px 14px;
-    padding: 14px 14px 14px 12px;
-    align-items: start;
-  }
-
-  .ticker-badge {
-    grid-row: span 2;
-    padding-top: 2px;
+  .ticker--open .ticker-head {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+    padding: 14px 14px;
   }
 
   .ticker-value {
-    grid-column: 2;
     display: flex;
     align-items: baseline;
     gap: 8px;
     text-align: left;
-    white-space: normal;
-  }
-
-  .ticker-value small {
-    margin: 0;
-  }
-
-  .punch-ticket,
-  .chance-gauge {
-    width: 48px;
-    height: 48px;
-  }
-
-  .punch-ticket svg {
-    width: 36px;
-    height: 36px;
   }
 
   .ticker-spark {
@@ -3452,8 +3323,7 @@ a {
   height: 64px;
   overflow: visible;
 }
-.punch-hole path,
-.punch-ticket path {
+.punch-hole path {
   fill: none;
   stroke-linecap: round;
   stroke-linejoin: round;
@@ -3830,6 +3700,7 @@ a {
 .bigfoot-tagline { max-width: 1320px; margin: 0 auto 28px; font: 600 clamp(16px, 2vw, 26px) / 1.25 var(--font-display), sans-serif; letter-spacing: -0.02em; color: var(--mint); }
 .noscript-note { margin: 0; padding: 10px 16px; font-size: 14px; background: var(--paper); color: var(--paper-ink); }
 .try-recent { margin: 36px 0 0; font-size: 21px; }
-@media (prefers-reduced-motion: reduce) {
-  .punch-ticket { transition: none; }
+/* On a phone the direction gets its own row so its words aren't cut off. */
+@media (max-width: 480px) {
+  .any-chain-form > label:first-child { grid-column: 1 / -1; }
 }
