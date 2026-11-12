@@ -15,6 +15,9 @@ import { verifyLabAttestation } from "../lab/orchestrator/src/tee/verify.ts";
 import { withNetworkRetry } from "../lab/orchestrator/src/nearai/attestation.ts";
 import { Chain, EXPLORER_TX } from "../lab/orchestrator/src/chain/near.ts";
 import { need, testnetChain } from "../lab/orchestrator/src/lab/setup.ts";
+import { loadEnv } from "../lab/orchestrator/src/env.ts";
+
+loadEnv();
 
 const [labUrl, ...flags] = process.argv.slice(2);
 if (!labUrl) {
