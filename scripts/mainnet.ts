@@ -130,7 +130,7 @@ async function main() {
     case "home": {
       if (await exists(HOME)) return console.log(`${HOME} already exists.`);
       const funding = implicitOf(ownerKey());
-      const keep = 0.05;
+      const keep = 0.1; // the 50 TGas attached is prepaid at the gas price, about 0.05 NEAR on its own
       const have = (await exists(funding)) ? Number(yoctoToNear((await provider.viewAccount({ accountId: funding })).amount, 3)) : 0;
       const move = (have - keep).toFixed(2);
       if (Number(move) < 1) {
