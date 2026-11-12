@@ -14,6 +14,11 @@
  *                                        opens a demo claim (made-up data) from the home account, as a draft
  *   pnpm mainnet fund <claim id> [points|money] [--send]
  *                                        funds it: 40 points, or 5 USDC prize pool + 2 bond + 0.5 Lab fee
+ *   pnpm mainnet swap <NEAR> [--send --min <USDC>]
+ *                                        swaps the home account's NEAR for Circle's USDC through NEAR Intents. Without
+ *                                        --send it prints a price only. With --send it takes a fresh quote and refuses it
+ *                                        if the guaranteed USDC is under --min, so it never sends at a worse price than
+ *                                        the one you approved
  */
 import { createHash } from "node:crypto";
 import { appendFileSync, readFileSync } from "node:fs";
@@ -22,6 +27,8 @@ import { specHash, specJson } from "@rerun/shared";
 import { Account, actions, JsonRpcProvider, KeyPair, nearToYocto, PublicKey, yoctoToNear, type KeyPairString } from "near-api-js";
 import { loadDemo, type DemoName } from "../lab/orchestrator/src/demo/fixtures.ts";
 import { loadEnv } from "../lab/orchestrator/src/env.ts";
+import { checkSwapQuote, nearUnits, OFFICIAL_USDC, swapBody, WNEAR } from "../web/lib/intents.ts";
+import { fetchRetry, loadTokens, ONECLICK } from "../web/lib/oneclick.ts";
 
 loadEnv();
 const root = path.resolve(import.meta.dirname, "..");
@@ -37,7 +44,9 @@ const UNIT = 1_000_000n;
 const provider = new JsonRpcProvider({ url: RPC });
 const [step, ...rest] = process.argv.slice(2);
 const send = rest.includes("--send");
-const args = rest.filter((a) => a !== "--send");
+const minAt = rest.indexOf("--min");
+const minUsdc = minAt >= 0 ? rest[minAt + 1] : undefined;
+const args = rest.filter((a, i) => a !== "--send" && a !== "--min" && (minAt < 0 || i !== minAt + 1));
 
 function saveKey(name: string, key: KeyPair) {
   appendFileSync(ENV, `\n${name}=${key.toString()}\n`);
@@ -168,6 +177,62 @@ async function main() {
       const pub = args[0];
       if (!pub || !/^ed25519:[1-9A-HJ-NP-Za-km-z]{43,44}$/.test(pub)) throw new Error("Give the key the mainnet CVM printed: pnpm mainnet lab ed25519:...");
       return subAccount(ACCOUNTS.lab, "0.3", null, pub);
+    }
+    case "swap": {
+      const near = args[0] ?? "";
+      if (nearUnits(near) === null) throw new Error("Give 0.1 to 5 NEAR, with at most 3 decimals: pnpm mainnet swap 3.4");
+      if (OFFICIAL_USDC !== USDC) throw new Error("The USDC address here and in web/lib/intents.ts differ.");
+      if (send && (!minUsdc || !/^\d+(\.\d{1,6})?$/.test(minUsdc))) throw new Error("Add --min <USDC>: the least USDC you accept, from the price you approved.");
+      const ask = async (dry: boolean) => {
+        const sent = swapBody({ account: HOME, near }, await loadTokens(), dry, Date.now());
+        if (!sent) throw new Error("NEAR Intents doesn't list NEAR to Circle's USDC right now.");
+        const res = await fetchRetry(`${ONECLICK}/quote`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(sent) }, dry ? 3 : 1);
+        const quote = res.ok ? checkSwapQuote(await res.json(), sent) : null;
+        if (!quote) throw new Error(`NEAR Intents gave no quote that matches what was asked (HTTP ${res.status}).`);
+        return quote;
+      };
+      const price = await ask(!send);
+      console.log(`\nNEAR Intents quote: ${price.near} NEAR from ${HOME} -> about ${price.usdc} USDC, at least ${price.minUsdc} USDC (1% slippage).`);
+      console.log(`USDC is Circle's ${USDC}. It goes to ${HOME}, and any refund goes back to ${HOME}.`);
+      if (!send) {
+        console.log(`\nNothing signed. To swap: pnpm mainnet swap ${near} --send --min ${price.minUsdc}`);
+        return;
+      }
+      if (Number(price.minUsdc) < Number(minUsdc)) throw new Error(`The live quote guarantees ${price.minUsdc} USDC, under your --min ${minUsdc}. Nothing sent.`);
+      if (Date.parse(price.deadline) < Date.now() + 2 * 60_000) throw new Error("The quote is about to expire. Nothing sent; try again.");
+      const deposit = price.depositAddress!;
+      const owes = async (token: string, account: string): Promise<bigint> => {
+        if (await view<unknown>("storage_balance_of", { account_id: account }, token)) return 0n;
+        return BigInt((await view<{ min: string }>("storage_balance_bounds", {}, token)).min);
+      };
+      const usdcReg = await owes(USDC, HOME);
+      if (usdcReg > 0n) {
+        await transaction(HOME, USDC, [`register ${HOME} with USDC (${yoctoToNear(usdcReg)} NEAR), so the swap can deliver to it`], [actions.functionCall("storage_deposit", { account_id: HOME, registration_only: true }, 30n * TGAS, usdcReg)]);
+      }
+      const [homeReg, depositReg] = [await owes(WNEAR, HOME), await owes(WNEAR, deposit)];
+      // One transaction: wrap exactly the quoted NEAR and send it to the deposit address. If the transfer fails, all of it is undone.
+      await transaction(HOME, WNEAR, [
+        ...(depositReg > 0n ? [`register the deposit address ${deposit} with wNEAR (${yoctoToNear(depositReg)} NEAR)`] : []),
+        `wrap ${price.near} NEAR${homeReg > 0n ? ` (plus ${yoctoToNear(homeReg)} NEAR to register ${HOME} with wNEAR)` : ""}`,
+        `send ${price.near} wNEAR to NEAR Intents' deposit address ${deposit}`,
+      ], [
+        ...(depositReg > 0n ? [actions.functionCall("storage_deposit", { account_id: deposit, registration_only: true }, 30n * TGAS, depositReg)] : []),
+        actions.functionCall("near_deposit", {}, 30n * TGAS, BigInt(price.amountIn) + homeReg),
+        actions.functionCall("ft_transfer", { receiver_id: deposit, amount: price.amountIn }, 50n * TGAS, 1n),
+      ]);
+      console.log("\nWaiting for NEAR Intents to deliver the USDC…");
+      for (let i = 0; i < 60; i++) {
+        await new Promise((r) => setTimeout(r, 10_000));
+        const st = (await fetchRetry(`${ONECLICK}/status?depositAddress=${deposit}`).then((r) => r.json()).catch(() => ({}))) as { status?: string; swapDetails?: { amountOutFormatted?: string; refundedAmountFormatted?: string } };
+        if (st.status && ["SUCCESS", "FAILED", "REFUNDED", "INCOMPLETE_DEPOSIT"].includes(st.status)) {
+          console.log(`Swap ${st.status}. USDC out: ${st.swapDetails?.amountOutFormatted ?? "?"}. Refunded: ${st.swapDetails?.refundedAmountFormatted ?? "nothing"}.`);
+          break;
+        }
+        if (i % 3 === 0) console.log(`  ${st.status ?? "no status yet"}`);
+      }
+      const usdc = await view<string>("ft_balance_of", { account_id: HOME }, USDC);
+      console.log(`${HOME} now holds ${(Number(usdc) / 1e6).toFixed(6)} USDC.`);
+      return;
     }
     case "setup": {
       const money = { creation_bond: (2n * UNIT).toString(), repro_fee: (UNIT / 2n).toString(), min_liquidity: (5n * UNIT).toString(), challenge_bond_min: UNIT.toString(), challenge_bond_bps: 500 };
