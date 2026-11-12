@@ -274,6 +274,19 @@ async function main() {
       if (id !== null) console.log(`Claim ${id} is a draft. Next: pnpm mainnet fund ${id}`);
       return;
     }
+    case "usdc": {
+      // Sends USDC from the home account to one of its own sub-accounts (for forecasting on camera).
+      const [to, amount] = args;
+      if (!to || !Object.values(ACCOUNTS).includes(to) || !amount || !/^\d+(\.\d{1,6})?$/.test(amount) || Number(amount) > 5) {
+        throw new Error("Usage: pnpm mainnet usdc <one of our sub-accounts> <USDC, at most 5>");
+      }
+      const [whole, frac = ""] = amount.split(".");
+      const units = (BigInt(whole!) * UNIT + BigInt(frac.padEnd(6, "0"))).toString();
+      await transaction(HOME, USDC, [`ft_transfer ${amount} USDC from ${HOME} to ${to}`], [
+        actions.functionCall("ft_transfer", { receiver_id: to, amount: units }, 30n * TGAS, 1n),
+      ]);
+      return;
+    }
     case "fund": {
       const id = Number(args[0]);
       if (!Number.isInteger(id)) throw new Error("Usage: pnpm mainnet fund <claim id> [points|money]");
