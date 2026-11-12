@@ -19,7 +19,7 @@ import { createHash } from "node:crypto";
 import { appendFileSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { specHash, specJson } from "@rerun/shared";
-import { Account, actions, JsonRpcProvider, KeyPair, nearToYocto, yoctoToNear, type KeyPairString } from "near-api-js";
+import { Account, actions, JsonRpcProvider, KeyPair, nearToYocto, PublicKey, yoctoToNear, type KeyPairString } from "near-api-js";
 import { loadDemo, type DemoName } from "../lab/orchestrator/src/demo/fixtures.ts";
 import { loadEnv } from "../lab/orchestrator/src/env.ts";
 
@@ -103,7 +103,7 @@ async function subAccount(id: string, near: string, keyName: string | null, publ
   await transaction(HOME, id, [`create ${id}`, `send it ${near} NEAR`, `give it the key ${pub}${keyName ? ` (its private half is in .env as ${keyName})` : " (made inside the secure hardware; nobody else has it)"}`], [
     actions.createAccount(),
     actions.transfer(nearToYocto(near as `${number}`)),
-    actions.addFullAccessKey(pub as never),
+    actions.addFullAccessKey(PublicKey.fromString(pub)),
   ]);
 }
 
