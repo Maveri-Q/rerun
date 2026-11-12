@@ -1,7 +1,7 @@
 {
-  "lastScanAt": "2026-11-11T14:25:30.862Z",
+  "lastScanAt": "2026-11-12T00:46:00.429Z",
   "draftsByDay": {
-    "2026-11-11": 2
+    "2026-11-12": 2
   },
   "candidates": {
     "rescience:10.5281_zenodo.20613595": {
@@ -864,9 +864,9 @@
       "upvotes": 50,
       "status": "retry",
       "reasons": [
-        "The AI draft failed: NEARAI_CLOUD_API_KEY is not set (or use MOCK_LLM=1)"
+        "Passed the checks, and waiting for the AI budget."
       ],
-      "checkedAt": "2026-11-11T14:25:30.862Z",
+      "checkedAt": "2026-11-12T00:46:00.429Z",
       "license": "MIT",
       "runtime": "python3.11"
     },
@@ -935,9 +935,9 @@
       "needsDataCheck": true,
       "status": "retry",
       "reasons": [
-        "Passed the checks, and waiting for the AI budget."
+        "The AI draft failed: NEARAI_CLOUD_API_KEY is not set (or use MOCK_LLM=1)"
       ],
-      "checkedAt": "2026-11-11T14:25:30.862Z",
+      "checkedAt": "2026-11-12T00:46:00.429Z",
       "license": "MIT",
       "runtime": "python3.11"
     },
@@ -983,15 +983,15 @@
       "title": "Learning Heterogeneous Tactile Representation for General Dexterous Manipulation",
       "paperUrl": "https://arxiv.org/abs/2611.12806",
       "doi": "10.48550/arXiv.2611.12806",
-      "upvotes": 97,
+      "upvotes": 98,
       "abstract": "Tactile sensing is an indispensable modality for contact-rich dexterous manipulation, a capability that hints at the ultimate frontiers of embodied intelligence. However, commercially available tactile sensors are still at a relatively early stage of development, with each type of sensor offering irreplaceable strengths alongside its own drawbacks. A key challenge is thus to free tactile understanding from sensor-specific physics, so that embodied models can effectively leverage heterogeneous tactile data. To this end, we develop LingBot-Touch, a tactile foundation model characterized by the following properties. (i) Our model yields a unified representation across different tactile sensors (i.e., piezoresistive, magnetic, and visuotactile sensors), and is easily extensible to new sensor types. (ii) The resulting tactile tokens are plug-and-play: they can be seamlessly integrated into policy models across paradigms, from diffusion policy to vision-language-action (VLA) models such as π_{0.5} and LingBot-VLA, consistently enhancing manipulation dexterity. (iii) Extensive experiments, spanning simulation and real-robot deployments across multiple hardware platforms, demonstrate that our tactile representation substantially benefits complex manipulation tasks while maintaining strong computational efficiency. We believe the findings in this work demonstrate the potential of leveraging cross-sensor data to scale tactile learning, and offer encouraging insights for the design of future hardware and embodied models.",
       "repoUrl": "https://github.com/Robbyant/lingbot-touch",
       "needsDataCheck": true,
       "status": "retry",
       "reasons": [
-        "The AI draft failed: NEARAI_CLOUD_API_KEY is not set (or use MOCK_LLM=1)"
+        "Passed the checks, and waiting for the AI budget."
       ],
-      "checkedAt": "2026-11-11T14:25:30.862Z",
+      "checkedAt": "2026-11-12T00:46:00.429Z",
       "license": "Apache-2.0",
       "runtime": "python3.11"
     },
@@ -1096,15 +1096,15 @@
       "title": "Don't Just Trust Your Memory: Evidence-Linked Memory Reduces Memory-Induced Degradation in LLM Agents",
       "paperUrl": "https://arxiv.org/abs/2611.14320",
       "doi": "10.48550/arXiv.2611.14320",
-      "upvotes": 45,
+      "upvotes": 54,
       "abstract": "External memory enables LLM agents to improve from experience by distilling trajectories of past tasks into concise lessons for new tasks. However, memory can also lead to memory-induced degradation, where an agent fails on tasks it would solve without memory, often because it follows a lesson that is incorrect, or misapplies or misreads a valid one. This is because lessons are inferred from trajectories labeled only with task success or failure, yet are typically provided without the trajectories they came from, leaving the agent no way to check them. To address this, we introduce WikiTrace, an evidence-linked memory system designed to let agents check each lesson against its original trajectory. Specifically, motivated by the finding that a trajectory often still holds the evidence needed to catch an erroneous lesson, WikiTrace stores each lesson as a concise insight linked to a summary of why its trajectory succeeded or failed and to the raw trajectory itself. Then, on a new task, the agent starts from all insights and, whenever one lacks details needed to act, conflicts with another, or comes from a failed task, descends through its links with terminal tools to fill in missing details or correct the insight before acting. We validate WikiTrace on five agentic benchmarks, showing that it consistently outperforms existing memory approaches and a baseline given the same insights alone, while also reducing memory-induced degradation. Our code is available at https://github.com/yukyeongleee/wikitrace",
       "repoUrl": "https://github.com/yukyeongleee/wikitrace",
       "needsDataCheck": true,
       "status": "retry",
       "reasons": [
-        "Passed the checks, and waiting for the AI budget."
+        "The AI draft failed: NEARAI_CLOUD_API_KEY is not set (or use MOCK_LLM=1)"
       ],
-      "checkedAt": "2026-11-11T14:25:30.862Z",
+      "checkedAt": "2026-11-12T00:46:00.429Z",
       "license": "Apache-2.0",
       "runtime": "python3.11"
     },
@@ -1160,6 +1160,77 @@
       ],
       "checkedAt": "2026-11-11T14:25:30.862Z",
       "license": "MIT",
+      "runtime": "python3.11"
+    },
+    "everyday:HolgerHBurchert/Cardiac-Output-Estimation": {
+      "id": "everyday:HolgerHBurchert/Cardiac-Output-Estimation",
+      "source": "Replication code on GitHub",
+      "title": "Cardiac output estimated noninvasively from oxygen uptake during exercise",
+      "paperUrl": "https://doi.org/10.1152/jappl.1997.82.3.908",
+      "doi": "10.1152/jappl.1997.82.3.908",
+      "repoUrl": "https://github.com/HolgerHBurchert/Cardiac-Output-Estimation",
+      "needsDataCheck": true,
+      "upvotes": 50,
+      "status": "retry",
+      "reasons": [
+        "Passed the checks, and waiting for the AI budget."
+      ],
+      "checkedAt": "2026-11-12T00:46:00.429Z",
+      "license": "CC0-1.0",
+      "runtime": "r4.4"
+    },
+    "arxiv:2611.12885": {
+      "id": "arxiv:2611.12885",
+      "source": "Hugging Face Papers",
+      "title": "World In-Context Learning for Agentic Robot Manipulation",
+      "paperUrl": "https://arxiv.org/abs/2611.12885",
+      "doi": "10.48550/arXiv.2611.12885",
+      "upvotes": 64,
+      "abstract": "Trained action policies write manipulation skill into network weights, tying what is learned to the distribution it is learned from. In-context learning (ICL) avoids this coupling but has not matched trained policies, because a demonstration recorded in another scene carries no feedback from the world the robot currently faces. We observe that what an agent learns in context is semantic, recording task steps and object roles rather than visual appearance, so experience gathered in one world transfers to another. Based on this insight, we propose World In-Context Learning (WICL), a paradigm in which a frozen model starts from a demonstration, rehearses the task in a world such as a simulator, and writes the feedback into its context rather than its weights. We build RoboScript, a modular infrastructure that implements WICL for agentic manipulation. From a single demonstration, RoboScript learns each task through rehearsal in simulation, freezes the learned knowledge as a Task Memory, and deploys the frozen memory on new scenes with data isolation that ensures every deployment input is available on a real robot. On all 50 tasks of RoboTwin 2.0, RoboScript reaches 83.4% mean success across clean and randomized settings with one demonstration per task and no gradient updates, exceeding the strongest trained action policy by over 20 points. The method generalizes across visual distributions, improves through reflection, scales with the foundation model, and transfers to a physical dual-arm robot through cross-embodiment memory adaptation. With a world in the loop, a robot can learn a manipulation task in its context as well as it learns one in its weights. All code is available at https://github.com/ArcheOne-AI/RoboScript",
+      "repoUrl": "https://github.com/ArcheOne-AI/RoboScript",
+      "needsDataCheck": true,
+      "status": "retry",
+      "reasons": [
+        "Passed the checks, and waiting for the AI budget."
+      ],
+      "checkedAt": "2026-11-12T00:46:00.429Z",
+      "license": "Apache-2.0",
+      "runtime": "python3.11"
+    },
+    "arxiv:2611.09124": {
+      "id": "arxiv:2611.09124",
+      "source": "Hugging Face Papers",
+      "title": "Toward the Era of Agentic Embodied Intelligence",
+      "paperUrl": "https://arxiv.org/abs/2611.09124",
+      "doi": "10.48550/arXiv.2611.09124",
+      "upvotes": 52,
+      "abstract": "Foundation models increasingly guide robot actions, yet sustained autonomy requires efficient control and failure recovery. We introduce A2-MEAS, an embodied multi-agent framework built around code as a scaling interface. Learned correction codes combine corrective language, spatial evidence, execution history, and action proposals. MetaBrain provides training supervision and runtime guidance. A correction encoder and adapter absorb this knowledge into policy weights during training, while fresh codes adapt behavior with frozen weights at deployment. The action model, A2-WLA, adds motion-aware history and a latent world model to a vision-language-action policy. Surprisingly, this simple design with action pretraining and task specialization reaches 0.5755 Q-score on the 50-task BEHAVIOR 2026 public subset before online correction, 2.21x the 2025 winner's reported 0.2605 across different benchmark editions and training configurations. On all 100 BEHAVIOR 2026 public tasks, A2-MEAS achieves 0.6411 Q-score and 45.40% task success. On RoboTwin 2.0, A2-WLA achieves 93.98% average success, rising to 95.05% with the complete system. Across 12 real-robot tasks in five household settings, A2-WLA achieves 57.92% average success versus 26.67% for pi0.5. In long-horizon pour-over coffee preparation, a history-conditioned adapter raises post-failure completion at two filter-handling steps from 14% to 94% and from 8% to 82%, compared with A2-WLA retries. Our training infrastructure delivers 427.1 samples per second, 4.03x the throughput of a pi0.5 reference implementation on matched hardware. We will release the system, models, training scripts, and infrastructure to support efficient embodied learning.",
+      "repoUrl": "https://github.com/AutoLab-SAI-SJTU/A2MEAS",
+      "needsDataCheck": true,
+      "status": "rejected",
+      "reasons": [
+        "Depends on torch, which usually needs a graphics card. The Lab only has CPUs."
+      ],
+      "checkedAt": "2026-11-12T00:46:00.429Z",
+      "license": "Apache-2.0",
+      "runtime": "python3.11"
+    },
+    "arxiv:2611.12886": {
+      "id": "arxiv:2611.12886",
+      "source": "Hugging Face Papers",
+      "title": "Reframe: Observation-Aligned Multi-Teacher On-Policy Distillation for Agentic Visual Reasoning",
+      "paperUrl": "https://arxiv.org/abs/2611.12886",
+      "doi": "10.48550/arXiv.2611.12886",
+      "upvotes": 39,
+      "abstract": "Agentic reinforcement learning (RL) and multi-teacher on-policy distillation (MOPD) offer complementary routes to post-training. For visual agents, however, tool use presents two related challenges. Models may overlook useful tool-returned observations, while poorly grounded actions can limit the evidence available for subsequent distillation. We introduce Reframe, a post-training framework that treats the observation state, rather than only the output distribution, as an object of alignment. First, Ground-Drop-GRPO (GD-GRPO) trains spatial and temporal specialists with evidence-aware rewards and stochastic removal of the original visual input, encouraging them to acquire grounded evidence and use the returned observations. Second, Observation-Gated-MOPD (OG-MOPD) replaces deficient tool actions with canonical ones mid-rollout and resumes distillation from the repaired observation. The two stages complement each other, as learning to rely on tool-returned observations can help the policy benefit from observation repair. Neither stage requires a task-specific SFT cold start. Extensive experiments over 14 image and video benchmarks demonstrate that Reframe outperforms both Mix-RL and vanilla MOPD. Ablation results show that GD-GRPO increases observation dependence and tool gain compared with outcome-based GRPO.",
+      "repoUrl": "https://github.com/EliYuan30/Reframe",
+      "needsDataCheck": true,
+      "status": "rejected",
+      "reasons": [
+        "Depends on CUDA, which usually needs a graphics card. The Lab only has CPUs."
+      ],
+      "checkedAt": "2026-11-12T00:46:00.429Z",
+      "license": "Apache-2.0",
       "runtime": "python3.11"
     }
   }
