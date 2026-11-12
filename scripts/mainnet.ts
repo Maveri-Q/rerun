@@ -21,11 +21,12 @@
  *                                        the one you approved
  */
 import { createHash } from "node:crypto";
-import { appendFileSync, readFileSync } from "node:fs";
+import { appendFileSync, existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { specHash, specJson } from "@rerun/shared";
 import { Account, actions, JsonRpcProvider, KeyPair, nearToYocto, PublicKey, yoctoToNear, type KeyPairString } from "near-api-js";
 import { loadDemo, type DemoName } from "../lab/orchestrator/src/demo/fixtures.ts";
+import { loadReal } from "../lab/orchestrator/src/demo/real.ts";
 import { loadEnv } from "../lab/orchestrator/src/env.ts";
 import { checkSwapQuote, nearUnits, OFFICIAL_USDC, swapBody, WNEAR } from "../web/lib/intents.ts";
 import { fetchRetry, loadTokens, ONECLICK } from "../web/lib/oneclick.ts";
@@ -254,10 +255,11 @@ async function main() {
     case "post": {
       const [name, mode, open, challenge] = args as [DemoName, string, string, string];
       if (!name || (mode !== "points" && mode !== "money") || !(Number(open) >= 5) || !(Number(challenge) >= 1)) {
-        throw new Error("Usage: pnpm mainnet post <demo> <points|money> <minutes open, 5 or more> <minutes to challenge>");
+        throw new Error("Usage: pnpm mainnet post <demo or claims/real name> <points|money> <minutes open, 5 or more> <minutes to challenge>");
       }
-      // A public demo's spec doesn't use the Lab's sealing key; only private-data demos do.
-      const spec = loadDemo(name, { publicKey: "", privateKey: "" } as never).spec;
+      // A real paper from claims/real, or a demo. A public demo's spec doesn't use the Lab's sealing key; only private-data demos do.
+      const real = existsSync(path.join(root, "claims/real", name, "claim.json"));
+      const spec = real ? loadReal(name).spec : loadDemo(name, { publicKey: "", privateKey: "" } as never).spec;
       if (spec.private_data) throw new Error("Private-data demos need the mainnet Lab's sealing key. Post a public one.");
       const lockTime = Math.floor(Date.now() / 1000) + Math.round(Number(open) * 60);
       const body = { spec_json: specJson(spec), lock_time: lockTime, challenge_window: Math.round(Number(challenge) * 60), mode };
@@ -265,7 +267,7 @@ async function main() {
         HOME,
         ACCOUNTS.contract,
         [
-          `create_market for the demo "${spec.title}" (fingerprint ${specHash(spec)})`,
+          `create_market for the ${real ? "real paper" : "demo"} "${spec.title}" (fingerprint ${specHash(spec)})`,
           `${mode} mode; forecasting closes ${open} minutes after sending, then ${challenge} minutes to challenge`,
           "attach 0.1 NEAR for its storage (the unused part comes back)",
         ],

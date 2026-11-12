@@ -4,6 +4,8 @@
  * corrected. lab/orchestrator/src/demo/real.test.ts checks these fingerprints against claims/real.
  */
 
+import { NETWORK } from "./config";
+
 export type CodeOrigin = "authors" | "rebuild" | "critics";
 
 export interface Provenance {
@@ -305,7 +307,16 @@ export const PROVENANCE: Record<string, Provenance> = {
   },
 };
 
-export const provenanceOf = (specHash: string): Provenance | undefined => PROVENANCE[specHash];
+/**
+ * On testnet these papers were posted with the result already known (settled showcases). On mainnet the same
+ * spec is an ordinary claim that people forecast, so the showcase label and its sentence don't apply there.
+ */
+const SHOWCASE_SENTENCE = " It's a settled showcase, so there was no forecasting.";
+export const provenanceOf = (specHash: string): Provenance | undefined => {
+  const p = PROVENANCE[specHash];
+  if (!p || NETWORK !== "mainnet" || !p.settledShowcase) return p;
+  return { ...p, settledShowcase: false, why: p.why && { ...p.why, text: p.why.text.replace(SHOWCASE_SENTENCE, "") } };
+};
 
 /** Whether a claim belongs on the lists. Demos live behind "Try it now", and tests aren't shown at all. */
 export function isListed(m: { state: string; spec: { spec_hash: string; title: string } }): boolean {
