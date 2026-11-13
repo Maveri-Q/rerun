@@ -3,6 +3,7 @@
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import Link from "next/link";
 import { useState } from "react";
+import { REAL_MONEY } from "@/lib/config";
 
 const VERDICTS = [
   { word: "\u2713 NUMBERS CHECK OUT", who: "YES wins", text: "The code ran and got a number inside the claim's range. That doesn't prove the study's method is right." },
@@ -114,7 +115,7 @@ export function SelfCheck() {
         ))}
       </ul>
       <p className="notice" style={{ marginTop: 20, maxWidth: "66ch" }}>
-        Where it stands today: everything runs on NEAR&apos;s test network with free points. The AI runs on secure hardware, and since 11 November so does the Lab, on Phala Cloud. Receipts from before then came from an ordinary computer and say so.
+        Where it stands today: {REAL_MONEY ? "this site runs on NEAR mainnet, where money claims use real USDC (at most 5 a forecast and 50 a claim) and points are free." : "this site runs on NEAR's test network with free points and test USDC."} The AI runs on secure hardware, and since 11 November so does the Lab, on Phala Cloud. Receipts from before then came from an ordinary computer and say so.
       </p>
     </>
   );
@@ -156,7 +157,9 @@ const WORDS = [
   { word: "Receipt", text: "The Lab's permanent public record of what it ran and what it found." },
   { word: "Challenge", text: "If you think a result is wrong, you put down a deposit and the Lab must run it again with a different AI. You have a limited time, 24 hours on claims open for forecasts." },
   { word: "Points", text: "Free play money for forecasting without risk. Everyone can claim 1,000." },
-  { word: "Test USDC", text: "A test token with no real value (tUSDC), used here to try real-money forecasting safely." },
+  REAL_MONEY
+    ? { word: "USDC", text: "A dollar stablecoin. Money claims on mainnet use Circle's USDC on NEAR, at most 5 a forecast." }
+    : { word: "Test USDC", text: "A test token with no real value (tUSDC), used here to try real-money forecasting safely." },
   { word: "Secure hardware", text: "A protected part of a computer. It produces proof of what code is running there, and keeps data hidden, even from whoever runs the computer." },
 ];
 

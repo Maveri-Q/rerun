@@ -105,11 +105,11 @@ export function TradePanel({ market, config, position, contract, onDone }: { mar
     return (
       <div className="panel">
         <h2>Will it hold up?</h2>
-        <p className="hint">{market.trades > 0 ? `Forecasters put it at ${yesPct}% so far. ` : "Nobody has forecast this yet. "}{market.mode === "points" ? "Make your own call with free points, so there's nothing to lose." : "Make your own call with free test money."}</p>
+        <p className="hint">{market.trades > 0 ? `Forecasters put it at ${yesPct}% so far. ` : "Nobody has forecast this yet. "}{market.mode === "points" ? "Make your own call with free points, so there's nothing to lose." : REAL_MONEY ? "Make your own call with real USDC, at most 5 a forecast." : "Make your own call with free test money."}</p>
         <button className="w-full" style={{ marginTop: 12 }} onClick={wallet.signIn}>
           Connect wallet to forecast
         </button>
-        <p className="hint">You&apos;ll need a wallet account on NEAR&apos;s test network. It&apos;s free, and your wallet opens in its own window.</p>
+        <p className="hint">{REAL_MONEY ? "You'll need a NEAR wallet account. Your wallet opens in its own window." : "You'll need a wallet account on NEAR's test network. It's free, and your wallet opens in its own window."}</p>
       </div>
     );
   }

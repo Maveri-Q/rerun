@@ -125,7 +125,9 @@ export function NearSwapPanel() {
       <p className="hint" style={{ maxWidth: "62ch" }}>
         {live
           ? "Money claims are forecast in USDC. Swap NEAR for it here through NEAR Intents: your wallet sends the NEAR, and USDC arrives in this same account in about a minute. If the swap can't happen, the NEAR comes back."
-          : "On mainnet, money claims are forecast in USDC, and you can swap NEAR for it here through NEAR Intents. Here's today's live mainnet price. Nothing moves from this page on the test network."}
+          : NETWORK === "mainnet"
+            ? "Money claims are forecast in USDC. Swap NEAR for it here through NEAR Intents. Here's today's live price; connect a wallet to swap, and nothing moves until you approve it there."
+            : "On mainnet, money claims are forecast in USDC, and you can swap NEAR for it here through NEAR Intents. Here's today's live mainnet price. Nothing moves from this page on the test network."}
       </p>
       <form
         className="any-chain-form"

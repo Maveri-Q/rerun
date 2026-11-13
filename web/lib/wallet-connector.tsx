@@ -39,7 +39,7 @@ function WalletHelp({ wait, blocked, onClose }: { wait: WalletWait; blocked: boo
           <b>{wait === "connect" ? "Your wallet opens in its own window." : "Approve this in your wallet's window."}</b>
           <p>
             Can&apos;t see it? It may be behind this one, or your browser may have blocked it.
-            {wait === "connect" && " This site uses NEAR's test network, so your wallet needs a testnet account. They're free, but your everyday NEAR account won't show up."}
+            {wait === "connect" && NETWORK === "testnet" && " This site uses NEAR's test network, so your wallet needs a testnet account. They're free, but your everyday NEAR account won't show up."}
           </p>
         </>
       )}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { REAL_MONEY } from "@/lib/config";
 import { INTENT_CHAINS, type IntentChain, type IntentDirection, type QuoteView } from "@/lib/intents";
 
 /** A live NEAR Intents price for moving USDC to or from another chain. Nothing moves from this panel. */
@@ -35,7 +36,9 @@ export function AnyChainPanel() {
         <h2>Holding USDC on another chain?</h2>
       </div>
       <p className="hint" style={{ maxWidth: "62ch" }}>
-        If real-money forecasts ever open, you could pay in from another chain and collect to it, with no bridge to set up. Here&apos;s today&apos;s live price from NEAR Intents. It&apos;s only a price, and nothing moves. Real money is still a decision for later, pending legal review.
+        {REAL_MONEY
+          ? "Paying in from another chain and collecting to it, with no bridge to set up, isn't switched on yet. Here's today's live price from NEAR Intents for when it is. It's only a price, and nothing moves."
+          : "On mainnet, you could pay in from another chain and collect to it, with no bridge to set up. Here's today's live price from NEAR Intents. It's only a price, and nothing moves."}
       </p>
       <form
         className="any-chain-form"
