@@ -7,7 +7,7 @@
 import { testnetChain } from "../lab/orchestrator/src/lab/setup.ts";
 import { claimName, isListed, ORIGIN_LABEL, provenanceOf, resultSentence } from "../web/lib/provenance.ts";
 
-const SITE = "https://rerun-silk.vercel.app";
+const SITE = "https://rerun-testnet.vercel.app";
 
 interface Row {
   id: number;
