@@ -4,7 +4,7 @@
  * corrected. lab/orchestrator/src/demo/real.test.ts checks these fingerprints against claims/real.
  */
 
-import { NETWORK } from "./config";
+import { NETWORK } from "./config.ts";
 
 export type CodeOrigin = "authors" | "rebuild" | "critics";
 

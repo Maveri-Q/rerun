@@ -1,7 +1,7 @@
 /** Contract view types, plus the display and quote maths the UI needs. */
 
 import { parseDecimal } from "@rerun/shared/browser";
-import { REAL_MONEY } from "./config";
+import { REAL_MONEY } from "./config.ts";
 
 export type Mode = "money" | "points";
 export type State = "Draft" | "Open" | "Locked" | "Running" | "Proposed" | "Challenged" | "Final";

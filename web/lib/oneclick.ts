@@ -1,4 +1,4 @@
-import type { IntentToken } from "./intents";
+import type { IntentToken } from "./intents.ts";
 
 /** NEAR Intents' 1Click API, from the server only. */
 export const ONECLICK = "https://1click.chaindefuser.com/v0";
