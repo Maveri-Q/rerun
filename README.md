@@ -8,7 +8,7 @@
 
 Other truth markets trust an AI's opinion. We rerun the research and post the receipt.
 
-**Live site:** https://rerun-testnet.vercel.app (NEAR testnet, free points) · **Video:** _link coming_
+**Live on NEAR mainnet:** https://rerun-mainnet.vercel.app (real USDC) · **Testnet, free points:** https://rerun-testnet.vercel.app · **Video:** _link coming_
 
 ## What the Lab found
 
@@ -29,7 +29,19 @@ Published results, rerun from public code and data. The forecast price never cha
 | [Does a 1986 figure for a forest pest's timing hold up?](https://rerun-testnet.vercel.app/market/23) | A 1986 study gave one number for how spread out a forest pest's development is. The Lab couldn't get a fair rerun, so there's no verdict. _Independent rebuild._ | [Receipt](https://rerun-testnet.vercel.app/receipt/23/0) |
 | [Does the brain's wiring predict where Parkinson's spreads?](https://rerun-testnet.vercel.app/market/24) | The study said the brain's wiring predicts where Parkinson's-like damage spreads in mice. The Lab reran it: ✓ same result. Paper 0.696, the Lab 0.6961. _Authors' own code._ | [Receipt](https://rerun-testnet.vercel.app/receipt/24/0) |
 
-Most of these are settled showcases: posted with the result already known, marked as such on their pages, and with no forecasting. Open claims for new papers ([37](https://rerun-testnet.vercel.app/market/37), [38](https://rerun-testnet.vercel.app/market/38)) lock on Nov 12 and Nov 16 and are rerun only after forecasting closes.
+Most of these are settled showcases: posted with the result already known, marked as such on their pages, and with no forecasting. Open claims for new papers are rerun only after forecasting closes: [37](https://rerun-testnet.vercel.app/market/37) has its verdict posted and is in its challenge window, and [38](https://rerun-testnet.vercel.app/market/38) locks on Nov 16.
+
+## Live on NEAR mainnet
+
+The same contract runs on mainnet at [`market.rerun-app.near`](https://nearblocks.io/address/market.rerun-app.near), with real USDC (Circle's token on NEAR). Its Lab, [`lab.rerun-app.near`](https://nearblocks.io/address/lab.rerun-app.near), runs on Phala's secure hardware, and the mainnet contract has no owner shortcut: it registers a Lab only with a checked attestation.
+
+| Claim | What happened |
+|---|---|
+| [Do better-looking professors get better student ratings?](https://rerun-mainnet.vercel.app/market/5) | A money claim. We forecast YES with 1 USDC, the Lab reran it on secure hardware: ✓ same result, paper 0.275, the Lab 0.2748. [Receipt](https://rerun-mainnet.vercel.app/receipt/5/0) |
+| [Does raising the minimum wage cost jobs?](https://rerun-mainnet.vercel.app/market/4) | ✓ same result. [Receipt](https://rerun-mainnet.vercel.app/receipt/4/0) |
+| [Does the name on a CV change who gets a callback?](https://rerun-mainnet.vercel.app/market/2), [Do referees give dark-skinned footballers more red cards?](https://rerun-mainnet.vercel.app/market/3) | Open for free-points forecasts until Nov 15, 14:00 UTC, then the Lab reruns them. |
+
+Need USDC? The site swaps NEAR for it through NEAR Intents (1Click), straight to your own account: the wallet wraps and transfers in one transaction, and a quote that doesn't match what you asked for is refused ([`intents.ts`](web/lib/intents.ts)).
 
 ## How it works
 
@@ -43,9 +55,10 @@ Outcomes: ✓ holds up (YES wins), ✗ doesn't hold up or the code didn't finish
 
 ## Why you can trust a verdict
 
-**No one, not even us, can change a verdict or the payouts.** The contract has no method that alters a final result, and a result only becomes final through the receipt checks and the challenge window. One caveat, stated plainly: until the contract account's own key is removed, whoever holds it could deploy different code. That key is still there on testnet, because we're still building. Next: upgrades move to a multisig with a time delay.
+**No one, not even us, can change a verdict or the payouts.** The contract has no method that alters a final result, and a result only becomes final through the receipt checks and the challenge window. One caveat, stated plainly: until the contract account's own key is removed, whoever holds it could deploy different code. That key is still there on testnet and mainnet, because we're still building. Next: upgrades move to a multisig with a time delay.
 
 - **Check it yourself:** [`pnpm verify-claim <id>`](scripts/verify-claim.ts) reruns a claim on your own computer and compares it with the receipt on NEAR.
+- **The Lab runs on secure hardware:** an Intel TDX machine on Phala Cloud, whose key never leaves it. The contract registers the Lab only after checking its attestation and code fingerprint ([`tee/`](lab/orchestrator/src/tee), [`docs/PHALA.md`](docs/PHALA.md)), on testnet since Nov 11 ([registration](https://testnet.nearblocks.io/txns/7F3KFtmWgVF2gCqH7tndKReovNkKojhm1AWFCnXUhcYM)) and on mainnet since Nov 12.
 - **The model is private and attested:** the Lab thinks with NEAR AI Cloud private models. It verifies the model's secure-hardware attestation before a run ([`attestation.ts`](lab/orchestrator/src/nearai/attestation.ts)), and every reply's signature after it ([`signature.ts`](lab/orchestrator/src/nearai/signature.ts)).
 - **Other apps can settle on it:** `get_verdict(claim_id)` is a public view. [`contracts/verdict-bet`](contracts/verdict-bet/src/lib.rs) is a tiny contract that settles its own bet from it, with nobody telling it who won. [It ran on testnet](https://testnet.nearblocks.io/txns/BqzmVEaGC8Uucg6ac3Fh5Wp1AofBpXwT3GhhsPVNhHaY).
 - **Forecasting costs no gas in points mode:** the wallet signs a NEP-366 delegate action and RERUN's relayer submits it, paying the gas and any storage, within a daily limit per account ([`relay.ts`](web/lib/relay.ts)). A brand-new account claimed its points and forecast without spending any NEAR: [claim points](https://testnet.nearblocks.io/txns/G5waPhuqZgPQhhYCsbmC52coq8Jt8pmzgS1ttvinnrrx), [forecast](https://testnet.nearblocks.io/txns/3RKCC9bRJCWk9T2KPqmTxRojvHMLCzAAr1wr5wT8oAge) (`pnpm relay:check`). Wallets that can't sign one fall back to an ordinary transaction.
@@ -55,9 +68,8 @@ Outcomes: ✓ holds up (YES wins), ✗ doesn't hold up or the code didn't finish
 
 ## Coming next
 
-- The Lab runs inside secure hardware on Phala Cloud, with its code fingerprint and attestation registered on NEAR. Live on testnet since Nov 11 ([`tee/`](lab/orchestrator/src/tee), [`docs/PHALA.md`](docs/PHALA.md)): [registration](https://testnet.nearblocks.io/txns/7F3KFtmWgVF2gCqH7tndKReovNkKojhm1AWFCnXUhcYM).
-- Mainnet: points mode and one money claim, with the gas-free relayer ([`docs/MAINNET_COSTS.md`](docs/MAINNET_COSTS.md)).
 - The Lab agent pays for its own compute via NEAR Intents.
+- Forecasting from other chains: USDC from anywhere through NEAR Intents (quotes work today; deposits are off).
 - A research reputation on claim pages, such as "3 of 4 checked results held up" for a paper's authors.
 - Upgrades move to a multisig with a time delay.
 
@@ -129,7 +141,7 @@ Each run follows the same stages: attest the private model → fetch the pinned 
 - **No attested model, no run.** The model's TEE is verified before work starts and each reply's signature afterwards. A failure stops the run.
 - **Private data:** sealed to the Lab's X25519 key and decrypted only after setup has finished. Once it is in the workspace, the network stays off and no logs or outputs reach the LLM, the stream or the receipt. Only hashes and the result leave, and the workspace is deleted afterwards. Failures on private claims therefore get no AI repair.
 
-Current limits: dependencies install with unrestricted network during setup (no secrets or private data are present yet; registry-only egress filtering is planned). Local runs have no TEE, so private-data confidentiality there is only as strong as the host, until the Phala deployment. Demo claims are labelled fixtures with `.invalid` URLs that resolve to local files, so the hosted Lab will need them published. Published papers have gone through the whole pipeline: see the table at the top.
+Current limits: dependencies install with unrestricted network during setup (no secrets or private data are present yet; registry-only egress filtering is planned). Local runs have no TEE, so private-data confidentiality there is only as strong as the host; the hosted Labs run on Phala's secure hardware. Demo claims are labelled fixtures with `.invalid` URLs that resolve to local files, so the hosted Lab will need them published. Published papers have gone through the whole pipeline: see the table at the top.
 
 ## Evidence beyond the verdict
 
@@ -149,13 +161,14 @@ The demos show why this matters: the `reproduces` claim gets 0.93 with the autho
 
 Next.js, reading directly from the contract, with wallets through NEAR Connect. Claims with live odds and a run feed; a market page with the odds chart, trading, the live rerun, challenges and redemption; a guide and glossary; a paper-only check; a create wizard where the AI drafts a claim from a GitHub repo and you confirm it, with technical fields folded away (private files are encrypted in the browser before upload); receipts with a panel that recomputes the checks in your browser; the Lab's attestation details; portfolio; and a points leaderboard.
 
-The browser re-checks what it can itself: the claim hash, the data hashes, the patch kinds and the verdict arithmetic. The secure-hardware line for the Lab shows a note, not a pass, until the Lab runs in a TEE.
+The browser re-checks what it can itself: the claim hash, the data hashes, the patch kinds and the verdict arithmetic.
 
 ## Repo layout
 
 ```
 contracts/rerun/    Rust market contract: specs, FPMM, lifecycle, receipts, points, lab registry
 contracts/mock-ft/  tUSDC: testnet NEP-141 collateral with an open faucet
+contracts/verdict-bet/  A tiny contract that settles its own bet from get_verdict
 lab/orchestrator/   TypeScript Lab: reproduction pipeline, repair guards, NEAR AI client, attestation
 lab/sandbox/        Sandbox images for untrusted research code (Python 3.11, R 4.4)
 claims/demo/        Six labelled demo claims with synthetic data
@@ -170,7 +183,8 @@ docs/               sources, mainnet costs, the repair benchmark, old claims
 - **NEAR AI Cloud** private inference, with model + gateway attestation and per-response signature verification.
 - **NEP-141** collateral and **NEP-297** events in the market contract (near-sdk 5.29).
 - **NEP-366** meta-transactions for gas-free forecasts, and **NEAR Connect** for wallets.
-- See [Coming next](#coming-next) for the Lab on Phala's secure hardware and NEAR Intents funding.
+- **NEAR Intents** (1Click) to swap NEAR for USDC on mainnet, with Circle's USDC as the money-claim collateral.
+- **Phala Cloud TEE** for the Lab, its attestation and code fingerprint checked by the contract before it may post a result, on testnet and mainnet.
 
 ## Limitations
 
