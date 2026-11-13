@@ -1,7 +1,7 @@
 {
-  "lastScanAt": "2026-11-12T23:40:06.633Z",
+  "lastScanAt": "2026-11-13T14:37:09.200Z",
   "draftsByDay": {
-    "2026-11-12": 6
+    "2026-11-13": 2
   },
   "candidates": {
     "rescience:10.5281_zenodo.20613595": {
@@ -866,7 +866,7 @@
       "reasons": [
         "Passed the checks, and waiting for the AI budget."
       ],
-      "checkedAt": "2026-11-12T23:40:06.633Z",
+      "checkedAt": "2026-11-13T14:37:09.200Z",
       "license": "MIT",
       "runtime": "python3.11"
     },
@@ -1096,15 +1096,15 @@
       "title": "Don't Just Trust Your Memory: Evidence-Linked Memory Reduces Memory-Induced Degradation in LLM Agents",
       "paperUrl": "https://arxiv.org/abs/2611.14320",
       "doi": "10.48550/arXiv.2611.14320",
-      "upvotes": 65,
+      "upvotes": 69,
       "abstract": "External memory enables LLM agents to improve from experience by distilling trajectories of past tasks into concise lessons for new tasks. However, memory can also lead to memory-induced degradation, where an agent fails on tasks it would solve without memory, often because it follows a lesson that is incorrect, or misapplies or misreads a valid one. This is because lessons are inferred from trajectories labeled only with task success or failure, yet are typically provided without the trajectories they came from, leaving the agent no way to check them. To address this, we introduce WikiTrace, an evidence-linked memory system designed to let agents check each lesson against its original trajectory. Specifically, motivated by the finding that a trajectory often still holds the evidence needed to catch an erroneous lesson, WikiTrace stores each lesson as a concise insight linked to a summary of why its trajectory succeeded or failed and to the raw trajectory itself. Then, on a new task, the agent starts from all insights and, whenever one lacks details needed to act, conflicts with another, or comes from a failed task, descends through its links with terminal tools to fill in missing details or correct the insight before acting. We validate WikiTrace on five agentic benchmarks, showing that it consistently outperforms existing memory approaches and a baseline given the same insights alone, while also reducing memory-induced degradation. Our code is available at https://github.com/yukyeongleee/wikitrace",
       "repoUrl": "https://github.com/yukyeongleee/wikitrace",
       "needsDataCheck": true,
       "status": "retry",
       "reasons": [
-        "The AI draft failed: NEARAI_CLOUD_API_KEY is not set (or use MOCK_LLM=1)"
+        "Passed the checks, and waiting for the AI budget."
       ],
-      "checkedAt": "2026-11-12T23:40:06.633Z",
+      "checkedAt": "2026-11-13T14:37:09.200Z",
       "license": "Apache-2.0",
       "runtime": "python3.11"
     },
@@ -1175,7 +1175,7 @@
       "reasons": [
         "Passed the checks, and waiting for the AI budget."
       ],
-      "checkedAt": "2026-11-12T23:40:06.633Z",
+      "checkedAt": "2026-11-13T14:37:09.200Z",
       "license": "CC0-1.0",
       "runtime": "r4.4"
     },
@@ -1191,9 +1191,9 @@
       "needsDataCheck": true,
       "status": "retry",
       "reasons": [
-        "Passed the checks, and waiting for the AI budget."
+        "The AI draft failed: NEARAI_CLOUD_API_KEY is not set (or use MOCK_LLM=1)"
       ],
-      "checkedAt": "2026-11-12T23:40:06.633Z",
+      "checkedAt": "2026-11-13T14:37:09.200Z",
       "license": "Apache-2.0",
       "runtime": "python3.11"
     },
@@ -1239,15 +1239,15 @@
       "title": "SteerDistill: Quantizing LLM Agents via Closed-Loop Teacher Steering",
       "paperUrl": "https://arxiv.org/abs/2611.13410",
       "doi": "10.48550/arXiv.2611.13410",
-      "upvotes": 31,
+      "upvotes": 34,
       "abstract": "Low-bit quantization reduces the inference cost of LLM agents but can compromise task success. Examining failed rollouts, we find that quantized agents overlook task requirements or environmental conditions, producing environment transitions that diverge from successful full-precision references. Correcting these behavioral divergences remains difficult: offline data may miss the student's failure contexts, while its own rollouts may provide few correct responses in those contexts. We introduce SteerDistill, a quantization-aware distillation method in which a full-precision teacher guides the student to revise failed responses and iteratively refines its guidance using feedback from student execution. This closed-loop teacher steering produces locally verified behavioral corrections. We internalize these corrections by training the student without guidance to match the steered student's predictions at corrected turns and the full-precision teacher's at other turns, enabling unassisted inference. Across five agentic benchmarks and three models, SteerDistill exceeds the strongest quantized baseline by 1.67--2.18 points in average score under W4A16 and stays within one point of BF16. On τ^2-Bench, it outperforms QeRL by 1.84 percentage points in success rate using 67% fewer training GPU hours and produces shorter successful trajectories than the quantized baselines.",
       "repoUrl": "https://github.com/air-embodied-brain/SteerDistill",
       "needsDataCheck": true,
       "status": "retry",
       "reasons": [
-        "The AI draft failed: NEARAI_CLOUD_API_KEY is not set (or use MOCK_LLM=1)"
+        "Passed the checks, and waiting for the AI budget."
       ],
-      "checkedAt": "2026-11-12T23:40:06.633Z",
+      "checkedAt": "2026-11-13T14:37:09.200Z",
       "license": "MIT",
       "runtime": "python3.11"
     },
@@ -1281,9 +1281,9 @@
       "needsDataCheck": true,
       "status": "retry",
       "reasons": [
-        "Passed the checks, and waiting for the AI budget."
+        "The AI draft failed: NEARAI_CLOUD_API_KEY is not set (or use MOCK_LLM=1)"
       ],
-      "checkedAt": "2026-11-12T23:40:06.633Z",
+      "checkedAt": "2026-11-13T14:37:09.200Z",
       "license": "MIT",
       "runtime": "python3.11"
     },
@@ -1303,6 +1303,43 @@
       ],
       "checkedAt": "2026-11-12T23:40:06.633Z",
       "license": null,
+      "runtime": "python3.11"
+    },
+    "arxiv:2611.16748": {
+      "id": "arxiv:2611.16748",
+      "source": "Hugging Face Papers",
+      "title": "PhysLoop: Harnessing LLMs' Physics Awareness for Self-Improving Video Generation Models",
+      "paperUrl": "https://arxiv.org/abs/2611.16748",
+      "doi": "10.48550/arXiv.2611.16748",
+      "upvotes": 31,
+      "abstract": "Video generation models produce visually realistic videos but still struggle with physical dynamics and causal consistency. Learning from generated videos requires fine-grained physical supervision, yet reliable quality judgments, correction pairs, and controlled variations are difficult to obtain. Large language models (LLMs) possess physical knowledge, but struggle to reliably guide video generation models in producing their training videos. We present PhysLoop, a unified harness designed to support physically grounded self-improvement in video generation models. The harness guides and constrains LLMs throughout video generation, selection, and correction, distilling their physical knowledge into physically consistent videos. The framework supports controllable training-data construction and inference-time video repair. By identifying and correcting failures, PhysLoop marks a key milestone toward recursive self-improvement (RSI) in video generation models with limited human intervention. We release 100K videos spanning diverse, realistic indoor and outdoor scenes, along with generation tools and two evaluation datasets: PhysLoop-Gen and PhysLoop-Repair. We evaluate controllable generation and localized repair on these datasets, respectively, and assess physical behavior on the external Physics-IQ Verified benchmark.",
+      "repoUrl": "https://github.com/DAGroup-PKU/PhysLoop",
+      "needsDataCheck": true,
+      "status": "rejected",
+      "reasons": [
+        "GitHub can't identify an open licence.",
+        "Mostly none. The Lab only runs Python and R."
+      ],
+      "checkedAt": "2026-11-13T14:37:09.200Z",
+      "license": null,
+      "runtime": null
+    },
+    "arxiv:2611.16321": {
+      "id": "arxiv:2611.16321",
+      "source": "Hugging Face Papers",
+      "title": "From Large Language Models to Efficient System One Models via Adaptive Computation",
+      "paperUrl": "https://arxiv.org/abs/2611.16321",
+      "doi": "10.48550/arXiv.2611.16321",
+      "upvotes": 2,
+      "abstract": "Transferring LLMs into System One decision models typically replaces the language modeling head with a decision head while retaining the full backbone, making every decision pay for all layers. Yet it remains unclear how much depth such decisions require. We find that decision information is concentrated in intermediate layers, with early layers building essential features and the final six layers removable without loss, while independently trained smaller models largely mimic the full model rather than developing specialized decision capabilities. These findings suggest that efficiency requires not simply smaller backbones, but shared computation across different depths. Building on this, we propose , which jointly trains a full model with prefix sub-models that share its final layers and decision head through self-distillation. A lightweight gate reads the hidden state at each exit to determine whether additional computation is needed, allowing one model to operate at multiple layers. Across seven decision benchmarks, our approach matches or outperforms independently trained models at every depth, while achieving better accuracy-efficiency trade-offs through adaptive computation.",
+      "repoUrl": "https://github.com/minhkks/NestOne",
+      "needsDataCheck": true,
+      "status": "rejected",
+      "reasons": [
+        "Depends on torch, which usually needs a graphics card. The Lab only has CPUs."
+      ],
+      "checkedAt": "2026-11-13T14:37:09.200Z",
+      "license": "Apache-2.0",
       "runtime": "python3.11"
     }
   }
