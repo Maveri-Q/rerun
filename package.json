@@ -41,6 +41,7 @@
     "finalize-claims": "pnpm --filter @rerun/scripts finalize-claims",
     "money-demo": "pnpm --filter @rerun/scripts money-demo",
     "readme-results": "pnpm --filter @rerun/scripts readme-results",
-    "phala:register": "pnpm --filter @rerun/scripts phala:register"
+    "phala:register": "pnpm --filter @rerun/scripts phala:register",
+    "phala:window": "pnpm --filter @rerun/scripts phala:window"
   }
 }

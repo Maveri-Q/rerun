@@ -28,7 +28,8 @@
     "finalize-claims": "tsx finalize-claims.ts",
     "money-demo": "tsx money-demo.ts",
     "readme-results": "tsx readme-results.ts",
-    "phala:register": "tsx phala-register.ts"
+    "phala:register": "tsx phala-register.ts",
+    "phala:window": "tsx phala-window.ts"
   },
   "dependencies": {
     "@rerun/shared": "workspace:*",
