@@ -1,7 +1,7 @@
 {
-  "lastScanAt": "2026-11-13T14:37:09.200Z",
+  "lastScanAt": "2026-11-13T23:36:08.791Z",
   "draftsByDay": {
-    "2026-11-13": 2
+    "2026-11-13": 4
   },
   "candidates": {
     "rescience:10.5281_zenodo.20613595": {
@@ -866,7 +866,7 @@
       "reasons": [
         "Passed the checks, and waiting for the AI budget."
       ],
-      "checkedAt": "2026-11-13T14:37:09.200Z",
+      "checkedAt": "2026-11-13T23:36:08.791Z",
       "license": "MIT",
       "runtime": "python3.11"
     },
@@ -1096,15 +1096,15 @@
       "title": "Don't Just Trust Your Memory: Evidence-Linked Memory Reduces Memory-Induced Degradation in LLM Agents",
       "paperUrl": "https://arxiv.org/abs/2611.14320",
       "doi": "10.48550/arXiv.2611.14320",
-      "upvotes": 69,
+      "upvotes": 70,
       "abstract": "External memory enables LLM agents to improve from experience by distilling trajectories of past tasks into concise lessons for new tasks. However, memory can also lead to memory-induced degradation, where an agent fails on tasks it would solve without memory, often because it follows a lesson that is incorrect, or misapplies or misreads a valid one. This is because lessons are inferred from trajectories labeled only with task success or failure, yet are typically provided without the trajectories they came from, leaving the agent no way to check them. To address this, we introduce WikiTrace, an evidence-linked memory system designed to let agents check each lesson against its original trajectory. Specifically, motivated by the finding that a trajectory often still holds the evidence needed to catch an erroneous lesson, WikiTrace stores each lesson as a concise insight linked to a summary of why its trajectory succeeded or failed and to the raw trajectory itself. Then, on a new task, the agent starts from all insights and, whenever one lacks details needed to act, conflicts with another, or comes from a failed task, descends through its links with terminal tools to fill in missing details or correct the insight before acting. We validate WikiTrace on five agentic benchmarks, showing that it consistently outperforms existing memory approaches and a baseline given the same insights alone, while also reducing memory-induced degradation. Our code is available at https://github.com/yukyeongleee/wikitrace",
       "repoUrl": "https://github.com/yukyeongleee/wikitrace",
       "needsDataCheck": true,
       "status": "retry",
       "reasons": [
-        "Passed the checks, and waiting for the AI budget."
+        "The AI draft failed: NEARAI_CLOUD_API_KEY is not set (or use MOCK_LLM=1)"
       ],
-      "checkedAt": "2026-11-13T14:37:09.200Z",
+      "checkedAt": "2026-11-13T23:36:08.791Z",
       "license": "Apache-2.0",
       "runtime": "python3.11"
     },
@@ -1175,7 +1175,7 @@
       "reasons": [
         "Passed the checks, and waiting for the AI budget."
       ],
-      "checkedAt": "2026-11-13T14:37:09.200Z",
+      "checkedAt": "2026-11-13T23:36:08.791Z",
       "license": "CC0-1.0",
       "runtime": "r4.4"
     },
@@ -1239,15 +1239,15 @@
       "title": "SteerDistill: Quantizing LLM Agents via Closed-Loop Teacher Steering",
       "paperUrl": "https://arxiv.org/abs/2611.13410",
       "doi": "10.48550/arXiv.2611.13410",
-      "upvotes": 34,
+      "upvotes": 35,
       "abstract": "Low-bit quantization reduces the inference cost of LLM agents but can compromise task success. Examining failed rollouts, we find that quantized agents overlook task requirements or environmental conditions, producing environment transitions that diverge from successful full-precision references. Correcting these behavioral divergences remains difficult: offline data may miss the student's failure contexts, while its own rollouts may provide few correct responses in those contexts. We introduce SteerDistill, a quantization-aware distillation method in which a full-precision teacher guides the student to revise failed responses and iteratively refines its guidance using feedback from student execution. This closed-loop teacher steering produces locally verified behavioral corrections. We internalize these corrections by training the student without guidance to match the steered student's predictions at corrected turns and the full-precision teacher's at other turns, enabling unassisted inference. Across five agentic benchmarks and three models, SteerDistill exceeds the strongest quantized baseline by 1.67--2.18 points in average score under W4A16 and stays within one point of BF16. On τ^2-Bench, it outperforms QeRL by 1.84 percentage points in success rate using 67% fewer training GPU hours and produces shorter successful trajectories than the quantized baselines.",
       "repoUrl": "https://github.com/air-embodied-brain/SteerDistill",
       "needsDataCheck": true,
       "status": "retry",
       "reasons": [
-        "Passed the checks, and waiting for the AI budget."
+        "The AI draft failed: NEARAI_CLOUD_API_KEY is not set (or use MOCK_LLM=1)"
       ],
-      "checkedAt": "2026-11-13T14:37:09.200Z",
+      "checkedAt": "2026-11-13T23:36:08.791Z",
       "license": "MIT",
       "runtime": "python3.11"
     },
@@ -1281,9 +1281,9 @@
       "needsDataCheck": true,
       "status": "retry",
       "reasons": [
-        "The AI draft failed: NEARAI_CLOUD_API_KEY is not set (or use MOCK_LLM=1)"
+        "Passed the checks, and waiting for the AI budget."
       ],
-      "checkedAt": "2026-11-13T14:37:09.200Z",
+      "checkedAt": "2026-11-13T23:36:08.791Z",
       "license": "MIT",
       "runtime": "python3.11"
     },
@@ -1340,6 +1340,60 @@
       ],
       "checkedAt": "2026-11-13T14:37:09.200Z",
       "license": "Apache-2.0",
+      "runtime": "python3.11"
+    },
+    "arxiv:2611.16009": {
+      "id": "arxiv:2611.16009",
+      "source": "Hugging Face Papers",
+      "title": "JustRUA: A Controlled Study of GPT-6 Robot-Use Agents",
+      "paperUrl": "https://arxiv.org/abs/2611.16009",
+      "doi": "10.48550/arXiv.2611.16009",
+      "upvotes": 3,
+      "abstract": "GPT-6 Astra can drive a robot arm directly through a fixed harness, and scores of such robot-use agents on RoboDojo have risen quickly since. Reported systems differ in harness and test subset and often change several designs at once, so it is hard to tell which choices produce the gains. We take these designs apart and test them in one framework, along the harness around the model, the action interface, the reuse of experience and the scene geometry given to the model. A lean harness that keeps the full episode history and stops each motion early goes a long way. Reusing experience changes how the model acts but is not a free lunch, and scene geometry helps most, even when depth is predicted from RGB alone. JustRUA starts from the official L3 harness and keeps only what matters most. Even with no learned policy, self-improvement loop or task-specific tuning, this simple harness raises the score on the RoboDojo simulation benchmark substantially, from 29.7 to 50.3.",
+      "repoUrl": "https://github.com/ZefanW/JustRUA",
+      "needsDataCheck": true,
+      "status": "rejected",
+      "reasons": [
+        "No small public dataset in the repository, so the Lab would have nothing to run on."
+      ],
+      "checkedAt": "2026-11-13T23:36:08.791Z",
+      "license": "Apache-2.0",
+      "runtime": "python3.11"
+    },
+    "arxiv:2611.12750": {
+      "id": "arxiv:2611.12750",
+      "source": "Hugging Face Papers",
+      "title": "The Narrative Gap: Can LLMs Help Us Navigate Diverse Narratives Across Languages?",
+      "paperUrl": "https://arxiv.org/abs/2611.12750",
+      "doi": "10.48550/arXiv.2611.12750",
+      "upvotes": 0,
+      "abstract": "Large language models (LLMs) increasingly mediate how people seek and consume information, including accounts that differ across languages and regions, especially on contested topics. Supporting diverse information seeking requires models to help users navigate competing narratives across languages and information streams. We define six capabilities necessary for diverse multilingual information seeking: three foundational capabilities for narrative inclusion, narrative exclusion, and missing narrative identification; and three higher-level capabilities for presenting diverse narratives, preserving narrative coverage under confirmatory queries, and maintaining information parity across languages. To guide the development of those information seeking capabilities, we introduce NarrativeBench, a benchmark comprising 1,333 news articles in 23 publication languages across 23 contested topics and 460 Reddit-grounded queries. Evaluating 14 LLMs across 24 query languages, we find that current models lack the capabilities needed to reliably navigate diverse narratives, limiting users' control over the perspectives they receive and leaving substantial gaps in exposure to competing accounts even when diversity is explicitly requested. Information access also differs across query framings and languages, risking echo chambers, linguistic filter bubbles, and information disparities that weaken the common ground needed for democratic discourse. NarrativeBench provides a foundation for developing information systems that give users across languages and regions agency to navigate diverse narratives.",
+      "repoUrl": "https://github.com/isle-dev/Narrative-Bench-NeurIPS-2026",
+      "needsDataCheck": true,
+      "status": "rejected",
+      "reasons": [
+        "GitHub can't identify an open licence."
+      ],
+      "checkedAt": "2026-11-13T23:36:08.791Z",
+      "license": "NOASSERTION",
+      "runtime": "python3.11"
+    },
+    "arxiv:2611.15777": {
+      "id": "arxiv:2611.15777",
+      "source": "Hugging Face Papers",
+      "title": "SO-Arena: Benchmarking the Capability Spectrum and Reliability of System One Models",
+      "paperUrl": "https://arxiv.org/abs/2611.15777",
+      "doi": "10.48550/arXiv.2611.15777",
+      "upvotes": 73,
+      "abstract": "System One models promise fast, general-purpose decision-making without lengthy token generation. However, understanding their capability spectrum and decision reliability requires more than aggregate performance on current benchmarks. Existing evaluations often provide limited insight into the breadth of model capabilities and the reliability of their decisions. We introduce SO-Arena, a benchmark characterizing the capability spectrum and decision reliability of System One models across 11 domains and five capability families. For the capability spectrum, SO-Arena offers evidence-grounded evaluation through reliable sources and manual verification of reference labels against model-visible inputs; fine-grained capability assessment through domain-specific difficulty criteria; and realistic interactive evaluation, where models iteratively execute actions in sandboxes. Reasoning-intensive tasks further enable system one-two comparison. Beyond accuracy, SO-Arena assesses decision reliability through two complementary measures: decision stability under controlled option-set changes and missing-answer recognition when no valid option is available. Evaluations across 21 models reveal that the benefits of scaling and additional reasoning vary substantially across domains. More importantly, strong overall performance does not necessarily imply reliable decision-making: the best-performing System One model ranks only seventh in reliability. Together, these findings highlight the need to characterize capability spectrum and decision reliability as complementary dimensions, providing a systematic view of the strengths and limitations of System One models.",
+      "repoUrl": "https://github.com/holdrain/SO-Arena",
+      "needsDataCheck": true,
+      "status": "retry",
+      "reasons": [
+        "Passed the checks, and waiting for the AI budget."
+      ],
+      "checkedAt": "2026-11-13T23:36:08.791Z",
+      "license": "MIT",
       "runtime": "python3.11"
     }
   }
