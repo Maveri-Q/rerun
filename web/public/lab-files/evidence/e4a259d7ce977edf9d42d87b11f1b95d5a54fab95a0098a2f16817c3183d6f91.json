@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "note": "Extra evidence. It does not settle the market: only the normal rerun does. The re-implementation is experimental, and a difference does not mean the paper is wrong.",
+  "robustness": {
+    "status": "sensitive",
+    "seed_had_effect": true,
+    "measured": "0.93",
+    "runs": [
+      {
+        "kind": "seed",
+        "label": "Seed shifted by 1",
+        "value": "0.93"
+      },
+      {
+        "kind": "seed",
+        "label": "Seed shifted by 2",
+        "value": "0.895"
+      },
+      {
+        "kind": "seed",
+        "label": "Seed shifted by 3",
+        "value": "0.885"
+      },
+      {
+        "kind": "resample",
+        "label": "Resampled data 1",
+        "value": "0.88"
+      },
+      {
+        "kind": "resample",
+        "label": "Resampled data 2",
+        "value": "0.895"
+      }
+    ]
+  },
+  "reimplementation": {
+    "status": "differs",
+    "model": "z-ai/glm-5.3-flash",
+    "methods_hash": "7091ebe6da8505056ea988040728dd60d63a7eb4b0338f66ad804b16843ca79a",
+    "value": "0.93",
+    "attempts": 1,
+    "script": "# Reimplementation of the described analysis:\n# Logistic regression predicting binary `response` from age, dose, biomarker.\n# - scikit-learn LogisticRegression with default settings, max_iter=1000\n# - train_test_split holding out 25% at random with random_state=42\n# - metric: classification accuracy on the held-out rows\n#\n# Standard choices made where the methods are silent:\n# - test_size=0.25 corresponds to \"held out 25% of the rows\"\n# - train_test_split's default shuffle=True is used (rows are held out at random)\n# - the split seed (42) fully determines the result; LogisticRegression with the\n#   default lbfgs solver is deterministic, so no additional seeding is needed.\n\nimport json\n\nimport pandas as pd\nfrom sklearn.linear_model import LogisticRegression\nfrom sklearn.metrics import accuracy_score\nfrom sklearn.model_selection import train_test_split\n\nDATA_PATH = \"/work/repo/data/trials.csv\"\nOUT_PATH = \"reimplementation_result.json\"\n\n# Load data\ndf = pd.read_csv(DATA_PATH)\n\nFEATURES = [\"age\", \"dose\", \"biomarker\"]\nTARGET = \"response\"\n\nX = df[FEATURES]\ny = df[TARGET]\n\n# Hold out 25% of rows at random for testing, seed 42\nX_train, X_test, y_train, y_test = train_test_split(\n    X, y, test_size=0.25, random_state=42\n)\n\n# Logistic regression, scikit-learn defaults, up to 1000 iterations\nmodel = LogisticRegression(max_iter=1000)\nmodel.fit(X_train, y_train)\n\n# Classification accuracy on the held-out rows\ny_pred = model.predict(X_test)\naccuracy = accuracy_score(y_test, y_pred)\n\njson.dump({\"value\": float(accuracy)}, open(OUT_PATH, \"w\"))",
+    "script_hash": "374632d0815171140b0f8893eafc9e513a35c7c9b3c251a8f5c4c2c86df6692e"
+  }
+}

@@ -87,12 +87,15 @@ async function live(path: string): Promise<Response | null> {
 }
 
 async function liveOrCopy(kind: keyof typeof COPIES, name: string): Promise<Response | null> {
-  const res = (await live(`/${kind}/${name}`)) ?? (await fetch(copyPath(kind, name)).catch(() => null));
+  // The copy first: same bytes (named by hash), and it answers at once while the Lab is stopped. "latest" changes, so it asks the Lab first.
+  if (name === "latest") return (await live(`/${kind}/${name}`)) ?? (await fetch(copyPath(kind, name)).catch(() => null));
+  const copy = await fetch(copyPath(kind, name)).catch(() => null);
+  const res = copy?.ok ? copy : await live(`/${kind}/${name}`);
   return res?.ok ? res : null;
 }
 
-/** Where a link to one of the Lab's files should go. */
-export const labFileHref = (kind: "reports" | "logs", hash: string) => (LAB_URL ? `${LAB_URL}/${kind}/${hash}` : copyPath(kind, hash));
+/** Where a link to one of the Lab's files should go: the site's copy if there is one, else the live Lab (app/api/lab-file). */
+export const labFileHref = (kind: "reports" | "logs", hash: string) => `/api/lab-file/${kind}/${hash}`;
 
 export interface ScoutCandidate {
   id: string;

@@ -1,0 +1,5 @@
+AI-written report (z-ai/glm-5.3-flash). The outcome was decided by deterministic code, not by this text.
+
+An independent rebuild ran on the public survey data behind Card and Krueger's 1994 study comparing fast-food employment in New Jersey and eastern Pennsylvania. The rebuild is not the authors' original code, so a mismatch would have ended as inconclusive. No environment patches were applied and no repair attempts were needed. The rebuild measured a change of 2.7536 jobs per store in New Jersey relative to Pennsylvania, against the reported 2.76, within the absolute tolerance of 0.05. Runtime was one second. Three extra runs kept the result within 0.05, so the outcome is REPRODUCED. This confirms the number recomputes from the public data; it does not establish whether the underlying claim about minimum wages and jobs is true.
+
+Evidence file sha256: 4ec34d91ce3a1e7da88b2d3a707e9fce9471da61a436623e806c4b1cb57a1d6a

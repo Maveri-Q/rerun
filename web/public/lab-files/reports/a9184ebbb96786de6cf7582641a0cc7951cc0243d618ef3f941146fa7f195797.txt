@@ -1,0 +1,5 @@
+AI-written report (z-ai/glm-5.3-flash). The outcome was decided by deterministic code, not by this text.
+
+A short script comparing pretend ice cream sales on sunny versus cloudy days was run on made-up practice data. No environment patches and no repair attempts were made. The script ran in about one second, but the measured uplift for sunny days was 21.06%, which falls outside the 2-point tolerance around the claimed 50%, so the outcome is NOT_REPRODUCED. Across five extra runs, the result moved by more than the 2-point tolerance, indicating instability. An independent re-implementation by the AI also obtained 21.06%, differing from the claimed figure. This checks whether the numbers can be reproduced, not whether the claim itself is scientifically true or false.
+
+Evidence file sha256: 09cd986e1b07acd02edf44c73a6ab61786745c2faf4e358b0f56f076f970f86f

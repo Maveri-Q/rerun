@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "note": "Extra evidence. It does not settle the market: only the normal re-run does. The re-implementation is experimental, and a difference does not mean the paper is wrong.",
+  "robustness": {
+    "status": "sensitive",
+    "seed_had_effect": false,
+    "measured": "21.05564712504313",
+    "runs": [
+      {
+        "kind": "seed",
+        "label": "Seed shifted by 1",
+        "value": "21.05564712504313"
+      },
+      {
+        "kind": "seed",
+        "label": "Seed shifted by 2",
+        "value": "21.05564712504313"
+      },
+      {
+        "kind": "seed",
+        "label": "Seed shifted by 3",
+        "value": "21.05564712504313"
+      },
+      {
+        "kind": "resample",
+        "label": "Resampled data 1",
+        "value": "17.67466141461358"
+      },
+      {
+        "kind": "resample",
+        "label": "Resampled data 2",
+        "value": "21.13677020653766"
+      }
+    ]
+  },
+  "reimplementation": {
+    "status": "differs",
+    "model": "z-ai/glm-5.3-flash",
+    "methods_hash": "6c53c245b093b41c7ed96d596d2873a8498a57fe8ba1be3689d70da3f8bd70f4",
+    "value": "21.05564712504312",
+    "attempts": 1,
+    "script": "# Reimplementation from the written methods only.\n# Methods: take the average cups sold on sunny days and on cloudy days,\n# then report how many percent higher the sunny average is than the cloudy average.\n# Open choices made (noted per methods ambiguity):\n#   - Percent higher is computed as ((sunny_mean - cloudy_mean) / cloudy_mean) * 100.\n#   - Weather labels are matched case-insensitively after stripping whitespace.\nimport json\nimport pandas as pd\n\ndf = pd.read_csv(\"data/ice_cream.csv\")\n\n# Normalize weather labels (standard choice; methods imply two categories)\ndf[\"weather\"] = df[\"weather\"].astype(str).str.strip().str.lower()\n\nmean_sunny = df.loc[df[\"weather\"] == \"sunny\", \"cups_sold\"].mean()\nmean_cloudy = df.loc[df[\"weather\"] == \"cloudy\", \"cups_sold\"].mean()\n\npct_more = (mean_sunny - mean_cloudy) / mean_cloudy * 100.0\n\njson.dump({\"value\": pct_more}, open(\"reimplementation_result.json\", \"w\"))",
+    "script_hash": "745bf272affb0983de3efc392c584ab4f88620823be2b77aa44ce5c6b76bea17"
+  }
+}

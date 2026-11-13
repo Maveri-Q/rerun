@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "note": "Extra evidence. It does not settle the market: only the normal rerun does. The re-implementation is experimental, and a difference does not mean the paper is wrong.",
+  "robustness": {
+    "status": "not_attempted",
+    "reason": "The run did not produce a result to stress-test.",
+    "runs": []
+  },
+  "reimplementation": {
+    "status": "not_attempted",
+    "reason": "The claim's data could not be verified."
+  }
+}

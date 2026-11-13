@@ -1,0 +1,5 @@
+AI-written report (z-ai/glm-5.3-flash). The outcome was decided by deterministic code, not by this text.
+
+A small independent program was run on a public copy of the Hamermesh and Parker data to recheck the link between professors' looks and student course ratings. No environment patches were applied and no repair attempts were needed, and the run took about one second. The rebuild is not the authors' original code, so a mismatch would have ended as inconclusive. The measured effect was 0.2748 course-rating points per point of the looks score against the reported 0.275, within the absolute tolerance of 0.005, so the outcome is REPRODUCED. In 5 extra robustness runs, however, the result moved by more than 0.005.
+
+Evidence file sha256: 7bb4269fa5e0ddc3ecb5086de9793b548a7fe773de61b6296de8049015cf0ae3

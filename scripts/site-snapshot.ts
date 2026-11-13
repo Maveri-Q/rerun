@@ -3,10 +3,15 @@
  * write-ups, stress tests and the scout's log while no Lab is running. Only files named by a receipt
  * on the chain are copied, byte for byte, so their fingerprints still match. Reads and signs nothing else.
  *
+ * Mainnet receipts are copied from the mainnet Lab over HTTP (MAINNET_LAB_URL), and each file is kept only
+ * if its sha256 matches the hash on the chain, so the receipt links keep working while that Lab is stopped.
+ *
  *   pnpm site-snapshot
  */
-import { copyFileSync, existsSync, mkdirSync, readFileSync, rmSync } from "node:fs";
+import { createHash } from "node:crypto";
+import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
+import { Chain } from "../lab/orchestrator/src/chain/near.ts";
 import { testnetChain } from "../lab/orchestrator/src/lab/setup.ts";
 
 const DATA = path.resolve(import.meta.dirname, "../lab/orchestrator/.data");
@@ -37,7 +42,7 @@ function copy(kind: string, hash: string, to: string, ext: string): string | nul
 const chain = testnetChain();
 const markets = await chain.view<{ id: number }[]>("list_markets", { limit: 200 });
 
-rmSync(OUT, { recursive: true, force: true });
+// Copies are named by their hash, so old ones are never wrong; keeping them means a Lab that's off can't erase them.
 for (const market of markets) {
   const receipts = await chain.view<Receipt[]>("get_receipts", { market_id: market.id });
   for (const r of receipts) {
@@ -47,6 +52,44 @@ for (const market of markets) {
     const evidence = report && /Evidence file sha256: ([0-9a-f]{64})/.exec(readFileSync(report, "utf8"))?.[1];
     if (evidence) copy("evidences", evidence, "evidence", ".json");
   }
+}
+
+const MAINNET_LAB = (process.env.MAINNET_LAB_URL || "").replace(/\/$/, "");
+const KINDS = { reports: ["reports", ".txt"], logs: ["logs", ".txt"], evidence: ["evidence", ".json"] } as const satisfies Record<string, readonly [string, string]>;
+
+async function fetchCopy(kind: keyof typeof KINDS, hash: string): Promise<string | null> {
+  const [dir, ext] = KINDS[kind];
+  const to = path.join(OUT, dir, `${hash}${ext}`);
+  if (existsSync(to)) return readFileSync(to, "utf8");
+  for (let i = 0; i < 4; i++) {
+    const res = await fetch(`${MAINNET_LAB}/${kind}/${hash}`).catch(() => null);
+    if (!res?.ok) continue;
+    const body = Buffer.from(await res.arrayBuffer());
+    if (createHash("sha256").update(body).digest("hex") !== hash) {
+      missing.push(`mainnet ${kind}/${hash} (fingerprint mismatch)`);
+      return null;
+    }
+    mkdirSync(path.dirname(to), { recursive: true });
+    writeFileSync(to, body);
+    copied++;
+    return body.toString("utf8");
+  }
+  missing.push(`mainnet ${kind}/${hash}`);
+  return null;
+}
+
+if (MAINNET_LAB) {
+  const main = new Chain(process.env.NEAR_MAINNET_RPC_URL || "https://free.rpc.fastnear.com", process.env.MAINNET_CONTRACT_ACCOUNT || "market.rerun-app.near");
+  const mainMarkets = await main.view<{ id: number }[]>("list_markets", { limit: 200 });
+  for (const market of mainMarkets) {
+    for (const r of await main.view<Receipt[]>("get_receipts", { market_id: market.id })) {
+      const report = await fetchCopy("reports", r.report_hash);
+      await fetchCopy("logs", r.log_hash);
+      const evidence = report && /Evidence file sha256: ([0-9a-f]{64})/.exec(report)?.[1];
+      if (evidence) await fetchCopy("evidence", evidence);
+    }
+  }
+  console.log(`mainnet: checked ${mainMarkets.length} claims`);
 }
 
 const latest = path.join(DATA, "attestations", "latest.json");

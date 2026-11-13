@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "note": "Extra evidence. It does not settle the market: only the normal rerun does. The re-implementation is experimental, and a difference does not mean the paper is wrong.",
+  "robustness": {
+    "status": "sensitive",
+    "seed_had_effect": false,
+    "measured": "21.05564712504313",
+    "runs": [
+      {
+        "kind": "seed",
+        "label": "Seed shifted by 1",
+        "value": "21.05564712504313"
+      },
+      {
+        "kind": "seed",
+        "label": "Seed shifted by 2",
+        "value": "21.05564712504313"
+      },
+      {
+        "kind": "seed",
+        "label": "Seed shifted by 3",
+        "value": "21.05564712504313"
+      },
+      {
+        "kind": "resample",
+        "label": "Resampled data 1",
+        "value": "17.67466141461358"
+      },
+      {
+        "kind": "resample",
+        "label": "Resampled data 2",
+        "value": "21.13677020653766"
+      }
+    ]
+  },
+  "reimplementation": {
+    "status": "differs",
+    "model": "z-ai/glm-5.3-flash",
+    "methods_hash": "6c53c245b093b41c7ed96d596d2873a8498a57fe8ba1be3689d70da3f8bd70f4",
+    "value": "21.05564712504312",
+    "attempts": 1,
+    "script": "\"\"\"\nReimplementation: \"% more ice cream sold on sunny days\"\n\nMethods as written:\n  - Data is a made-up practice CSV with columns day, weather, cups_sold.\n  - Take the average cups sold on sunny days and on cloudy days.\n  - Report how many percent higher the sunny average is than the cloudy average.\n\nOpen choices made (standard defaults, noted as required):\n  - \"% higher than the cloudy average\" is interpreted with the cloudy mean as\n    the base: ((mean_sunny - mean_cloudy) / mean_cloudy) * 100.\n  - Weather labels are matched case-insensitively after stripping whitespace,\n    so that exactly the rows labeled \"sunny\" vs. \"cloudy\" are compared.\n  - Arithmetic mean over all rows of each group; no weighting or filtering.\n\"\"\"\n\nimport json\n\nimport pandas as pd\n\n\ndef main() -> None:\n    # Load the provided data file.\n    df = pd.read_csv(\"data/ice_cream.csv\")\n\n    # Defensive normalization of labels (methods only mention sunny/cloudy).\n    df[\"weather\"] = df[\"weather\"].astype(str).str.strip().str.lower()\n\n    # Group means of cups sold.\n    mean_sunny = df.loc[df[\"weather\"] == \"sunny\", \"cups_sold\"].mean()\n    mean_cloudy = df.loc[df[\"weather\"] == \"cloudy\", \"cups_sold\"].mean()\n\n    # Percent higher relative to the cloudy average (cloudy = base).\n    percent_higher = (mean_sunny - mean_cloudy) / mean_cloudy * 100.0\n\n    result = {\"value\": float(percent_higher)}\n\n    with open(\"reimplementation_result.json\", \"w\") as f:\n        json.dump(result, f)\n\n\nif __name__ == \"__main__\":\n    main()",
+    "script_hash": "8adc8ee89944e8f6cfeddaa4e460494b795da9d932df90070975f032da6f5c36"
+  }
+}

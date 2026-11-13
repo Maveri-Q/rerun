@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "note": "Extra evidence. It does not settle the market: only the normal rerun does. The re-implementation is experimental, and a difference does not mean the paper is wrong.",
+  "robustness": {
+    "status": "sensitive",
+    "seed_had_effect": false,
+    "measured": "21.05564712504313",
+    "runs": [
+      {
+        "kind": "seed",
+        "label": "Seed shifted by 1",
+        "value": "21.05564712504313"
+      },
+      {
+        "kind": "seed",
+        "label": "Seed shifted by 2",
+        "value": "21.05564712504313"
+      },
+      {
+        "kind": "seed",
+        "label": "Seed shifted by 3",
+        "value": "21.05564712504313"
+      },
+      {
+        "kind": "resample",
+        "label": "Resampled data 1",
+        "value": "17.67466141461358"
+      },
+      {
+        "kind": "resample",
+        "label": "Resampled data 2",
+        "value": "21.13677020653766"
+      }
+    ]
+  },
+  "reimplementation": {
+    "status": "agrees",
+    "model": "z-ai/glm-5.3-flash",
+    "methods_hash": "6c53c245b093b41c7ed96d596d2873a8498a57fe8ba1be3689d70da3f8bd70f4",
+    "value": "21.05564712504312",
+    "attempts": 1,
+    "script": "#!/usr/bin/env python3\n\"\"\"Reimplementation: % more ice cream sold on sunny days vs cloudy days.\n\nMethods as written:\n- Data is a made-up CSV with cups_sold per day and a weather label.\n- Take the mean cups_sold on sunny days and on cloudy days.\n- Report the percent by which the sunny mean exceeds the cloudy mean:\n      (mean_sunny - mean_cloudy) / mean_cloudy * 100\n  (i.e., cloudy mean is the baseline/reference, the most standard reading\n  of \"how many percent higher the sunny average is than the cloudy average\").\n\"\"\"\n\nimport json\nimport pandas as pd\n\n# Load the practice data\ndf = pd.read_csv(\"data/ice_cream.csv\")\n\n# Standardize the weather labels (strip whitespace, lowercase) so that\n# e.g. \"Sunny \" or \"SUNNY\" still count as sunny. Open choice in the methods;\n# exact-string matching on the raw column would give the same result if the\n# labels are already clean.\nweather = df[\"weather\"].astype(str).str.strip().str.lower()\n\nmean_sunny = df.loc[weather == \"sunny\", \"cups_sold\"].mean()\nmean_cloudy = df.loc[weather == \"cloudy\", \"cups_sold\"].mean()\n\n# Percent higher: sunny average relative to cloudy average\npct_higher = (mean_sunny - mean_cloudy) / mean_cloudy * 100.0\n\nresult = {\"value\": float(pct_higher)}\n\nwith open(\"reimplementation_result.json\", \"w\") as f:\n    json.dump(result, f)",
+    "script_hash": "572828aa9ec333ac31ea61f49cc5ff74880989a8d2485af401270425443b35da"
+  }
+}

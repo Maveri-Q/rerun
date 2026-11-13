@@ -1,0 +1,5 @@
+AI-written report (z-ai/glm-5.3-flash). The outcome was decided by deterministic code, not by this text.
+
+The claim comes from a made-up practice dataset, not real research, so truth or falsity of the science is not at issue. A short script comparing pretend ice cream sales on sunny versus cloudy days was run. The checker reported the measured difference as about 21.06 percent, which falls far outside the allowed tolerance of 2 points around the claimed 50 percent. Runtime was about one second. No environment patches or repair attempts were made. In robustness checks, the result shifted by more than 2 across five extra runs, so it was unstable. An independent re-analysis by the AI also gave about 21.06, matching the run but not the claim. Because the measured value sits outside tolerance, the outcome is marked NOT_REPRODUCED.
+
+Evidence file sha256: db34214e98656360911bd4bc32bdfbad71aa6b5e3d6dd9a39f7a5cb6e1fbc92e

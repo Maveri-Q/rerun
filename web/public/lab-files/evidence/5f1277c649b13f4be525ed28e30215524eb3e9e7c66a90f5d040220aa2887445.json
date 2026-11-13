@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "note": "Extra evidence. It does not settle the market: only the normal rerun does. The re-implementation is experimental, and a difference does not mean the paper is wrong.",
+  "robustness": {
+    "status": "not_attempted",
+    "reason": "This claim uses private data, so no extra runs are made.",
+    "runs": []
+  },
+  "reimplementation": {
+    "status": "not_attempted",
+    "reason": "This claim uses private data, which is never shown to the AI."
+  }
+}

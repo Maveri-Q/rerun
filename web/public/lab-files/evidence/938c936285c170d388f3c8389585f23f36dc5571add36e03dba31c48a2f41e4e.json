@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "note": "Extra evidence. It does not settle the market: only the normal re-run does. The re-implementation is experimental, and a difference does not mean the paper is wrong.",
+  "robustness": {
+    "status": "sensitive",
+    "seed_had_effect": false,
+    "measured": "21.05564712504313",
+    "runs": [
+      {
+        "kind": "seed",
+        "label": "Seed shifted by 1",
+        "value": "21.05564712504313"
+      },
+      {
+        "kind": "seed",
+        "label": "Seed shifted by 2",
+        "value": "21.05564712504313"
+      },
+      {
+        "kind": "seed",
+        "label": "Seed shifted by 3",
+        "value": "21.05564712504313"
+      },
+      {
+        "kind": "resample",
+        "label": "Resampled data 1",
+        "value": "17.67466141461358"
+      },
+      {
+        "kind": "resample",
+        "label": "Resampled data 2",
+        "value": "21.13677020653766"
+      }
+    ]
+  },
+  "reimplementation": {
+    "status": "agrees",
+    "model": "z-ai/glm-5.3-flash",
+    "methods_hash": "6c53c245b093b41c7ed96d596d2873a8498a57fe8ba1be3689d70da3f8bd70f4",
+    "value": "21.05564712504312",
+    "attempts": 1,
+    "script": "\"\"\"\nReimplementation of a published analysis from its written methods only.\n\nMetric: % more ice cream sold on sunny days.\n\nMethods as written:\n- Data: pretend shop's cups of ice cream sold each day, with weather\n  (sunny or cloudy). File: data/ice_cream.csv with columns\n  day, weather, cups_sold (200 rows).\n- Compute the average cups sold on sunny days and on cloudy days.\n- Report how many percent higher the sunny average is than the\n  cloudy average.\n\nStandard choice for the open point:\n- \"percent higher\" is computed relative to the cloudy (reference)\n  average: ((mean_sunny / mean_cloudy) - 1) * 100.\n- Weather labels are matched case-insensitively after stripping\n  whitespace (only the two categories sunny/cloudy are expected).\n\"\"\"\n\nimport json\n\nimport pandas as pd\n\nDATA_PATH = \"data/ice_cream.csv\"\nOUTPUT_PATH = \"reimplementation_result.json\"\n\n\ndef main() -> None:\n    # Load the practice data.\n    df = pd.read_csv(DATA_PATH)\n\n    # Normalize the weather labels for robust matching\n    # (standard choice: trim whitespace, lowercase).\n    weather = df[\"weather\"].astype(str).str.strip().str.lower()\n\n    sunny = df.loc[weather == \"sunny\", \"cups_sold\"]\n    cloudy = df.loc[weather == \"cloudy\", \"cups_sold\"]\n\n    # Average cups sold on sunny days and on cloudy days.\n    mean_sunny = sunny.mean()\n    mean_cloudy = cloudy.mean()\n\n    # Percent higher the sunny average is than the cloudy average.\n    pct_higher = (mean_sunny - mean_cloudy) / mean_cloudy * 100.0\n\n    result = {\"value\": float(pct_higher)}\n    with open(OUTPUT_PATH, \"w\") as f:\n        json.dump(result, f)\n\n\nif __name__ == \"__main__\":\n    main()",
+    "script_hash": "94817fc38a53eaae397cbd8bbd5133744e9cba140cb0387e33f179d403a5e133"
+  }
+}

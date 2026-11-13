@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "note": "Extra evidence. It does not settle the market: only the normal rerun does. The re-implementation is experimental, and a difference does not mean the paper is wrong.",
+  "robustness": {
+    "status": "sensitive",
+    "seed_had_effect": false,
+    "measured": "21.05564712504313",
+    "runs": [
+      {
+        "kind": "seed",
+        "label": "Seed shifted by 1",
+        "value": "21.05564712504313"
+      },
+      {
+        "kind": "seed",
+        "label": "Seed shifted by 2",
+        "value": "21.05564712504313"
+      },
+      {
+        "kind": "seed",
+        "label": "Seed shifted by 3",
+        "value": "21.05564712504313"
+      },
+      {
+        "kind": "resample",
+        "label": "Resampled data 1",
+        "value": "17.67466141461358"
+      },
+      {
+        "kind": "resample",
+        "label": "Resampled data 2",
+        "value": "21.13677020653766"
+      }
+    ]
+  },
+  "reimplementation": {
+    "status": "differs",
+    "model": "z-ai/glm-5.3-flash",
+    "methods_hash": "6c53c245b093b41c7ed96d596d2873a8498a57fe8ba1be3689d70da3f8bd70f4",
+    "value": "21.05564712504312",
+    "attempts": 1,
+    "script": "# Re-implementation of: \"% more ice cream sold on sunny days\"\n# Methods: averages of cups_sold for sunny vs cloudy days,\n# and percent by which the sunny average exceeds the cloudy average.\n# Standard interpretation of \"percent higher than\":\n#   ((sunny_mean - cloudy_mean) / cloudy_mean) * 100\n\nimport json\nimport pandas as pd\n\ndf = pd.read_csv(\"data/ice_cream.csv\")\n\nmeans = df.groupby(\"weather\")[\"cups_sold\"].mean()\nsunny_mean = means[\"sunny\"]\ncloudy_mean = means[\"cloudy\"]\n\npct_more = (sunny_mean - cloudy_mean) / cloudy_mean * 100.0\n\nresult = {\"value\": float(pct_more)}\nwith open(\"reimplementation_result.json\", \"w\") as f:\n    json.dump(result, f)",
+    "script_hash": "94f2cc70647e41707c3dfe3354ec89a1cf36097f65a9675c2d1071fa60ecbc17"
+  }
+}

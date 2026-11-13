@@ -1,0 +1,5 @@
+AI-written report (z-ai/glm-5.3-flash). The outcome was decided by deterministic code, not by this text.
+
+This was a demo fixture, not real research, testing whether a paper's code with a hardcoded laptop path could still reproduce after a minimal fix. The original script pointed to a data file on the author's machine, so it failed elsewhere. The only patch applied to reproduce.py replaced that hardcoded path with the repo-relative file data/trials.csv shipped inside the repository; the data and analysis code were untouched. Dependencies were installed per requirements.txt as they existed on 2026-11-01, the commit date, on Python 3.11. With this single path fix, the unchanged analysis ran in 17 seconds and reproduced the result: reported accuracy 0.93, measured 0.93, within the 0.02 tolerance. An independent re-implementation by the AI also obtained 0.93, agreeing with the reported value. However, robustness checking showed the result moved by more than 0.02 across five extra runs.
+
+Evidence file sha256: bcb016ada1fb8a56cb97cda97d5a3900210f8fbe5a6f20adccd310b49702487e

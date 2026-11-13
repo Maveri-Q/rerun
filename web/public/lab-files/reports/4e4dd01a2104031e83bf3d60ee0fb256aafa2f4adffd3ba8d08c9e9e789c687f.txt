@@ -1,0 +1,5 @@
+AI-written report (z-ai/glm-5.3-flash). The outcome was decided by deterministic code, not by this text.
+
+A demo fixture logistic model was run with its own code and data. The claim states 97% accuracy, but the measured accuracy was 0.93, which falls outside the 0.01 tolerance, so the claim was not reproduced. No environment patches or repair attempts were needed or made. Across five extra runs, the result moved by more than 0.01, indicating instability. An independent re-implementation by the AI also obtained 0.93, differing from the claimed value, though this may reflect vagueness in the original claim rather than an error. Runtime was about five seconds. This shows the reported number does not match what the code produces; it does not establish whether the underlying science is true or false.
+
+Evidence file sha256: e4a259d7ce977edf9d42d87b11f1b95d5a54fab95a0098a2f16817c3183d6f91

@@ -1,0 +1,5 @@
+AI-written report (z-ai/glm-5.3-flash). The outcome was decided by deterministic code, not by this text.
+
+A short demo script, built on made-up practice data, compared ice cream sales at a pretend shop on sunny versus cloudy days. No environment patches or repair attempts were needed, and the run took about one second. The script reported a 20% uplift for sunny days; the re-run measured about 21.06%, which is within the allowed tolerance of 2, so the outcome was marked REPRODUCED. This reproduction is not replication: it only shows the numbers recompute as described, not that the science is true or false, especially since the data are explicitly pretend. One caveat remains: across five extra robustness runs, the result moved by more than 2. An independent re-implementation by the AI got essentially the same value, 21.05564712504312, agreeing with the claim.
+
+Evidence file sha256: 0d00cdb7a72ba4c1686f7489e5d587ae8fa674598d842b5c819a963af09653f9

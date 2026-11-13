@@ -1,0 +1,5 @@
+AI-written report (z-ai/glm-5.3-flash). The outcome was decided by deterministic code, not by this text.
+
+An automated reproduction was run against a demo fixture that imports a private package, labtools_internal, which the authors never released. The system rebuilt the environment from requirements.txt with packages as they were on 2026-11-01, the commit date, on Python 3.11. Repair attempt one found that the entrypoint depends on labtools_internal, which is not obtainable from any package repository, and recreating its missing function without writing analysis code is forbidden. Nothing was applied or rejected. The software could not be run, so the reported metric of 0.9 had no measured counterpart within the 0.01 tolerance. The outcome was INVALID, classified as environment setup failed. This only shows the code could not run; it says nothing about whether the underlying research is correct. Runtime was 6 seconds.
+
+Evidence file sha256: 4dc877f47ecd92887708fb1c0285196da5b53bdf1271e6968f19b1a85b8241a1

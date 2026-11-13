@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "note": "Extra evidence. It does not settle the market: only the normal rerun does. The re-implementation is experimental, and a difference does not mean the paper is wrong.",
+  "robustness": {
+    "status": "sensitive",
+    "seed_had_effect": false,
+    "measured": "21.05564712504313",
+    "runs": [
+      {
+        "kind": "seed",
+        "label": "Seed shifted by 1",
+        "value": "21.05564712504313"
+      },
+      {
+        "kind": "seed",
+        "label": "Seed shifted by 2",
+        "value": "21.05564712504313"
+      },
+      {
+        "kind": "seed",
+        "label": "Seed shifted by 3",
+        "value": "21.05564712504313"
+      },
+      {
+        "kind": "resample",
+        "label": "Resampled data 1",
+        "value": "17.67466141461358"
+      },
+      {
+        "kind": "resample",
+        "label": "Resampled data 2",
+        "value": "21.13677020653766"
+      }
+    ]
+  },
+  "reimplementation": {
+    "status": "agrees",
+    "model": "z-ai/glm-5.3-flash",
+    "methods_hash": "6c53c245b093b41c7ed96d596d2873a8498a57fe8ba1be3689d70da3f8bd70f4",
+    "value": "21.05564712504312",
+    "attempts": 1,
+    "script": "import pandas as pd\nimport numpy as np\nimport json\n\n# Load the practice data\ndf = pd.read_csv(\"data/ice_cream.csv\")\n\n# Normalize the weather labels defensively (strip whitespace, lowercase)\ndf[\"weather\"] = df[\"weather\"].astype(str).str.strip().str.lower()\n\n# Average cups sold on sunny days and on cloudy days\nmean_sunny = df.loc[df[\"weather\"] == \"sunny\", \"cups_sold\"].mean()\nmean_cloudy = df.loc[df[\"weather\"] == \"cloudy\", \"cups_sold\"].mean()\n\n# Percent higher the sunny average is than the cloudy average:\n# (mean_sunny - mean_cloudy) / mean_cloudy * 100\npercent_more = (mean_sunny - mean_cloudy) / mean_cloudy * 100.0\n\n# Standard choice note: \"percent higher than\" is interpreted as the\n# relative difference with the cloudy mean as the base/reference,\n# expressed in percent.\n\nresult = {\"value\": float(percent_more)}\nwith open(\"reimplementation_result.json\", \"w\") as f:\n    json.dump(result, f)",
+    "script_hash": "43e33de7a84bca3ab7539f9b45624c97208ddd3237077047e3782ec856e33ae3"
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "note": "Extra evidence. It does not settle the market: only the normal rerun does. The re-implementation is experimental, and a difference does not mean the paper is wrong.",
+  "robustness": {
+    "status": "sensitive",
+    "seed_had_effect": false,
+    "measured": "0.2748",
+    "runs": [
+      {
+        "kind": "seed",
+        "label": "Seed shifted by 1",
+        "value": "0.2748"
+      },
+      {
+        "kind": "seed",
+        "label": "Seed shifted by 2",
+        "value": "0.2748"
+      },
+      {
+        "kind": "seed",
+        "label": "Seed shifted by 3",
+        "value": "0.2748"
+      },
+      {
+        "kind": "resample",
+        "label": "Resampled data 1",
+        "value": "0.2886"
+      },
+      {
+        "kind": "resample",
+        "label": "Resampled data 2",
+        "value": "0.2837"
+      }
+    ]
+  },
+  "reimplementation": {
+    "status": "not_attempted",
+    "reason": "Nobody provided the paper's methods section."
+  }
+}

@@ -1,0 +1,5 @@
+AI-written report (z-ai/glm-5.3-flash). The outcome was decided by deterministic code, not by this text.
+
+This demo fixture ran a readmission model against synthetic hospital records encrypted to the attested Lab, with only hashes and the result leaving the environment. The claim's reported AUC was 0.94, and the measured AUC came out to 0.937216, within the absolute tolerance of 0.03. The outcome was reproduced, meaning the measured value fell within tolerance. Runtime was 4 seconds. No environment patches were applied and no repair attempts were made. Because this is a demo fixture with synthetic data rather than real research, and reproduction differs from replication, this result confirms only that the pipeline produced a matching measured value, not whether the underlying science is true or false.
+
+Evidence file sha256: 5f1277c649b13f4be525ed28e30215524eb3e9e7c66a90f5d040220aa2887445

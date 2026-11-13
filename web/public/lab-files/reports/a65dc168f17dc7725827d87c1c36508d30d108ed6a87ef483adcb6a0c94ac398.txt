@@ -1,0 +1,5 @@
+AI-written report (z-ai/glm-5.3-flash). The outcome was decided by deterministic code, not by this text.
+
+A demo script using made-up practice data claimed a pretend shop sold 50% more ice cream on sunny days than cloudy days. The Lab's rerun ran the same script successfully in about one second, with no environment patches needed, but measured only about 21.06% more, which is outside the allowed tolerance of 2. Five extra runs shifted the result by more than 2 each time, and an independent re-analysis by the AI also returned about 21.06. The run is marked not reproduced. This is a practice dataset, not real research, so the disagreement reflects how the demo script computes the number rather than any real-world claim.
+
+Evidence file sha256: b4755837cbb7410970379ff7fc40ab928d63ce84955a09050ca12568bede5836

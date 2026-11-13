@@ -1,0 +1,5 @@
+AI-written report (z-ai/glm-5.3-flash). The outcome was decided by deterministic code, not by this text.
+
+A short demo script compared pretend ice cream sales from a made-up practice dataset for a pretend shop on sunny versus cloudy days. No patches were applied and no repairs were needed; the rerun took about one second. The claimed uplift was 20% more ice cream sold on sunny days, and the rerun measured 21.06%, which falls within the allowed tolerance of 2, so the outcome was marked REPRODUCED. An independent re-implementation by the AI's own analysis also got about 21.06% and agreed. However, across five extra robustness runs the result moved by more than 2, so the number may not be stable. This is practice data, not real research, and reproduction here does not confirm the claim is scientifically true.
+
+Evidence file sha256: c354493f18097ee7fdb34e4230991135c43ef6923670fc2951555e0c0a2a160b

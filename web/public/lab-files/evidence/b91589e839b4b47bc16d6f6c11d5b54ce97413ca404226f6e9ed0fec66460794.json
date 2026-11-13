@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "note": "Extra evidence. It does not settle the market: only the normal rerun does. The re-implementation is experimental, and a difference does not mean the paper is wrong.",
+  "robustness": {
+    "status": "sensitive",
+    "seed_had_effect": false,
+    "measured": "21.05564712504313",
+    "runs": [
+      {
+        "kind": "seed",
+        "label": "Seed shifted by 1",
+        "value": "21.05564712504313"
+      },
+      {
+        "kind": "seed",
+        "label": "Seed shifted by 2",
+        "value": "21.05564712504313"
+      },
+      {
+        "kind": "seed",
+        "label": "Seed shifted by 3",
+        "value": "21.05564712504313"
+      },
+      {
+        "kind": "resample",
+        "label": "Resampled data 1",
+        "value": "17.67466141461358"
+      },
+      {
+        "kind": "resample",
+        "label": "Resampled data 2",
+        "value": "21.13677020653766"
+      }
+    ]
+  },
+  "reimplementation": {
+    "status": "agrees",
+    "model": "z-ai/glm-5.3-flash",
+    "methods_hash": "6c53c245b093b41c7ed96d596d2873a8498a57fe8ba1be3689d70da3f8bd70f4",
+    "value": "21.05564712504312",
+    "attempts": 1,
+    "script": "\"\"\"\nReimplementation: % more ice cream sold on sunny days vs cloudy days.\n\nMethods as written:\n- Data: data/ice_cream.csv (day, weather, cups_sold) - made-up practice data.\n- Compute the average cups sold on sunny days and on cloudy days.\n- Report how many percent higher the sunny average is than the cloudy average.\n\nStandard choice for the open question \"percent higher than cloudy\":\n    pct = (mean_sunny - mean_cloudy) / mean_cloudy * 100\ni.e. the cloudy mean is the baseline (reference) for the percentage.\n\"\"\"\n\nimport json\n\nimport pandas as pd\n\nINPUT_PATH = \"data/ice_cream.csv\"\nOUTPUT_PATH = \"reimplementation_result.json\"\n\n# Load the shop's daily sales records\ndf = pd.read_csv(INPUT_PATH)\n\n# Normalize the weather labels defensively (strip whitespace, lowercase)\ndf[\"weather\"] = df[\"weather\"].astype(str).str.strip().str.lower()\n\n# Average cups sold on sunny days and on cloudy days\nmean_sunny = df.loc[df[\"weather\"] == \"sunny\", \"cups_sold\"].mean()\nmean_cloudy = df.loc[df[\"weather\"] == \"cloudy\", \"cups_sold\"].mean()\n\n# Percent higher: sunny average relative to the cloudy average\npct_higher = (mean_sunny - mean_cloudy) / mean_cloudy * 100.0\n\nwith open(OUTPUT_PATH, \"w\") as f:\n    json.dump({\"value\": pct_higher}, f)",
+    "script_hash": "fd5dbf55dc07650342adeb269967d9ff6252c3b8750b664fab3afa4db08da6b5"
+  }
+}

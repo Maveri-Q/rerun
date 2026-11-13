@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "note": "Extra evidence. It does not settle the market: only the normal rerun does. The re-implementation is experimental, and a difference does not mean the paper is wrong.",
+  "robustness": {
+    "status": "sensitive",
+    "seed_had_effect": true,
+    "measured": "0.93",
+    "runs": [
+      {
+        "kind": "seed",
+        "label": "Seed shifted by 1",
+        "value": "0.93"
+      },
+      {
+        "kind": "seed",
+        "label": "Seed shifted by 2",
+        "value": "0.895"
+      },
+      {
+        "kind": "seed",
+        "label": "Seed shifted by 3",
+        "value": "0.885"
+      },
+      {
+        "kind": "resample",
+        "label": "Resampled data 1",
+        "value": "0.88"
+      },
+      {
+        "kind": "resample",
+        "label": "Resampled data 2",
+        "value": "0.895"
+      }
+    ]
+  },
+  "reimplementation": {
+    "status": "agrees",
+    "model": "z-ai/glm-5.3-flash",
+    "methods_hash": "7091ebe6da8505056ea988040728dd60d63a7eb4b0338f66ad804b16843ca79a",
+    "value": "0.93",
+    "attempts": 1,
+    "script": "# Reimplementation of the described analysis:\n# - Logistic regression (scikit-learn defaults, max_iter=1000) predicting\n#   binary `response` from age, dose, biomarker.\n# - 25% of rows held out at random via train_test_split(random_state=42),\n#   model fitted on the remaining 75%.\n# - Metric: classification accuracy on the held-out rows.\n#\n# Standard choices made where the methods leave things open:\n# - Features are used in the order listed in the methods (age, dose, biomarker).\n# - train_test_split's default shuffle=True is used (split is \"at random\").\n# - Accuracy computed with sklearn.metrics.accuracy_score on the held-out rows.\n\nimport json\nimport os\n\nimport pandas as pd\nfrom sklearn.linear_model import LogisticRegression\nfrom sklearn.metrics import accuracy_score\nfrom sklearn.model_selection import train_test_split\n\nDATA_PATH = os.path.join(\"/work/repo\", \"data\", \"trials.csv\")\n\n# Load data\ndf = pd.read_csv(DATA_PATH)\n\nfeature_cols = [\"age\", \"dose\", \"biomarker\"]\ntarget_col = \"response\"\n\nX = df[feature_cols]\ny = df[target_col]\n\n# Hold out 25% of rows at random, seed 42\nX_train, X_test, y_train, y_test = train_test_split(\n    X, y, test_size=0.25, random_state=42\n)\n\n# Logistic regression with default settings, up to 1000 iterations\nmodel = LogisticRegression(max_iter=1000)\nmodel.fit(X_train, y_train)\n\n# Accuracy on the held-out rows\ny_pred = model.predict(X_test)\naccuracy = accuracy_score(y_test, y_pred)\n\nwith open(\"reimplementation_result.json\", \"w\") as f:\n    json.dump({\"value\": float(accuracy)}, f)",
+    "script_hash": "d6fc3e89e3dd4c78970c6020958fe90493d59cd4f9378eda53ddd5f52b5de7b3"
+  }
+}

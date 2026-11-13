@@ -1,0 +1,5 @@
+AI-written report (z-ai/glm-5.3-flash). The outcome was decided by deterministic code, not by this text.
+
+This was a demonstration using made-up practice data, not real research. A short script compared how much ice cream a pretend shop sold on sunny versus cloudy days. The lab's rerun matched within tolerance: the claim reported a 20% increase on sunny days, and the rerun measured about 21.1%, inside the allowed difference of 2. The run took about one second. No environment patches or repair attempts were needed. An independent reimplementation by the AI got essentially the same measured value and agrees with the claim. One caveat: across five extra runs the result shifted by more than the 2-point tolerance, so the outcome was sensitive to how the data varied between runs. Reproduced here does not mean the underlying relationship is scientifically true.
+
+Evidence file sha256: 3a78402d65e4eee6a321298f47ee66ac333f9a05b1f946276d3a619ed2317307

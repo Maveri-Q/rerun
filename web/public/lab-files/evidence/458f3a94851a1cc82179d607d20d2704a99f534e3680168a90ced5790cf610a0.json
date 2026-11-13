@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "note": "Extra evidence. It does not settle the market: only the normal rerun does. The re-implementation is experimental, and a difference does not mean the paper is wrong.",
+  "robustness": {
+    "status": "sensitive",
+    "seed_had_effect": false,
+    "measured": "21.05564712504313",
+    "runs": [
+      {
+        "kind": "seed",
+        "label": "Seed shifted by 1",
+        "value": "21.05564712504313"
+      },
+      {
+        "kind": "seed",
+        "label": "Seed shifted by 2",
+        "value": "21.05564712504313"
+      },
+      {
+        "kind": "seed",
+        "label": "Seed shifted by 3",
+        "value": "21.05564712504313"
+      },
+      {
+        "kind": "resample",
+        "label": "Resampled data 1",
+        "value": "17.67466141461358"
+      },
+      {
+        "kind": "resample",
+        "label": "Resampled data 2",
+        "value": "21.13677020653766"
+      }
+    ]
+  },
+  "reimplementation": {
+    "status": "agrees",
+    "model": "z-ai/glm-5.3-flash",
+    "methods_hash": "6c53c245b093b41c7ed96d596d2873a8498a57fe8ba1be3689d70da3f8bd70f4",
+    "value": "21.05564712504312",
+    "attempts": 1,
+    "script": "\"\"\"\nReimplementation: percentage by which ice cream sales on sunny days exceed\nsales on cloudy days.\n\nMethods (as written):\n  - Data: data/ice_cream.csv (columns: day, weather, cups_sold), a made-up\n    practice dataset of daily cups sold with a sunny/cloudy label.\n  - Take the average cups sold on sunny days and on cloudy days.\n  - Report how many percent higher the sunny average is than the cloudy\n    average.\n\nInterpretation notes (standard choices where the methods left things open):\n  - \"percent higher than the cloudy average\" is computed as the relative\n    difference vs. the cloudy mean, expressed in percent:\n        (mean_sunny - mean_cloudy) / mean_cloudy * 100\n  - Weather labels are matched case-insensitively after stripping whitespace.\n  - Rows whose weather is neither sunny nor cloudy are excluded from both\n    group means.\n\"\"\"\n\nimport json\n\nimport pandas as pd\n\n\ndef main() -> None:\n    # Load the practice data.\n    df = pd.read_csv(\"data/ice_cream.csv\")\n\n    # Normalize labels/numeric column defensively (no change to well-formed data).\n    weather = df[\"weather\"].astype(str).str.strip().str.lower()\n    cups = pd.to_numeric(df[\"cups_sold\"], errors=\"coerce\")\n\n    sunny_mean = cups[weather == \"sunny\"].mean()\n    cloudy_mean = cups[weather == \"cloudy\"].mean()\n\n    # Percent by which the sunny average is higher than the cloudy average.\n    pct_higher = (sunny_mean - cloudy_mean) / cloudy_mean * 100.0\n\n    result = {\"value\": float(pct_higher)}\n\n    with open(\"reimplementation_result.json\", \"w\") as f:\n        json.dump(result, f)\n\n\nif __name__ == \"__main__\":\n    main()",
+    "script_hash": "109ced00b740578edf09e50e084b0948d7f9b30605e84805187b8abf45449dec"
+  }
+}
