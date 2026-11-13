@@ -10,6 +10,25 @@ Other truth markets trust an AI's opinion. We rerun the research and post the re
 
 **Live on NEAR mainnet:** https://rerun-mainnet.vercel.app (real USDC) · **Testnet, free points:** https://rerun-testnet.vercel.app · **Video:** https://x.com/Maveriq_/status/2121174144926847265
 
+
+<table>
+<tr>
+<td width="33%"><a href="https://rerun-mainnet.vercel.app"><img src="docs/screenshots/home.jpg" alt="RERUN home page: Will this research hold up?"></a><br><sub>Claims, live on mainnet</sub></td>
+<td width="33%"><a href="https://rerun-mainnet.vercel.app/market/5"><img src="docs/screenshots/claim.jpg" alt="A claim page with the forecast odds and the verdict"></a><br><sub>A claim: forecasts, then the verdict</sub></td>
+<td width="33%"><a href="https://rerun-mainnet.vercel.app/receipt/5/0"><img src="docs/screenshots/receipt.jpg" alt="A receipt: the paper said 0.275, the Lab got 0.2748, numbers check out"></a><br><sub>The receipt on NEAR</sub></td>
+</tr>
+</table>
+
+## Try it in 2 minutes
+
+No setup and nothing to pay:
+
+- **See a verdict, no wallet:** open [claim 5 on mainnet](https://rerun-mainnet.vercel.app/market/5), then its [receipt](https://rerun-mainnet.vercel.app/receipt/5/0). Your browser re-checks the receipt against what's stored on NEAR.
+- **Forecast for free:** on [the testnet site](https://rerun-testnet.vercel.app), connect a testnet wallet (Meteor or Intear make a free testnet account), claim your free points, and forecast YES or NO on an open claim. There's no gas to pay: our relayer submits it.
+- **Watch the whole cycle:** on [Try it now](https://rerun-testnet.vercel.app/try), open a demo claim with made-up data, forecast on it, and watch the Lab retrace it live a few minutes later.
+- **Check a paper's statistics, no wallet:** [Check a paper](https://rerun-testnet.vercel.app/check) → **Try an example**.
+- **From a terminal, no wallet or keys:** with Node ≥ 22.22.2 and pnpm 12, run `pnpm install`, then `pnpm judge-demo`. It makes a throwaway testnet account, claims points, forecasts, re-checks a finished receipt, and tries to cheat, printing PASS or BLOCKED for each.
+
 ## What the Lab found
 
 Published results, rerun from public code and data. The forecast price never changes a verdict: plain code compares the Lab's number with the paper's, within a margin fixed before anyone forecast.
