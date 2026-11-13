@@ -8,7 +8,7 @@
 
 Other truth markets trust an AI's opinion. We rerun the research and post the receipt.
 
-**Live on NEAR mainnet:** https://rerun-mainnet.vercel.app (real USDC) · **Testnet, free points:** https://rerun-testnet.vercel.app · **Video:** _link coming_
+**Live on NEAR mainnet:** https://rerun-mainnet.vercel.app (real USDC) · **Testnet, free points:** https://rerun-testnet.vercel.app · **Video:** https://x.com/Maveriq_/status/2121174144926847265
 
 ## What the Lab found
 
