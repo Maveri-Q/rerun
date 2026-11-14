@@ -1,7 +1,7 @@
 {
-  "lastScanAt": "2026-11-14T13:33:39.840Z",
+  "lastScanAt": "2026-11-14T22:26:12.006Z",
   "draftsByDay": {
-    "2026-11-14": 2
+    "2026-11-14": 4
   },
   "candidates": {
     "rescience:10.5281_zenodo.20613595": {
@@ -1102,9 +1102,9 @@
       "needsDataCheck": true,
       "status": "retry",
       "reasons": [
-        "Passed the checks, and waiting for the AI budget."
+        "The AI draft failed: NEARAI_CLOUD_API_KEY is not set (or use MOCK_LLM=1)"
       ],
-      "checkedAt": "2026-11-14T13:33:39.840Z",
+      "checkedAt": "2026-11-14T22:26:12.006Z",
       "license": "Apache-2.0",
       "runtime": "python3.11"
     },
@@ -1175,7 +1175,7 @@
       "reasons": [
         "Passed the checks, and waiting for the AI budget."
       ],
-      "checkedAt": "2026-11-14T13:33:39.840Z",
+      "checkedAt": "2026-11-14T22:26:12.006Z",
       "license": "CC0-1.0",
       "runtime": "r4.4"
     },
@@ -1193,7 +1193,7 @@
       "reasons": [
         "Passed the checks, and waiting for the AI budget."
       ],
-      "checkedAt": "2026-11-14T13:33:39.840Z",
+      "checkedAt": "2026-11-14T22:26:12.006Z",
       "license": "Apache-2.0",
       "runtime": "python3.11"
     },
@@ -1245,9 +1245,9 @@
       "needsDataCheck": true,
       "status": "retry",
       "reasons": [
-        "Passed the checks, and waiting for the AI budget."
+        "The AI draft failed: NEARAI_CLOUD_API_KEY is not set (or use MOCK_LLM=1)"
       ],
-      "checkedAt": "2026-11-14T13:33:39.840Z",
+      "checkedAt": "2026-11-14T22:26:12.006Z",
       "license": "MIT",
       "runtime": "python3.11"
     },
@@ -1281,9 +1281,9 @@
       "needsDataCheck": true,
       "status": "retry",
       "reasons": [
-        "The AI draft failed: NEARAI_CLOUD_API_KEY is not set (or use MOCK_LLM=1)"
+        "Passed the checks, and waiting for the AI budget."
       ],
-      "checkedAt": "2026-11-14T13:33:39.840Z",
+      "checkedAt": "2026-11-14T22:26:12.006Z",
       "license": "MIT",
       "runtime": "python3.11"
     },
@@ -1384,15 +1384,15 @@
       "title": "SO-Arena: Benchmarking the Capability Spectrum and Reliability of System One Models",
       "paperUrl": "https://arxiv.org/abs/2611.15777",
       "doi": "10.48550/arXiv.2611.15777",
-      "upvotes": 84,
+      "upvotes": 134,
       "abstract": "System One models promise fast, general-purpose decision-making without lengthy token generation. However, understanding their capability spectrum and decision reliability requires more than aggregate performance on current benchmarks. Existing evaluations often provide limited insight into the breadth of model capabilities and the reliability of their decisions. We introduce SO-Arena, a benchmark characterizing the capability spectrum and decision reliability of System One models across 11 domains and five capability families. For the capability spectrum, SO-Arena offers evidence-grounded evaluation through reliable sources and manual verification of reference labels against model-visible inputs; fine-grained capability assessment through domain-specific difficulty criteria; and realistic interactive evaluation, where models iteratively execute actions in sandboxes. Reasoning-intensive tasks further enable system one-two comparison. Beyond accuracy, SO-Arena assesses decision reliability through two complementary measures: decision stability under controlled option-set changes and missing-answer recognition when no valid option is available. Evaluations across 21 models reveal that the benefits of scaling and additional reasoning vary substantially across domains. More importantly, strong overall performance does not necessarily imply reliable decision-making: the best-performing System One model ranks only seventh in reliability. Together, these findings highlight the need to characterize capability spectrum and decision reliability as complementary dimensions, providing a systematic view of the strengths and limitations of System One models.",
       "repoUrl": "https://github.com/holdrain/SO-Arena",
       "needsDataCheck": true,
       "status": "retry",
       "reasons": [
-        "The AI draft failed: NEARAI_CLOUD_API_KEY is not set (or use MOCK_LLM=1)"
+        "Passed the checks, and waiting for the AI budget."
       ],
-      "checkedAt": "2026-11-14T13:33:39.840Z",
+      "checkedAt": "2026-11-14T22:26:12.006Z",
       "license": "MIT",
       "runtime": "python3.11"
     },
@@ -1431,6 +1431,42 @@
       ],
       "checkedAt": "2026-11-14T13:33:39.840Z",
       "license": "MIT",
+      "runtime": "python3.11"
+    },
+    "arxiv:2611.15131": {
+      "id": "arxiv:2611.15131",
+      "source": "Hugging Face Papers",
+      "title": "Duo: A Reciprocal World Model for Full-Duplex Interaction",
+      "paperUrl": "https://arxiv.org/abs/2611.15131",
+      "doi": "10.48550/arXiv.2611.15131",
+      "upvotes": 40,
+      "abstract": "In this report, we introduce the Reciprocal World Model (RWM) and present Duo v1, a full-duplex world model that continuously perceives audiovisual inputs while responding to users in real time. The RWM treats intelligence and physical reality as equally fundamental to what constitutes a world. Existing world models largely focus on simulating the latter, leaving reasoning and decision-making as external controls rather than intrinsic parts of the world itself. In RWM, we identify two equally fundamental capabilities: Intent, which provides the cognition underlying world interactions, and Realization, which generates coherent audio-visual behavior. To realize this formulation, Duo v1 introduces three key technical designs: (1) Leveraging autoregressive modeling for continuous interaction reasoning and participation decisions, rather than restricting it to instruction understanding for diffusion models. (2) Constructing chunk-specific conditions and synchronize tokens across Intent and Realization on a unified timeline. Module-specific attention masks enforce causal dependencies both within and across chunks, preventing access to future inputs. (3) Mitigating distribution shift in both modules through dual rollout distillation, training on autoregressively generated Intent tokens and synthesized audiovisual histories from Realization. Both modules continuously perceive real-time audio, video, and text, enabling full-duplex interaction with spontaneous conversations and interruptions. Beyond conversation, users can share real objects, reshape virtual scenes, guide assistants, or play audiovisual games without mouse or keyboard controls. The release of Duo v1 makes our first step, with the next version coming soon. We look forward to broader exploration of this emerging field.",
+      "repoUrl": "https://github.com/inclusionAI/Duo",
+      "needsDataCheck": true,
+      "status": "retry",
+      "reasons": [
+        "Passed the checks, and waiting for the AI budget."
+      ],
+      "checkedAt": "2026-11-14T22:26:12.006Z",
+      "license": "Apache-2.0",
+      "runtime": "python3.11"
+    },
+    "arxiv:2611.13001": {
+      "id": "arxiv:2611.13001",
+      "source": "Hugging Face Papers",
+      "title": "One Table, Many Queries: Benchmarking Generalist Tabular Models Across Generation, Imputation, and Prediction",
+      "paperUrl": "https://arxiv.org/abs/2611.13001",
+      "doi": "10.48550/arXiv.2611.13001",
+      "upvotes": 39,
+      "abstract": "Generation, imputation, and prediction query different aspects of the same tabular distribution, but are usually evaluated separately. This leaves unclear which capabilities they share, how their training objectives interact, and whether one model can perform all three well. We introduce the One Table Benchmark (), spanning 56 datasets, 46 registered methods, and 20 capability axes under aligned data splits and explicit task contracts. We compare task ranks on aligned support, train five backbones under all seven non-empty objective combinations on five datasets with three seeds, and contrast fixed-model profiles with specialist portfolios. Rank comparisons connect imputation and prediction through numerical recovery and dependence preservation, and link generation to both through predictive utility; distributional fidelity follows different, sometimes opposing, rankings. Objective interventions show the largest pooled gains from including the recipient's own objective. Generation has the broadest coverage of positive pooled auxiliary effects, while prediction shows potential to improve imputation and synthetic-data utility, with responses that vary across backbones. Cross-addition effects reveal that objective benefits need not add and depend on the objectives already present. Fixed-model comparisons expose corresponding utility--fidelity trade-offs: some generalists surpass specialist portfolios on utility, while fidelity continues to favor specialization. Frozen foundation models show strong prediction and numerical point imputation, together with promising synthetic-data utility, highlighting their potential across all three tasks. These findings motivate unified tabular models that share useful conditional information while improving categorical reconstruction and faithful joint sampling.",
+      "repoUrl": "https://github.com/limix-ldm-ai/OTBench",
+      "needsDataCheck": true,
+      "status": "retry",
+      "reasons": [
+        "Passed the checks, and waiting for the AI budget."
+      ],
+      "checkedAt": "2026-11-14T22:26:12.006Z",
+      "license": "Apache-2.0",
       "runtime": "python3.11"
     }
   }
