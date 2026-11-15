@@ -1,7 +1,7 @@
 {
-  "lastScanAt": "2026-11-14T22:26:12.006Z",
+  "lastScanAt": "2026-11-15T13:57:29.786Z",
   "draftsByDay": {
-    "2026-11-14": 4
+    "2026-11-15": 2
   },
   "candidates": {
     "rescience:10.5281_zenodo.20613595": {
@@ -1102,9 +1102,9 @@
       "needsDataCheck": true,
       "status": "retry",
       "reasons": [
-        "The AI draft failed: NEARAI_CLOUD_API_KEY is not set (or use MOCK_LLM=1)"
+        "Passed the checks, and waiting for the AI budget."
       ],
-      "checkedAt": "2026-11-14T22:26:12.006Z",
+      "checkedAt": "2026-11-15T13:57:29.786Z",
       "license": "Apache-2.0",
       "runtime": "python3.11"
     },
@@ -1175,7 +1175,7 @@
       "reasons": [
         "Passed the checks, and waiting for the AI budget."
       ],
-      "checkedAt": "2026-11-14T22:26:12.006Z",
+      "checkedAt": "2026-11-15T13:57:29.786Z",
       "license": "CC0-1.0",
       "runtime": "r4.4"
     },
@@ -1193,7 +1193,7 @@
       "reasons": [
         "Passed the checks, and waiting for the AI budget."
       ],
-      "checkedAt": "2026-11-14T22:26:12.006Z",
+      "checkedAt": "2026-11-15T13:57:29.786Z",
       "license": "Apache-2.0",
       "runtime": "python3.11"
     },
@@ -1281,9 +1281,9 @@
       "needsDataCheck": true,
       "status": "retry",
       "reasons": [
-        "Passed the checks, and waiting for the AI budget."
+        "The AI draft failed: NEARAI_CLOUD_API_KEY is not set (or use MOCK_LLM=1)"
       ],
-      "checkedAt": "2026-11-14T22:26:12.006Z",
+      "checkedAt": "2026-11-15T13:57:29.786Z",
       "license": "MIT",
       "runtime": "python3.11"
     },
@@ -1384,15 +1384,15 @@
       "title": "SO-Arena: Benchmarking the Capability Spectrum and Reliability of System One Models",
       "paperUrl": "https://arxiv.org/abs/2611.15777",
       "doi": "10.48550/arXiv.2611.15777",
-      "upvotes": 134,
+      "upvotes": 136,
       "abstract": "System One models promise fast, general-purpose decision-making without lengthy token generation. However, understanding their capability spectrum and decision reliability requires more than aggregate performance on current benchmarks. Existing evaluations often provide limited insight into the breadth of model capabilities and the reliability of their decisions. We introduce SO-Arena, a benchmark characterizing the capability spectrum and decision reliability of System One models across 11 domains and five capability families. For the capability spectrum, SO-Arena offers evidence-grounded evaluation through reliable sources and manual verification of reference labels against model-visible inputs; fine-grained capability assessment through domain-specific difficulty criteria; and realistic interactive evaluation, where models iteratively execute actions in sandboxes. Reasoning-intensive tasks further enable system one-two comparison. Beyond accuracy, SO-Arena assesses decision reliability through two complementary measures: decision stability under controlled option-set changes and missing-answer recognition when no valid option is available. Evaluations across 21 models reveal that the benefits of scaling and additional reasoning vary substantially across domains. More importantly, strong overall performance does not necessarily imply reliable decision-making: the best-performing System One model ranks only seventh in reliability. Together, these findings highlight the need to characterize capability spectrum and decision reliability as complementary dimensions, providing a systematic view of the strengths and limitations of System One models.",
       "repoUrl": "https://github.com/holdrain/SO-Arena",
       "needsDataCheck": true,
       "status": "retry",
       "reasons": [
-        "Passed the checks, and waiting for the AI budget."
+        "The AI draft failed: NEARAI_CLOUD_API_KEY is not set (or use MOCK_LLM=1)"
       ],
-      "checkedAt": "2026-11-14T22:26:12.006Z",
+      "checkedAt": "2026-11-15T13:57:29.786Z",
       "license": "MIT",
       "runtime": "python3.11"
     },
@@ -1447,7 +1447,7 @@
       "reasons": [
         "Passed the checks, and waiting for the AI budget."
       ],
-      "checkedAt": "2026-11-14T22:26:12.006Z",
+      "checkedAt": "2026-11-15T13:57:29.786Z",
       "license": "Apache-2.0",
       "runtime": "python3.11"
     },
@@ -1457,7 +1457,7 @@
       "title": "One Table, Many Queries: Benchmarking Generalist Tabular Models Across Generation, Imputation, and Prediction",
       "paperUrl": "https://arxiv.org/abs/2611.13001",
       "doi": "10.48550/arXiv.2611.13001",
-      "upvotes": 39,
+      "upvotes": 40,
       "abstract": "Generation, imputation, and prediction query different aspects of the same tabular distribution, but are usually evaluated separately. This leaves unclear which capabilities they share, how their training objectives interact, and whether one model can perform all three well. We introduce the One Table Benchmark (), spanning 56 datasets, 46 registered methods, and 20 capability axes under aligned data splits and explicit task contracts. We compare task ranks on aligned support, train five backbones under all seven non-empty objective combinations on five datasets with three seeds, and contrast fixed-model profiles with specialist portfolios. Rank comparisons connect imputation and prediction through numerical recovery and dependence preservation, and link generation to both through predictive utility; distributional fidelity follows different, sometimes opposing, rankings. Objective interventions show the largest pooled gains from including the recipient's own objective. Generation has the broadest coverage of positive pooled auxiliary effects, while prediction shows potential to improve imputation and synthetic-data utility, with responses that vary across backbones. Cross-addition effects reveal that objective benefits need not add and depend on the objectives already present. Fixed-model comparisons expose corresponding utility--fidelity trade-offs: some generalists surpass specialist portfolios on utility, while fidelity continues to favor specialization. Frozen foundation models show strong prediction and numerical point imputation, together with promising synthetic-data utility, highlighting their potential across all three tasks. These findings motivate unified tabular models that share useful conditional information while improving categorical reconstruction and faithful joint sampling.",
       "repoUrl": "https://github.com/limix-ldm-ai/OTBench",
       "needsDataCheck": true,
@@ -1465,9 +1465,26 @@
       "reasons": [
         "Passed the checks, and waiting for the AI budget."
       ],
-      "checkedAt": "2026-11-14T22:26:12.006Z",
+      "checkedAt": "2026-11-15T13:57:29.786Z",
       "license": "Apache-2.0",
       "runtime": "python3.11"
+    },
+    "everyday:majohnso/JASA-mobile-AQ": {
+      "id": "everyday:majohnso/JASA-mobile-AQ",
+      "source": "Replication code on GitHub",
+      "title": "Fine-Scale Spatiotemporal Air Pollution Analysis Using Mobile Monitors on Google Street View Vehicles",
+      "paperUrl": "https://doi.org/10.1080/01621459.2019.1665526",
+      "doi": "10.1080/01621459.2019.1665526",
+      "repoUrl": "https://github.com/majohnso/JASA-mobile-AQ",
+      "needsDataCheck": true,
+      "upvotes": 28,
+      "status": "retry",
+      "reasons": [
+        "Passed the checks, and waiting for the AI budget."
+      ],
+      "checkedAt": "2026-11-15T13:57:29.786Z",
+      "license": "GPL-3.0",
+      "runtime": "r4.4"
     }
   }
 }
