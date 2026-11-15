@@ -1,0 +1,5 @@
+AI-written report (z-ai/glm-5.3-flash). The outcome was decided by deterministic code, not by this text.
+
+A short program re-ran on the published table listing each team's answer from Silberzahn and colleagues' 2018 project, in which 29 teams analysed the same football data on referees and dark-skinned players' red cards. It computed the median odds ratio across the 29 answers and compared it with the reported 1.31. The measured median was also 1.31, within the 0.01 tolerance, so the outcome is REPRODUCED. No environment patches or repair attempts were needed. The run took one second, and three extra runs stayed within 0.01. This checks the published numbers only; it does not redo the 29 analyses or judge whether referees truly give more red cards.
+
+Evidence file sha256: 7c69683fb1f909c6bdd04fbfdea2582247dadd724f0df66053ba64caf6925195
